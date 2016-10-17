@@ -19,7 +19,9 @@ namespace ManagementApp
         private int clientNodesNumber;
         private int networkNodesNumber;
         private ContainerElement nodeFrom;
+	private bool isDrawing = false;
         private Point domainFrom;
+        private Graphics myGraphics;
 
         public MainWindow()
         {
@@ -29,12 +31,12 @@ namespace ManagementApp
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.Hand;
+            this.Cursor = Cursors.Cross;
             nType = NodeType.CLIENT_NODE;
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.Hand;
+            this.Cursor = Cursors.Cross;
             nType = NodeType.NETWORK_NODE;
         }
 
@@ -136,21 +138,27 @@ namespace ManagementApp
             int x = e.X;
             int y = e.Y;
             putToGrid(ref x, ref y);
-            if(nType==NodeType.CONNECTION)
+            if (nType == NodeType.CONNECTION)
+            {
                 nodeFrom = getNodeFrom(x, y);
+                isDrawing = true;
+            }
             if (nType == NodeType.DOMAIN)
                 domainFrom = new Point(x, y);
+           
         }
 
         private void container_MouseUp(object sender, MouseEventArgs e)
         {
+
             int x = e.X;
             int y = e.Y;
+            isDrawing = false;
             putToGrid(ref x, ref y);
             if (nType == NodeType.CONNECTION && nodeFrom != null)
             {
                 ContainerElement nodeTo = getNodeFrom(x, y);
-                if (nodeTo != null)
+                if(nodeTo != null)
                     bind(nodeFrom, nodeTo);
             }
             if(nType == NodeType.DOMAIN && domainFrom != null)
@@ -191,9 +199,21 @@ namespace ManagementApp
                     containerPoints.SetPixel(x, y, Color.Black);
                 }
             }
+            myGraphics = container.CreateGraphics();
         }
 
-       
+        private void container_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (isDrawing && nodeFrom != null)
+            {
+                container.Refresh();
+                Pen blackPen = new Pen(Color.Black, 3);
+                Point s = new Point(nodeFrom.ContainedPoints.ElementAt(0).X, nodeFrom.ContainedPoints.ElementAt(0).Y);
+                Point p = new Point(e.X, e.Y);
+                myGraphics.DrawLine(blackPen, s, p);
+                System.Threading.Thread.Sleep(10);
+            }
+        }
     }
 
     enum NodeType
