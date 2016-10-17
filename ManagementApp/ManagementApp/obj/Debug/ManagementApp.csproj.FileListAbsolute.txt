@@ -1,0 +1,12 @@
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe.config
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\bin\Debug\ManagementApp.pdb
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csprojResolveAssemblyReference.cache
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\obj\Debug\ManagementApp.MainWindow.resources
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\obj\Debug\ManagementApp.Properties.Resources.resources
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\obj\Debug\ManagementApp.exe
+C:\Users\Grzegorz\Documents\GitHub\EventHandler\ManagementApp\ManagementApp\obj\Debug\ManagementApp.pdb
+C:\Users\Grzegorz\Desktop\TSST\Projekt\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe.config
+C:\Users\Grzegorz\Desktop\TSST\Projekt\ManagementApp\ManagementApp\obj\Debug\ManagementApp.exe
+C:\Users\Grzegorz\Desktop\TSST\Projekt\ManagementApp\ManagementApp\obj\Debug\ManagementApp.pdb
