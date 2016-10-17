@@ -145,6 +145,20 @@ namespace ManagementApp
                 nType = NodeType.NOTHING;
             }
         }
+
+        private void MainWindow_Load(object sender, EventArgs e)
+        {
+            containerPoints = new Bitmap(this.container.ClientSize.Width, this.container.ClientSize.Height);
+            for (int x = 0; x < container.ClientSize.Width;
+                x += GAP)
+            {
+                for (int y = 0; y < container.ClientSize.Height;
+                    y += GAP)
+                {
+                    containerPoints.SetPixel(x, y, Color.Black);
+                }
+            }
+        }
     }
 
     enum NodeType
