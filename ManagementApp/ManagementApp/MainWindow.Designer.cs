@@ -46,11 +46,11 @@ namespace ManagementApp
             this.containerPictureBox.Size = new System.Drawing.Size(593, 520);
             this.containerPictureBox.TabIndex = 0;
             this.containerPictureBox.TabStop = false;
-            this.containerPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.container_Paint_1);
-            this.containerPictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.container_MouseClick);
-            this.containerPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.container_MouseDown);
-            this.containerPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.container_MouseMove);
-            this.containerPictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.container_MouseUp);
+            this.containerPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.containerPictureBox_Paint);
+            this.containerPictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseClick);
+            this.containerPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseDown);
+            this.containerPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseMove);
+            this.containerPictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseUp);
             // 
             // clientNodeBtn
             // 

@@ -12,12 +12,17 @@ namespace ManagementApp
 {
     public partial class MainWindow : Form
     {
-        private NodeType nType;
+        // CONSTS
         private const int GAP = 10;
-        private Bitmap containerPoints;
+
+        // LOGICAL VARS
+        private NodeType nType;
         private List<ContainerElement> elements = new List<ContainerElement>();
         private int clientNodesNumber;
         private int networkNodesNumber;
+
+        // PAINTING VARS
+        private Bitmap containerPoints;
         private ContainerElement nodeFrom;
         private ContainerElement nodeFromTo;
         private bool isDrawing = false;
@@ -30,46 +35,28 @@ namespace ManagementApp
             clientNodesNumber = 0;
             networkNodesNumber = 0;
         }
-       
 
-
-        private void putToGrid(ref int x, ref int y)
+        // MAIN WINDOW ACTIONS
+        private void MainWindow_Load(object sender, EventArgs e)
         {
-            x = GAP * (int)Math.Round((double)x / GAP);
-            y = GAP * (int)Math.Round((double)y / GAP);
-        }
-
-        private void container_MouseClick(object sender, MouseEventArgs e)
-        {
-            int x = e.X;
-            int y = e.Y;
-            putToGrid(ref x, ref y);
-            switch (nType)
+            containerPoints = new Bitmap(containerPictureBox.ClientSize.Width, containerPictureBox.ClientSize.Height);
+            for (int x = 0; x < containerPictureBox.ClientSize.Width;
+                x += GAP)
             {
-                case NodeType.CLIENT_NODE:
-                    elements.Add(new ClientNode(x, y, "CN" + clientNodesNumber++));
-                    consoleTextBox.AppendText("Client Node added at: " + x + "," + y);
-                    consoleTextBox.AppendText(Environment.NewLine);
-                    break;
-                case NodeType.NETWORK_NODE:
-                    elements.Add(new NetNode(x, y, "NN" + networkNodesNumber++));
-                    consoleTextBox.AppendText("Network Node added at: " + x + "," + y);
-                    consoleTextBox.AppendText(Environment.NewLine);
-                    break;
+                for (int y = 0; y < containerPictureBox.ClientSize.Height;
+                    y += GAP)
+                {
+                    containerPoints.SetPixel(x, y, Color.Black);
+                }
             }
-            containerPictureBox.Refresh();
+            myGraphics = containerPictureBox.CreateGraphics();
         }
 
-        private ContainerElement getNodeFrom(int x, int y)
-        {
-            return elements.Where(i => i.ContainedPoints.ElementAtOrDefault(0).X == x &&
-               i.ContainedPoints.ElementAtOrDefault(0).Y == y).FirstOrDefault(); 
-        }
-
-        private void container_Paint_1(object sender, PaintEventArgs e)
+        // CONTAINER ACTIONS
+        private void containerPictureBox_Paint(object sender, PaintEventArgs e)
         {
             Graphics panel = e.Graphics;
-   
+
             Rectangle rect;
             foreach (var elem in elements.AsParallel().Where(i => i is NetNode))
             {
@@ -91,13 +78,11 @@ namespace ManagementApp
             }
             foreach (var elem in elements.AsParallel().Where(i => i is NodeConnection))
             {
-                // Create pen.
                 Pen blackPen = new Pen(Color.Black, 2);
-                // Draw line to screen.
                 Point from = elem.ContainedPoints.ElementAt(0);
                 Point to = elem.ContainedPoints.ElementAt(1);
                 panel.DrawLine(blackPen, from, to);
-                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point((from.X + to.X)/2 + 3,
+                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point((from.X + to.X) / 2 + 3,
                    (from.Y + to.Y) / 2 + 3));
             }
             foreach (var elem in elements.AsParallel().Where(i => i is Domain))
@@ -105,15 +90,31 @@ namespace ManagementApp
                 Domain tmp = (Domain)elem;
                 Point from = tmp.PointFrom;
                 rect = new Rectangle(from.X, from.Y, tmp.Width, tmp.Height);
-                panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3),rect);
+                panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
             }
-
-
-
-                containerPictureBox.BackgroundImage = containerPoints;
+            containerPictureBox.BackgroundImage = containerPoints;
         }
-
-        private void container_MouseDown(object sender, MouseEventArgs e)
+        private void containerPictureBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            int x = e.X;
+            int y = e.Y;
+            putToGrid(ref x, ref y);
+            switch (nType)
+            {
+                case NodeType.CLIENT_NODE:
+                    elements.Add(new ClientNode(x, y, "CN" + clientNodesNumber++));
+                    consoleTextBox.AppendText("Client Node added at: " + x + "," + y);
+                    consoleTextBox.AppendText(Environment.NewLine);
+                    break;
+                case NodeType.NETWORK_NODE:
+                    elements.Add(new NetNode(x, y, "NN" + networkNodesNumber++));
+                    consoleTextBox.AppendText("Network Node added at: " + x + "," + y);
+                    consoleTextBox.AppendText(Environment.NewLine);
+                    break;
+            }
+            containerPictureBox.Refresh();
+        }
+        private void containerPictureBox_MouseDown(object sender, MouseEventArgs e)
         {
             int x = e.X;
             int y = e.Y;
@@ -127,10 +128,9 @@ namespace ManagementApp
             {
                 domainFrom = new Point(x, y);
                 isDrawing = true;
-            }             
+            }
         }
-
-        private void container_MouseUp(object sender, MouseEventArgs e)
+        private void containerPictureBox_MouseUp(object sender, MouseEventArgs e)
         {
 
             int x = e.X;
@@ -140,19 +140,19 @@ namespace ManagementApp
             if (nType == NodeType.CONNECTION && nodeFrom != null)
             {
                 ContainerElement nodeTo = getNodeFrom(x, y);
-                if(nodeTo != null)
+                if (nodeTo != null)
                     bind(nodeFrom, nodeTo);
-                else if(nodeFromTo != null)
+                else if (nodeFromTo != null)
                     bind(nodeFrom, nodeFromTo);
             }
-            if(nType == NodeType.DOMAIN && domainFrom != null && domainFrom.X < x && domainFrom.Y < y)
+            if (nType == NodeType.DOMAIN && domainFrom != null && domainFrom.X < x && domainFrom.Y < y)
             {
                 Point domainTo = new Point(x, y);
                 Domain toAdd = new Domain(domainFrom, domainTo);
                 bool add = true;
-                foreach(Domain d in elements.AsParallel().Where(i => i is Domain))
+                foreach (Domain d in elements.AsParallel().Where(i => i is Domain))
                 {
-                    if(toAdd.crossingOtherDomain(d))
+                    if (toAdd.crossingOtherDomain(d))
                     {
                         add = false;
                         break;
@@ -172,30 +172,7 @@ namespace ManagementApp
             }
             containerPictureBox.Refresh();
         }
-
-        private void bind(ContainerElement nodeFrom, ContainerElement nodeTo)
-        {
-            elements.Add(new NodeConnection(nodeFrom, nodeTo,nodeFrom.Name + "-" + nodeTo.Name));
-            consoleTextBox.AppendText("Connection  added");
-            consoleTextBox.AppendText(Environment.NewLine);
-        }
-
-        private void MainWindow_Load(object sender, EventArgs e)
-        {
-            containerPoints = new Bitmap(containerPictureBox.ClientSize.Width, containerPictureBox.ClientSize.Height);
-            for (int x = 0; x < containerPictureBox.ClientSize.Width;
-                x += GAP)
-            {
-                for (int y = 0; y < containerPictureBox.ClientSize.Height;
-                    y += GAP)
-                {
-                    containerPoints.SetPixel(x, y, Color.Black);
-                }
-            }
-            myGraphics = containerPictureBox.CreateGraphics();
-        }
-
-        private void container_MouseMove(object sender, MouseEventArgs e)
+        private void containerPictureBox_MouseMove(object sender, MouseEventArgs e)
         {
             if (isDrawing && nodeFrom != null && nType == NodeType.CONNECTION)
             {
@@ -245,7 +222,8 @@ namespace ManagementApp
                     myGraphics.DrawLine(blackPen, s, end);
                 }
                 System.Threading.Thread.Sleep(10);
-            } else if (isDrawing && nType == NodeType.DOMAIN)
+            }
+            else if (isDrawing && nType == NodeType.DOMAIN)
             {
                 containerPictureBox.Refresh();
                 Pen pr = new Pen(Color.PaleVioletRed, 3);
@@ -253,6 +231,28 @@ namespace ManagementApp
                 System.Threading.Thread.Sleep(10);
             }
         }
+
+
+        // Returns x,y to closest grid point
+        private void putToGrid(ref int x, ref int y)
+        {
+            x = GAP * (int)Math.Round((double)x / GAP);
+            y = GAP * (int)Math.Round((double)y / GAP);
+        }
+        // Returns ContainterElement associated with given x,y
+        private ContainerElement getNodeFrom(int x, int y)
+        {
+            return elements.Where(i => i.ContainedPoints.ElementAtOrDefault(0).X == x &&
+               i.ContainedPoints.ElementAtOrDefault(0).Y == y).FirstOrDefault(); 
+        }
+        // Binding from  Node A to Node B with NodeConnection
+        private void bind(ContainerElement nodeFrom, ContainerElement nodeTo)
+        {
+            elements.Add(new NodeConnection(nodeFrom, nodeTo,nodeFrom.Name + "-" + nodeTo.Name));
+            consoleTextBox.AppendText("Connection  added");
+            consoleTextBox.AppendText(Environment.NewLine);
+        }
+
 
         private void clientNodeBtn_Click(object sender, EventArgs e)
         {
