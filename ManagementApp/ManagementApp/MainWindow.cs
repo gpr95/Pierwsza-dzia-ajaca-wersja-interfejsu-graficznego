@@ -24,7 +24,7 @@ namespace ManagementApp
         // PAINTING VARS
         private Bitmap containerPoints;
         private ContainerElement nodeFrom;
-        private ContainerElement nodeFromTo;
+        private ContainerElement virtualNodeTo;
         private bool isDrawing = false;
         private Point domainFrom;
         private Graphics myGraphics;
@@ -132,43 +132,23 @@ namespace ManagementApp
         }
         private void containerPictureBox_MouseUp(object sender, MouseEventArgs e)
         {
-
             int x = e.X;
             int y = e.Y;
-            isDrawing = false;
             putToGrid(ref x, ref y);
+            isDrawing = false;
             if (nType == NodeType.CONNECTION && nodeFrom != null)
             {
                 ContainerElement nodeTo = getNodeFrom(x, y);
                 if (nodeTo != null)
                     bind(nodeFrom, nodeTo);
-                else if (nodeFromTo != null)
-                    bind(nodeFrom, nodeFromTo);
+                else if (virtualNodeTo != null)
+                    bind(nodeFrom, virtualNodeTo);
             }
             if (nType == NodeType.DOMAIN && domainFrom != null && domainFrom.X < x && domainFrom.Y < y)
             {
                 Point domainTo = new Point(x, y);
                 Domain toAdd = new Domain(domainFrom, domainTo);
-                bool add = true;
-                foreach (Domain d in elements.AsParallel().Where(i => i is Domain))
-                {
-                    if (toAdd.crossingOtherDomain(d))
-                    {
-                        add = false;
-                        break;
-                    }
-                }
-                if (add)
-                {
-                    elements.Add(new Domain(domainFrom, domainTo));
-                    consoleTextBox.AppendText("Domain added");
-                    consoleTextBox.AppendText(Environment.NewLine);
-                }
-                else
-                {
-                    consoleTextBox.AppendText("Domains can't cross each others.");
-                    consoleTextBox.AppendText(Environment.NewLine);
-                }
+                addDomainToElements(toAdd);
             }
             containerPictureBox.Refresh();
         }
@@ -177,61 +157,75 @@ namespace ManagementApp
             if (isDrawing && nodeFrom != null && nType == NodeType.CONNECTION)
             {
                 containerPictureBox.Refresh();
-                Pen blackPen = new Pen(Color.Black, 3);
-                Point s = new Point(nodeFrom.ContainedPoints.ElementAt(0).X, nodeFrom.ContainedPoints.ElementAt(0).Y);
-                Point p = new Point(e.X, e.Y);
+                Point fromNode = new Point(nodeFrom.ContainedPoints.ElementAt(0).X, nodeFrom.ContainedPoints.ElementAt(0).Y);
+                Point to = new Point(e.X, e.Y);
 
                 double distance = Double.PositiveInfinity;
-                double d = Double.PositiveInfinity;
+                double temporartDistance = Double.PositiveInfinity;
 
-                foreach (var elem in elements.AsParallel().Where(i => i is NetNode))
+                foreach (var elem in elements.AsParallel().Where(i => i is NetNode && i != nodeFrom))
                 {
-                    if (elem != nodeFrom)
+                    temporartDistance = Math.Round(Math.Sqrt(Math.Pow(elem.ContainedPoints.ElementAt(0).X - e.X, 2) + Math.Pow(elem.ContainedPoints.ElementAt(0).Y - e.Y, 2)), 2);
+                    if (temporartDistance < distance)
                     {
-                        if (elem != nodeFrom)
-                        {
-                            d = Math.Round(Math.Sqrt(Math.Pow(elem.ContainedPoints.ElementAt(0).X - e.X, 2) + Math.Pow(elem.ContainedPoints.ElementAt(0).Y - e.Y, 2)), 2);
-                            if (d < distance)
-                            {
-                                distance = d;
-                                nodeFromTo = elem;
-                            }
-                            d = Double.PositiveInfinity;
-                        }
+                        distance = temporartDistance;
+                        virtualNodeTo = elem;
                     }
+                    temporartDistance = Double.PositiveInfinity;
                 }
-                foreach (var elem in elements.AsParallel().Where(i => i is ClientNode))
+                foreach (var elem in elements.AsParallel().Where(i => i is ClientNode && i != nodeFrom))
                 {
-                    if (elem != nodeFrom)
+                    temporartDistance = Math.Round(Math.Sqrt(Math.Pow(elem.ContainedPoints.ElementAt(0).X - e.X, 2) + Math.Pow(elem.ContainedPoints.ElementAt(0).Y - e.Y, 2)), 2);
+                    if (temporartDistance < distance)
                     {
-                        d = Math.Round(Math.Sqrt(Math.Pow(elem.ContainedPoints.ElementAt(0).X - e.X, 2) + Math.Pow(elem.ContainedPoints.ElementAt(0).Y - e.Y, 2)), 2);
-                        if (d < distance)
-                        {
-                            distance = d;
-                            nodeFromTo = elem;
-                        }
-                        d = Double.PositiveInfinity;
+                        distance = temporartDistance;
+                        virtualNodeTo = elem;
                     }
+                    temporartDistance = Double.PositiveInfinity;
                 }
-
+                Pen blackPen = new Pen(Color.Black, 3);
                 if (distance > 100)
-                    myGraphics.DrawLine(blackPen, s, p);
+                    myGraphics.DrawLine(blackPen, fromNode, to);
                 else
                 {
-                    Point end = new Point(nodeFromTo.ContainedPoints.ElementAt(0).X, nodeFromTo.ContainedPoints.ElementAt(0).Y);
-                    myGraphics.DrawLine(blackPen, s, end);
+                    Point end = new Point(virtualNodeTo.ContainedPoints.ElementAt(0).X, virtualNodeTo.ContainedPoints.ElementAt(0).Y);
+                    myGraphics.DrawLine(blackPen, fromNode, end);
                 }
                 System.Threading.Thread.Sleep(10);
             }
             else if (isDrawing && nType == NodeType.DOMAIN)
             {
                 containerPictureBox.Refresh();
-                Pen pr = new Pen(Color.PaleVioletRed, 3);
-                myGraphics.DrawRectangle(pr, domainFrom.X, domainFrom.Y, e.X - domainFrom.X, e.Y - domainFrom.Y);
+                myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), domainFrom.X, 
+                    domainFrom.Y, e.X - domainFrom.X, e.Y - domainFrom.Y);
                 System.Threading.Thread.Sleep(10);
             }
         }
 
+        // Validate adding domain to container
+        private void addDomainToElements(Domain toAdd)
+        {
+            bool add = true;
+            foreach (Domain d in elements.AsParallel().Where(i => i is Domain))
+            {
+                if (toAdd.crossingOtherDomain(d))
+                {
+                    add = false;
+                    break;
+                }
+            }
+            if (add)
+            {
+                elements.Add(toAdd);
+                consoleTextBox.AppendText("Domain added");
+                consoleTextBox.AppendText(Environment.NewLine);
+            }
+            else
+            {
+                consoleTextBox.AppendText("Domains can't cross each others.");
+                consoleTextBox.AppendText(Environment.NewLine);
+            }
+        }
 
         // Returns x,y to closest grid point
         private void putToGrid(ref int x, ref int y)
