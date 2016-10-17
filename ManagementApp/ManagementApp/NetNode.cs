@@ -10,10 +10,11 @@ namespace ManagementApp
 
     class NetNode : ContainerElement
     {
-        public NetNode(int x , int y)
+        public NetNode(int x , int y,String name)
         {
             containedPoints = new List<Point>();
             containedPoints.Add(new Point(x, y));
+            this.name = name;
         }
     }
 }

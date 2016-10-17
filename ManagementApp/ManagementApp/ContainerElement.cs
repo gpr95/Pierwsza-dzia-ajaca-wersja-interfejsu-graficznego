@@ -10,6 +10,7 @@ namespace ManagementApp
     class ContainerElement
     {
         protected List<Point> containedPoints;
+        protected String name;
         public List<Point> ContainedPoints
         {
             get
@@ -20,6 +21,19 @@ namespace ManagementApp
             set
             {
                 containedPoints = value;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+
+            set
+            {
+                name = value;
             }
         }
     }

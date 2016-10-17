@@ -16,11 +16,15 @@ namespace ManagementApp
         private const int GAP = 10;
         private Bitmap containerPoints;
         private List<ContainerElement> elements = new List<ContainerElement>();
+        private int clientNodesNumber;
+        private int networkNodesNumber;
         private ContainerElement nodeFrom;
 
         public MainWindow()
         {
             InitializeComponent();
+            clientNodesNumber = 0;
+            networkNodesNumber = 0;
         }
         private void button1_Click(object sender, EventArgs e)
         {
@@ -54,12 +58,12 @@ namespace ManagementApp
             switch (nType)
             {
                 case NodeType.CLIENT_NODE:
-                    elements.Add(new ClientNode(x, y));
+                    elements.Add(new ClientNode(x, y, "CN" + clientNodesNumber++));
                     textConsole.AppendText("Client Node added at: " + x + "," + y);
                     textConsole.AppendText(Environment.NewLine);
                     break;
                 case NodeType.NETWORK_NODE:
-                    elements.Add(new NetNode(x, y));
+                    elements.Add(new NetNode(x, y, "NN" + networkNodesNumber++));
                     textConsole.AppendText("Network Node added at: " + x + "," + y);
                     textConsole.AppendText(Environment.NewLine);
                     break;
@@ -84,6 +88,8 @@ namespace ManagementApp
                     elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
                 panel.FillEllipse(Brushes.Bisque, rect);
                 panel.DrawEllipse(Pens.Black, rect);
+                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point(elem.ContainedPoints.ElementAt(0).X + 3,
+                    elem.ContainedPoints.ElementAt(0).Y + 3));
             }
             foreach (var elem in elements.AsParallel().Where(i => i is ClientNode))
             {
@@ -91,13 +97,19 @@ namespace ManagementApp
                    elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
                 panel.FillEllipse(Brushes.AliceBlue, rect);
                 panel.DrawEllipse(Pens.Black, rect);
+                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point(elem.ContainedPoints.ElementAt(0).X + 3,
+                    elem.ContainedPoints.ElementAt(0).Y + 3));
             }
             foreach (var elem in elements.AsParallel().Where(i => i is NodeConnection))
             {
                 // Create pen.
                 Pen blackPen = new Pen(Color.Black, 3);
                 // Draw line to screen.
-                panel.DrawLine(blackPen, elem.ContainedPoints.ElementAt(0), elem.ContainedPoints.ElementAt(1));
+                Point from = elem.ContainedPoints.ElementAt(0);
+                Point to = elem.ContainedPoints.ElementAt(1);
+                panel.DrawLine(blackPen, from, to);
+                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point((from.X + to.X)/2 + 3,
+                   (from.Y + to.Y) / 2 + 3));
             }
               
          
@@ -130,8 +142,7 @@ namespace ManagementApp
 
         private void bind(ContainerElement nodeFrom, ContainerElement nodeTo)
         {
-            elements.Add(new NodeConnection(nodeFrom, nodeTo));
-            elements.Add(new NodeConnection(nodeTo, nodeFrom));
+            elements.Add(new NodeConnection(nodeFrom, nodeTo,nodeFrom.Name + "-" + nodeTo.Name));
             textConsole.AppendText("Connection  added");
             textConsole.AppendText(Environment.NewLine);
         }
