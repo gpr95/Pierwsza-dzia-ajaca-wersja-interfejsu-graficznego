@@ -103,7 +103,6 @@ namespace ManagementApp
          
 
             container.BackgroundImage = containerPoints;
-            this.Refresh();
         }
 
         private void container_MouseDown(object sender, MouseEventArgs e)
@@ -148,7 +147,7 @@ namespace ManagementApp
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            containerPoints = new Bitmap(this.container.ClientSize.Width, this.container.ClientSize.Height);
+            containerPoints = new Bitmap(container.ClientSize.Width, container.ClientSize.Height);
             for (int x = 0; x < container.ClientSize.Width;
                 x += GAP)
             {
