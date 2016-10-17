@@ -19,6 +19,7 @@ namespace ManagementApp
         private int clientNodesNumber;
         private int networkNodesNumber;
         private ContainerElement nodeFrom;
+        private Point domainFrom;
 
         public MainWindow()
         {
@@ -109,7 +110,7 @@ namespace ManagementApp
             foreach (var elem in elements.AsParallel().Where(i => i is NodeConnection))
             {
                 // Create pen.
-                Pen blackPen = new Pen(Color.Black, 3);
+                Pen blackPen = new Pen(Color.Black, 2);
                 // Draw line to screen.
                 Point from = elem.ContainedPoints.ElementAt(0);
                 Point to = elem.ContainedPoints.ElementAt(1);
@@ -117,10 +118,17 @@ namespace ManagementApp
                 panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point((from.X + to.X)/2 + 3,
                    (from.Y + to.Y) / 2 + 3));
             }
-              
-         
+            foreach (var elem in elements.AsParallel().Where(i => i is Domain))
+            {
+                Domain tmp = (Domain)elem;
+                Point from = tmp.PointFrom;
+                rect = new Rectangle(from.X, from.Y, tmp.Width, tmp.Height);
+                panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3),rect);
+            }
 
-            container.BackgroundImage = containerPoints;
+
+
+                container.BackgroundImage = containerPoints;
         }
 
         private void container_MouseDown(object sender, MouseEventArgs e)
@@ -129,23 +137,28 @@ namespace ManagementApp
             int y = e.Y;
             putToGrid(ref x, ref y);
             if(nType==NodeType.CONNECTION)
-                    nodeFrom = getNodeFrom(x, y);
-       //     if(nType==NodeType.DOMAIN)
-                    
+                nodeFrom = getNodeFrom(x, y);
+            if (nType == NodeType.DOMAIN)
+                domainFrom = new Point(x, y);
         }
 
         private void container_MouseUp(object sender, MouseEventArgs e)
         {
-            if (nodeFrom == null)
-                return;
             int x = e.X;
             int y = e.Y;
             putToGrid(ref x, ref y);
-            if (nType == NodeType.CONNECTION)
+            if (nType == NodeType.CONNECTION && nodeFrom != null)
             {
                 ContainerElement nodeTo = getNodeFrom(x, y);
                 if (nodeTo != null)
                     bind(nodeFrom, nodeTo);
+            }
+            if(nType == NodeType.DOMAIN && domainFrom != null)
+            {
+                Point domainTo = new Point(x, y);
+                elements.Add(new Domain(domainFrom,domainTo));
+                textConsole.AppendText("Domain  added");
+                textConsole.AppendText(Environment.NewLine);
             }
             container.Refresh();
         }

@@ -11,6 +11,7 @@ namespace ManagementApp
     {
         protected List<Point> containedPoints;
         protected String name;
+        protected const int GAP = 10;
         public List<Point> ContainedPoints
         {
             get

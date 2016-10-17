@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="ClientNode.cs" />
     <Compile Include="ContainerElement.cs" />
+    <Compile Include="Domain.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
