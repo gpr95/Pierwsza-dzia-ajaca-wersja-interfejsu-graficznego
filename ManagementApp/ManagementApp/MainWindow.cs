@@ -30,28 +30,7 @@ namespace ManagementApp
             clientNodesNumber = 0;
             networkNodesNumber = 0;
         }
-        private void button1_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Cross;
-            nType = NodeType.CLIENT_NODE;
-        }
-        private void button2_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Cross;
-            nType = NodeType.NETWORK_NODE;
-        }
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Cross;
-            nType = NodeType.CONNECTION;
-        }
-
-        private void domain_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Cross;
-            nType = NodeType.DOMAIN;
-        }
+       
 
 
         private void putToGrid(ref int x, ref int y)
@@ -69,16 +48,16 @@ namespace ManagementApp
             {
                 case NodeType.CLIENT_NODE:
                     elements.Add(new ClientNode(x, y, "CN" + clientNodesNumber++));
-                    textConsole.AppendText("Client Node added at: " + x + "," + y);
-                    textConsole.AppendText(Environment.NewLine);
+                    consoleTextBox.AppendText("Client Node added at: " + x + "," + y);
+                    consoleTextBox.AppendText(Environment.NewLine);
                     break;
                 case NodeType.NETWORK_NODE:
                     elements.Add(new NetNode(x, y, "NN" + networkNodesNumber++));
-                    textConsole.AppendText("Network Node added at: " + x + "," + y);
-                    textConsole.AppendText(Environment.NewLine);
+                    consoleTextBox.AppendText("Network Node added at: " + x + "," + y);
+                    consoleTextBox.AppendText(Environment.NewLine);
                     break;
             }
-            container.Refresh();
+            containerPictureBox.Refresh();
         }
 
         private ContainerElement getNodeFrom(int x, int y)
@@ -131,7 +110,7 @@ namespace ManagementApp
 
 
 
-                container.BackgroundImage = containerPoints;
+                containerPictureBox.BackgroundImage = containerPoints;
         }
 
         private void container_MouseDown(object sender, MouseEventArgs e)
@@ -182,54 +161,45 @@ namespace ManagementApp
                 if (add)
                 {
                     elements.Add(new Domain(domainFrom, domainTo));
-                    textConsole.AppendText("Domain added");
-                    textConsole.AppendText(Environment.NewLine);
+                    consoleTextBox.AppendText("Domain added");
+                    consoleTextBox.AppendText(Environment.NewLine);
                 }
                 else
                 {
-                    textConsole.AppendText("Domains can't cross each others.");
-                    textConsole.AppendText(Environment.NewLine);
+                    consoleTextBox.AppendText("Domains can't cross each others.");
+                    consoleTextBox.AppendText(Environment.NewLine);
                 }
             }
-            container.Refresh();
+            containerPictureBox.Refresh();
         }
 
         private void bind(ContainerElement nodeFrom, ContainerElement nodeTo)
         {
             elements.Add(new NodeConnection(nodeFrom, nodeTo,nodeFrom.Name + "-" + nodeTo.Name));
-            textConsole.AppendText("Connection  added");
-            textConsole.AppendText(Environment.NewLine);
-        }
-
-        private void Connection_MouseClick(object sender, MouseEventArgs e)
-        {
-            if(e.Button == MouseButtons.Right)
-            {
-                this.Cursor = Cursors.Arrow;
-                nType = NodeType.NOTHING;
-            }
+            consoleTextBox.AppendText("Connection  added");
+            consoleTextBox.AppendText(Environment.NewLine);
         }
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            containerPoints = new Bitmap(container.ClientSize.Width, container.ClientSize.Height);
-            for (int x = 0; x < container.ClientSize.Width;
+            containerPoints = new Bitmap(containerPictureBox.ClientSize.Width, containerPictureBox.ClientSize.Height);
+            for (int x = 0; x < containerPictureBox.ClientSize.Width;
                 x += GAP)
             {
-                for (int y = 0; y < container.ClientSize.Height;
+                for (int y = 0; y < containerPictureBox.ClientSize.Height;
                     y += GAP)
                 {
                     containerPoints.SetPixel(x, y, Color.Black);
                 }
             }
-            myGraphics = container.CreateGraphics();
+            myGraphics = containerPictureBox.CreateGraphics();
         }
 
         private void container_MouseMove(object sender, MouseEventArgs e)
         {
             if (isDrawing && nodeFrom != null && nType == NodeType.CONNECTION)
             {
-                container.Refresh();
+                containerPictureBox.Refresh();
                 Pen blackPen = new Pen(Color.Black, 3);
                 Point s = new Point(nodeFrom.ContainedPoints.ElementAt(0).X, nodeFrom.ContainedPoints.ElementAt(0).Y);
                 Point p = new Point(e.X, e.Y);
@@ -277,13 +247,38 @@ namespace ManagementApp
                 System.Threading.Thread.Sleep(10);
             } else if (isDrawing && nType == NodeType.DOMAIN)
             {
-                container.Refresh();
+                containerPictureBox.Refresh();
                 Pen pr = new Pen(Color.PaleVioletRed, 3);
                 myGraphics.DrawRectangle(pr, domainFrom.X, domainFrom.Y, e.X - domainFrom.X, e.Y - domainFrom.Y);
                 System.Threading.Thread.Sleep(10);
             }
         }
+
+        private void clientNodeBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            nType = NodeType.CLIENT_NODE;
+        }
+        private void networkNodeBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            nType = NodeType.NETWORK_NODE;
+        }
+
+        private void connectionBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            nType = NodeType.CONNECTION;
+        }
+
+        private void domainBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            nType = NodeType.DOMAIN;
+        }
     }
+
+
 
     enum NodeType
     {
