@@ -48,6 +48,7 @@ namespace ManagementApp
             this.container.Paint += new System.Windows.Forms.PaintEventHandler(this.container_Paint_1);
             this.container.MouseClick += new System.Windows.Forms.MouseEventHandler(this.container_MouseClick);
             this.container.MouseDown += new System.Windows.Forms.MouseEventHandler(this.container_MouseDown);
+            this.container.MouseMove += new System.Windows.Forms.MouseEventHandler(this.container_MouseMove);
             this.container.MouseUp += new System.Windows.Forms.MouseEventHandler(this.container_MouseUp);
             // 
             // clientNode

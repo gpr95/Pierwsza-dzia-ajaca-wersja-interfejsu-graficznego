@@ -16,3 +16,12 @@ C:\Users\Grzegorz\Desktop\TSST\Projekt\ManagementApp\ManagementApp\obj\Debug\Man
 C:\Users\Grzegorz\Desktop\TSST\Projekt\ManagementApp\ManagementApp\obj\Debug\ManagementApp.MainWindow.resources
 C:\Users\Grzegorz\Desktop\TSST\Projekt\ManagementApp\ManagementApp\obj\Debug\ManagementApp.Properties.Resources.resources
 C:\Users\Grzegorz\Desktop\TSST\Projekt\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe.config
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\bin\Debug\ManagementApp.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csprojResolveAssemblyReference.cache
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.MainWindow.resources
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.Properties.Resources.resources
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
