@@ -33,9 +33,8 @@ namespace ManagementApp
             this.container = new System.Windows.Forms.PictureBox();
             this.clientNode = new System.Windows.Forms.Button();
             this.netNode = new System.Windows.Forms.Button();
-            this.connection = new System.Windows.Forms.Button();
+            this.Connection = new System.Windows.Forms.Button();
             this.textConsole = new System.Windows.Forms.TextBox();
-            this.domain = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.container)).BeginInit();
             this.SuspendLayout();
             // 
@@ -71,16 +70,16 @@ namespace ManagementApp
             this.netNode.UseVisualStyleBackColor = true;
             this.netNode.Click += new System.EventHandler(this.button2_Click);
             // 
-            // connection
+            // Connection
             // 
-            this.connection.Location = new System.Drawing.Point(404, 545);
-            this.connection.Name = "connection";
-            this.connection.Size = new System.Drawing.Size(140, 22);
-            this.connection.TabIndex = 3;
-            this.connection.Text = "Połączenie";
-            this.connection.UseVisualStyleBackColor = true;
-            this.connection.Click += new System.EventHandler(this.button3_Click);
-            this.connection.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Connection_MouseClick);
+            this.Connection.Location = new System.Drawing.Point(404, 545);
+            this.Connection.Name = "Connection";
+            this.Connection.Size = new System.Drawing.Size(140, 22);
+            this.Connection.TabIndex = 3;
+            this.Connection.Text = "Połączenie";
+            this.Connection.UseVisualStyleBackColor = true;
+            this.Connection.Click += new System.EventHandler(this.button3_Click);
+            this.Connection.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Connection_MouseClick);
             // 
             // textConsole
             // 
@@ -92,24 +91,13 @@ namespace ManagementApp
             this.textConsole.Size = new System.Drawing.Size(293, 520);
             this.textConsole.TabIndex = 4;
             // 
-            // domain
-            // 
-            this.domain.Location = new System.Drawing.Point(561, 545);
-            this.domain.Name = "domain";
-            this.domain.Size = new System.Drawing.Size(140, 22);
-            this.domain.TabIndex = 5;
-            this.domain.Text = "Domena";
-            this.domain.UseVisualStyleBackColor = true;
-            this.domain.Click += new System.EventHandler(this.domain_Click);
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(914, 574);
-            this.Controls.Add(this.domain);
             this.Controls.Add(this.textConsole);
-            this.Controls.Add(this.connection);
+            this.Controls.Add(this.Connection);
             this.Controls.Add(this.netNode);
             this.Controls.Add(this.clientNode);
             this.Controls.Add(this.container);
@@ -127,9 +115,8 @@ namespace ManagementApp
         private System.Windows.Forms.PictureBox container;
         private System.Windows.Forms.Button clientNode;
         private System.Windows.Forms.Button netNode;
-        private System.Windows.Forms.Button connection;
+        private System.Windows.Forms.Button Connection;
         private System.Windows.Forms.TextBox textConsole;
-        private System.Windows.Forms.Button domain;
     }
 }
 
