@@ -145,7 +145,11 @@ namespace ManagementApp
                 isDrawing = true;
             }
             if (nType == NodeType.DOMAIN)
+            {
                 domainFrom = new Point(x, y);
+                isDrawing = true;
+            }
+                
            
         }
 
@@ -161,15 +165,21 @@ namespace ManagementApp
                 ContainerElement nodeTo = getNodeFrom(x, y);
                 if(nodeTo != null)
                     bind(nodeFrom, nodeTo);
-                if (nodeFromTo != null)
+                else if(nodeFromTo != null)
                     bind(nodeFrom, nodeFromTo);
             }
             if(nType == NodeType.DOMAIN && domainFrom != null)
             {
                 Point domainTo = new Point(x, y);
                 elements.Add(new Domain(domainFrom,domainTo));
-                textConsole.AppendText("Domain  added");
+                textConsole.AppendText("Domain added");
                 textConsole.AppendText(Environment.NewLine);
+
+                if(e.X - domainFrom.X < 0 || e.Y - domainFrom.Y < 0)
+                {
+                    textConsole.AppendText("There are problems with negative sizes.");
+                    textConsole.AppendText(Environment.NewLine);
+                }
             }
             container.Refresh();
         }
@@ -207,7 +217,7 @@ namespace ManagementApp
 
         private void container_MouseMove(object sender, MouseEventArgs e)
         {
-            if (isDrawing && nodeFrom != null)
+            if (isDrawing && nodeFrom != null && nType == NodeType.CONNECTION)
             {
                 container.Refresh();
                 Pen blackPen = new Pen(Color.Black, 3);
@@ -247,7 +257,6 @@ namespace ManagementApp
                     }
                 }
 
-                Console.WriteLine(distance);
                 if (distance > 100)
                     myGraphics.DrawLine(blackPen, s, p);
                 else
@@ -255,6 +264,12 @@ namespace ManagementApp
                     Point end = new Point(nodeFromTo.ContainedPoints.ElementAt(0).X, nodeFromTo.ContainedPoints.ElementAt(0).Y);
                     myGraphics.DrawLine(blackPen, s, end);
                 }
+                System.Threading.Thread.Sleep(10);
+            } else if (isDrawing && nType == NodeType.DOMAIN)
+            {
+                container.Refresh();
+                Pen pr = new Pen(Color.PaleVioletRed, 3);
+                myGraphics.DrawRectangle(pr, domainFrom.X, domainFrom.Y, e.X - domainFrom.X, e.Y - domainFrom.Y);
                 System.Threading.Thread.Sleep(10);
             }
         }
