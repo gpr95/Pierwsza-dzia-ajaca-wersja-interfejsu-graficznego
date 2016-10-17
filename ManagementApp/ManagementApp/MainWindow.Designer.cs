@@ -35,6 +35,7 @@ namespace ManagementApp
             this.netNode = new System.Windows.Forms.Button();
             this.Connection = new System.Windows.Forms.Button();
             this.textConsole = new System.Windows.Forms.TextBox();
+            this.domain = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.container)).BeginInit();
             this.SuspendLayout();
             // 
@@ -92,11 +93,22 @@ namespace ManagementApp
             this.textConsole.Size = new System.Drawing.Size(293, 520);
             this.textConsole.TabIndex = 4;
             // 
+            // domain
+            // 
+            this.domain.Location = new System.Drawing.Point(561, 545);
+            this.domain.Name = "domain";
+            this.domain.Size = new System.Drawing.Size(140, 22);
+            this.domain.TabIndex = 5;
+            this.domain.Text = "Domena";
+            this.domain.UseVisualStyleBackColor = true;
+            this.domain.Click += new System.EventHandler(this.domain_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(914, 574);
+            this.Controls.Add(this.domain);
             this.Controls.Add(this.textConsole);
             this.Controls.Add(this.Connection);
             this.Controls.Add(this.netNode);
@@ -118,6 +130,7 @@ namespace ManagementApp
         private System.Windows.Forms.Button netNode;
         private System.Windows.Forms.Button Connection;
         private System.Windows.Forms.TextBox textConsole;
+        private System.Windows.Forms.Button domain;
     }
 }
 

@@ -19,7 +19,7 @@ namespace ManagementApp
         private int clientNodesNumber;
         private int networkNodesNumber;
         private ContainerElement nodeFrom;
-	private bool isDrawing = false;
+	    private bool isDrawing = false;
         private Point domainFrom;
         private Graphics myGraphics;
 
