@@ -19,7 +19,8 @@ namespace ManagementApp
         private int clientNodesNumber;
         private int networkNodesNumber;
         private ContainerElement nodeFrom;
-	    private bool isDrawing = false;
+        private ContainerElement nodeFromTo;
+        private bool isDrawing = false;
         private Point domainFrom;
         private Graphics myGraphics;
 
@@ -160,6 +161,8 @@ namespace ManagementApp
                 ContainerElement nodeTo = getNodeFrom(x, y);
                 if(nodeTo != null)
                     bind(nodeFrom, nodeTo);
+                if (nodeFromTo != null)
+                    bind(nodeFrom, nodeFromTo);
             }
             if(nType == NodeType.DOMAIN && domainFrom != null)
             {
@@ -210,7 +213,48 @@ namespace ManagementApp
                 Pen blackPen = new Pen(Color.Black, 3);
                 Point s = new Point(nodeFrom.ContainedPoints.ElementAt(0).X, nodeFrom.ContainedPoints.ElementAt(0).Y);
                 Point p = new Point(e.X, e.Y);
-                myGraphics.DrawLine(blackPen, s, p);
+
+                double distance = Double.PositiveInfinity;
+                double d = Double.PositiveInfinity;
+
+                foreach (var elem in elements.AsParallel().Where(i => i is NetNode))
+                {
+                    if (elem != nodeFrom)
+                    {
+                        if (elem != nodeFrom)
+                        {
+                            d = Math.Round(Math.Sqrt(Math.Pow(elem.ContainedPoints.ElementAt(0).X - e.X, 2) + Math.Pow(elem.ContainedPoints.ElementAt(0).Y - e.Y, 2)), 2);
+                            if (d < distance)
+                            {
+                                distance = d;
+                                nodeFromTo = elem;
+                            }
+                            d = Double.PositiveInfinity;
+                        }
+                    }
+                }
+                foreach (var elem in elements.AsParallel().Where(i => i is ClientNode))
+                {
+                    if (elem != nodeFrom)
+                    {
+                        d = Math.Round(Math.Sqrt(Math.Pow(elem.ContainedPoints.ElementAt(0).X - e.X, 2) + Math.Pow(elem.ContainedPoints.ElementAt(0).Y - e.Y, 2)), 2);
+                        if (d < distance)
+                        {
+                            distance = d;
+                            nodeFromTo = elem;
+                        }
+                        d = Double.PositiveInfinity;
+                    }
+                }
+
+                Console.WriteLine(distance);
+                if (distance > 100)
+                    myGraphics.DrawLine(blackPen, s, p);
+                else
+                {
+                    Point end = new Point(nodeFromTo.ContainedPoints.ElementAt(0).X, nodeFromTo.ContainedPoints.ElementAt(0).Y);
+                    myGraphics.DrawLine(blackPen, s, end);
+                }
                 System.Threading.Thread.Sleep(10);
             }
         }
