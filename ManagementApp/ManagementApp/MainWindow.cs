@@ -28,12 +28,12 @@ namespace ManagementApp
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.Cross;
+            this.Cursor = Cursors.Hand;
             nType = NodeType.CLIENT_NODE;
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.Cross;
+            this.Cursor = Cursors.Hand;
             nType = NodeType.NETWORK_NODE;
         }
 
@@ -41,6 +41,12 @@ namespace ManagementApp
         {
             this.Cursor = Cursors.Cross;
             nType = NodeType.CONNECTION;
+        }
+
+        private void domain_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            nType = NodeType.DOMAIN;
         }
 
 
@@ -124,17 +130,21 @@ namespace ManagementApp
             putToGrid(ref x, ref y);
             if(nType==NodeType.CONNECTION)
                     nodeFrom = getNodeFrom(x, y);
+       //     if(nType==NodeType.DOMAIN)
+                    
         }
 
         private void container_MouseUp(object sender, MouseEventArgs e)
         {
+            if (nodeFrom == null)
+                return;
             int x = e.X;
             int y = e.Y;
             putToGrid(ref x, ref y);
-            if (nType == NodeType.CONNECTION && nodeFrom != null)
+            if (nType == NodeType.CONNECTION)
             {
                 ContainerElement nodeTo = getNodeFrom(x, y);
-                if(nodeTo != null)
+                if (nodeTo != null)
                     bind(nodeFrom, nodeTo);
             }
             container.Refresh();
@@ -169,6 +179,8 @@ namespace ManagementApp
                 }
             }
         }
+
+       
     }
 
     enum NodeType
@@ -176,6 +188,7 @@ namespace ManagementApp
         CLIENT_NODE,
         NETWORK_NODE,
         CONNECTION,
+        DOMAIN,
         NOTHING
     }
 }
