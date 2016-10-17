@@ -148,9 +148,7 @@ namespace ManagementApp
             {
                 domainFrom = new Point(x, y);
                 isDrawing = true;
-            }
-                
-           
+            }             
         }
 
         private void container_MouseUp(object sender, MouseEventArgs e)
@@ -168,16 +166,28 @@ namespace ManagementApp
                 else if(nodeFromTo != null)
                     bind(nodeFrom, nodeFromTo);
             }
-            if(nType == NodeType.DOMAIN && domainFrom != null)
+            if(nType == NodeType.DOMAIN && domainFrom != null && domainFrom.X < x && domainFrom.Y < y)
             {
                 Point domainTo = new Point(x, y);
-                elements.Add(new Domain(domainFrom,domainTo));
-                textConsole.AppendText("Domain added");
-                textConsole.AppendText(Environment.NewLine);
-
-                if(e.X - domainFrom.X < 0 || e.Y - domainFrom.Y < 0)
+                Domain toAdd = new Domain(domainFrom, domainTo);
+                bool add = true;
+                foreach(Domain d in elements.AsParallel().Where(i => i is Domain))
                 {
-                    textConsole.AppendText("There are problems with negative sizes.");
+                    if(toAdd.crossingOtherDomain(d))
+                    {
+                        add = false;
+                        break;
+                    }
+                }
+                if (add)
+                {
+                    elements.Add(new Domain(domainFrom, domainTo));
+                    textConsole.AppendText("Domain added");
+                    textConsole.AppendText(Environment.NewLine);
+                }
+                else
+                {
+                    textConsole.AppendText("Domains can't cross each others.");
                     textConsole.AppendText(Environment.NewLine);
                 }
             }

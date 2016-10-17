@@ -40,6 +40,17 @@ namespace ManagementApp
             }
         }
 
+        public bool crossingOtherDomain(Domain other)
+        {
+            foreach(Point otherP in other.containedPoints)
+            {
+                if (containedPoints.AsParallel().Contains(otherP))
+                    return true;
+            }
+
+            return false;
+        }
+
         public Point PointFrom
         {
             get
