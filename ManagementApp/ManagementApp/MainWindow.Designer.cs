@@ -1,4 +1,6 @@
-﻿namespace ManagementApp
+﻿using System.Drawing;
+
+namespace ManagementApp
 {
     partial class MainWindow
     {
@@ -104,6 +106,16 @@
             ((System.ComponentModel.ISupportInitialize)(this.container)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+            containerPoints = new Bitmap(this.container.ClientSize.Width,this.container.ClientSize.Height);
+            for (int x = 0; x < container.ClientSize.Width;
+                x += GAP)
+            {
+                for (int y = 0; y < container.ClientSize.Height;
+                    y += GAP)
+                {
+                    containerPoints.SetPixel(x, y, Color.Black);
+                }
+            }
 
         }
 

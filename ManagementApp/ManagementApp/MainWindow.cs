@@ -14,6 +14,7 @@ namespace ManagementApp
     {
         private NodeType nType;
         private const int GAP = 10;
+        private Bitmap containerPoints;
         private List<ContainerElement> elements = new List<ContainerElement>();
         private ContainerElement nodeFrom;
 
@@ -75,45 +76,33 @@ namespace ManagementApp
         private void container_Paint_1(object sender, PaintEventArgs e)
         {
             Graphics panel = e.Graphics;
-            Bitmap bm = new Bitmap(
-            container.ClientSize.Width,
-            container.ClientSize.Height);
-            for (int x = 0; x < container.ClientSize.Width;
-                x += GAP)
-            {
-                for (int y = 0; y < container.ClientSize.Height;
-                    y += GAP)
-                {
-                    bm.SetPixel(x, y, Color.Black);
-                }
-            }
+   
             Rectangle rect;
-            foreach (var elem in elements)
+            foreach (var elem in elements.AsParallel().Where(i => i is NetNode))
             {
-                if(elem is NetNode)
-                {
-                    rect = new Rectangle(elem.ContainedPoints.ElementAt(0).X- 5, 
-                        elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
-                    panel.FillEllipse(Brushes.Bisque, rect);
-                    panel.DrawEllipse(Pens.Black, rect);
-
-                }
-                else if(elem is ClientNode)
-                {
-                     rect = new Rectangle(elem.ContainedPoints.ElementAt(0).X - 5,
-                        elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
-                    panel.FillEllipse(Brushes.AliceBlue, rect);
-                    panel.DrawEllipse(Pens.Black, rect);
-                } else if(elem is NodeConnection)
-                {
-                    // Create pen.
-                    Pen blackPen = new Pen(Color.Black, 3);
-                    // Draw line to screen.
-                    panel.DrawLine(blackPen, elem.ContainedPoints.ElementAt(0), elem.ContainedPoints.ElementAt(1));
-                }
+                rect = new Rectangle(elem.ContainedPoints.ElementAt(0).X - 5,
+                    elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
+                panel.FillEllipse(Brushes.Bisque, rect);
+                panel.DrawEllipse(Pens.Black, rect);
             }
+            foreach (var elem in elements.AsParallel().Where(i => i is ClientNode))
+            {
+                rect = new Rectangle(elem.ContainedPoints.ElementAt(0).X - 5,
+                   elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
+                panel.FillEllipse(Brushes.AliceBlue, rect);
+                panel.DrawEllipse(Pens.Black, rect);
+            }
+            foreach (var elem in elements.AsParallel().Where(i => i is NodeConnection))
+            {
+                // Create pen.
+                Pen blackPen = new Pen(Color.Black, 3);
+                // Draw line to screen.
+                panel.DrawLine(blackPen, elem.ContainedPoints.ElementAt(0), elem.ContainedPoints.ElementAt(1));
+            }
+              
+         
 
-            container.BackgroundImage = bm;
+            container.BackgroundImage = containerPoints;
             this.Refresh();
         }
 
