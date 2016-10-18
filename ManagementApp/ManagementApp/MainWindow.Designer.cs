@@ -37,6 +37,7 @@ namespace ManagementApp
             this.consoleTextBox = new System.Windows.Forms.TextBox();
             this.domainBtn = new System.Windows.Forms.Button();
             this.deleteBtn = new System.Windows.Forms.Button();
+            this.deleteListBox = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -113,11 +114,23 @@ namespace ManagementApp
             this.deleteBtn.UseVisualStyleBackColor = true;
             this.deleteBtn.Click += new System.EventHandler(this.deleteBtn_Click);
             // 
+            // deleteListBox
+            // 
+            this.deleteListBox.Enabled = false;
+            this.deleteListBox.FormattingEnabled = true;
+            this.deleteListBox.Location = new System.Drawing.Point(501, 450);
+            this.deleteListBox.Name = "deleteListBox";
+            this.deleteListBox.Size = new System.Drawing.Size(89, 69);
+            this.deleteListBox.TabIndex = 7;
+            this.deleteListBox.Visible = false;
+            this.deleteListBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.deleteListBox_MouseDoubleClick);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(914, 574);
+            this.Controls.Add(this.deleteListBox);
             this.Controls.Add(this.deleteBtn);
             this.Controls.Add(this.domainBtn);
             this.Controls.Add(this.consoleTextBox);
@@ -143,6 +156,7 @@ namespace ManagementApp
         private System.Windows.Forms.TextBox consoleTextBox;
         private System.Windows.Forms.Button domainBtn;
         private System.Windows.Forms.Button deleteBtn;
+        private System.Windows.Forms.ListBox deleteListBox;
     }
 }
 

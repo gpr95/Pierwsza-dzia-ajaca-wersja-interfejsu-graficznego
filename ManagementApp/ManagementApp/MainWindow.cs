@@ -62,7 +62,7 @@ namespace ManagementApp
             {
                 rect = new Rectangle(elem.ContainedPoints.ElementAt(0).X - 5,
                     elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
-                panel.FillEllipse(Brushes.Bisque, rect);
+                panel.FillEllipse(Brushes.CadetBlue, rect);
                 panel.DrawEllipse(Pens.Black, rect);
                 panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point(elem.ContainedPoints.ElementAt(0).X + 3,
                     elem.ContainedPoints.ElementAt(0).Y + 3));
@@ -71,7 +71,7 @@ namespace ManagementApp
             {
                 rect = new Rectangle(elem.ContainedPoints.ElementAt(0).X - 5,
                    elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
-                panel.FillEllipse(Brushes.AliceBlue, rect);
+                panel.FillEllipse(Brushes.ForestGreen, rect);
                 panel.DrawEllipse(Pens.Black, rect);
                 panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point(elem.ContainedPoints.ElementAt(0).X + 3,
                     elem.ContainedPoints.ElementAt(0).Y + 3));
@@ -112,9 +112,25 @@ namespace ManagementApp
                     consoleTextBox.AppendText(Environment.NewLine);
                     break;
                 case NodeType.DELETE:
-                    int idxOfElement = findElementByPosition(x, y);
-                    if(idxOfElement != -1)
-                        elements.RemoveAt(idxOfElement);
+                    List<String> atPosition = findElementsByPosition(x, y).Select(i => i.Name).ToList();
+                    foreach (String toDelete in atPosition)
+                        deleteListBox.Items.Add(toDelete);
+                    if (deleteListBox.Items != null && atPosition.Count > 1)
+                    {
+                        deleteListBox.Items.Add("Cancel");
+                        deleteListBox.Location = new Point(x, y);
+                        deleteListBox.Visible = true;
+                        deleteListBox.Enabled = true;
+                        autofit();
+                    }
+                    else
+                    {
+                        int idxOfElement = elements.IndexOf(elements.Where(
+                            i => i.Name.Equals(atPosition.First())
+                            ).FirstOrDefault());
+                        if (idxOfElement != -1)
+                            elements.RemoveAt(idxOfElement);
+                    }
                     break;
             }
             containerPictureBox.Refresh();
@@ -206,7 +222,33 @@ namespace ManagementApp
                 System.Threading.Thread.Sleep(10);
             }
         }
-
+        // DELETE LISTBOX ACTIONS
+        private void deleteListBox_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            int idxOfElement = elements.IndexOf(elements.Where(
+                           i => i.Name.Equals(deleteListBox.SelectedItem)
+                           ).FirstOrDefault());
+            if (idxOfElement != -1)
+                elements.RemoveAt(idxOfElement);
+            deleteListBox.Visible = false;
+            deleteListBox.Enabled = false;
+            deleteListBox.Items.Clear();
+            containerPictureBox.Refresh();
+        }
+        // Auto wigth adding to listbox
+        private void autofit()
+        {
+            int width = deleteListBox.Width;
+            using (Graphics g = deleteListBox.CreateGraphics())
+            {
+                for (int i1 = 0; i1 < deleteListBox.Items.Count; i1++)
+                {
+                    int itemWidth = Convert.ToInt32(g.MeasureString(Convert.ToString(deleteListBox.Items[i1]), deleteListBox.Font).Width);
+                    width = Math.Max(width, itemWidth);
+                }
+            }
+            deleteListBox.Width = width;
+        }
         // Validate adding domain to container
         private void addDomainToElements(Domain toAdd)
         {
@@ -232,14 +274,12 @@ namespace ManagementApp
             }
         }
         // Returns index of element in elements by position
-        private int findElementByPosition(int x, int y)
+        private List<ContainerElement> findElementsByPosition(int x, int y)
         {
-            ContainerElement result = elements.AsParallel().Where(
-                i => i.ContainedPoints.Contains(new Point(x,y))
-                ).FirstOrDefault();
-            if (result == null)
-                return -1;
-            return elements.IndexOf(result);
+            List<ContainerElement> result = elements.AsParallel().Where(
+                i => i.ContainedPoints.Where(p => p.Equals(new Point(x,y))).FirstOrDefault() != default(Point)
+                ).ToList();
+            return result;
         }
         // Returns x,y to closest grid point
         private void putToGrid(ref int x, ref int y)
@@ -287,7 +327,7 @@ namespace ManagementApp
 
         private void deleteBtn_Click(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.HSplit;
+            this.Cursor = Cursors.Hand;
             nType = NodeType.DELETE;
         }
     }
