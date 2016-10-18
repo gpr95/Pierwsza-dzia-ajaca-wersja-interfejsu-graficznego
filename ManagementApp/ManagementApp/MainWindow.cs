@@ -111,6 +111,11 @@ namespace ManagementApp
                     consoleTextBox.AppendText("Network Node added at: " + x + "," + y);
                     consoleTextBox.AppendText(Environment.NewLine);
                     break;
+                case NodeType.DELETE:
+                    int idxOfElement = findElementByPosition(x, y);
+                    if(idxOfElement != -1)
+                        elements.RemoveAt(idxOfElement);
+                    break;
             }
             containerPictureBox.Refresh();
         }
@@ -226,7 +231,16 @@ namespace ManagementApp
                 consoleTextBox.AppendText(Environment.NewLine);
             }
         }
-
+        // Returns index of element in elements by position
+        private int findElementByPosition(int x, int y)
+        {
+            ContainerElement result = elements.AsParallel().Where(
+                i => i.ContainedPoints.Contains(new Point(x,y))
+                ).FirstOrDefault();
+            if (result == null)
+                return -1;
+            return elements.IndexOf(result);
+        }
         // Returns x,y to closest grid point
         private void putToGrid(ref int x, ref int y)
         {
@@ -270,6 +284,12 @@ namespace ManagementApp
             this.Cursor = Cursors.Cross;
             nType = NodeType.DOMAIN;
         }
+
+        private void deleteBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.HSplit;
+            nType = NodeType.DELETE;
+        }
     }
 
 
@@ -280,6 +300,7 @@ namespace ManagementApp
         NETWORK_NODE,
         CONNECTION,
         DOMAIN,
+        DELETE,
         NOTHING
     }
 }

@@ -36,6 +36,7 @@ namespace ManagementApp
             this.connectionBtn = new System.Windows.Forms.Button();
             this.consoleTextBox = new System.Windows.Forms.TextBox();
             this.domainBtn = new System.Windows.Forms.Button();
+            this.deleteBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -102,11 +103,22 @@ namespace ManagementApp
             this.domainBtn.UseVisualStyleBackColor = true;
             this.domainBtn.Click += new System.EventHandler(this.domainBtn_Click);
             // 
+            // deleteBtn
+            // 
+            this.deleteBtn.Location = new System.Drawing.Point(740, 545);
+            this.deleteBtn.Name = "deleteBtn";
+            this.deleteBtn.Size = new System.Drawing.Size(98, 22);
+            this.deleteBtn.TabIndex = 6;
+            this.deleteBtn.Text = "Usuń element";
+            this.deleteBtn.UseVisualStyleBackColor = true;
+            this.deleteBtn.Click += new System.EventHandler(this.deleteBtn_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(914, 574);
+            this.Controls.Add(this.deleteBtn);
             this.Controls.Add(this.domainBtn);
             this.Controls.Add(this.consoleTextBox);
             this.Controls.Add(this.connectionBtn);
@@ -130,6 +142,7 @@ namespace ManagementApp
         private System.Windows.Forms.Button connectionBtn;
         private System.Windows.Forms.TextBox consoleTextBox;
         private System.Windows.Forms.Button domainBtn;
+        private System.Windows.Forms.Button deleteBtn;
     }
 }
 
