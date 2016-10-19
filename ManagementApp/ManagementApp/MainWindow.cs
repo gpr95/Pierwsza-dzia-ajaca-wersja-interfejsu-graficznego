@@ -206,6 +206,7 @@ namespace ManagementApp
                 }
                 Pen blackPen = new Pen(Color.Black, 3);
                 if (distance > 100)
+                    //ControlPaint.DrawReversibleLine(fromNode, to, Color.Black);
                     myGraphics.DrawLine(blackPen, fromNode, to);
                 else
                 {
@@ -217,8 +218,29 @@ namespace ManagementApp
             else if (isDrawing && nType == NodeType.DOMAIN)
             {
                 containerPictureBox.Refresh();
-                myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), domainFrom.X, 
-                    domainFrom.Y, e.X - domainFrom.X, e.Y - domainFrom.Y);
+
+                if(e.X - domainFrom.X < 0 && e.Y - domainFrom.Y < 0)
+                {
+                    myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), e.X,
+                        e.Y, domainFrom.X - e.X, domainFrom.Y - e.Y);
+                }
+                else if(e.X - domainFrom.X < 0)
+                {
+                    myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), e.X,
+                        domainFrom.Y, domainFrom.X - e.X, e.Y - domainFrom.Y);
+                }
+                else if (e.Y - domainFrom.Y < 0)
+                {
+                    myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), domainFrom.X,
+                        e.Y, e.X - domainFrom.X, domainFrom.Y - e.Y);
+                }
+                else
+                {
+                    myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), domainFrom.X,
+                        domainFrom.Y, e.X - domainFrom.X, e.Y - domainFrom.Y);
+                }
+
+
                 System.Threading.Thread.Sleep(10);
             }
         }
