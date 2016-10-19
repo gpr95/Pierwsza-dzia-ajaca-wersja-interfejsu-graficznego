@@ -18,6 +18,7 @@ namespace ManagementApp
         // LOGICAL VARS
         private NodeType nType;
         private List<ContainerElement> elements = new List<ContainerElement>();
+        private List<ContainerElement> elementsTemp = new List<ContainerElement>();
         private int clientNodesNumber;
         private int networkNodesNumber;
 
@@ -145,10 +146,37 @@ namespace ManagementApp
                 nodeFrom = getNodeFrom(x, y);
                 isDrawing = true;
             }
-            if (nType == NodeType.DOMAIN)
+            else if (nType == NodeType.DOMAIN)
             {
                 domainFrom = new Point(x, y);
                 isDrawing = true;
+            }
+            else if (nType == NodeType.MOVE)
+            {
+                isDrawing = true;
+                //Delete node and connections before move
+                if(findElementsByPosition(x, y).Count > 0)
+                    nodeFrom = findElementsByPosition(x, y).ElementAt(0);
+                if(nodeFrom != null)
+                {
+                    int idxOfElement = elements.IndexOf(elements.Where(i => i.Name.Equals(nodeFrom.Name)).FirstOrDefault());
+                    if (idxOfElement != -1)
+                        elements.RemoveAt(idxOfElement);
+                    List<String> atPosition = findElementsByPosition(x, y).Select(i => i.Name).ToList();
+                    foreach (String toMove in atPosition)
+                    {
+                        idxOfElement = elements.IndexOf(elements.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
+                        Console.WriteLine(toMove);
+                        if (idxOfElement != -1)
+                        {
+                            elementsTemp.Add(elements.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
+                            elements.RemoveAt(idxOfElement);
+                        }
+                            
+                    }
+                }
+                System.Threading.Thread.Sleep(10);
+                containerPictureBox.Refresh();
             }
         }
         private void containerPictureBox_MouseUp(object sender, MouseEventArgs e)
@@ -165,11 +193,27 @@ namespace ManagementApp
                 else if (virtualNodeTo != null)
                     bind(nodeFrom, virtualNodeTo);
             }
-            if (nType == NodeType.DOMAIN && domainFrom != null && domainFrom.X < x && domainFrom.Y < y)
+            else if (nType == NodeType.DOMAIN && domainFrom != null && domainFrom.X < x && domainFrom.Y < y)
             {
                 Point domainTo = new Point(x, y);
                 Domain toAdd = new Domain(domainFrom, domainTo);
                 addDomainToElements(toAdd);
+            }
+            else if (nType == NodeType.MOVE && nodeFrom != null)
+            {
+                virtualNodeTo = new ClientNode(x, y, nodeFrom.Name);
+                elements.Add(virtualNodeTo);
+                foreach (var elem in elementsTemp.AsParallel().Where(i => i is NodeConnection))
+                    if (elem.ContainedPoints.ElementAt(0) == nodeFrom.ContainedPoints.ElementAt(0))
+                        bind(getNodeFrom(elem.ContainedPoints.ElementAt(1).X, elem.ContainedPoints.ElementAt(1).Y), virtualNodeTo);
+                    else if (elem.ContainedPoints.ElementAt(1) == nodeFrom.ContainedPoints.ElementAt(0))
+                        bind(getNodeFrom(elem.ContainedPoints.ElementAt(0).X, elem.ContainedPoints.ElementAt(0).Y), virtualNodeTo);
+
+                consoleTextBox.AppendText("Client Node moved from: " + nodeFrom.ContainedPoints.ElementAt(0).X + "," + nodeFrom.ContainedPoints.ElementAt(0).Y + " to:" +
+                    x + "," + y);
+                consoleTextBox.AppendText(Environment.NewLine);
+                nodeFrom = null;
+                elementsTemp.Clear();
             }
             containerPictureBox.Refresh();
         }
@@ -241,6 +285,31 @@ namespace ManagementApp
                 }
 
 
+                System.Threading.Thread.Sleep(10);
+            }
+            else if(isDrawing && nType == NodeType.MOVE)
+            {
+                Rectangle rect;
+                containerPictureBox.Refresh();
+
+                        rect = new Rectangle(e.X - 5, e.Y - 5, 11, 11);
+                        myGraphics.FillEllipse(Brushes.ForestGreen, rect);
+                        myGraphics.DrawEllipse(Pens.Black, rect);
+                        myGraphics.DrawString(nodeFrom.Name, new Font("Arial", 5), Brushes.Black, new Point(e.X + 3, e.Y + 3));
+
+                foreach (var elem in elementsTemp.AsParallel().Where(i => i is NodeConnection))
+                {
+                    if (elem.ContainedPoints.ElementAt(0) == nodeFrom.ContainedPoints.ElementAt(0) || elem.ContainedPoints.ElementAt(1) == nodeFrom.ContainedPoints.ElementAt(0))
+                    {
+                        Pen blackPen = new Pen(Color.Black, 2);
+                        Point from = elem.ContainedPoints.ElementAt(0);
+                        Point to = new Point(e.X, e.Y);
+                        myGraphics.DrawLine(blackPen, from, to);
+                        myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point((from.X + to.X) / 2 + 3,
+                           (from.Y + to.Y) / 2 + 3));
+                    }
+
+                }
                 System.Threading.Thread.Sleep(10);
             }
         }
@@ -352,6 +421,12 @@ namespace ManagementApp
             this.Cursor = Cursors.Hand;
             nType = NodeType.DELETE;
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Default;
+            nType = NodeType.MOVE;
+        }
     }
 
 
@@ -363,6 +438,7 @@ namespace ManagementApp
         CONNECTION,
         DOMAIN,
         DELETE,
+        MOVE,
         NOTHING
     }
 }
