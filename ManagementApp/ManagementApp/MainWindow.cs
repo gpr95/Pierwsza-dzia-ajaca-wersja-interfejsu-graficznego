@@ -193,9 +193,29 @@ namespace ManagementApp
                 else if (virtualNodeTo != null)
                     bind(nodeFrom, virtualNodeTo);
             }
-            else if (nType == NodeType.DOMAIN && domainFrom != null && domainFrom.X < x && domainFrom.Y < y)
+            else if (nType == NodeType.DOMAIN && domainFrom != null)
             {
-                Point domainTo = new Point(x, y);
+                Point domainTo = new Point(x,y);
+                if (domainFrom.X > x && domainFrom.Y < y)
+                {
+                    Point tmpFrom = new Point(domainTo.X, domainFrom.Y);
+                    Point tmpTo = new Point(domainFrom.X, domainTo.Y);
+                    domainFrom = tmpFrom;
+                    domainTo = tmpTo;
+                }
+                else if(domainFrom.X > x && domainFrom.Y > y)
+                {
+                    domainTo = domainFrom;
+                    domainFrom = new Point(x, y);
+                }
+                else if(domainFrom.X < x && domainFrom.Y > y)
+                {
+                    Point tmpFrom = new Point(domainFrom.X, domainTo.Y);
+                    Point tmpTo = new Point(domainTo.X, domainFrom.Y);
+                    domainFrom = tmpFrom;
+                    domainTo = tmpTo;
+                }
+              
                 Domain toAdd = new Domain(domainFrom, domainTo);
                 addDomainToElements(toAdd);
             }
@@ -204,9 +224,9 @@ namespace ManagementApp
                 virtualNodeTo = new ClientNode(x, y, nodeFrom.Name);
                 elements.Add(virtualNodeTo);
                 foreach (var elem in elementsTemp.AsParallel().Where(i => i is NodeConnection))
-                    if (elem.ContainedPoints.ElementAt(0) == nodeFrom.ContainedPoints.ElementAt(0))
+                    if (elem.ContainedPoints.ElementAt(0).Equals(nodeFrom.ContainedPoints.ElementAt(0)))
                         bind(getNodeFrom(elem.ContainedPoints.ElementAt(1).X, elem.ContainedPoints.ElementAt(1).Y), virtualNodeTo);
-                    else if (elem.ContainedPoints.ElementAt(1) == nodeFrom.ContainedPoints.ElementAt(0))
+                    else if (elem.ContainedPoints.ElementAt(1).Equals(nodeFrom.ContainedPoints.ElementAt(0)))
                         bind(getNodeFrom(elem.ContainedPoints.ElementAt(0).X, elem.ContainedPoints.ElementAt(0).Y), virtualNodeTo);
 
                 consoleTextBox.AppendText("Client Node moved from: " + nodeFrom.ContainedPoints.ElementAt(0).X + "," + nodeFrom.ContainedPoints.ElementAt(0).Y + " to:" +
@@ -219,6 +239,8 @@ namespace ManagementApp
         }
         private void containerPictureBox_MouseMove(object sender, MouseEventArgs e)
         {
+            if (nodeFrom == null)
+                return;
             if (isDrawing && nodeFrom != null && nType == NodeType.CONNECTION)
             {
                 containerPictureBox.Refresh();
@@ -292,19 +314,19 @@ namespace ManagementApp
                 Rectangle rect;
                 containerPictureBox.Refresh();
 
-                        rect = new Rectangle(e.X - 5, e.Y - 5, 11, 11);
-                        myGraphics.FillEllipse(Brushes.ForestGreen, rect);
-                        myGraphics.DrawEllipse(Pens.Black, rect);
-                        myGraphics.DrawString(nodeFrom.Name, new Font("Arial", 5), Brushes.Black, new Point(e.X + 3, e.Y + 3));
+                rect = new Rectangle(e.X - 5, e.Y - 5, 11, 11);
+                myGraphics.FillEllipse(Brushes.ForestGreen, rect);
+                myGraphics.DrawEllipse(Pens.Black, rect);
+                myGraphics.DrawString(nodeFrom.Name, new Font("Arial", 5), Brushes.Black, new Point(e.X + 3, e.Y + 3));
 
                 foreach (var elem in elementsTemp.AsParallel().Where(i => i is NodeConnection))
                 {
-                    if (elem.ContainedPoints.ElementAt(0) == nodeFrom.ContainedPoints.ElementAt(0) || elem.ContainedPoints.ElementAt(1) == nodeFrom.ContainedPoints.ElementAt(0))
+                    if (elem.ContainedPoints.Contains(nodeFrom.ContainedPoints.ElementAt(0)))
                     {
-                        Pen blackPen = new Pen(Color.Black, 2);
-                        Point from = elem.ContainedPoints.ElementAt(0);
+                        Point from = elem.ContainedPoints.ElementAt(0).Equals(nodeFrom.ContainedPoints.ElementAt(0)) ? 
+                            elem.ContainedPoints.ElementAt(1) : elem.ContainedPoints.ElementAt(0);
                         Point to = new Point(e.X, e.Y);
-                        myGraphics.DrawLine(blackPen, from, to);
+                        myGraphics.DrawLine(new Pen(Color.Black, 2), from, to);
                         myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point((from.X + to.X) / 2 + 3,
                            (from.Y + to.Y) / 2 + 3));
                     }
@@ -424,7 +446,7 @@ namespace ManagementApp
 
         private void button1_Click(object sender, EventArgs e)
         {
-            this.Cursor = Cursors.Default;
+            this.Cursor = Cursors.Hand;
             nType = NodeType.MOVE;
         }
     }

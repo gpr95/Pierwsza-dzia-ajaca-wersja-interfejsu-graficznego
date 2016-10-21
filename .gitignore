@@ -240,3 +240,8 @@ ModelManifest.xml
 
 # FAKE - F# Make
 .fake/
+ManagementApp/ManagementApp/bin/Debug/ManagementApp.exe
+ManagementApp/ManagementApp/bin/Debug/ManagementApp.pdb
+ManagementApp/ManagementApp/obj/Debug/ManagementApp.csproj.GenerateResource.Cache
+ManagementApp/ManagementApp/obj/Debug/ManagementApp.exe
+ManagementApp/ManagementApp/obj/Debug/ManagementApp.pdb
