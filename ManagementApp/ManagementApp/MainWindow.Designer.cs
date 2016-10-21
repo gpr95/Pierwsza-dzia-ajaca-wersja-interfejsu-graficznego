@@ -39,14 +39,22 @@ namespace ManagementApp
             this.deleteBtn = new System.Windows.Forms.Button();
             this.deleteListBox = new System.Windows.Forms.ListBox();
             this.button1 = new System.Windows.Forms.Button();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).BeginInit();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // containerPictureBox
             // 
             this.containerPictureBox.Location = new System.Drawing.Point(10, 12);
             this.containerPictureBox.Name = "containerPictureBox";
-            this.containerPictureBox.Size = new System.Drawing.Size(593, 520);
+            this.containerPictureBox.Size = new System.Drawing.Size(598, 520);
             this.containerPictureBox.TabIndex = 0;
             this.containerPictureBox.TabStop = false;
             this.containerPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.containerPictureBox_Paint);
@@ -88,11 +96,11 @@ namespace ManagementApp
             // consoleTextBox
             // 
             this.consoleTextBox.BackColor = System.Drawing.SystemColors.Control;
-            this.consoleTextBox.Location = new System.Drawing.Point(609, 12);
+            this.consoleTextBox.Location = new System.Drawing.Point(0, 0);
             this.consoleTextBox.Multiline = true;
             this.consoleTextBox.Name = "consoleTextBox";
             this.consoleTextBox.ReadOnly = true;
-            this.consoleTextBox.Size = new System.Drawing.Size(293, 520);
+            this.consoleTextBox.Size = new System.Drawing.Size(284, 493);
             this.consoleTextBox.TabIndex = 4;
             // 
             // domainBtn
@@ -136,16 +144,56 @@ namespace ManagementApp
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(610, 12);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(292, 520);
+            this.tabControl1.TabIndex = 9;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.consoleTextBox);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(284, 494);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Log";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Controls.Add(this.dataGridView1);
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(284, 494);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Nodes";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(284, 494);
+            this.dataGridView1.TabIndex = 0;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(914, 574);
+            this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.deleteListBox);
             this.Controls.Add(this.deleteBtn);
             this.Controls.Add(this.domainBtn);
-            this.Controls.Add(this.consoleTextBox);
             this.Controls.Add(this.connectionBtn);
             this.Controls.Add(this.netNodeBtn);
             this.Controls.Add(this.clientNodeBtn);
@@ -154,8 +202,12 @@ namespace ManagementApp
             this.Text = "ManagementApplication";
             this.Load += new System.EventHandler(this.MainWindow_Load);
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).EndInit();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
+            this.tabPage2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -170,6 +222,10 @@ namespace ManagementApp
         private System.Windows.Forms.Button deleteBtn;
         private System.Windows.Forms.ListBox deleteListBox;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.DataGridView dataGridView1;
     }
 }
 

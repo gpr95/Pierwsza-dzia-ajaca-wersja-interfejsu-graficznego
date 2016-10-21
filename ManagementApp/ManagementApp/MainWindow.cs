@@ -21,6 +21,7 @@ namespace ManagementApp
         private List<ContainerElement> elementsTemp = new List<ContainerElement>();
         private int clientNodesNumber;
         private int networkNodesNumber;
+        private DataTable table;
 
         // PAINTING VARS
         private Bitmap containerPoints;
@@ -33,6 +34,7 @@ namespace ManagementApp
         public MainWindow()
         {
             InitializeComponent();
+            MakeTable();
             clientNodesNumber = 0;
             networkNodesNumber = 0;
         }
@@ -51,6 +53,44 @@ namespace ManagementApp
                 }
             }
             myGraphics = containerPictureBox.CreateGraphics();
+        }
+        private void MakeTable()
+        {
+            table = new DataTable("threadManagment");
+            var column = new DataColumn();
+            column.DataType = System.Type.GetType("System.Int32");
+            column.ColumnName = "id";
+            column.AutoIncrement = false;
+            column.Caption = "ParentItem";
+            column.ReadOnly = true;
+            column.Unique = false;
+            // Add the column to the table.
+            table.Columns.Add(column);
+
+            column = new DataColumn();
+            column.DataType = System.Type.GetType("System.String");
+            column.ColumnName = "Type";
+            column.ReadOnly = true;
+            column.Unique = false;
+            table.Columns.Add(column);
+
+            column = new DataColumn();
+            column.DataType = System.Type.GetType("System.String");
+            column.ColumnName = "Name";
+            column.ReadOnly = true;
+            column.Unique = true;
+            table.Columns.Add(column);
+
+            DataColumn[] PrimaryKeyColumns = new DataColumn[1];
+            PrimaryKeyColumns[0] = table.Columns["Name"];
+            table.PrimaryKey = PrimaryKeyColumns;
+            var dtSet = new DataSet();
+            dtSet.Tables.Add(table);
+
+            this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.AllowUserToAddRows = false;
+            this.dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
         // CONTAINER ACTIONS
@@ -100,17 +140,37 @@ namespace ManagementApp
             int x = e.X;
             int y = e.Y;
             putToGrid(ref x, ref y);
+            var row = table.NewRow();
+            var bSource = new BindingSource();
             switch (nType)
             {
                 case NodeType.CLIENT_NODE:
+                    var clientNodeCurrentNumber = clientNodesNumber;
                     elements.Add(new ClientNode(x, y, "CN" + clientNodesNumber++));
                     consoleTextBox.AppendText("Client Node added at: " + x + "," + y);
                     consoleTextBox.AppendText(Environment.NewLine);
+                    row["id"] = clientNodeCurrentNumber;
+                    row["Type"] = "Client";
+                    row["Name"] = "CN" + clientNodeCurrentNumber;
+                    table.Rows.Add(row);
+                    bSource.DataSource = table;
+                    dataGridView1.DataSource = bSource;
+                    dataGridView1.Update();
+                    dataGridView1.Refresh();
                     break;
                 case NodeType.NETWORK_NODE:
+                    var networkNodeCurrentNumber = networkNodesNumber;
                     elements.Add(new NetNode(x, y, "NN" + networkNodesNumber++));
                     consoleTextBox.AppendText("Network Node added at: " + x + "," + y);
                     consoleTextBox.AppendText(Environment.NewLine);
+                    row["id"] = networkNodeCurrentNumber;
+                    row["Type"] = "Network";
+                    row["Name"] = "NN" + networkNodeCurrentNumber;
+                    table.Rows.Add(row);
+                    bSource.DataSource = table;
+                    dataGridView1.DataSource = bSource;
+                    dataGridView1.Update();
+                    dataGridView1.Refresh();
                     break;
                 case NodeType.DELETE:
                     List<String> atPosition = findElementsByPosition(x, y).Select(i => i.Name).ToList();
@@ -155,9 +215,9 @@ namespace ManagementApp
             {
                 isDrawing = true;
                 //Delete node and connections before move
-                if(findElementsByPosition(x, y).Count > 0)
+                if (findElementsByPosition(x, y).Count > 0)
                     nodeFrom = findElementsByPosition(x, y).ElementAt(0);
-                if(nodeFrom != null)
+                if (nodeFrom != null)
                 {
                     int idxOfElement = elements.IndexOf(elements.Where(i => i.Name.Equals(nodeFrom.Name)).FirstOrDefault());
                     if (idxOfElement != -1)
@@ -172,7 +232,7 @@ namespace ManagementApp
                             elementsTemp.Add(elements.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
                             elements.RemoveAt(idxOfElement);
                         }
-                            
+
                     }
                 }
                 System.Threading.Thread.Sleep(10);
@@ -203,24 +263,42 @@ namespace ManagementApp
                     domainFrom = tmpFrom;
                     domainTo = tmpTo;
                 }
-                else if(domainFrom.X > x && domainFrom.Y > y)
+                else if (domainFrom.X > x && domainFrom.Y > y)
                 {
                     domainTo = domainFrom;
                     domainFrom = new Point(x, y);
                 }
-                else if(domainFrom.X < x && domainFrom.Y > y)
+                else if (domainFrom.X < x && domainFrom.Y > y)
                 {
                     Point tmpFrom = new Point(domainFrom.X, domainTo.Y);
                     Point tmpTo = new Point(domainTo.X, domainFrom.Y);
                     domainFrom = tmpFrom;
                     domainTo = tmpTo;
                 }
-              
+
                 Domain toAdd = new Domain(domainFrom, domainTo);
                 addDomainToElements(toAdd);
             }
             else if (nType == NodeType.MOVE && nodeFrom != null)
             {
+                if (x > containerPictureBox.Size.Width)
+                {
+                    x = containerPictureBox.Size.Width;
+                    if (y > containerPictureBox.Size.Height)
+                        y = containerPictureBox.Size.Height;
+                    else if (y < 0)
+                        y = 0;
+                }
+                else if (x < 0)
+                {
+                    x = 0;
+                    if (y > containerPictureBox.Size.Height)
+                        y = containerPictureBox.Size.Height;
+                    else if (y < 0)
+                        y = 0;
+                }
+
+
                 virtualNodeTo = new ClientNode(x, y, nodeFrom.Name);
                 elements.Add(virtualNodeTo);
                 foreach (var elem in elementsTemp.AsParallel().Where(i => i is NodeConnection))
@@ -239,8 +317,8 @@ namespace ManagementApp
         }
         private void containerPictureBox_MouseMove(object sender, MouseEventArgs e)
         {
-            if (nodeFrom == null)
-                return;
+            //if (nodeFrom == null)
+            //    return;
             if (isDrawing && nodeFrom != null && nType == NodeType.CONNECTION)
             {
                 containerPictureBox.Refresh();
@@ -285,12 +363,12 @@ namespace ManagementApp
             {
                 containerPictureBox.Refresh();
 
-                if(e.X - domainFrom.X < 0 && e.Y - domainFrom.Y < 0)
+                if (e.X - domainFrom.X < 0 && e.Y - domainFrom.Y < 0)
                 {
                     myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), e.X,
                         e.Y, domainFrom.X - e.X, domainFrom.Y - e.Y);
                 }
-                else if(e.X - domainFrom.X < 0)
+                else if (e.X - domainFrom.X < 0)
                 {
                     myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), e.X,
                         domainFrom.Y, domainFrom.X - e.X, e.Y - domainFrom.Y);
@@ -306,10 +384,9 @@ namespace ManagementApp
                         domainFrom.Y, e.X - domainFrom.X, e.Y - domainFrom.Y);
                 }
 
-
                 System.Threading.Thread.Sleep(10);
             }
-            else if(isDrawing && nType == NodeType.MOVE)
+            else if (isDrawing && nType == NodeType.MOVE && nodeFrom != null)
             {
                 Rectangle rect;
                 containerPictureBox.Refresh();
@@ -323,7 +400,7 @@ namespace ManagementApp
                 {
                     if (elem.ContainedPoints.Contains(nodeFrom.ContainedPoints.ElementAt(0)))
                     {
-                        Point from = elem.ContainedPoints.ElementAt(0).Equals(nodeFrom.ContainedPoints.ElementAt(0)) ? 
+                        Point from = elem.ContainedPoints.ElementAt(0).Equals(nodeFrom.ContainedPoints.ElementAt(0)) ?
                             elem.ContainedPoints.ElementAt(1) : elem.ContainedPoints.ElementAt(0);
                         Point to = new Point(e.X, e.Y);
                         myGraphics.DrawLine(new Pen(Color.Black, 2), from, to);
@@ -404,12 +481,12 @@ namespace ManagementApp
         private ContainerElement getNodeFrom(int x, int y)
         {
             return elements.Where(i => i.ContainedPoints.ElementAtOrDefault(0).X == x &&
-               i.ContainedPoints.ElementAtOrDefault(0).Y == y).FirstOrDefault(); 
+               i.ContainedPoints.ElementAtOrDefault(0).Y == y).FirstOrDefault();
         }
         // Binding from  Node A to Node B with NodeConnection
         private void bind(ContainerElement nodeFrom, ContainerElement nodeTo)
         {
-            elements.Add(new NodeConnection(nodeFrom, nodeTo,nodeFrom.Name + "-" + nodeTo.Name));
+            elements.Add(new NodeConnection(nodeFrom, nodeTo, nodeFrom.Name + "-" + nodeTo.Name));
             consoleTextBox.AppendText("Connection  added");
             consoleTextBox.AppendText(Environment.NewLine);
         }
