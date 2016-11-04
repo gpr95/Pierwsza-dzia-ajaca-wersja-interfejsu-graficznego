@@ -67,6 +67,7 @@ namespace ManagementApp
             // Add the column to the table.
             table.Columns.Add(column);
 
+
             column = new DataColumn();
             column.DataType = System.Type.GetType("System.String");
             column.ColumnName = "Type";
