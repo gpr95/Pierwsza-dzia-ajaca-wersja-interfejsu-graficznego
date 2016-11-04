@@ -25,3 +25,6 @@ C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\
 C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.MainWindow.resources
 C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.Properties.Resources.resources
 C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
+D:\TSSTRepo\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe.config
+D:\TSSTRepo\ManagementApp\ManagementApp\obj\Debug\ManagementApp.exe
+D:\TSSTRepo\ManagementApp\ManagementApp\obj\Debug\ManagementApp.pdb
