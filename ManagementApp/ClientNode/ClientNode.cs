@@ -16,14 +16,14 @@ namespace ClientNode
     {
 
 
-        private static String Id = null;
+        private string Id = null;
         private TcpListener listener;
         private TcpClient client;
         private Thread thread;
         private static BinaryWriter writeOutput;
         private static int outputPort;
         private static bool cyclic_sending = false;
-        String[] args2 = new string[3];
+        string[] args2 = new string[3];
 
         public ClientNode(string[] args)
         {
@@ -86,7 +86,7 @@ namespace ClientNode
                     {
                         case 1:
                             Console.WriteLine("\nEnter node address: ");
-                            String address = Console.ReadLine();
+                            string address = Console.ReadLine();
                             TcpClient output = new TcpClient();
                             try
                             {
@@ -99,18 +99,18 @@ namespace ClientNode
                                 break;
                             }
                             Console.WriteLine("\nEnter message: ");
-                            String message = Console.ReadLine();
+                            string message = Console.ReadLine();
                             writeOutput.Write(message);
                             output.Close();
                             break;
                         case 2:
                             Console.WriteLine("\nEnter node address: ");
-                            String address2 = Console.ReadLine();
+                            string address2 = Console.ReadLine();
                             Console.WriteLine("\nEnter period(in seconds): ");
-                            String period_tmp = Console.ReadLine();
+                            string period_tmp = Console.ReadLine();
                             int period = Convert.ToInt32(period_tmp);
                             Console.WriteLine("\nEnter message: ");
-                            String message2 = Console.ReadLine();
+                            string message2 = Console.ReadLine();
                             this.SendPeriodically(address2, period, message2);
                             cyclic_sending = true;                            
                            
@@ -155,9 +155,6 @@ namespace ClientNode
 
             Thread myThread = new Thread(async delegate ()
             {
-
-
-              
 
                 while (cyclic_sending)
                 {
