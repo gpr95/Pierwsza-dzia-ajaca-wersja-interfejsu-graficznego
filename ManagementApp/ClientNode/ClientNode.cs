@@ -59,7 +59,18 @@ namespace ClientNode
         {
             TcpClient clienttmp = (TcpClient)client;
                 BinaryReader reader = new BinaryReader(clienttmp.GetStream());
-                Console.WriteLine("Message received: " + reader.ReadString());
+                string received_data = reader.ReadString();
+                JMessage received_object = JMessage.Deserialize(received_data);
+                 if (received_object.Type == typeof(Packet))
+                    {
+                       Packet received_packet = received_object.Value.ToObject<Packet>();
+                       Console.WriteLine("Message received: " + received_packet.message);
+            }
+                 else 
+                     {
+                Console.WriteLine("\n Odebrano uszkodzony pakiet");
+                      }
+            
                 reader.Close();
         }
 
@@ -100,7 +111,11 @@ namespace ClientNode
                             }
                             Console.WriteLine("\nEnter message: ");
                             string message = Console.ReadLine();
-                            writeOutput.Write(message);
+                            Packet packet = new Packet();
+                            packet.sourceAddress = address;
+                            packet.message = message;
+                            string data = JMessage.Serialize(JMessage.FromValue(packet));
+                            writeOutput.Write(data);
                             output.Close();
                             break;
                         case 2:
@@ -135,9 +150,6 @@ namespace ClientNode
 
 
                     }
-
-
-
                 }
                 else
                 {
@@ -155,6 +167,10 @@ namespace ClientNode
 
             Thread myThread = new Thread(async delegate ()
             {
+                Packet packet = new Packet();
+                packet.sourceAddress = address;
+                packet.message = message;
+                string data = JMessage.Serialize(JMessage.FromValue(packet));
 
                 while (cyclic_sending)
                 {
@@ -163,7 +179,7 @@ namespace ClientNode
                     {
                         output.Connect(IPAddress.Parse(address), outputPort);
                         writeOutput = new BinaryWriter(output.GetStream());
-                        writeOutput.Write(message);
+                        writeOutput.Write(data);
                         await Task.Delay(TimeSpan.FromSeconds(period));
                     }
                     catch (Exception e)
