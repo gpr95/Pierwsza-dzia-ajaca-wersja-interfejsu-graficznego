@@ -163,15 +163,16 @@ namespace ClientNode
                     {
                         output.Connect(IPAddress.Parse(address), outputPort);
                         writeOutput = new BinaryWriter(output.GetStream());
+                        writeOutput.Write(message);
+                        await Task.Delay(TimeSpan.FromSeconds(period));
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e.ToString());
                         Console.WriteLine("Could not connect to host.");
-
+                        break;
                     }
-                    writeOutput.Write(message);
-                    await Task.Delay(TimeSpan.FromSeconds(period));
+                    
                 }
                
 
