@@ -1,0 +1,8 @@
+C:\TSSTprojekt\trunk\ManagementApp\ClientNode\bin\Debug\ClientNode.exe.config
+C:\TSSTprojekt\trunk\ManagementApp\ClientNode\bin\Debug\ClientNode.exe
+C:\TSSTprojekt\trunk\ManagementApp\ClientNode\bin\Debug\ClientNode.pdb
+C:\TSSTprojekt\trunk\ManagementApp\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+C:\TSSTprojekt\trunk\ManagementApp\ClientNode\obj\Debug\ClientNode.exe
+C:\TSSTprojekt\trunk\ManagementApp\ClientNode\obj\Debug\ClientNode.pdb
+C:\TSSTprojekt\trunk\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.dll
+C:\TSSTprojekt\trunk\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.xml

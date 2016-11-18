@@ -34,3 +34,14 @@ D:\TSSTRepo\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csprojResolveAss
 D:\TSSTRepo\ManagementApp\ManagementApp\obj\Debug\ManagementApp.MainWindow.resources
 D:\TSSTRepo\ManagementApp\ManagementApp\obj\Debug\ManagementApp.Properties.Resources.resources
 D:\TSSTRepo\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe.config
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.exe
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.pdb
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\bin\Debug\ManagementApp.pdb
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\bin\Debug\Newtonsoft.Json.dll
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\bin\Debug\Newtonsoft.Json.xml
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csprojResolveAssemblyReference.cache
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.MainWindow.resources
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.Properties.Resources.resources
+C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
