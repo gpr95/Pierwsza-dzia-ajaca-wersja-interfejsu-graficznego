@@ -177,7 +177,7 @@ namespace ClientNode
                     TcpClient output = new TcpClient();
                     try
                     {
-                        output.Connect(IPAddress.Parse(address), outputPort);
+                        output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
                         writeOutput = new BinaryWriter(output.GetStream());
                         writeOutput.Write(data);
                         await Task.Delay(TimeSpan.FromSeconds(period));
