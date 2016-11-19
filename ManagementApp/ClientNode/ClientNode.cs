@@ -101,7 +101,7 @@ namespace ClientNode
                             TcpClient output = new TcpClient();
                             try
                             {
-                                output.Connect(IPAddress.Parse(address), outputPort);
+                                output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
                                 writeOutput = new BinaryWriter(output.GetStream());
                             }catch(Exception e)
                             {
@@ -141,7 +141,7 @@ namespace ClientNode
                             }
                             break;
                         case 4:
-                            Environment.Exit(0);
+                            Environment.Exit(1);
                             quit = true;
                             break;
                         default:
