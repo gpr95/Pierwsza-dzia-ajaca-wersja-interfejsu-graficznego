@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ClientNode;
 
 namespace NetNode
 {
@@ -31,15 +32,15 @@ namespace NetNode
             NetNode netnode = new NetNode(IPAddress.Parse("192.168.56.1"));
             
             //symuluje odebranie do portu wiadomosci
-            TcpClient temp = new TcpClient();
-            temp.Connect(netnode.ip, 1234);
-            BinaryWriter writeOutput = new BinaryWriter(temp.GetStream());
-            Packet packet = new Packet();
-            packet.sourceAddress = "192.168.1.12";
-            packet.message = "tralalala";
-            string data = JMessage.Serialize(JMessage.FromValue(packet));
-            writeOutput.Write(data);
-            temp.Close();
+            //TcpClient temp = new TcpClient();
+            //temp.Connect(netnode.ip, 1234);
+            //BinaryWriter writeOutput = new BinaryWriter(temp.GetStream());
+            //Packet packet = new Packet();
+            //packet.sourceAddress = "192.168.1.12";
+            //packet.message = "tralalala";
+            //string data = JMessage.Serialize(JMessage.FromValue(packet));
+            //writeOutput.Write(data);
+            //temp.Close();
 
             //sprawdza czy sa jakies pakiety w kolejkach w portach wejsciowych
             while(true)
@@ -49,9 +50,9 @@ namespace NetNode
                     //check if there is packet in queue and try to process it 
                     if(iport.input.Count > 0)
                     {
-                        Packet pack = iport.input.Dequeue();
+                        ClientNode.Packet pack = iport.input.Dequeue();
                         int oport = netnode.switchField.commutePacket(pack, iport.port, pack.sourceAddress);
-                        netnode.ports.oports[oport].addToOutQueue(packet);
+                        netnode.ports.oports[oport].addToOutQueue(pack);
                         Console.ReadLine();
                     }
                 }

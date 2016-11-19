@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using ClientNode;
 
 namespace NetNode
 {
@@ -20,7 +21,7 @@ namespace NetNode
             this.port = port;
         }
 
-        public void addToOutQueue(Packet packet)
+        public void addToOutQueue(ClientNode.Packet packet)
         {
             this.output.Enqueue(packet);
             sendData(packet);

@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ClientNode
 {
-    class JMessage
+    public class JMessage
     {
         public Type Type { get; set; }
         public JToken Value { get; set; }

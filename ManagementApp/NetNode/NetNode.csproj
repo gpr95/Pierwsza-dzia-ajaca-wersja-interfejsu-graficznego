@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NetNode</RootNamespace>
     <AssemblyName>NetNode</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,10 +48,8 @@
   <ItemGroup>
     <Compile Include="FIB.cs" />
     <Compile Include="IPort.cs" />
-    <Compile Include="JMessage.cs" />
     <Compile Include="ManagementAgent.cs" />
     <Compile Include="OPort.cs" />
-    <Compile Include="Packet.cs" />
     <Compile Include="Ports.cs" />
     <Compile Include="NetNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -62,6 +61,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="config.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClientNode\ClientNode.csproj">
+      <Project>{c348fc9f-8edb-415f-8984-2fb7da94b364}</Project>
+      <Name>ClientNode</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

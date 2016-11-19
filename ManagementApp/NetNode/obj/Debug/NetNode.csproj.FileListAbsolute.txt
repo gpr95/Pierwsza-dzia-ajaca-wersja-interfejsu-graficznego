@@ -6,3 +6,5 @@ C:\TSSTprojekt\trunk\ManagementApp\NetNode\obj\Debug\NetNode.exe
 C:\TSSTprojekt\trunk\ManagementApp\NetNode\obj\Debug\NetNode.pdb
 C:\TSSTprojekt\trunk\ManagementApp\NetNode\bin\Debug\Newtonsoft.Json.dll
 C:\TSSTprojekt\trunk\ManagementApp\NetNode\bin\Debug\Newtonsoft.Json.xml
+C:\TSSTprojekt\trunk\ManagementApp\NetNode\bin\Debug\ClientNode.exe
+C:\TSSTprojekt\trunk\ManagementApp\NetNode\bin\Debug\ClientNode.pdb

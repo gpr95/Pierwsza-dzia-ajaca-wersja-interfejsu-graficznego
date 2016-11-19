@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ClientNode;
 
 namespace NetNode
 {
@@ -56,7 +57,7 @@ namespace NetNode
             reader.Close();
         }
 
-        public void addToInQueue(Packet packet)
+        public void addToInQueue(ClientNode.Packet packet)
         {
             input.Enqueue(packet);
         }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClientNode
 {
-    class Packet
+    public class Packet
     {
         public string sourceAddress { get; set; }
         public string message { get; set; }
