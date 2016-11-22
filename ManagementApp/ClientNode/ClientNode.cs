@@ -10,16 +10,11 @@ using System.Threading.Tasks;
 
 namespace ClientNode
 {
-
-
     class ClientNode
     {
-
-
-        private string Id = null;
+        private string virtualIP;
         private TcpListener listener;
         private TcpClient client;
-        private Thread thread;
         private static BinaryWriter writeOutput;
         private static int outputPort;
         private static bool cyclic_sending = false;
@@ -27,51 +22,44 @@ namespace ClientNode
 
         public ClientNode(string[] args)
         {
-            Id = args[0];
-          
-                int inputPort = Convert.ToInt32(args[1]);
-                outputPort = Convert.ToInt32(args[2]);
-
-                listener = new TcpListener(IPAddress.Parse("127.0.0.1"), inputPort);
-                thread = new Thread(new ThreadStart(Listen));
-                thread.Start();
-
-           
-
+            virtualIP = args[0];
+            int inputPort = Convert.ToInt32(args[1]);
+            outputPort = Convert.ToInt32(args[2]);
+            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), inputPort);
+            Thread thread = new Thread(new ThreadStart(Listen));
+            thread.Start();
             ConsoleInterface();
         }
         private void Listen()
         {
             listener.Start();
-          
+
             while (true)
             {
-             
+
                 TcpClient client = listener.AcceptTcpClient();
                 Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
                 clientThread.Start(client);
-
-                
             }
         }
 
-         private static void ListenThread(Object client)
+        private static void ListenThread(Object client)
         {
             TcpClient clienttmp = (TcpClient)client;
-                BinaryReader reader = new BinaryReader(clienttmp.GetStream());
-                string received_data = reader.ReadString();
-                JMessage received_object = JMessage.Deserialize(received_data);
-                 if (received_object.Type == typeof(Packet))
-                    {
-                       Packet received_packet = received_object.Value.ToObject<Packet>();
-                       Console.WriteLine("Message received: " + received_packet.message);
+            BinaryReader reader = new BinaryReader(clienttmp.GetStream());
+            string received_data = reader.ReadString();
+            JMessage received_object = JMessage.Deserialize(received_data);
+            if (received_object.Type == typeof(Packet))
+            {
+                Packet received_packet = received_object.Value.ToObject<Packet>();
+                Console.WriteLine("Message received: " + received_packet.message);
             }
-                 else 
-                     {
+            else
+            {
                 Console.WriteLine("\n Odebrano uszkodzony pakiet");
-                      }
-            
-                reader.Close();
+            }
+
+            reader.Close();
         }
 
         private void ConsoleInterface()
@@ -81,7 +69,7 @@ namespace ClientNode
             while (!quit)
             {
 
-                Console.WriteLine("\n---- Client Node " + Id + " ----");
+                Console.WriteLine("\n---- Client Node " + virtualIP + " ----");
                 Console.WriteLine("\n MENU: ");
                 Console.WriteLine("\n 1) Send message");
                 Console.WriteLine("\n 2) Send message periodically");
@@ -103,7 +91,8 @@ namespace ClientNode
                             {
                                 output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
                                 writeOutput = new BinaryWriter(output.GetStream());
-                            }catch(Exception e)
+                            }
+                            catch (Exception e)
                             {
                                 Console.WriteLine(e.ToString());
                                 Console.WriteLine("\nCould not connect to host.");
@@ -127,15 +116,16 @@ namespace ClientNode
                             Console.WriteLine("\nEnter message: ");
                             string message2 = Console.ReadLine();
                             this.SendPeriodically(address2, period, message2);
-                            cyclic_sending = true;                            
-                           
+                            cyclic_sending = true;
+
                             break;
                         case 3:
                             if (cyclic_sending == true)
                             {
                                 cyclic_sending = false;
                                 Console.WriteLine("\nSending stopped");
-                            }else
+                            }
+                            else
                             {
                                 Console.WriteLine("\nNothing to stop");
                             }
@@ -160,12 +150,12 @@ namespace ClientNode
             }
         }
 
-   
-        private  void SendPeriodically(string address, int period, string message)
-        {
-           
 
-            Thread myThread = new Thread(async delegate ()
+        private void SendPeriodically(string address, int period, string message)
+        {
+
+
+            Thread myThread = new Thread(async delegate()
             {
                 Packet packet = new Packet();
                 packet.sourceAddress = address;
@@ -188,14 +178,14 @@ namespace ClientNode
                         Console.WriteLine("Could not connect to host.");
                         break;
                     }
-                    
+
                 }
-               
+
 
             });
             myThread.Start();
         }
-       
+
 
     }
 }

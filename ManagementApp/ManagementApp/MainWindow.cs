@@ -33,6 +33,7 @@ namespace ManagementApp
 
         public MainWindow()
         {
+            //TODO: start chmury kablowej
             InitializeComponent();
             MakeTable();
             clientNodesNumber = 0;
@@ -147,8 +148,9 @@ namespace ManagementApp
             {
                 case NodeType.CLIENT_NODE:
                     var clientNodeCurrentNumber = clientNodesNumber;
-                    elements.Add(new ClientNode(x, y, "CN" + clientNodesNumber++));
-                    consoleTextBox.AppendText("Client Node added at: " + x + "," + y);
+
+                    elements.Add(new ClientNode(x, y, "CN" + clientNodesNumber++, 6000 + clientNodesNumber, 6050 + clientNodesNumber));
+                    consoleTextBox.AppendText("Client Node added at: " + x + "," + y + " with adress: CN" + clientNodesNumber);
                     consoleTextBox.AppendText(Environment.NewLine);
                     row["id"] = clientNodeCurrentNumber;
                     row["Type"] = "Client";
@@ -311,7 +313,7 @@ namespace ManagementApp
                 }
 
 
-                virtualNodeTo = new ClientNode(x, y, nodeFrom.Name);
+                virtualNodeTo = new ClientNode(x, y, nodeFrom.Name, 6000 + int.Parse(nodeFrom.Name.Replace("CN", "")), 6050 + int.Parse(nodeFrom.Name.Replace("CN", "")));
                 elements.Add(virtualNodeTo);
                 foreach (var elem in elementsTemp.AsParallel().Where(i => i is NodeConnection))
                     if (elem.ContainedPoints.ElementAt(0).Equals(nodeFrom.ContainedPoints.ElementAt(0)))
