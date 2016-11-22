@@ -177,7 +177,9 @@ namespace ManagementApp
                     List<String> atPosition = findElementsByPosition(x, y).Select(i => i.Name).ToList();
                     foreach (String toDelete in atPosition)
                         deleteListBox.Items.Add(toDelete);
-                    if (deleteListBox.Items != null && atPosition.Count > 1)
+                    if (deleteListBox.Visible.Equals(true) || deleteListBox.Items == null)
+                        break;
+                    if (atPosition.Count > 1)
                     {
                         deleteListBox.Items.Add("Cancel");
                         deleteListBox.Location = new Point(x, y);
@@ -185,7 +187,7 @@ namespace ManagementApp
                         deleteListBox.Enabled = true;
                         autofit();
                     }
-                    else
+                    else if (atPosition.Count == 1)
                     {
                         int idxOfElement = elements.IndexOf(elements.Where(
                             i => i.Name.Equals(atPosition.First())
@@ -249,10 +251,19 @@ namespace ManagementApp
             if (nType == NodeType.CONNECTION && nodeFrom != null)
             {
                 ContainerElement nodeTo = getNodeFrom(x, y);
-                if (nodeTo != null)
+
+                if (nodeTo != null &&
+                    elements.Where(i => i is NodeConnection &&
+                    i.ContainedPoints.Contains(nodeFrom.ContainedPoints.First()) &&
+                    i.ContainedPoints.Contains(nodeTo.ContainedPoints.First())).Count() == 0)
                     bind(nodeFrom, nodeTo);
-                else if (virtualNodeTo != null)
+                else if (virtualNodeTo != null &&
+                     elements.Where(
+                    i => i is NodeConnection &&
+                    i.ContainedPoints.Contains(nodeFrom.ContainedPoints.First()) &&
+                    i.ContainedPoints.Contains(virtualNodeTo.ContainedPoints.First())).Count() == 0)
                     bind(nodeFrom, virtualNodeTo);
+                nodeFrom = null;
             }
             else if (nType == NodeType.DOMAIN && domainFrom != null)
             {
@@ -419,8 +430,20 @@ namespace ManagementApp
             int idxOfElement = elements.IndexOf(elements.Where(
                            i => i.Name.Equals(deleteListBox.SelectedItem)
                            ).FirstOrDefault());
+            ContainerElement toDelete = elements.Where(i => i.Name.Equals(deleteListBox.SelectedItem)).FirstOrDefault();
             if (idxOfElement != -1)
+            {
                 elements.RemoveAt(idxOfElement);
+                if (toDelete is ClientNode || toDelete is NetNode)
+                {
+                    List<ContainerElement> connectionsToDelete = elements.Where(
+                        i => i.ContainedPoints.Contains(toDelete.ContainedPoints.First()) && i is NodeConnection
+                        ).ToList();
+
+                    foreach (ContainerElement con in connectionsToDelete)
+                        elements.RemoveAt(elements.IndexOf(con));
+                }
+            }
             deleteListBox.Visible = false;
             deleteListBox.Enabled = false;
             deleteListBox.Items.Clear();
