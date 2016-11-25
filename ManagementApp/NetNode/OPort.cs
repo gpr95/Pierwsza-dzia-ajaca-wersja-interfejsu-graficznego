@@ -24,17 +24,6 @@ namespace NetNode
         public void addToOutQueue(ClientNode.Packet packet)
         {
             this.output.Enqueue(packet);
-            sendData(packet);
-        }
-
-        public void sendData(Packet packet)
-        {
-            TcpClient temp = new TcpClient();
-            temp.Connect(IPAddress.Parse("192.168.56.1"), 1234+port);
-            BinaryWriter writeOutput = new BinaryWriter(temp.GetStream());
-            string data = JMessage.Serialize(JMessage.FromValue(packet));
-            writeOutput.Write(data);
-            this.output.Dequeue();
         }
     }
 }
