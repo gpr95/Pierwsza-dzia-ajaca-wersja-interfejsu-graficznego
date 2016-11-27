@@ -14,30 +14,62 @@ namespace ManagementApp
     {
         // CONSTS
         private const int GAP = 10;
-
+        private ControlPlane control;
         // LOGICAL VARS
-        private NodeType nType;
-        private List<ContainerElement> elements = new List<ContainerElement>();
+        private OperationType oType;
+        //private List<ContainerElement> elements = new List<ContainerElement>();
         private List<ContainerElement> elementsTemp = new List<ContainerElement>();
-        private int clientNodesNumber;
-        private int networkNodesNumber;
-        private DataTable table;
+        //private List<ClientNode> clientNodeList;
+        //private List<NetNode> networkNodeList;
+        private List<Node> nodeList;
+        private List<NodeConnection> connectionList;
+        private List<Domain> domainList;
 
+        private DataTable table;
+        
         // PAINTING VARS
         private Bitmap containerPoints;
-        private ContainerElement nodeFrom;
-        private ContainerElement virtualNodeTo;
+        private Node nodeFrom;
+        private Node virtualNodeTo;
         private bool isDrawing = false;
         private Point domainFrom;
         private Graphics myGraphics;
 
-        public MainWindow()
+        internal ControlPlane Control
+        {
+            get
+            {
+                return control;
+            }
+
+            set
+            {
+                control = value;
+            }
+        }
+
+        enum OperationType
+        {
+            ADD_CLIENT_NODE,
+            ADD_NETWORK_NODE,
+            ADD_CONNECTION,
+            ADD_DOMAIN,
+            DELETE,
+            MOVE_NODE,
+            NOTHING
+        }
+
+        public MainWindow(DataTable table, List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
         {
             //TODO: start chmury kablowej
             InitializeComponent();
-            MakeTable();
-            clientNodesNumber = 0;
-            networkNodesNumber = 0;
+            RenderTable();
+            this.table = table;
+            this.nodeList = nodeList;
+            //this.networkNodeList = networkNodeList;
+            this.connectionList = connectionList;
+            this.domainList = domainList;
+
         }
 
         // MAIN WINDOW ACTIONS
@@ -50,45 +82,14 @@ namespace ManagementApp
                 for (int y = 0; y < containerPictureBox.ClientSize.Height;
                     y += GAP)
                 {
-                    containerPoints.SetPixel(x, y, Color.Black);
+                    containerPoints.SetPixel(x, y, Color.Gainsboro);
                 }
             }
             myGraphics = containerPictureBox.CreateGraphics();
         }
-        private void MakeTable()
+
+        private void RenderTable()
         {
-            table = new DataTable("threadManagment");
-            var column = new DataColumn();
-            column.DataType = System.Type.GetType("System.Int32");
-            column.ColumnName = "id";
-            column.AutoIncrement = false;
-            column.Caption = "ParentItem";
-            column.ReadOnly = true;
-            column.Unique = false;
-            // Add the column to the table.
-            table.Columns.Add(column);
-
-
-            column = new DataColumn();
-            column.DataType = System.Type.GetType("System.String");
-            column.ColumnName = "Type";
-            column.ReadOnly = true;
-            column.Unique = false;
-            table.Columns.Add(column);
-
-            column = new DataColumn();
-            column.DataType = System.Type.GetType("System.String");
-            column.ColumnName = "Name";
-            column.ReadOnly = true;
-            column.Unique = true;
-            table.Columns.Add(column);
-
-            DataColumn[] PrimaryKeyColumns = new DataColumn[1];
-            PrimaryKeyColumns[0] = table.Columns["Name"];
-            table.PrimaryKey = PrimaryKeyColumns;
-            var dtSet = new DataSet();
-            dtSet.Tables.Add(table);
-
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -100,83 +101,49 @@ namespace ManagementApp
         {
             Graphics panel = e.Graphics;
 
-            Rectangle rect;
-            foreach (var elem in elements.AsParallel().Where(i => i is NetNode))
+            foreach (var elem in domainList)
             {
-                rect = new Rectangle(elem.ContainedPoints.ElementAt(0).X - 5,
-                    elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
-                panel.FillEllipse(Brushes.CadetBlue, rect);
-                panel.DrawEllipse(Pens.Black, rect);
-                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point(elem.ContainedPoints.ElementAt(0).X + 3,
-                    elem.ContainedPoints.ElementAt(0).Y + 3));
+                drawElement(elem, panel);
             }
-            foreach (var elem in elements.AsParallel().Where(i => i is ClientNode))
+            foreach (var elem in connectionList)
             {
-                rect = new Rectangle(elem.ContainedPoints.ElementAt(0).X - 5,
-                   elem.ContainedPoints.ElementAt(0).Y - 5, 11, 11);
-                panel.FillEllipse(Brushes.ForestGreen, rect);
-                panel.DrawEllipse(Pens.Black, rect);
-                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point(elem.ContainedPoints.ElementAt(0).X + 3,
-                    elem.ContainedPoints.ElementAt(0).Y + 3));
+                drawElement(elem, panel);
             }
-            foreach (var elem in elements.AsParallel().Where(i => i is NodeConnection))
+            foreach (var node in nodeList)
             {
-                Pen blackPen = new Pen(Color.Black, 2);
-                Point from = elem.ContainedPoints.ElementAt(0);
-                Point to = elem.ContainedPoints.ElementAt(1);
-                panel.DrawLine(blackPen, from, to);
-                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point((from.X + to.X) / 2 + 3,
-                   (from.Y + to.Y) / 2 + 3));
-            }
-            foreach (var elem in elements.AsParallel().Where(i => i is Domain))
-            {
-                Domain tmp = (Domain)elem;
-                Point from = tmp.PointFrom;
-                rect = new Rectangle(from.X, from.Y, tmp.Width, tmp.Height);
-                panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
+                drawNode(node, panel);
             }
             containerPictureBox.BackgroundImage = containerPoints;
         }
+
+        
+
         private void containerPictureBox_MouseClick(object sender, MouseEventArgs e)
         {
             int x = e.X;
             int y = e.Y;
             putToGrid(ref x, ref y);
-            var row = table.NewRow();
-            var bSource = new BindingSource();
-            switch (nType)
+            switch (oType)
             {
-                case NodeType.CLIENT_NODE:
-                    var clientNodeCurrentNumber = clientNodesNumber;
+                case OperationType.ADD_CLIENT_NODE:
+                    control.addClientNode(x, y);
+                    break;
+                case OperationType.ADD_NETWORK_NODE:
+                    control.addNetworkNode(x, y);
+                    break;
+                case OperationType.DELETE:
+                    deleteListBox.Visible = false;
+                    deleteListBox.Enabled = false;
+                    deleteListBox.Items.Clear();
+                    containerPictureBox.Refresh();
+                    //deleteListBox = new ListBox();
+                    List<String> atPosition = findConnectionsByPosition(x, y).Select(i => i.Name).ToList();
+                    Node n = getNodeFrom(x, y);
+                    if (n == null)
+                        break;
 
-                    elements.Add(new ClientNode(x, y, "CN" + clientNodesNumber++, 6000 + clientNodesNumber, 6050 + clientNodesNumber));
-                    consoleTextBox.AppendText("Client Node added at: " + x + "," + y + " with adress: CN" + clientNodesNumber);
-                    consoleTextBox.AppendText(Environment.NewLine);
-                    row["id"] = clientNodeCurrentNumber;
-                    row["Type"] = "Client";
-                    row["Name"] = "CN" + clientNodeCurrentNumber;
-                    table.Rows.Add(row);
-                    bSource.DataSource = table;
-                    dataGridView1.DataSource = bSource;
-                    dataGridView1.Update();
-                    dataGridView1.Refresh();
-                    break;
-                case NodeType.NETWORK_NODE:
-                    var networkNodeCurrentNumber = networkNodesNumber;
-                    elements.Add(new NetNode(x, y, "NN" + networkNodesNumber++));
-                    consoleTextBox.AppendText("Network Node added at: " + x + "," + y);
-                    consoleTextBox.AppendText(Environment.NewLine);
-                    row["id"] = networkNodeCurrentNumber;
-                    row["Type"] = "Network";
-                    row["Name"] = "NN" + networkNodeCurrentNumber;
-                    table.Rows.Add(row);
-                    bSource.DataSource = table;
-                    dataGridView1.DataSource = bSource;
-                    dataGridView1.Update();
-                    dataGridView1.Refresh();
-                    break;
-                case NodeType.DELETE:
-                    List<String> atPosition = findElementsByPosition(x, y).Select(i => i.Name).ToList();
+                    atPosition.Add(n.Name);
+
                     foreach (String toDelete in atPosition)
                         deleteListBox.Items.Add(toDelete);
                     if (deleteListBox.Visible.Equals(true) || deleteListBox.Items == null)
@@ -191,189 +158,173 @@ namespace ManagementApp
                     }
                     else if (atPosition.Count == 1)
                     {
-                        int idxOfElement = elements.IndexOf(elements.Where(
-                            i => i.Name.Equals(atPosition.First())
-                            ).FirstOrDefault());
-                        if (idxOfElement != -1)
-                            elements.RemoveAt(idxOfElement);
+                        //int idxOfElement = elements.IndexOf(elements.Where(
+                        //    i => i.Name.Equals(atPosition.First())
+                        //    ).FirstOrDefault());
+                        //if (idxOfElement != -1)
+                        //    elements.RemoveAt(idxOfElement);
+
+                        control.deleteNode(n);
                     }
                     break;
+
             }
             containerPictureBox.Refresh();
         }
+
         private void containerPictureBox_MouseDown(object sender, MouseEventArgs e)
         {
             int x = e.X;
             int y = e.Y;
             putToGrid(ref x, ref y);
-            if (nType == NodeType.CONNECTION)
+            switch (oType)
             {
-                nodeFrom = getNodeFrom(x, y);
-                isDrawing = true;
-            }
-            else if (nType == NodeType.DOMAIN)
-            {
-                domainFrom = new Point(x, y);
-                isDrawing = true;
-            }
-            else if (nType == NodeType.MOVE)
-            {
-                isDrawing = true;
-                //Delete node and connections before move
-                if (findElementsByPosition(x, y).Count > 0)
-                    nodeFrom = findElementsByPosition(x, y).ElementAt(0);
-                if (nodeFrom != null)
-                {
-                    int idxOfElement = elements.IndexOf(elements.Where(i => i.Name.Equals(nodeFrom.Name)).FirstOrDefault());
-                    if (idxOfElement != -1)
-                        elements.RemoveAt(idxOfElement);
-                    List<String> atPosition = findElementsByPosition(x, y).Select(i => i.Name).ToList();
-                    foreach (String toMove in atPosition)
+                case OperationType.ADD_CONNECTION:
+                    nodeFrom = getNodeFrom(x, y);
+                    isDrawing = true;
+                    break;
+                case OperationType.ADD_DOMAIN:
+                    domainFrom = new Point(x, y);
+                    isDrawing = true;
+                    break;
+                case OperationType.MOVE_NODE:
+                    nodeFrom = getNodeFrom(x, y);
+                    if (nodeFrom != null)
                     {
-                        idxOfElement = elements.IndexOf(elements.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
-                        Console.WriteLine(toMove);
-                        if (idxOfElement != -1)
-                        {
-                            elementsTemp.Add(elements.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
-                            elements.RemoveAt(idxOfElement);
-                        }
-
+                        isDrawing = true;
+                        selectAffectedElements(nodeFrom);
                     }
-                }
-                System.Threading.Thread.Sleep(10);
-                containerPictureBox.Refresh();
+                    System.Threading.Thread.Sleep(10);
+                    containerPictureBox.Refresh();
+                    break;
             }
         }
+
         private void containerPictureBox_MouseUp(object sender, MouseEventArgs e)
         {
             int x = e.X;
             int y = e.Y;
             putToGrid(ref x, ref y);
             isDrawing = false;
-            if (nType == NodeType.CONNECTION && nodeFrom != null)
+
+            switch (oType)
             {
-                ContainerElement nodeTo = getNodeFrom(x, y);
+                case OperationType.ADD_CONNECTION:
+                    if (nodeFrom == null)
+                        break;
+                    Node nodeTo = getNodeFrom(x, y);
+                    control.addConnection(nodeFrom, virtualNodeTo);
+                    nodeFrom = null;
+                    break;
 
-                if (nodeTo != null &&
-                    elements.Where(i => i is NodeConnection &&
-                    i.ContainedPoints.Contains(nodeFrom.ContainedPoints.First()) &&
-                    i.ContainedPoints.Contains(nodeTo.ContainedPoints.First())).Count() == 0)
-                    bind(nodeFrom, nodeTo);
-                else if (virtualNodeTo != null &&
-                     elements.Where(
-                    i => i is NodeConnection &&
-                    i.ContainedPoints.Contains(nodeFrom.ContainedPoints.First()) &&
-                    i.ContainedPoints.Contains(virtualNodeTo.ContainedPoints.First())).Count() == 0)
-                    bind(nodeFrom, virtualNodeTo);
-                nodeFrom = null;
-            }
-            else if (nType == NodeType.DOMAIN && domainFrom != null)
-            {
-                Point domainTo = new Point(x,y);
-                if (domainFrom.X > x && domainFrom.Y < y)
-                {
-                    Point tmpFrom = new Point(domainTo.X, domainFrom.Y);
-                    Point tmpTo = new Point(domainFrom.X, domainTo.Y);
-                    domainFrom = tmpFrom;
-                    domainTo = tmpTo;
-                }
-                else if (domainFrom.X > x && domainFrom.Y > y)
-                {
-                    domainTo = domainFrom;
-                    domainFrom = new Point(x, y);
-                }
-                else if (domainFrom.X < x && domainFrom.Y > y)
-                {
-                    Point tmpFrom = new Point(domainFrom.X, domainTo.Y);
-                    Point tmpTo = new Point(domainTo.X, domainFrom.Y);
-                    domainFrom = tmpFrom;
-                    domainTo = tmpTo;
-                }
+                case OperationType.ADD_DOMAIN:
+                    //Add domain thrue control
+                    Point domainTo = new Point(x,y);
+                    if (domainFrom.X > x && domainFrom.Y < y)
+                    {
+                        Point tmpFrom = new Point(domainTo.X, domainFrom.Y);
+                        Point tmpTo = new Point(domainFrom.X, domainTo.Y);
+                        domainFrom = tmpFrom;
+                        domainTo = tmpTo;
+                    }
+                    else if (domainFrom.X > x && domainFrom.Y > y)
+                    {
+                        domainTo = domainFrom;
+                        domainFrom = new Point(x, y);
+                    }
+                    else if (domainFrom.X < x && domainFrom.Y > y)
+                    {
+                        Point tmpFrom = new Point(domainFrom.X, domainTo.Y);
+                        Point tmpTo = new Point(domainTo.X, domainFrom.Y);
+                        domainFrom = tmpFrom;
+                        domainTo = tmpTo;
+                    }
 
-                Domain toAdd = new Domain(domainFrom, domainTo);
-                addDomainToElements(toAdd);
-            }
-            else if (nType == NodeType.MOVE && nodeFrom != null)
-            {
-                if (x > containerPictureBox.Size.Width)
-                {
-                    x = containerPictureBox.Size.Width;
-                    if (y > containerPictureBox.Size.Height)
-                        y = containerPictureBox.Size.Height;
-                    else if (y < 0)
-                        y = 0;
-                }
-                else if (x < 0)
-                {
-                    x = 0;
-                    if (y > containerPictureBox.Size.Height)
-                        y = containerPictureBox.Size.Height;
-                    else if (y < 0)
-                        y = 0;
-                }
+                    Domain toAdd = new Domain(domainFrom, domainTo);
+                    addDomainToElements(toAdd);
+                    break;
 
+                case OperationType.MOVE_NODE:
+                    //Update node thrue control
+                    if (nodeFrom == null)
+                        break;
 
-                virtualNodeTo = new ClientNode(x, y, nodeFrom.Name, 6000 + int.Parse(nodeFrom.Name.Replace("CN", "")), 6050 + int.Parse(nodeFrom.Name.Replace("CN", "")));
-                elements.Add(virtualNodeTo);
-                foreach (var elem in elementsTemp.AsParallel().Where(i => i is NodeConnection))
-                    if (elem.ContainedPoints.ElementAt(0).Equals(nodeFrom.ContainedPoints.ElementAt(0)))
-                        bind(getNodeFrom(elem.ContainedPoints.ElementAt(1).X, elem.ContainedPoints.ElementAt(1).Y), virtualNodeTo);
-                    else if (elem.ContainedPoints.ElementAt(1).Equals(nodeFrom.ContainedPoints.ElementAt(0)))
-                        bind(getNodeFrom(elem.ContainedPoints.ElementAt(0).X, elem.ContainedPoints.ElementAt(0).Y), virtualNodeTo);
+                    if (x > containerPictureBox.Size.Width)
+                    {
+                        x = containerPictureBox.Size.Width;
+                        if (y > containerPictureBox.Size.Height)
+                            y = containerPictureBox.Size.Height;
+                        else if (y < 0)
+                            y = 0;
+                    }
+                    else if (x < 0)
+                    {
+                        x = 0;
+                        if (y > containerPictureBox.Size.Height)
+                            y = containerPictureBox.Size.Height;
+                        else if (y < 0)
+                            y = 0;
+                    }
 
-                consoleTextBox.AppendText("Client Node moved from: " + nodeFrom.ContainedPoints.ElementAt(0).X + "," + nodeFrom.ContainedPoints.ElementAt(0).Y + " to:" +
-                    x + "," + y);
-                consoleTextBox.AppendText(Environment.NewLine);
-                nodeFrom = null;
-                elementsTemp.Clear();
+                    //virtualNodeTo = new ClientNode(x, y, nodeFrom.Name, 9999, 9999);
+                    //nodeList.Add(virtualNodeTo);
+                    Point oldPosition = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
+                    control.updateNode(nodeFrom, x, y);
+                    foreach (var elem in elementsTemp)
+                        if (elem.Start.Equals(oldPosition))
+                            control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), nodeFrom);
+                        else if (elem.End.Equals(oldPosition))
+                            control.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), nodeFrom);
+
+                    consoleTextBox.AppendText("Node moved from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
+                        x + "," + y);
+                    consoleTextBox.AppendText(Environment.NewLine);
+                    nodeFrom = null;
+                    elementsTemp.Clear();
+                    break;
+
             }
             containerPictureBox.Refresh();
         }
+        //keep mouse_move as it is because there is only painting(i hope)
         private void containerPictureBox_MouseMove(object sender, MouseEventArgs e)
         {
-            //if (nodeFrom == null)
-            //    return;
-            if (isDrawing && nodeFrom != null && nType == NodeType.CONNECTION)
+            
+            if (isDrawing && nodeFrom != null && oType == OperationType.ADD_CONNECTION)
             {
                 containerPictureBox.Refresh();
-                Point fromNode = new Point(nodeFrom.ContainedPoints.ElementAt(0).X, nodeFrom.ContainedPoints.ElementAt(0).Y);
+                Point fromNode = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
                 Point to = new Point(e.X, e.Y);
 
                 double distance = Double.PositiveInfinity;
                 double temporartDistance = Double.PositiveInfinity;
 
-                foreach (var elem in elements.AsParallel().Where(i => i is NetNode && i != nodeFrom))
+                foreach (var node in nodeList)
                 {
-                    temporartDistance = Math.Round(Math.Sqrt(Math.Pow(elem.ContainedPoints.ElementAt(0).X - e.X, 2) + Math.Pow(elem.ContainedPoints.ElementAt(0).Y - e.Y, 2)), 2);
-                    if (temporartDistance < distance)
+                    temporartDistance = Math.Round(Math.Sqrt(Math.Pow(node.Position.X - e.X, 2) + Math.Pow(node.Position.Y - e.Y, 2)), 2);
+                    if (temporartDistance < distance && !node.Equals(nodeFrom))
                     {
                         distance = temporartDistance;
-                        virtualNodeTo = elem;
+                        virtualNodeTo = node;
                     }
                     temporartDistance = Double.PositiveInfinity;
                 }
-                foreach (var elem in elements.AsParallel().Where(i => i is ClientNode && i != nodeFrom))
-                {
-                    temporartDistance = Math.Round(Math.Sqrt(Math.Pow(elem.ContainedPoints.ElementAt(0).X - e.X, 2) + Math.Pow(elem.ContainedPoints.ElementAt(0).Y - e.Y, 2)), 2);
-                    if (temporartDistance < distance)
-                    {
-                        distance = temporartDistance;
-                        virtualNodeTo = elem;
-                    }
-                    temporartDistance = Double.PositiveInfinity;
-                }
-                Pen blackPen = new Pen(Color.Black, 3);
+
+                Pen blackPen = new Pen(Color.WhiteSmoke, 3);
                 if (distance > 100)
+                {
                     //ControlPaint.DrawReversibleLine(fromNode, to, Color.Black);
                     myGraphics.DrawLine(blackPen, fromNode, to);
+                    virtualNodeTo = null;
+                }
                 else
                 {
-                    Point end = new Point(virtualNodeTo.ContainedPoints.ElementAt(0).X, virtualNodeTo.ContainedPoints.ElementAt(0).Y);
+                    Point end = new Point(virtualNodeTo.Position.X, virtualNodeTo.Position.Y);
                     myGraphics.DrawLine(blackPen, fromNode, end);
                 }
                 System.Threading.Thread.Sleep(10);
             }
-            else if (isDrawing && nType == NodeType.DOMAIN)
+            else if (isDrawing && oType == OperationType.ADD_DOMAIN)
             {
                 containerPictureBox.Refresh();
 
@@ -400,25 +351,38 @@ namespace ManagementApp
 
                 System.Threading.Thread.Sleep(10);
             }
-            else if (isDrawing && nType == NodeType.MOVE && nodeFrom != null)
+            else if (isDrawing && nodeFrom != null && oType == OperationType.MOVE_NODE)
             {
-                Rectangle rect;
                 containerPictureBox.Refresh();
 
-                rect = new Rectangle(e.X - 5, e.Y - 5, 11, 11);
-                myGraphics.FillEllipse(Brushes.ForestGreen, rect);
+                Rectangle rect = new Rectangle(e.X - 5, e.Y - 5, 11, 11);
+                if (nodeFrom is NetNode)
+                    myGraphics.FillEllipse(Brushes.DodgerBlue, rect);
+                else if (nodeFrom is ClientNode)
+                    myGraphics.FillEllipse(Brushes.YellowGreen, rect);
                 myGraphics.DrawEllipse(Pens.Black, rect);
-                myGraphics.DrawString(nodeFrom.Name, new Font("Arial", 5), Brushes.Black, new Point(e.X + 3, e.Y + 3));
+                myGraphics.DrawString(nodeFrom.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point(e.X + 3,
+                    e.Y + 3));
 
-                foreach (var elem in elementsTemp.AsParallel().Where(i => i is NodeConnection))
+                foreach (var elem in elementsTemp)
                 {
-                    if (elem.ContainedPoints.Contains(nodeFrom.ContainedPoints.ElementAt(0)))
+                    if (elem.Start.Equals(nodeFrom.Position))
                     {
-                        Point from = elem.ContainedPoints.ElementAt(0).Equals(nodeFrom.ContainedPoints.ElementAt(0)) ?
-                            elem.ContainedPoints.ElementAt(1) : elem.ContainedPoints.ElementAt(0);
+                        Point from = elem.Start.Equals(nodeFrom.Position) ?
+                            elem.End : elem.Start;
                         Point to = new Point(e.X, e.Y);
-                        myGraphics.DrawLine(new Pen(Color.Black, 2), from, to);
-                        myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Black, new Point((from.X + to.X) / 2 + 3,
+                        myGraphics.DrawLine(new Pen(Color.WhiteSmoke, 2), from, to);
+                        myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + to.X) / 2 + 3,
+                           (from.Y + to.Y) / 2 + 3));
+                    }
+
+                    if (elem.End.Equals(nodeFrom.Position))
+                    {
+                        Point from = elem.Start.Equals(nodeFrom.Position) ?
+                            elem.End : elem.Start;
+                        Point to = new Point(e.X, e.Y);
+                        myGraphics.DrawLine(new Pen(Color.WhiteSmoke, 2), from, to);
+                        myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + to.X) / 2 + 3,
                            (from.Y + to.Y) / 2 + 3));
                     }
 
@@ -426,25 +390,41 @@ namespace ManagementApp
                 System.Threading.Thread.Sleep(10);
             }
         }
-        // DELETE LISTBOX ACTIONS
+
         private void deleteListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            int idxOfElement = elements.IndexOf(elements.Where(
-                           i => i.Name.Equals(deleteListBox.SelectedItem)
+            bool isNode = true;
+            //int idxOfElement = nodeList.IndexOf(nodeList.Where(i => i.Name.Equals(deleteListBox.SelectedItem)
+            //               ).FirstOrDefault());
+
+            //ContainerElement toDelete = connectionList.Where(i => i.Name.Equals(deleteListBox.SelectedItem)).FirstOrDefault();
+
+            int idxOfElement = nodeList.IndexOf(nodeList.Where(i => i.Name.Equals(deleteListBox.SelectedItem)).FirstOrDefault());
+
+            if (idxOfElement == -1)
+            {
+                idxOfElement = connectionList.IndexOf(connectionList.Where(i => i.Name.Equals(deleteListBox.SelectedItem)
                            ).FirstOrDefault());
-            ContainerElement toDelete = elements.Where(i => i.Name.Equals(deleteListBox.SelectedItem)).FirstOrDefault();
+                isNode = false;
+            }
+
             if (idxOfElement != -1)
             {
-                elements.RemoveAt(idxOfElement);
-                if (toDelete is ClientNode || toDelete is NetNode)
+                if (isNode)
                 {
-                    List<ContainerElement> connectionsToDelete = elements.Where(
-                        i => i.ContainedPoints.Contains(toDelete.ContainedPoints.First()) && i is NodeConnection
+                    List<NodeConnection> connectionsToDelete = connectionList.Where(
+                        i => i.Start.Equals(nodeList.ElementAt(idxOfElement).Position) ||
+                        i.End.Equals(nodeList.ElementAt(idxOfElement).Position)
                         ).ToList();
 
-                    foreach (ContainerElement con in connectionsToDelete)
-                        elements.RemoveAt(elements.IndexOf(con));
+                    foreach (NodeConnection con in connectionsToDelete)
+                        connectionList.RemoveAt(connectionList.IndexOf(con));
+
+                    control.deleteNode(nodeList.ElementAt(idxOfElement));
                 }
+                else
+                    connectionList.RemoveAt(idxOfElement);
+
             }
             deleteListBox.Visible = false;
             deleteListBox.Enabled = false;
@@ -465,11 +445,91 @@ namespace ManagementApp
             }
             deleteListBox.Width = width;
         }
-        // Validate adding domain to container
+
+        private void clientNodeBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            oType = OperationType.ADD_CLIENT_NODE;
+        }
+        private void networkNodeBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            oType = OperationType.ADD_NETWORK_NODE;
+        }
+        private void connectionBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            oType = OperationType.ADD_CONNECTION;
+        }
+        private void domainBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            oType = OperationType.ADD_DOMAIN;
+        }
+        private void deleteBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            oType = OperationType.DELETE;
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            oType = OperationType.MOVE_NODE;
+        }
+
+        public void addNode(Node node)
+        {
+            if(node is ClientNode)
+                consoleTextBox.AppendText("Client Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.Name);
+                
+            if (node is NetNode)
+                consoleTextBox.AppendText("Network Node added at: " + node.Position.X + "," + node.Position.Y);
+
+            consoleTextBox.AppendText(Environment.NewLine);
+            var bSource = new BindingSource();
+            bSource.DataSource = table;
+            dataGridView1.DataSource = bSource;
+            dataGridView1.Update();
+            dataGridView1.Refresh();
+            containerPictureBox.Refresh();
+        }
+
+        public void errorMessage(String ms)
+        {
+            consoleTextBox.AppendText(ms);
+            consoleTextBox.AppendText(Environment.NewLine);
+        }
+
+        private Node getNodeFrom(int x, int y)
+        {
+            Node n = nodeList.Where(i => i.Position.Equals(new Point(x, y))).FirstOrDefault();
+            return n;
+        }
+
+        private List<NodeConnection> findConnectionsByPosition(int x, int y)
+        {
+            List<NodeConnection> result = new List<NodeConnection>();
+            NodeConnection ifExist = connectionList.FirstOrDefault(
+                i => (i.Start.Equals(new Point(x,y))) || (i.End.Equals(new Point(x,y))));
+            if(ifExist != null)
+                result = connectionList.AsParallel().Where(
+                    i => (i.Start.Equals(new Point(x,y))) || (i.End.Equals(new Point(x,y)))
+                    ).ToList();
+
+            return result;
+        }
+
+        // Binding from  Node A to Node B with NodeConnection
+        public void bind()
+        {
+            consoleTextBox.AppendText("Connection  added");
+            consoleTextBox.AppendText(Environment.NewLine);
+        }
+
         private void addDomainToElements(Domain toAdd)
         {
             bool add = true;
-            foreach (Domain d in elements.AsParallel().Where(i => i is Domain))
+            foreach (Domain d in domainList)
             {
                 if (toAdd.crossingOtherDomain(d))
                 {
@@ -477,93 +537,105 @@ namespace ManagementApp
                     break;
                 }
             }
+            if (toAdd.Size.Width < GAP || toAdd.Size.Height < GAP)
+                add = false;
             if (add)
             {
-                elements.Add(toAdd);
+                domainList.Add(toAdd);
                 consoleTextBox.AppendText("Domain added");
                 consoleTextBox.AppendText(Environment.NewLine);
             }
             else
             {
-                consoleTextBox.AppendText("Domains can't cross each others.");
+                consoleTextBox.AppendText("Domains can't cross each others or domain too small for rendering.");
                 consoleTextBox.AppendText(Environment.NewLine);
             }
         }
-        // Returns index of element in elements by position
-        private List<ContainerElement> findElementsByPosition(int x, int y)
+
+        private void selectAffectedElements(Node node)
         {
-            List<ContainerElement> result = elements.AsParallel().Where(
-                i => i.ContainedPoints.Where(p => p.Equals(new Point(x,y))).FirstOrDefault() != default(Point)
-                ).ToList();
-            return result;
+            int idxOfElement = nodeList.IndexOf(nodeList.Where(i => i.Name.Equals(node.Name)).FirstOrDefault());
+            //if (idxOfElement != -1)
+            //    nodeList.RemoveAt(idxOfElement);
+            
+            List<String> atPosition = findConnectionsByPosition(node.Position.X, node.Position.Y).Select(i => i.Name).ToList();
+            foreach (String toMove in atPosition)
+            {
+                idxOfElement = connectionList.IndexOf(connectionList.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
+                Console.WriteLine(toMove);
+                if (idxOfElement != -1)
+                {
+                    elementsTemp.Add(connectionList.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
+                    connectionList.RemoveAt(idxOfElement);
+                }
+            }
         }
-        // Returns x,y to closest grid point
+
+        private void drawNode(Node node, Graphics panel)
+        {
+            Rectangle rect = new Rectangle(node.Position.X - 5, node.Position.Y - 5, 11, 11);
+            if (node is NetNode)
+                panel.FillEllipse(Brushes.DodgerBlue, rect);
+            else if (node is ClientNode)
+                panel.FillEllipse(Brushes.YellowGreen, rect);
+            panel.DrawEllipse(Pens.Black, rect);
+            panel.DrawString(node.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point(node.Position.X + 3,
+                node.Position.Y + 3));
+        }
+
+        private void drawElement(ContainerElement elem, Graphics panel)
+        {
+            if (elem is NodeConnection)
+            {
+                Pen blackPen = new Pen(Color.WhiteSmoke, 2);
+                panel.DrawLine(blackPen, elem.Start, elem.End);
+                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((elem.Start.X + elem.End.X) / 2 + 3,
+                   (elem.Start.Y + elem.End.Y) / 2 + 3));
+            }
+            else if (elem is Domain)
+            {
+                Domain tmp = (Domain)elem;
+                Rectangle rect = new Rectangle(tmp.PointFrom, tmp.Size);
+                panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
+            }
+
+        }
+
         private void putToGrid(ref int x, ref int y)
         {
             x = GAP * (int)Math.Round((double)x / GAP);
             y = GAP * (int)Math.Round((double)y / GAP);
         }
-        // Returns ContainterElement associated with given x,y
-        private ContainerElement getNodeFrom(int x, int y)
+
+        private int getNumberOfConnections(Node from, Node to)
         {
-            return elements.Where(i => i.ContainedPoints.ElementAtOrDefault(0).X == x &&
-               i.ContainedPoints.ElementAtOrDefault(0).Y == y).FirstOrDefault();
-        }
-        // Binding from  Node A to Node B with NodeConnection
-        private void bind(ContainerElement nodeFrom, ContainerElement nodeTo)
-        {
-            elements.Add(new NodeConnection(nodeFrom, nodeTo, nodeFrom.Name + "-" + nodeTo.Name));
-            consoleTextBox.AppendText("Connection  added");
-            consoleTextBox.AppendText(Environment.NewLine);
+            return connectionList.Where(i => (
+                        i.Start.Equals(from.Position) &&
+                        i.Start.Equals(to.Position)) || (
+                        i.Start.Equals(to.Position) &&
+                        i.Start.Equals(from.Position))
+                        ).Count();
         }
 
 
-        private void clientNodeBtn_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Hand;
-            nType = NodeType.CLIENT_NODE;
-        }
-        private void networkNodeBtn_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Hand;
-            nType = NodeType.NETWORK_NODE;
-        }
+        //private int isVarInFrame(int va)
+        //{
 
-        private void connectionBtn_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Cross;
-            nType = NodeType.CONNECTION;
-        }
+        //}
+        //public void addNN(NetNode nN)
+        //{
+        //    networkNodeList.Add(nN);
+        //    consoleTextBox.AppendText("Network Node added at: " + nN.Position.X + "," + nN.Position.Y);
+        //    consoleTextBox.AppendText(Environment.NewLine);
+        //    var bSource = new BindingSource();
+        //    bSource.DataSource = table;
+        //    dataGridView1.DataSource = bSource;
+        //    dataGridView1.Update();
+        //    dataGridView1.Refresh();
+        //    containerPictureBox.Refresh();
+        //}
 
-        private void domainBtn_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Cross;
-            nType = NodeType.DOMAIN;
-        }
-
-        private void deleteBtn_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Hand;
-            nType = NodeType.DELETE;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.Hand;
-            nType = NodeType.MOVE;
-        }
     }
 
 
-
-    enum NodeType
-    {
-        CLIENT_NODE,
-        NETWORK_NODE,
-        CONNECTION,
-        DOMAIN,
-        DELETE,
-        MOVE,
-        NOTHING
-    }
 }

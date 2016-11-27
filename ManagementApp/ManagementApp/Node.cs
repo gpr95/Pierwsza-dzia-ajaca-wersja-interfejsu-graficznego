@@ -3,40 +3,28 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ManagementApp
 {
-    public class ContainerElement
+    public class Node
     {
-        protected Point start;
-        protected Point end;
+        protected Point position;
         protected String name;
         protected const int GAP = 10;
+        protected Thread threadHandle;
 
-        public Point Start
+        public Point Position
         {
             get
             {
-                return start;
+                return position;
             }
 
             set
             {
-                start = value;
-            }
-        }
-
-        public Point End
-        {
-            get
-            {
-                return end;
-            }
-
-            set
-            {
-                end = value;
+                position = value;
             }
         }
 
@@ -50,6 +38,19 @@ namespace ManagementApp
             set
             {
                 name = value;
+            }
+        }
+
+        public Thread ThreadHandle
+        {
+            get
+            {
+                return threadHandle;
+            }
+
+            set
+            {
+                threadHandle = value;
             }
         }
     }

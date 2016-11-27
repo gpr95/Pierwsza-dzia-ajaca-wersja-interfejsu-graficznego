@@ -7,14 +7,42 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
-    class NodeConnection : ContainerElement
+    public class NodeConnection : ContainerElement
     {
-        public NodeConnection(ContainerElement from, ContainerElement to, String name)
+        private Node from, to;
+        public NodeConnection(Node from, Node to, String name)
         {
-            containedPoints = new List<Point>();
-            containedPoints.Add(from.ContainedPoints.ElementAt(0));
-            containedPoints.Add(to.ContainedPoints.ElementAt(0));
-            this.name = name;
+            this.From = from;
+            this.To = to;
+            Start = from.Position;
+            End = to.Position;
+            this.Name = name;
+        }
+
+        public Node From
+        {
+            get
+            {
+                return from;
+            }
+
+            set
+            {
+                from = value;
+            }
+        }
+
+        public Node To
+        {
+            get
+            {
+                return to;
+            }
+
+            set
+            {
+                to = value;
+            }
         }
     }
 }

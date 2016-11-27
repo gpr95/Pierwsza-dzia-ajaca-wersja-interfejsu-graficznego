@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="ClientNode.cs" />
     <Compile Include="ContainerElement.cs" />
+    <Compile Include="Control.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
@@ -61,6 +62,7 @@
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="NetNode.cs" />
+    <Compile Include="Node.cs" />
     <Compile Include="NodeConnection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -7,48 +7,51 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
-    class Domain : ContainerElement
+    public class Domain : ContainerElement
     {
         private Point pointFrom;
         private int width;
         private int height;
         private Point pointTo;
+        private Size size;
+
         public Domain(Point from, Point to)
         {
             this.pointFrom = from;
             this.pointTo = to;
-
-            containedPoints = new List<Point>();
-            int xFrom = from.X >= to.X ? from.X:to.X;
-            int xTo = from.X >= to.X ? to.X : from.X;
-            int yFrom = from.Y >= to.Y ? from.Y : to.Y;
-            int yTo = from.Y >= to.Y ? to.Y : from.Y;
-            this.width = xFrom - xTo;
-            this.height = yFrom - yTo;
-            while (xFrom >= xTo)
-            {
-                containedPoints.Add(new Point(xFrom, yFrom));
-                containedPoints.Add(new Point(xFrom, yTo));
-                xFrom -= GAP;
-            }
-            xFrom = from.X >= to.X ? from.X : to.X;
-            while (yFrom > yTo)
-            {
-                yFrom -= GAP;
-                containedPoints.Add(new Point(xFrom, yFrom));
-                containedPoints.Add(new Point(xTo, yFrom));
-            }
+            Size = new Size(pointTo.X - pointFrom.X, pointTo.Y - pointFrom.Y);
+            //containedPoints = new List<Point>();
+            //int xFrom = from.X >= to.X ? from.X:to.X;
+            //int xTo = from.X >= to.X ? to.X : from.X;
+            //int yFrom = from.Y >= to.Y ? from.Y : to.Y;
+            //int yTo = from.Y >= to.Y ? to.Y : from.Y;
+            //this.width = xFrom - xTo;
+            //this.height = yFrom - yTo;
+            //while (xFrom >= xTo)
+            //{
+            //    containedPoints.Add(new Point(xFrom, yFrom));
+            //    containedPoints.Add(new Point(xFrom, yTo));
+            //    xFrom -= GAP;
+            //}
+            //xFrom = from.X >= to.X ? from.X : to.X;
+            //while (yFrom > yTo)
+            //{
+            //    yFrom -= GAP;
+            //    containedPoints.Add(new Point(xFrom, yFrom));
+            //    containedPoints.Add(new Point(xTo, yFrom));
+            //}
         }
 
         public bool crossingOtherDomain(Domain other)
         {
-            foreach(Point otherP in other.containedPoints)
-            {
-                if (containedPoints.AsParallel().Contains(otherP))
-                    return true;
-            }
-
-            return false;
+            if (pointFrom.X > other.pointFrom.X && pointTo.X < other.pointTo.X &&
+                pointFrom.Y > other.pointFrom.Y && pointTo.Y < other.pointTo.Y)
+                return false;
+            else if (pointFrom.X < other.pointTo.X && pointTo.X > other.pointFrom.X &&
+                pointFrom.Y < other.pointTo.Y && pointTo.Y > other.pointFrom.Y)
+                return true;
+            else
+                return false;
         }
 
         public Point PointFrom
@@ -100,6 +103,19 @@ namespace ManagementApp
             set
             {
                 height = value;
+            }
+        }
+
+        public Size Size
+        {
+            get
+            {
+                return size;
+            }
+
+            set
+            {
+                size = value;
             }
         }
     }

@@ -30,6 +30,10 @@ namespace ManagementApp
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.containerPictureBox = new System.Windows.Forms.PictureBox();
             this.clientNodeBtn = new System.Windows.Forms.Button();
             this.netNodeBtn = new System.Windows.Forms.Button();
@@ -52,9 +56,9 @@ namespace ManagementApp
             // 
             // containerPictureBox
             // 
-            this.containerPictureBox.Location = new System.Drawing.Point(10, 12);
+            this.containerPictureBox.Location = new System.Drawing.Point(12, 12);
             this.containerPictureBox.Name = "containerPictureBox";
-            this.containerPictureBox.Size = new System.Drawing.Size(598, 520);
+            this.containerPictureBox.Size = new System.Drawing.Size(596, 520);
             this.containerPictureBox.TabIndex = 0;
             this.containerPictureBox.TabStop = false;
             this.containerPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.containerPictureBox_Paint);
@@ -65,105 +69,134 @@ namespace ManagementApp
             // 
             // clientNodeBtn
             // 
-            this.clientNodeBtn.Location = new System.Drawing.Point(10, 545);
+            this.clientNodeBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.clientNodeBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.clientNodeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.clientNodeBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.clientNodeBtn.Location = new System.Drawing.Point(614, 12);
             this.clientNodeBtn.Name = "clientNodeBtn";
             this.clientNodeBtn.Size = new System.Drawing.Size(140, 22);
             this.clientNodeBtn.TabIndex = 1;
             this.clientNodeBtn.Text = "Węzeł kliencki";
-            this.clientNodeBtn.UseVisualStyleBackColor = true;
+            this.clientNodeBtn.UseVisualStyleBackColor = false;
             this.clientNodeBtn.Click += new System.EventHandler(this.clientNodeBtn_Click);
             // 
             // netNodeBtn
             // 
-            this.netNodeBtn.Location = new System.Drawing.Point(156, 545);
+            this.netNodeBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.netNodeBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.netNodeBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.netNodeBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.netNodeBtn.Location = new System.Drawing.Point(614, 40);
             this.netNodeBtn.Name = "netNodeBtn";
             this.netNodeBtn.Size = new System.Drawing.Size(140, 22);
             this.netNodeBtn.TabIndex = 2;
             this.netNodeBtn.Text = "Węzeł sieciowy";
-            this.netNodeBtn.UseVisualStyleBackColor = true;
+            this.netNodeBtn.UseVisualStyleBackColor = false;
             this.netNodeBtn.Click += new System.EventHandler(this.networkNodeBtn_Click);
             // 
             // connectionBtn
             // 
-            this.connectionBtn.Location = new System.Drawing.Point(404, 545);
+            this.connectionBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.connectionBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.connectionBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.connectionBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.connectionBtn.Location = new System.Drawing.Point(614, 96);
             this.connectionBtn.Name = "connectionBtn";
             this.connectionBtn.Size = new System.Drawing.Size(140, 22);
             this.connectionBtn.TabIndex = 3;
             this.connectionBtn.Text = "Połączenie";
-            this.connectionBtn.UseVisualStyleBackColor = true;
+            this.connectionBtn.UseVisualStyleBackColor = false;
             this.connectionBtn.Click += new System.EventHandler(this.connectionBtn_Click);
             // 
             // consoleTextBox
             // 
-            this.consoleTextBox.BackColor = System.Drawing.SystemColors.Control;
+            this.consoleTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.consoleTextBox.ForeColor = System.Drawing.Color.Gainsboro;
             this.consoleTextBox.Location = new System.Drawing.Point(0, 0);
             this.consoleTextBox.Multiline = true;
             this.consoleTextBox.Name = "consoleTextBox";
             this.consoleTextBox.ReadOnly = true;
-            this.consoleTextBox.Size = new System.Drawing.Size(284, 493);
+            this.consoleTextBox.Size = new System.Drawing.Size(278, 498);
             this.consoleTextBox.TabIndex = 4;
             // 
             // domainBtn
             // 
-            this.domainBtn.Location = new System.Drawing.Point(561, 545);
+            this.domainBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.domainBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.domainBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.domainBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.domainBtn.Location = new System.Drawing.Point(614, 68);
             this.domainBtn.Name = "domainBtn";
             this.domainBtn.Size = new System.Drawing.Size(140, 22);
             this.domainBtn.TabIndex = 5;
             this.domainBtn.Text = "Domena";
-            this.domainBtn.UseVisualStyleBackColor = true;
+            this.domainBtn.UseVisualStyleBackColor = false;
             this.domainBtn.Click += new System.EventHandler(this.domainBtn_Click);
             // 
             // deleteBtn
             // 
-            this.deleteBtn.Location = new System.Drawing.Point(740, 545);
+            this.deleteBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.deleteBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.deleteBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.deleteBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.deleteBtn.Location = new System.Drawing.Point(614, 481);
             this.deleteBtn.Name = "deleteBtn";
-            this.deleteBtn.Size = new System.Drawing.Size(98, 22);
+            this.deleteBtn.Size = new System.Drawing.Size(140, 22);
             this.deleteBtn.TabIndex = 6;
             this.deleteBtn.Text = "Usuń element";
-            this.deleteBtn.UseVisualStyleBackColor = true;
+            this.deleteBtn.UseVisualStyleBackColor = false;
             this.deleteBtn.Click += new System.EventHandler(this.deleteBtn_Click);
             // 
             // deleteListBox
             // 
+            this.deleteListBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.deleteListBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.deleteListBox.Enabled = false;
+            this.deleteListBox.ForeColor = System.Drawing.Color.Gainsboro;
             this.deleteListBox.FormattingEnabled = true;
-            this.deleteListBox.Location = new System.Drawing.Point(501, 450);
+            this.deleteListBox.Location = new System.Drawing.Point(614, 406);
             this.deleteListBox.Name = "deleteListBox";
-            this.deleteListBox.Size = new System.Drawing.Size(89, 69);
+            this.deleteListBox.Size = new System.Drawing.Size(140, 67);
             this.deleteListBox.TabIndex = 7;
             this.deleteListBox.Visible = false;
             this.deleteListBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.deleteListBox_MouseDoubleClick);
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(303, 545);
+            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.button1.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.ForeColor = System.Drawing.Color.Gainsboro;
+            this.button1.Location = new System.Drawing.Point(614, 509);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(95, 23);
+            this.button1.Size = new System.Drawing.Size(140, 23);
             this.button1.TabIndex = 8;
             this.button1.Text = "Kursor";
-            this.button1.UseVisualStyleBackColor = true;
+            this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Location = new System.Drawing.Point(610, 12);
+            this.tabControl1.Location = new System.Drawing.Point(760, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(292, 520);
+            this.tabControl1.Size = new System.Drawing.Size(286, 520);
             this.tabControl1.TabIndex = 9;
             // 
             // tabPage1
             // 
+            this.tabPage1.BackColor = System.Drawing.Color.Maroon;
             this.tabPage1.Controls.Add(this.consoleTextBox);
+            this.tabPage1.ForeColor = System.Drawing.Color.Gainsboro;
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(284, 494);
+            this.tabPage1.Size = new System.Drawing.Size(278, 494);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Log";
-            this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
@@ -171,24 +204,63 @@ namespace ManagementApp
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(284, 494);
+            this.tabPage2.Size = new System.Drawing.Size(278, 494);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Nodes";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // dataGridView1
             // 
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridView1.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+            this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle3;
+            this.dataGridView1.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(63)))), ((int)(((byte)(70)))));
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(284, 494);
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.Size = new System.Drawing.Size(278, 494);
             this.dataGridView1.TabIndex = 0;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(914, 574);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
+            this.ClientSize = new System.Drawing.Size(1058, 544);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.deleteListBox);
@@ -199,7 +271,7 @@ namespace ManagementApp
             this.Controls.Add(this.clientNodeBtn);
             this.Controls.Add(this.containerPictureBox);
             this.Name = "MainWindow";
-            this.Text = "ManagementApplication";
+            this.Text = "Oversight Application";
             this.Load += new System.EventHandler(this.MainWindow_Load);
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).EndInit();
             this.tabControl1.ResumeLayout(false);
@@ -222,10 +294,10 @@ namespace ManagementApp
         private System.Windows.Forms.Button deleteBtn;
         private System.Windows.Forms.ListBox deleteListBox;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.TabControl tabControl1;
     }
 }
 
