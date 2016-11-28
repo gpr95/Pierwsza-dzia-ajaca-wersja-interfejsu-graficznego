@@ -17,7 +17,6 @@ namespace NetNode
     {
         private TcpListener listener;
         public int port;
-        private int p;
 
         public ManagementAgent(int port)
         {

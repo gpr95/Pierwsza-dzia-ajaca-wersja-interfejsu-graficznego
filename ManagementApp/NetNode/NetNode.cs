@@ -18,12 +18,9 @@ namespace NetNode
         public Ports ports;
         public ManagementAgent agent;
 
-        //tcp dla komunikacji z chmura kablowa client i listener
-        private TcpListener listenerFromCloud;
-
-        //tcp dla polaczen miedzywezlowych
-        TcpClient clientToNodes;
-        private TcpListener listenerFromNodes;
+        //tcp dla komunikacji z chmura kablowa listener
+        public int physicalPort;
+        private TcpListener listener;
 
         public NetNode(string[] args)
         {
@@ -32,19 +29,20 @@ namespace NetNode
             this.ports = new Ports();
             this.switchField = new SwitchingField();
             this.agent = new ManagementAgent(Convert.ToInt32(args[1]));
-            this.listenerFromCloud = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[2]));
+            this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[2]));
+            this.physicalPort = Convert.ToInt32(args[2]);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
             ConsoleInterface();
         }
         private void Listen()
         {
-            this.listenerFromCloud.Start();
+            this.listener.Start();
             while (true)
             {
-                TcpClient clientToCloud = listenerFromCloud.AcceptTcpClient();
+                TcpClient client = listener.AcceptTcpClient();
                 Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
-                clientThread.Start(clientToCloud);
+                clientThread.Start(client);
             }
         }
 
@@ -61,14 +59,6 @@ namespace NetNode
         {
             //main for testing netNode
             Console.WriteLine("NetNode");
-
-            //zestawiane tylko na czas odebrania
-            //TODO
-            int inputPortFromCloud = 2222;
-            this.setupListenerFromNodes(inputPortFromCloud);
-            //zestawiane tylko na czas wyslania
-            this.clientToNodes = new TcpClient();
-            int destinationPortFromCloud = 4444;
 
             //sprawdza czy sa jakies pakiety w kolejkach w portach wejsciowych
             while(true)
@@ -92,8 +82,9 @@ namespace NetNode
                     if (oport.output.Count > 0)
                     {
                         Packet packet = oport.output.Dequeue();
-                        clientToNodes.Connect(IPAddress.Parse("127.0.0.1"), destinationPortFromCloud);
-                        BinaryWriter writeOutput = new BinaryWriter(this.clientToNodes.GetStream());
+                        TcpClient client = new TcpClient();
+                        client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
+                        BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
                         string data = JMessage.Serialize(JMessage.FromValue(packet));
                         writeOutput.Write(data);
                     }
@@ -101,31 +92,6 @@ namespace NetNode
             }
         }
 
-        private void setupListenerFromNodes(int port)
-        {
-            //TODO
-            this.listenerFromNodes = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
-            Thread thread2 = new Thread(new ThreadStart(ListenNodes));
-            thread2.Start();
-        }
-        private void ListenNodes()
-        {
-            this.listenerFromNodes.Start();
-            while (true)
-            {
-                clientToNodes = listenerFromNodes.AcceptTcpClient();
-                Thread clientThreadNodes = new Thread(new ParameterizedThreadStart(ListenThreadNodes));
-                clientThreadNodes.Start(clientToNodes);
-            }
-        }
-        private static void ListenThreadNodes(Object client)
-        {
-            TcpClient clienttmp = (TcpClient)client;
-            BinaryReader reader = new BinaryReader(clienttmp.GetStream());
-            string received_data = reader.ReadString();
-            Console.WriteLine(received_data);
-            reader.Close();
-        }
         static void Main(string[] args)
         {
             string[] parameters = new string[] { "192.168.56.55", "111", "112" };
