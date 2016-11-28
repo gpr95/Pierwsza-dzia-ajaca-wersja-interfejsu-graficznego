@@ -20,10 +20,10 @@ namespace CableCloud
         public CloudLogic()
         {
             table = new DataTable("Connections");
-            table.Columns.Add("fromAdr", typeof(String)).AllowDBNull = false;
             table.Columns.Add("fromPort", typeof(int)).AllowDBNull = false;
-            table.Columns.Add("toAdr", typeof(String)).AllowDBNull = false;
+            table.Columns.Add("virtualFromPort", typeof(int)).AllowDBNull = false;
             table.Columns.Add("toPort", typeof(int)).AllowDBNull = false;
+            table.Columns.Add("virtualToPort", typeof(int)).AllowDBNull = false;
         }
 
         public void connectToWindowApplication(int port)
@@ -42,9 +42,8 @@ namespace CableCloud
             if (received_object.Type == typeof(NodeConnection))
             {
                 NodeConnection received_connection = received_object.Value.ToObject<NodeConnection>();
-                connectToNodes(received_connection.From.Name, received_connection.VirtualPortFrom,
-                    received_connection.LocalPortFrom, received_connection.To.Name, 
-                    received_connection.VirtualPortTo, received_connection.LocalPortTo);
+                connectToNodes( received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
+                   received_connection.LocalPortTo, received_connection.VirtualPortTo);
             }
             else
             {
@@ -54,32 +53,32 @@ namespace CableCloud
             reader.Close();
         }
 
-        public void connectToNodes(String virtualIPFrom, int virtualPortFrom, int realPortFrom,
-                                    String virtualIPTo, int virtualPortTo, int realPortTo)
+        public void connectToNodes(int fromPort, int virtualFromPort,
+                                    int toPort, int virtualToPort)
         {
-            TcpClient connectionFrom = new TcpClient("localhost", realPortFrom);
-            NodeConnectionThread fromArg = new NodeConnectionThread(ref connectionFrom, virtualIPFrom, virtualPortFrom);
+            TcpClient connectionFrom = new TcpClient("localhost", fromPort);
+            NodeConnectionThread fromArg = new NodeConnectionThread(ref connectionFrom, virtualFromPort, virtualToPort);
 
-            TcpClient connectionTo = new TcpClient("localhost", realPortTo);
-            NodeConnectionThread toArg = new NodeConnectionThread(ref connectionFrom, virtualIPFrom, virtualPortFrom);
+            TcpClient connectionTo = new TcpClient("localhost", toPort);
+            NodeConnectionThread toArg = new NodeConnectionThread(ref connectionFrom, virtualToPort, virtualFromPort);
 
-            addNewCable(virtualIPFrom, virtualPortFrom, virtualIPTo, virtualPortTo);
+            addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
         }
 
         
 
-        private void  addNewCable(String fromAdr, int fromPort, String toAdr, int toPort)
+        private void  addNewCable(int fromPort, int virtualFromPort, int toPort, int virtualToPort)
         {
-            table.Rows.Add(fromAdr, fromPort, toAdr, toPort);
+            table.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
         }
 
-        private void deleteCable(String fromAdr, String fromPort, String toAdr, String toPort)
+        private void deleteCable(int fromPort, int virtualFromPort, int  toPort, int  virtualToPort)
         {
             for (int i = table.Rows.Count - 1; i >= 0; i--)
             {
                 DataRow dr = table.Rows[i];
-                if (dr["fromAdr"].Equals(fromAdr) && dr["fromPort"].Equals(fromPort)
-                    && dr["toAdr"].Equals(toAdr) && dr["toPort"].Equals(toPort))
+                if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort)
+                    && dr["toPort"].Equals(toPort) && dr["virtualToPort"].Equals(virtualToPort))
                     table.Rows.Remove(dr);
             }
         }
@@ -87,13 +86,13 @@ namespace CableCloud
         private class NodeConnectionThread
         {
             private Thread thread;
-            private String virtualIp;
-            private int virtualPort;
+            private int virtualFromPort;
+            private int virtualToPort;
 
-            public NodeConnectionThread(ref TcpClient connection, String virtualIp, int virtualPort)
+            public NodeConnectionThread(ref TcpClient connection, int virtualIp, int virtualPort)
             {
-                this.virtualIp = virtualIp;
-                this.virtualPort = virtualPort;
+                this.virtualFromPort = virtualIp;
+                this.virtualToPort = virtualPort;
                 thread = new Thread(new ParameterizedThreadStart(nodeConnectionThread));
                 thread.Start(connection);
             }

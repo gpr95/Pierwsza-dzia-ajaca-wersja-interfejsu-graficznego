@@ -45,3 +45,14 @@ C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csprojR
 C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.MainWindow.resources
 C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.Properties.Resources.resources
 C:\TSSTprojekt\trunk\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe.config
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.exe
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.pdb
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\bin\Debug\ManagementApp.exe
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\bin\Debug\ManagementApp.pdb
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csprojResolveAssemblyReference.cache
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.MainWindow.resources
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.Properties.Resources.resources
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
