@@ -14,7 +14,7 @@ namespace ManagementApp
         protected String name;
         protected const int GAP = 10;
         protected Thread threadHandle;
-
+        //Porty
         public Point Position
         {
             get

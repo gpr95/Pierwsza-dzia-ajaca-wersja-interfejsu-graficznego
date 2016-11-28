@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
-    public class NodeConnection : ContainerElement
+    public class NodeConnection
     {
+        private Point start;
+        private Point end;
+        private String name;
         private Node from, to;
         private int virtualPortFrom;
         private int virtualPortTo;
         private int localPortFrom;
         private int localPortTo;
+
         public NodeConnection(Node from, Node to, String name)
         {
             // TODO (dodac w konstruktorze porty na których powstaje połączenie - to okienko o którym wspominałem)
@@ -30,6 +34,45 @@ namespace ManagementApp
             Start = from.Position;
             End = to.Position;
             this.Name = name;
+        }
+
+        public Point Start
+        {
+            get
+            {
+                return start;
+            }
+
+            set
+            {
+                start = value;
+            }
+        }
+
+        public Point End
+        {
+            get
+            {
+                return end;
+            }
+
+            set
+            {
+                end = value;
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+
+            set
+            {
+                name = value;
+            }
         }
 
         public Node From

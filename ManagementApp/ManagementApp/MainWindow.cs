@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ManagementApp
@@ -18,12 +15,14 @@ namespace ManagementApp
         // LOGICAL VARS
         private OperationType oType;
         //private List<ContainerElement> elements = new List<ContainerElement>();
-        private List<ContainerElement> elementsTemp = new List<ContainerElement>();
+        
         //private List<ClientNode> clientNodeList;
         //private List<NetNode> networkNodeList;
         private List<Node> nodeList;
         private List<NodeConnection> connectionList;
+        private List<NodeConnection> connectionTemp = new List<NodeConnection>();
         private List<Domain> domainList;
+
 
         private DataTable table;
         
@@ -107,7 +106,7 @@ namespace ManagementApp
             }
             foreach (var elem in connectionList)
             {
-                drawElement(elem, panel);
+                drawConnection(elem, panel);
             }
             foreach (var node in nodeList)
             {
@@ -136,13 +135,11 @@ namespace ManagementApp
                     deleteListBox.Enabled = false;
                     deleteListBox.Items.Clear();
                     containerPictureBox.Refresh();
-                    //deleteListBox = new ListBox();
-                    List<String> atPosition = findConnectionsByPosition(x, y).Select(i => i.Name).ToList();
+
                     Node n = getNodeFrom(x, y);
                     if (n == null)
                         break;
-
-                    atPosition.Add(n.Name);
+                    List<String> atPosition = control.findElemAtPosition(x, y);
 
                     foreach (String toDelete in atPosition)
                         deleteListBox.Items.Add(toDelete);
@@ -158,12 +155,6 @@ namespace ManagementApp
                     }
                     else if (atPosition.Count == 1)
                     {
-                        //int idxOfElement = elements.IndexOf(elements.Where(
-                        //    i => i.Name.Equals(atPosition.First())
-                        //    ).FirstOrDefault());
-                        //if (idxOfElement != -1)
-                        //    elements.RemoveAt(idxOfElement);
-
                         control.deleteNode(n);
                     }
                     break;
@@ -245,7 +236,7 @@ namespace ManagementApp
                     break;
 
                 case OperationType.MOVE_NODE:
-                    //Update node thrue control
+
                     if (nodeFrom == null)
                         break;
 
@@ -266,11 +257,9 @@ namespace ManagementApp
                             y = 0;
                     }
 
-                    //virtualNodeTo = new ClientNode(x, y, nodeFrom.Name, 9999, 9999);
-                    //nodeList.Add(virtualNodeTo);
                     Point oldPosition = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
                     control.updateNode(nodeFrom, x, y);
-                    foreach (var elem in elementsTemp)
+                    foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
                             control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), nodeFrom);
                         else if (elem.End.Equals(oldPosition))
@@ -280,13 +269,13 @@ namespace ManagementApp
                         x + "," + y);
                     consoleTextBox.AppendText(Environment.NewLine);
                     nodeFrom = null;
-                    elementsTemp.Clear();
+                    connectionTemp.Clear();
                     break;
 
             }
             containerPictureBox.Refresh();
         }
-        //keep mouse_move as it is because there is only painting(i hope)
+
         private void containerPictureBox_MouseMove(object sender, MouseEventArgs e)
         {
             
@@ -313,7 +302,6 @@ namespace ManagementApp
                 Pen blackPen = new Pen(Color.WhiteSmoke, 3);
                 if (distance > 100)
                 {
-                    //ControlPaint.DrawReversibleLine(fromNode, to, Color.Black);
                     myGraphics.DrawLine(blackPen, fromNode, to);
                     virtualNodeTo = null;
                 }
@@ -364,26 +352,16 @@ namespace ManagementApp
                 myGraphics.DrawString(nodeFrom.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point(e.X + 3,
                     e.Y + 3));
 
-                foreach (var elem in elementsTemp)
+                foreach (var elem in connectionTemp)
                 {
                     if (elem.Start.Equals(nodeFrom.Position))
                     {
-                        Point from = elem.Start.Equals(nodeFrom.Position) ?
-                            elem.End : elem.Start;
-                        Point to = new Point(e.X, e.Y);
-                        myGraphics.DrawLine(new Pen(Color.WhiteSmoke, 2), from, to);
-                        myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + to.X) / 2 + 3,
-                           (from.Y + to.Y) / 2 + 3));
+                        drawMovingConnection(myGraphics, elem, new Point(e.X, e.Y));
                     }
 
                     if (elem.End.Equals(nodeFrom.Position))
                     {
-                        Point from = elem.Start.Equals(nodeFrom.Position) ?
-                            elem.End : elem.Start;
-                        Point to = new Point(e.X, e.Y);
-                        myGraphics.DrawLine(new Pen(Color.WhiteSmoke, 2), from, to);
-                        myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + to.X) / 2 + 3,
-                           (from.Y + to.Y) / 2 + 3));
+                        drawMovingConnection(myGraphics, elem, new Point(e.X, e.Y));
                     }
 
                 }
@@ -394,10 +372,6 @@ namespace ManagementApp
         private void deleteListBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             bool isNode = true;
-            //int idxOfElement = nodeList.IndexOf(nodeList.Where(i => i.Name.Equals(deleteListBox.SelectedItem)
-            //               ).FirstOrDefault());
-
-            //ContainerElement toDelete = connectionList.Where(i => i.Name.Equals(deleteListBox.SelectedItem)).FirstOrDefault();
 
             int idxOfElement = nodeList.IndexOf(nodeList.Where(i => i.Name.Equals(deleteListBox.SelectedItem)).FirstOrDefault());
 
@@ -418,12 +392,12 @@ namespace ManagementApp
                         ).ToList();
 
                     foreach (NodeConnection con in connectionsToDelete)
-                        connectionList.RemoveAt(connectionList.IndexOf(con));
+                        control.removeConnection(con);
 
                     control.deleteNode(nodeList.ElementAt(idxOfElement));
                 }
                 else
-                    connectionList.RemoveAt(idxOfElement);
+                    control.removeConnection(connectionList.ElementAt(idxOfElement));
 
             }
             deleteListBox.Visible = false;
@@ -486,12 +460,8 @@ namespace ManagementApp
                 consoleTextBox.AppendText("Network Node added at: " + node.Position.X + "," + node.Position.Y);
 
             consoleTextBox.AppendText(Environment.NewLine);
-            var bSource = new BindingSource();
-            bSource.DataSource = table;
-            dataGridView1.DataSource = bSource;
-            dataGridView1.Update();
-            dataGridView1.Refresh();
-            containerPictureBox.Refresh();
+
+            refreshTable();
         }
 
         public void errorMessage(String ms)
@@ -555,9 +525,7 @@ namespace ManagementApp
         private void selectAffectedElements(Node node)
         {
             int idxOfElement = nodeList.IndexOf(nodeList.Where(i => i.Name.Equals(node.Name)).FirstOrDefault());
-            //if (idxOfElement != -1)
-            //    nodeList.RemoveAt(idxOfElement);
-            
+
             List<String> atPosition = findConnectionsByPosition(node.Position.X, node.Position.Y).Select(i => i.Name).ToList();
             foreach (String toMove in atPosition)
             {
@@ -565,7 +533,7 @@ namespace ManagementApp
                 Console.WriteLine(toMove);
                 if (idxOfElement != -1)
                 {
-                    elementsTemp.Add(connectionList.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
+                    connectionTemp.Add(connectionList.Where(i => i.Name.Equals(toMove)).FirstOrDefault());
                     connectionList.RemoveAt(idxOfElement);
                 }
             }
@@ -573,32 +541,42 @@ namespace ManagementApp
 
         private void drawNode(Node node, Graphics panel)
         {
-            Rectangle rect = new Rectangle(node.Position.X - 5, node.Position.Y - 5, 11, 11);
+            Rectangle rect = new Rectangle(node.Position.X - 5, node.Position.Y - 5, GAP + 1, GAP + 1);
             if (node is NetNode)
                 panel.FillEllipse(Brushes.DodgerBlue, rect);
             else if (node is ClientNode)
                 panel.FillEllipse(Brushes.YellowGreen, rect);
             panel.DrawEllipse(Pens.Black, rect);
-            panel.DrawString(node.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point(node.Position.X + 3,
+            panel.DrawString(node.Name, new Font("Arial", GAP/2), Brushes.Gainsboro, new Point(node.Position.X + 3,
                 node.Position.Y + 3));
+        }
+
+        private void drawMovingConnection(Graphics panel, NodeConnection elem, Point end)
+        {
+            Point from = elem.Start.Equals(nodeFrom.Position) ?
+                            elem.End : elem.Start;
+            myGraphics.DrawLine(new Pen(Color.WhiteSmoke, 2), from, end);
+            myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + end.X) / 2 + 3,
+               (from.Y + end.Y) / 2 + 3));
+        }
+
+        private void drawConnection(NodeConnection conn, Graphics panel)
+        {
+
+                Pen blackPen = new Pen(Color.WhiteSmoke, 2);
+                panel.DrawLine(blackPen, conn.Start, conn.End);
+                panel.DrawString(conn.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((conn.Start.X + conn.End.X) / 2 + 3,
+                   (conn.Start.Y + conn.End.Y) / 2 + 3));
         }
 
         private void drawElement(ContainerElement elem, Graphics panel)
         {
-            if (elem is NodeConnection)
-            {
-                Pen blackPen = new Pen(Color.WhiteSmoke, 2);
-                panel.DrawLine(blackPen, elem.Start, elem.End);
-                panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((elem.Start.X + elem.End.X) / 2 + 3,
-                   (elem.Start.Y + elem.End.Y) / 2 + 3));
-            }
-            else if (elem is Domain)
+            if (elem is Domain)
             {
                 Domain tmp = (Domain)elem;
                 Rectangle rect = new Rectangle(tmp.PointFrom, tmp.Size);
                 panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
             }
-
         }
 
         private void putToGrid(ref int x, ref int y)
@@ -615,6 +593,33 @@ namespace ManagementApp
                         i.Start.Equals(to.Position) &&
                         i.Start.Equals(from.Position))
                         ).Count();
+        }
+
+        private void refreshTable()
+        {
+            var bSource = new BindingSource();
+            bSource.DataSource = table;
+            dataGridView1.DataSource = bSource;
+            dataGridView1.Update();
+            dataGridView1.Refresh();
+            containerPictureBox.Refresh();
+        }
+
+        private void testBtn_Click(object sender, EventArgs e)
+        {
+            List<List<String>> paths = control.findPaths(nodeList.Where(i => i.Name.Equals("CN0")).FirstOrDefault());
+
+            foreach (List<String> list in paths)
+            {
+                consoleTextBox.AppendText("Path: ");
+                consoleTextBox.AppendText(Environment.NewLine);
+                foreach (String str in list)
+                {
+                    consoleTextBox.AppendText(str);
+                    consoleTextBox.AppendText(Environment.NewLine);
+                }
+
+            }
         }
 
 
