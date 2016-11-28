@@ -12,7 +12,7 @@ namespace ClientNode
         private static ClientNode client = null;
         static void Main(string[] args)
         {
-            string[] parameters = new string[] { "1", "8000", "1234" };
+            string[] parameters = new string[] { args[0], args[1], args[2] };
             client = new ClientNode(args);
         }
     }

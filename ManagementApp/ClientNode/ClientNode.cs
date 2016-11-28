@@ -14,7 +14,7 @@ namespace ClientNode
     {
         private string virtualIP;
         private TcpListener listener;
-        private TcpClient client;
+        private TcpClient managmentClient;
         private static BinaryWriter writeOutput;
         private static int outputPort;
         private static bool cyclic_sending = false;
@@ -23,7 +23,8 @@ namespace ClientNode
         public ClientNode(string[] args)
         {
             virtualIP = args[0];
-            int inputPort = Convert.ToInt32(args[1]);
+            int managmentPort = Convert.ToInt32(args[1]); 
+            int inputPort = Convert.ToInt32(args[2]);
             outputPort = Convert.ToInt32(args[2]);
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), inputPort);
             Thread thread = new Thread(new ThreadStart(Listen));
@@ -60,6 +61,23 @@ namespace ClientNode
             }
 
             reader.Close();
+        }
+
+        private void initManagmentConnection(int sessionPort)
+        {
+            managmentClient.Connect("127.0.0.1", sessionPort);
+            BinaryReader reader = new BinaryReader(managmentClient.GetStream());
+            string received_data = reader.ReadString();
+            JMessage received_object = JMessage.Deserialize(received_data);
+            if (received_object.Type == typeof(Packet))
+            {
+                Packet received_packet = received_object.Value.ToObject<Packet>();
+                //TO DO odbierz od marka tablice adresow i ich portow i wpisz u siebie lokalnie
+            }
+            else
+            {
+                Console.WriteLine("\n Odebrano uszkodzony pakiet");
+            }
         }
 
         private void ConsoleInterface()
