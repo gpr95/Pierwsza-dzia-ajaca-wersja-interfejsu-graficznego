@@ -15,7 +15,7 @@ namespace ManagementApp
         // LOGICAL VARS
         private OperationType oType;
         //private List<ContainerElement> elements = new List<ContainerElement>();
-        
+
         //private List<ClientNode> clientNodeList;
         //private List<NetNode> networkNodeList;
         private List<Node> nodeList;
@@ -25,7 +25,7 @@ namespace ManagementApp
 
 
         private DataTable table;
-        
+
         // PAINTING VARS
         private Bitmap containerPoints;
         private Node nodeFrom;
@@ -115,7 +115,7 @@ namespace ManagementApp
             containerPictureBox.BackgroundImage = containerPoints;
         }
 
-        
+
 
         private void containerPictureBox_MouseClick(object sender, MouseEventArgs e)
         {
@@ -278,7 +278,7 @@ namespace ManagementApp
 
         private void containerPictureBox_MouseMove(object sender, MouseEventArgs e)
         {
-            
+
             if (isDrawing && nodeFrom != null && oType == OperationType.ADD_CONNECTION)
             {
                 containerPictureBox.Refresh();
@@ -453,9 +453,9 @@ namespace ManagementApp
 
         public void addNode(Node node)
         {
-            if(node is ClientNode)
+            if (node is ClientNode)
                 consoleTextBox.AppendText("Client Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.Name);
-                
+
             if (node is NetNode)
                 consoleTextBox.AppendText("Network Node added at: " + node.Position.X + "," + node.Position.Y);
 
@@ -481,9 +481,9 @@ namespace ManagementApp
             List<NodeConnection> result = new List<NodeConnection>();
             NodeConnection ifExist = connectionList.FirstOrDefault(
                 i => (i.Start.Equals(new Point(x,y))) || (i.End.Equals(new Point(x,y))));
-            if(ifExist != null)
+            if (ifExist != null)
                 result = connectionList.AsParallel().Where(
-                    i => (i.Start.Equals(new Point(x,y))) || (i.End.Equals(new Point(x,y)))
+                    i => (i.Start.Equals(new Point(x, y))) || (i.End.Equals(new Point(x, y)))
                     ).ToList();
 
             return result;
@@ -547,7 +547,7 @@ namespace ManagementApp
             else if (node is ClientNode)
                 panel.FillEllipse(Brushes.YellowGreen, rect);
             panel.DrawEllipse(Pens.Black, rect);
-            panel.DrawString(node.Name, new Font("Arial", GAP/2), Brushes.Gainsboro, new Point(node.Position.X + 3,
+            panel.DrawString(node.Name, new Font("Arial", GAP / 2), Brushes.Gainsboro, new Point(node.Position.X + 3,
                 node.Position.Y + 3));
         }
 
@@ -563,10 +563,10 @@ namespace ManagementApp
         private void drawConnection(NodeConnection conn, Graphics panel)
         {
 
-                Pen blackPen = new Pen(Color.WhiteSmoke, 2);
-                panel.DrawLine(blackPen, conn.Start, conn.End);
-                panel.DrawString(conn.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((conn.Start.X + conn.End.X) / 2 + 3,
-                   (conn.Start.Y + conn.End.Y) / 2 + 3));
+            Pen blackPen = new Pen(Color.WhiteSmoke, 2);
+            panel.DrawLine(blackPen, conn.Start, conn.End);
+            panel.DrawString(conn.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((conn.Start.X + conn.End.X) / 2 + 3,
+               (conn.Start.Y + conn.End.Y) / 2 + 3));
         }
 
         private void drawElement(ContainerElement elem, Graphics panel)
