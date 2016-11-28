@@ -112,7 +112,7 @@ namespace CableCloud
                 }
                 else
                 {
-                    Console.WriteLine("\n Connection with Window Application: WRONG DATA");
+                    Console.WriteLine("\n Connection with Node: WRONG DATA");
                 }
 
                 reader.Close();
