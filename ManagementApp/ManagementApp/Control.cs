@@ -112,9 +112,22 @@ namespace ManagementApp
 
         public void addConnection(Node from, Node to)
         {
+            if (from is ClientNode)
+                if (connectionList.Where(i => i.From.Equals(from) || i.To.Equals(from)).Any())
+                {
+                    mainWindow.errorMessage("Client node can have onli one connection!");
+                    return;
+                }
+
+            if (to is ClientNode)
+                if (connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).Any())
+                {
+                    mainWindow.errorMessage("Client node can have onli one connection!");
+                    return;
+                }
             if (to != null)
                 if (connectionList.Where(i => (i.From.Equals(from) && i.To.Equals(to))||(i.From.Equals(to) && i.To.Equals(from))).Any())
-                    {
+                {
                     mainWindow.errorMessage("That connection alredy exist!");
                 }
                 else
@@ -122,7 +135,6 @@ namespace ManagementApp
                     connectionList.Add(new NodeConnection(from, to, from.Name + "-" + to.Name));
                     mainWindow.bind();
                 }
-                    
         }
 
         public void updateNode(Node node, int x, int y)
@@ -193,7 +205,7 @@ namespace ManagementApp
             List<List<Node>> finder = new List<List<Node>>();
             bool pathInProggress = true;
             List<List<String>> found = new List<List<String>>();
-            int noc = 0;
+            //int noc = 0;
 
             foreach (Node node in nodeList)
             {
@@ -207,7 +219,7 @@ namespace ManagementApp
             tmp.Add(client);
             finder.Add(tmp);
             int j = 0;
-            while(pathInProggress && j < 100000)
+            while(pathInProggress && j < 10000000)
             {
                 List<List<Node>> finderCopy = new List<List<Node>>(finder);
                 foreach (List<Node> nodeList in finderCopy)
@@ -242,7 +254,8 @@ namespace ManagementApp
                         }
 
                     }
-                    finder.Remove(nodeList);
+                    if (nodeList.Count() == 1)
+                        finder.Remove(nodeList);
                 }
                 foreach(List<Node> nodeList in finder)
                 {
@@ -253,8 +266,17 @@ namespace ManagementApp
                 }
             }
 
+            List<List<Node>> finderCopyTwo = new List<List<Node>>(finder);
+            foreach (List<Node> nodeList in finderCopyTwo)
+            {
+                if (!(nodeList.Last() is ClientNode))
+                    finder.Remove(nodeList);
+                if (nodeList.Count() == 1)
+                    finder.Remove(nodeList);
+            }
             foreach (List<Node> nodeList in finder)
             {
+
                 List<String> temp = new List<string>();
                 foreach (Node node in nodeList)
                 {
