@@ -17,6 +17,7 @@ namespace CableCloud
     class CloudLogic
     {
         private DataTable table;
+        private Dictionary<int, NodeConnectionThread> portToThreadMap;
         public CloudLogic()
         {
             table = new DataTable("Connections");
@@ -57,10 +58,10 @@ namespace CableCloud
                                     int toPort, int virtualToPort)
         {
             TcpClient connectionFrom = new TcpClient("localhost", fromPort);
-            NodeConnectionThread fromArg = new NodeConnectionThread(ref connectionFrom, virtualFromPort, virtualToPort);
+            NodeConnectionThread fromArg = new NodeConnectionThread(ref connectionFrom, virtualToPort, table);
 
             TcpClient connectionTo = new TcpClient("localhost", toPort);
-            NodeConnectionThread toArg = new NodeConnectionThread(ref connectionFrom, virtualToPort, virtualFromPort);
+            NodeConnectionThread toArg = new NodeConnectionThread(ref connectionFrom, virtualFromPort, table);
 
             addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
         }
@@ -86,28 +87,42 @@ namespace CableCloud
         private class NodeConnectionThread
         {
             private Thread thread;
-            private int virtualFromPort;
-            private int virtualToPort;
 
-            public NodeConnectionThread(ref TcpClient connection, int virtualIp, int virtualPort)
+            private TcpClient connection;
+            private int virtualToPort;
+            private DataTable table;
+
+            public NodeConnectionThread(ref TcpClient connection, int virtualToPort, DataTable table)
             {
-                this.virtualFromPort = virtualIp;
-                this.virtualToPort = virtualPort;
-                thread = new Thread(new ParameterizedThreadStart(nodeConnectionThread));
-                thread.Start(connection);
+                this.virtualToPort = virtualToPort;
+                this.connection = connection;
+                this.table = table;
+
+                thread = new Thread(nodeConnectionThread);
+                thread.Start();
             }
 
-            private void nodeConnectionThread(Object connection)
+            private void nodeConnectionThread()
             {
-                TcpClient clienttmp = (TcpClient)connection;
-                BinaryReader reader = new BinaryReader(clienttmp.GetStream());
+                BinaryReader reader = new BinaryReader(connection.GetStream());
                 string received_data = reader.ReadString();
                 JMessage received_object = JMessage.Deserialize(received_data);
                 // TODO Poki co string , potem bedzie tu klasa kontenera , przekazywanie dalej wiadomosci
-                if (received_object.Type == typeof(String))
+                if (received_object.Type == typeof(int))
                 {
-                    String received_message = received_object.Value.ToObject<String>();
-
+                    int virtualFromPort = received_object.Value.ToObject<int>();
+                    var fromPort = ((IPEndPoint)connection.Client.RemoteEndPoint).Port;
+                    int virtualToPort;
+                    int toPort;
+                    for (int i = table.Rows.Count - 1; i >= 0; i--)
+                    {
+                        DataRow dr = table.Rows[i];
+                        if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort))
+                        {
+                            virtualToPort = (int) dr["toPort"];
+                            toPort = (int) dr["virtualToPort"];
+                        }
+                    }
                 }
                 else
                 {
