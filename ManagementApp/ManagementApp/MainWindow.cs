@@ -27,6 +27,8 @@ namespace ManagementApp
         private DataTable table;
 
         // PAINTING VARS
+        private Node aNode;
+        private Node bNode;
         private Bitmap containerPoints;
         private Node nodeFrom;
         private Node virtualNodeTo;
@@ -62,6 +64,7 @@ namespace ManagementApp
         {
             //TODO: start chmury kablowej
             InitializeComponent();
+            hidePortSetup();
             RenderTable();
             this.table = table;
             this.nodeList = nodeList;
@@ -85,6 +88,32 @@ namespace ManagementApp
                 }
             }
             myGraphics = containerPictureBox.CreateGraphics();
+        }
+
+        private void hidePortSetup()
+        {
+            label1.Visible = false;
+            label2.Visible = false;
+            textBox1.Visible = false;
+            textBox2.Visible = false;
+            button2.Visible = false;
+        }
+
+        private void showPortSetup(Node from, Node to)
+        {
+            
+            aNode = from;
+            bNode = to;
+            myGraphics.DrawLine(new Pen(Color.Red, 3), aNode.Position, bNode.Position);
+            containerPictureBox.Update();
+            label1.Text = aNode.Name + " port:";
+            label2.Text = bNode.Name + " port:";
+            
+            label1.Visible = true;
+            label2.Visible = true;
+            textBox1.Visible = true;
+            textBox2.Visible = true;
+            button2.Visible = true;
         }
 
         private void RenderTable()
@@ -204,7 +233,9 @@ namespace ManagementApp
                     if (nodeFrom == null)
                         break;
                     Node nodeTo = getNodeFrom(x, y);
-                    control.addConnection(nodeFrom, virtualNodeTo);
+                    showPortSetup(nodeFrom, virtualNodeTo);
+
+                    
                     nodeFrom = null;
                     break;
 
@@ -261,9 +292,9 @@ namespace ManagementApp
                     control.updateNode(nodeFrom, x, y);
                     foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
-                            control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), nodeFrom);
+                            control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo);
                         else if (elem.End.Equals(oldPosition))
-                            control.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), nodeFrom);
+                            control.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom);
 
                     consoleTextBox.AppendText("Node moved from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
                         x + "," + y);
@@ -555,8 +586,8 @@ namespace ManagementApp
         {
             Point from = elem.Start.Equals(nodeFrom.Position) ?
                             elem.End : elem.Start;
-            myGraphics.DrawLine(new Pen(Color.WhiteSmoke, 2), from, end);
-            myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + end.X) / 2 + 3,
+            panel.DrawLine(new Pen(Color.WhiteSmoke, 2), from, end);
+            panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + end.X) / 2 + 3,
                (from.Y + end.Y) / 2 + 3));
         }
 
@@ -618,8 +649,18 @@ namespace ManagementApp
                     consoleTextBox.AppendText(str);
                     consoleTextBox.AppendText(Environment.NewLine);
                 }
-
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            String portFrom = textBox1.Text;
+            String portTo = textBox1.Text;
+            int portF = int.Parse(portFrom);
+            int portT = int.Parse(portTo);
+            control.addConnection(aNode, portF, bNode, portT);
+            hidePortSetup();
+            containerPictureBox.Refresh();
         }
 
 

@@ -9,10 +9,6 @@ using System.Windows.Forms;
 
 namespace ManagementApp
 {
-    interface IControl
-    {
-
-    }
     class ControlPlane
     {
         MainWindow mainWindow;
@@ -82,7 +78,8 @@ namespace ManagementApp
                     mainWindow.errorMessage("There is already node in that position.");
                     return;
                 }
-            ClientNode client = new ClientNode(x, y, "CN" + clientNodesNumber, 6000 + clientNodesNumber, 6050 + clientNodesNumber);
+            ClientNode client = new ClientNode(x, y, "CN" + clientNodesNumber, 8000 + clientNodesNumber);
+            
             nodeList.Add(client);
             var row = table.NewRow();
             row["id"] = clientNodesNumber;
@@ -100,7 +97,8 @@ namespace ManagementApp
                     mainWindow.errorMessage("There is already node in that position.");
                     return;
                 }
-            NetNode network = new NetNode(x, y, "NN" + networkNodesNumber);
+            NetNode network = new NetNode(x, y, "NN" + networkNodesNumber, 8500 + networkNodesNumber);
+            network.LocalPort = 8500 + networkNodesNumber;
             nodeList.Add(network);
             var row = table.NewRow();
             row["id"] = networkNodesNumber;
@@ -110,7 +108,7 @@ namespace ManagementApp
             mainWindow.addNode(network);
         }
 
-        public void addConnection(Node from, Node to)
+        public void addConnection(Node from, int portFrom, Node to, int portTo)
         {
             if (from is ClientNode)
                 if (connectionList.Where(i => i.From.Equals(from) || i.To.Equals(from)).Any())
@@ -132,8 +130,20 @@ namespace ManagementApp
                 }
                 else
                 {
-                    connectionList.Add(new NodeConnection(from, to, from.Name + "-" + to.Name));
-                    mainWindow.bind();
+                    //List<NodeConnection> portList = connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).ToList();
+                    if (connectionList.Where(i => i.From.Equals(to)).ToList().Where(i => i.VirtualPortFrom.Equals(portTo)).Any())
+                        mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.");
+                    else if (connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
+                        mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.");
+                    else if (connectionList.Where(i => i.From.Equals(from)).ToList().Where(i => i.VirtualPortFrom.Equals(portFrom)).Any())
+                        mainWindow.errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.");
+                    else if (connectionList.Where(i => i.To.Equals(from)).ToList().Where(i => i.VirtualPortTo.Equals(portFrom)).Any())
+                        mainWindow.errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.");
+                    else
+                    {
+                        connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
+                        mainWindow.bind();
+                    }   
                 }
         }
 
@@ -199,92 +209,76 @@ namespace ManagementApp
 
         public List<List<String>> findPaths(Node client)
         {
-            List<Node> listOfAllNodes = new List<Node>();
-            List<Node> listOfAllDestinations = new List<Node>();
-            //List<Node> path = new List<Node>();
-            List<List<Node>> finder = new List<List<Node>>();
             bool pathInProggress = true;
+            //List<Node> listOfAllDestinations = new List<Node>();
+            List<Node> listOfAllNodes = new List<Node>();
+            List<List<Node>> finder = new List<List<Node>>();
             List<List<String>> found = new List<List<String>>();
-            //int noc = 0;
 
             foreach (Node node in nodeList)
             {
-                if (node is ClientNode)
-                    listOfAllDestinations.Add(node);
+                //if (node is ClientNode)
+                //    listOfAllDestinations.Add(node);
                 listOfAllNodes.Add(node);
             }
             listOfAllNodes.Remove(client);
-            //path.Add(client);
+
             List<Node> tmp = new List<Node>();
             tmp.Add(client);
             finder.Add(tmp);
-            int j = 0;
-            while(pathInProggress && j < 10000000)
+            while (pathInProggress)
             {
                 List<List<Node>> finderCopy = new List<List<Node>>(finder);
-                foreach (List<Node> nodeList in finderCopy)
+                foreach (List<Node> nodeListPath in finderCopy)
                 {
-                    List<NodeConnection> possibeNodesConn = connectionList.Where(i => i.From.Equals(nodeList.Last())).ToList();
+                    Node last = nodeListPath.Last();
+                    List<NodeConnection> possibeNodesConn = connectionList.Where(i => i.From.Equals(last) || i.To.Equals(last)).ToList();
                     foreach (NodeConnection con in possibeNodesConn)
                     {
-                        //if con.to is on the list
-                        if (listOfAllNodes.Contains(con.To))
+                        Node target = con.From.Equals(last) ? con.To : con.From;
+                        if (listOfAllNodes.Contains(target))
                         {
-                            List<Node> temp = new List<Node>(nodeList);
-                            temp.Add(con.To);
+                            List<Node> temp = new List<Node>(nodeListPath);
+                            temp.Add(target);
                             finder.Add(temp);
-                            listOfAllNodes.Remove(con.To);
+                            listOfAllNodes.Remove(target);
+                            pathInProggress = true;
                         }
+                        else
+                            pathInProggress = false;
                         
                     }
 
-                    //remove nodeList
-
-                    possibeNodesConn.Clear();
-                    possibeNodesConn = connectionList.Where(i => i.To.Equals(nodeList.Last())).ToList();
-                    foreach (NodeConnection con in possibeNodesConn)
-                    {
-                        //if con.to is on the list
-                        if (listOfAllNodes.Contains(con.From))
-                        {
-                            List<Node> temp = new List<Node>(nodeList);
-                            temp.Add(con.From);
-                            finder.Add(temp);
-                            listOfAllNodes.Remove(con.From);
-                        }
-
-                    }
-                    if (nodeList.Count() == 1)
                         finder.Remove(nodeList);
                 }
-                foreach(List<Node> nodeList in finder)
+                foreach (List<Node> nodeListPath in finder)
                 {
-                    if (nodeList.Last() is ClientNode)
+                    if (nodeListPath.Last() is ClientNode)
                         pathInProggress = false;
                     else
                         pathInProggress = true;
                 }
+
             }
 
             List<List<Node>> finderCopyTwo = new List<List<Node>>(finder);
-            foreach (List<Node> nodeList in finderCopyTwo)
+            foreach (List<Node> nodeListPath in finderCopyTwo)
             {
-                if (!(nodeList.Last() is ClientNode))
-                    finder.Remove(nodeList);
-                if (nodeList.Count() == 1)
-                    finder.Remove(nodeList);
+                if (!(nodeListPath.Last() is ClientNode))
+                    finder.Remove(nodeListPath);
+                if (nodeListPath.Count() == 1)
+                    finder.Remove(nodeListPath);
             }
-            foreach (List<Node> nodeList in finder)
+            foreach (List<Node> nodeListPath in finder)
             {
 
                 List<String> temp = new List<string>();
-                foreach (Node node in nodeList)
+                foreach (Node node in nodeListPath)
                 {
                     temp.Add(node.Name);
                 }
                 found.Add(temp);
             }
-            j++;
         return found;
         }
     }

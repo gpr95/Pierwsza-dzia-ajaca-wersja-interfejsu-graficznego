@@ -18,22 +18,18 @@ namespace ManagementApp
         private int localPortFrom;
         private int localPortTo;
 
-        public NodeConnection(Node from, Node to, String name)
+        public NodeConnection(Node from, int virtualPortFrom, Node to, int virtualPortTo, String name)
         {
-            // TODO (dodac w konstruktorze porty na których powstaje połączenie - to okienko o którym wspominałem)
-            virtualPortFrom = 11;
-            virtualPortTo = 12;
-            // TODO (tu trzeba przechowywac jakos rzeczywiste porty bo dzieki temu ze nie mam listenera
-            // musisz mi je wyslac z okienkowego :)  )
-  
-            localPortFrom = 6845;
-            localPortTo = 6846;
-
+            this.virtualPortFrom = virtualPortFrom;
+            this.virtualPortTo = virtualPortTo;
             this.From = from;
             this.To = to;
+            this.Name = name;
+
+            localPortFrom = from.LocalPort;
+            localPortTo = to.LocalPort;
             Start = from.Position;
             End = to.Position;
-            this.Name = name;
         }
 
         public Point Start
