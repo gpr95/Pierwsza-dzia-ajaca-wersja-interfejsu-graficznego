@@ -104,8 +104,12 @@ namespace ManagementApp
             
             aNode = from;
             bNode = to;
-            myGraphics.DrawLine(new Pen(Color.Red, 3), aNode.Position, bNode.Position);
+            //myGraphics.DrawLine(new Pen(Color.Red, 3), aNode.Position, bNode.Position);
             containerPictureBox.Update();
+            if (from == null)
+                return;
+            if (to == null)
+                return;
             label1.Text = aNode.Name + " port:";
             label2.Text = bNode.Name + " port:";
             
@@ -239,21 +243,21 @@ namespace ManagementApp
                         int portT;
                         int nodeConnectionPort1;
                         int nodeConnectionPort2;
-                        if (connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.LocalPortFrom).Any())
-                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.LocalPortFrom).Max();
+                        if (connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.VirtualPortFrom).Any())
+                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.VirtualPortFrom).Max();
                         else
                             nodeConnectionPort1 = 0;
-                        if(connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.LocalPortTo).Any())
-                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.LocalPortTo).Max();
+                        if(connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.VirtualPortTo).Any())
+                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.VirtualPortTo).Max();
                         else
                             nodeConnectionPort2 = 0;
                         portF = nodeConnectionPort1 > nodeConnectionPort2 ? ++nodeConnectionPort1 : ++nodeConnectionPort2;
-                        if(connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.LocalPortFrom).Any())
-                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.LocalPortFrom).Max();
+                        if(connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.VirtualPortFrom).Any())
+                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.VirtualPortFrom).Max();
                         else
                             nodeConnectionPort1 = 0;
-                        if (connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.LocalPortTo).Any())
-                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.LocalPortTo).Max();
+                        if (connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.VirtualPortTo).Any())
+                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.VirtualPortTo).Max();
                         else
                             nodeConnectionPort2 = 0;
                         portT = nodeConnectionPort1 > nodeConnectionPort2 ? ++nodeConnectionPort1 : ++nodeConnectionPort2;
@@ -691,9 +695,23 @@ namespace ManagementApp
         private void button2_Click(object sender, EventArgs e)
         {
             String portFrom = textBox1.Text;
-            String portTo = textBox1.Text;
-            int portF = int.Parse(portFrom);
-            int portT = int.Parse(portTo);
+            String portTo = textBox2.Text;
+            if (portFrom.Equals("") || portTo.Equals(""))
+                return;
+            int portF;
+            int portT;
+            if (!int.TryParse(portFrom,out portF))
+            {
+                consoleTextBox.AppendText("Please enter correct ports.");
+                consoleTextBox.AppendText(Environment.NewLine);
+                return;
+            }
+            if (!int.TryParse(portTo, out portT))
+            {
+                consoleTextBox.AppendText("Please enter correct ports in To.");
+                consoleTextBox.AppendText(Environment.NewLine);
+                return;
+            }
             control.addConnection(aNode, portF, bNode, portT);
             hidePortSetup();
             containerPictureBox.Refresh();
