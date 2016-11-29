@@ -289,7 +289,7 @@ namespace ManagementApp
                     }
 
                     Point oldPosition = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
-                    control.isSpaceAvailable(nodeFrom, x, y);
+                    control.isSpaceAvailable(nodeFrom, x, y, containerPictureBox.Size.Height, containerPictureBox.Size.Width);
                     //control.updateNode(nodeFrom, x, y);
                     foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
@@ -573,13 +573,13 @@ namespace ManagementApp
 
         private void drawNode(Node node, Graphics panel)
         {
-            Rectangle rect = new Rectangle(node.Position.X - 5, node.Position.Y - 5, GAP + 1, GAP + 1);
+            Rectangle rect = new Rectangle(node.Position.X - GAP / 2, node.Position.Y - GAP / 2, GAP + 1, GAP + 1);
             if (node is NetNode)
                 panel.FillEllipse(Brushes.DodgerBlue, rect);
             else if (node is ClientNode)
                 panel.FillEllipse(Brushes.YellowGreen, rect);
             panel.DrawEllipse(Pens.Black, rect);
-            panel.DrawString(node.Name, new Font("Arial", GAP / 2), Brushes.Gainsboro, new Point(node.Position.X + 3,
+            panel.DrawString(node.Name, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + 3,
                 node.Position.Y + 3));
         }
 

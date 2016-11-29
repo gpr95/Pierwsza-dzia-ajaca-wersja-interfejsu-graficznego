@@ -147,13 +147,16 @@ namespace ManagementApp
                 }
         }
 
-        public void isSpaceAvailable(Node node, int x, int y)
+        public void isSpaceAvailable(Node node, int x, int y, int maxW, int maxH)
         {
             foreach(Node n in nodeList)
             {
                 if(n.Position.Equals(new Point(x, y)))
                 {
-                    isSpaceAvailable(node, x + 10, y);
+                    if (x + 10 < maxW - 1)
+                        isSpaceAvailable(node, x + 10, y, maxW, maxH);
+                    else
+                        isSpaceAvailable(node, x - 10, y, maxW, maxH);
                     return;
                 }
             }
