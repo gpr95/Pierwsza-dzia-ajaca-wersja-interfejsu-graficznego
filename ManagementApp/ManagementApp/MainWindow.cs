@@ -289,7 +289,8 @@ namespace ManagementApp
                     }
 
                     Point oldPosition = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
-                    control.updateNode(nodeFrom, x, y);
+                    control.isSpaceAvailable(nodeFrom, x, y);
+                    //control.updateNode(nodeFrom, x, y);
                     foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
                             control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo);
@@ -639,17 +640,22 @@ namespace ManagementApp
         private void testBtn_Click(object sender, EventArgs e)
         {
             List<List<String>> paths = control.findPaths(nodeList.Where(i => i.Name.Equals("CN0")).FirstOrDefault());
-
-            foreach (List<String> list in paths)
+            if(paths == null)
             {
-                consoleTextBox.AppendText("Path: ");
+                consoleTextBox.AppendText("No paths available.");
                 consoleTextBox.AppendText(Environment.NewLine);
-                foreach (String str in list)
-                {
-                    consoleTextBox.AppendText(str);
-                    consoleTextBox.AppendText(Environment.NewLine);
-                }
             }
+            else
+                foreach (List<String> list in paths)
+                {
+                    consoleTextBox.AppendText("Path: ");
+                    consoleTextBox.AppendText(Environment.NewLine);
+                    foreach (String str in list)
+                    {
+                        consoleTextBox.AppendText(str);
+                        consoleTextBox.AppendText(Environment.NewLine);
+                    }
+                }
         }
 
         private void button2_Click(object sender, EventArgs e)

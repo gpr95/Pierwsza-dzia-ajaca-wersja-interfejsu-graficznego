@@ -147,6 +147,19 @@ namespace ManagementApp
                 }
         }
 
+        public void isSpaceAvailable(Node node, int x, int y)
+        {
+            foreach(Node n in nodeList)
+            {
+                if(n.Position.Equals(new Point(x, y)))
+                {
+                    isSpaceAvailable(node, x + 10, y);
+                    return;
+                }
+            }
+            updateNode(node, x, y);
+        }
+
         public void updateNode(Node node, int x, int y)
         {
             node.Position = new Point(x, y);
@@ -214,6 +227,9 @@ namespace ManagementApp
             List<Node> listOfAllNodes = new List<Node>();
             List<List<Node>> finder = new List<List<Node>>();
             List<List<String>> found = new List<List<String>>();
+
+            if (client == null)
+                return null;
 
             foreach (Node node in nodeList)
             {
