@@ -19,8 +19,8 @@ namespace ClientNode
         private static int outputPort;
         private static bool cyclic_sending = false;
         string[] args2 = new string[3];
-        //obecna przeplywnosc, mozna potem zmienic jak dostanie na STM-2 ?
-        private int currentSpeed = 1;
+        //obecna przeplywnosc, mozna potem zmienic jak dostanie na VC-4 (4) całe mozliwosc
+        private int currentSpeed = 3;
 
         public ClientNode(string[] args)
         {
@@ -54,21 +54,17 @@ namespace ClientNode
             if (received_object.Type == typeof(STM1))
             {
                 STM1 received_frame = received_object.Value.ToObject<STM1>();
-                Console.WriteLine("Message received: " + received_frame.vc4.message);
-            } else if (received_object.Type == typeof(STM2))
-            {
-                STM2 received_frame = received_object.Value.ToObject<STM2>();
-                if (received_frame.vc44c.POH == 0)
+                if (received_frame.VC4.POH == 0)
                 {
-                    Console.WriteLine("Message received: " + received_frame.vc44c.message);
+                    Console.WriteLine("Message received: " + received_frame.VC4.message);
                 }else
                 {
-                    foreach(VirtualContainer4 c in received_frame.vc44c.C44c)
+                    foreach(VirtualContainer3 con in received_frame.VC4.C4)
                     {
-                        Console.WriteLine("Message received: " + c.message);
+                        Console.WriteLine("Message received: " + con.message);
                     }
                 }
-            }
+            } 
             else
             {
                 Console.WriteLine("\n Odebrano uszkodzony pakiet");
@@ -83,9 +79,9 @@ namespace ClientNode
             BinaryReader reader = new BinaryReader(managmentClient.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(STM))
+            if (received_object.Type == typeof(STM1))
             {
-                STM received_frame = received_object.Value.ToObject<STM>();
+                STM1 received_frame = received_object.Value.ToObject<STM1>();
                 //TO DO odbierz od marka tablice adresow i ich portow i wpisz u siebie lokalnie
             }
             else
@@ -172,13 +168,16 @@ namespace ClientNode
             {
                 output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
                 writeOutput = new BinaryWriter(output.GetStream());
-                if (currentSpeed == 1)
+                if (currentSpeed == 3)
                 {
                     STM1 frame = new STM1();
-                    frame.vc4.message = message;
-                    frame.vc4.sourceAddress = address;
+                    VirtualContainer3 vc3 = new VirtualContainer3();
+                    vc3.message = message;
+                    vc3.sourceAddress = address;
                     //tu dopasowac port dla adresu, narazie domyslny jakis
-                    frame.vc4.port = 43333;
+                    vc3.port = 43333;
+                    frame.VC4.C4.Add(vc3);
+                   
                     string data = JMessage.Serialize(JMessage.FromValue(frame));
                     writeOutput.Write(data);
                     output.Close();
@@ -186,11 +185,11 @@ namespace ClientNode
                 }
                 else
                 {
-                    STM2 frame = new STM2();
-                    frame.vc44c.message = message;
-                    frame.vc44c.sourceAddress = address;
+                    STM1 frame = new STM1();
+                    frame.VC4.message = message;
+                    frame.VC4.sourceAddress = address;
                     //tu dopasowac port dla adresu, narazie domyslny jakis
-                    frame.vc44c.port = 43333;
+                    frame.VC4.port = 43333;
                     string data = JMessage.Serialize(JMessage.FromValue(frame));
                     writeOutput.Write(data);
                     output.Close();
@@ -216,21 +215,24 @@ namespace ClientNode
                 if (currentSpeed == 1)
                 {
                     STM1 frame = new STM1();
-                    frame.vc4.message = message;
-                    frame.vc4.sourceAddress = address;
+                    VirtualContainer3 vc3 = new VirtualContainer3();
+                    vc3.message = message;
+                    vc3.sourceAddress = address;
                     //tu dopasowac port dla adresu, narazie domyslny jakis
-                    frame.vc4.port = 43333;
+                    vc3.port = 43333;
+                    frame.VC4.C4.Add(vc3);
+
                     data = JMessage.Serialize(JMessage.FromValue(frame));
-                  
+
 
                 }
                 else
                 {
-                    STM2 frame = new STM2();
-                    frame.vc44c.message = message;
-                    frame.vc44c.sourceAddress = address;
+                    STM1 frame = new STM1();
+                    frame.VC4.message = message;
+                    frame.VC4.sourceAddress = address;
                     //tu dopasowac port dla adresu, narazie domyslny jakis
-                    frame.vc44c.port = 43333;
+                    frame.VC4.port = 43333;
                     data = JMessage.Serialize(JMessage.FromValue(frame));
                    
                 }

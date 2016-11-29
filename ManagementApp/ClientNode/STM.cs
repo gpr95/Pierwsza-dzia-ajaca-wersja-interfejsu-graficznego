@@ -8,24 +8,20 @@ using System.Threading.Tasks;
 namespace ClientNode
 {
     
-    class STM
+    class STM1
     {
+        //RSOH
+        //MSOH
         private string type;
+        public VirtualContainer4 VC4;
 
     }
 
-    class STM1 :STM
-    {
-        public VirtualContainer4 vc4;
-    }
-    class STM2 : STM
-    {
-        public VirtualContainer44c vc44c;
-    }
+   
 
 
 
-    class VirtualContainer4 
+    class VirtualContainer3
     {
         // defines if container has low level containers 0 - NO, 1 - YES
         public int POH;
@@ -34,11 +30,11 @@ namespace ClientNode
         public int port { get; set; }
     }
 
-    class VirtualContainer44c : VirtualContainer4
+    class VirtualContainer4 : VirtualContainer3
     {
-        public List<VirtualContainer4> C44c;
+        public List<VirtualContainer3> C4;
 
-        public VirtualContainer44c(int POH)
+        public VirtualContainer4(int POH)
         {
             this.POH = POH;
         }
