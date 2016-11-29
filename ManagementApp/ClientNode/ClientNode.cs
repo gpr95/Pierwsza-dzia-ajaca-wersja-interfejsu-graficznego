@@ -19,6 +19,8 @@ namespace ClientNode
         private static int outputPort;
         private static bool cyclic_sending = false;
         string[] args2 = new string[3];
+        //obecna przeplywnosc, mozna potem zmienic jak dostanie na STM-2 ?
+        private int currentSpeed = 1;
 
         public ClientNode(string[] args)
         {
@@ -49,10 +51,23 @@ namespace ClientNode
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(Frame))
+            if (received_object.Type == typeof(STM1))
             {
-                Frame received_frame = received_object.Value.ToObject<Frame>();
-                Console.WriteLine("Message received: " + received_frame.message);
+                STM1 received_frame = received_object.Value.ToObject<STM1>();
+                Console.WriteLine("Message received: " + received_frame.vc4.message);
+            } else if (received_object.Type == typeof(STM2))
+            {
+                STM2 received_frame = received_object.Value.ToObject<STM2>();
+                if (received_frame.vc44c.POH == 0)
+                {
+                    Console.WriteLine("Message received: " + received_frame.vc44c.message);
+                }else
+                {
+                    foreach(VirtualContainer4 c in received_frame.vc44c.C44c)
+                    {
+                        Console.WriteLine("Message received: " + c.message);
+                    }
+                }
             }
             else
             {
@@ -68,9 +83,9 @@ namespace ClientNode
             BinaryReader reader = new BinaryReader(managmentClient.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(Frame))
+            if (received_object.Type == typeof(STM))
             {
-                Frame received_frame = received_object.Value.ToObject<Frame>();
+                STM received_frame = received_object.Value.ToObject<STM>();
                 //TO DO odbierz od marka tablice adresow i ich portow i wpisz u siebie lokalnie
             }
             else
@@ -102,27 +117,10 @@ namespace ClientNode
                     {
                         case 1:
                             Console.WriteLine("\nEnter node address: ");
-                            string address = Console.ReadLine();
-                            TcpClient output = new TcpClient();
-                            try
-                            {
-                                output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
-                                writeOutput = new BinaryWriter(output.GetStream());
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e.ToString());
-                                Console.WriteLine("\nCould not connect to host.");
-                                break;
-                            }
+                            string address = Console.ReadLine();                     
                             Console.WriteLine("\nEnter message: ");
                             string message = Console.ReadLine();
-                            Frame frame = new Frame();
-                            frame.sourceAddress = address;
-                            frame.message = message;
-                            string data = JMessage.Serialize(JMessage.FromValue(frame));
-                            writeOutput.Write(data);
-                            output.Close();
+                            this.send(address, message);
                             break;
                         case 2:
                             Console.WriteLine("\nEnter node address: ");
@@ -132,7 +130,7 @@ namespace ClientNode
                             int period = Convert.ToInt32(period_tmp);
                             Console.WriteLine("\nEnter message: ");
                             string message2 = Console.ReadLine();
-                            this.SendPeriodically(address2, period, message2);
+                            this.sendPeriodically(address2, period, message2);
                             cyclic_sending = true;
 
                             break;
@@ -167,17 +165,75 @@ namespace ClientNode
             }
         }
 
+        private void send(string address,string message)
+        {
+            TcpClient output = new TcpClient();
+            try
+            {
+                output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
+                writeOutput = new BinaryWriter(output.GetStream());
+                if (currentSpeed == 1)
+                {
+                    STM1 frame = new STM1();
+                    frame.vc4.message = message;
+                    frame.vc4.sourceAddress = address;
+                    //tu dopasowac port dla adresu, narazie domyslny jakis
+                    frame.vc4.port = 43333;
+                    string data = JMessage.Serialize(JMessage.FromValue(frame));
+                    writeOutput.Write(data);
+                    output.Close();
 
-        private void SendPeriodically(string address, int period, string message)
+                }
+                else
+                {
+                    STM2 frame = new STM2();
+                    frame.vc44c.message = message;
+                    frame.vc44c.sourceAddress = address;
+                    //tu dopasowac port dla adresu, narazie domyslny jakis
+                    frame.vc44c.port = 43333;
+                    string data = JMessage.Serialize(JMessage.FromValue(frame));
+                    writeOutput.Write(data);
+                    output.Close();
+                }
+                
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                Console.WriteLine("\nCould not connect to host.");
+                
+            }
+           
+
+        }
+        private void sendPeriodically(string address, int period, string message)
         {
 
 
             Thread myThread = new Thread(async delegate()
             {
-                Frame frame = new Frame();
-                frame.sourceAddress = address;
-                frame.message = message;
-                string data = JMessage.Serialize(JMessage.FromValue(frame));
+                string data;
+                if (currentSpeed == 1)
+                {
+                    STM1 frame = new STM1();
+                    frame.vc4.message = message;
+                    frame.vc4.sourceAddress = address;
+                    //tu dopasowac port dla adresu, narazie domyslny jakis
+                    frame.vc4.port = 43333;
+                    data = JMessage.Serialize(JMessage.FromValue(frame));
+                  
+
+                }
+                else
+                {
+                    STM2 frame = new STM2();
+                    frame.vc44c.message = message;
+                    frame.vc44c.sourceAddress = address;
+                    //tu dopasowac port dla adresu, narazie domyslny jakis
+                    frame.vc44c.port = 43333;
+                    data = JMessage.Serialize(JMessage.FromValue(frame));
+                   
+                }
 
                 while (cyclic_sending)
                 {
