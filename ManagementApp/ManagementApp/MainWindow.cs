@@ -233,7 +233,37 @@ namespace ManagementApp
                     if (nodeFrom == null)
                         break;
                     Node nodeTo = getNodeFrom(x, y);
-                    showPortSetup(nodeFrom, virtualNodeTo);
+                    if (checkBox1.Checked)
+                    {
+                        int portF;
+                        int portT;
+                        int nodeConnectionPort1;
+                        int nodeConnectionPort2;
+                        if (connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.LocalPortFrom).Any())
+                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.LocalPortFrom).Max();
+                        else
+                            nodeConnectionPort1 = 0;
+                        if(connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.LocalPortTo).Any())
+                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.LocalPortTo).Max();
+                        else
+                            nodeConnectionPort2 = 0;
+                        portF = nodeConnectionPort1 > nodeConnectionPort2 ? ++nodeConnectionPort1 : ++nodeConnectionPort2;
+                        if(connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.LocalPortFrom).Any())
+                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.LocalPortFrom).Max();
+                        else
+                            nodeConnectionPort1 = 0;
+                        if (connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.LocalPortTo).Any())
+                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.LocalPortTo).Max();
+                        else
+                            nodeConnectionPort2 = 0;
+                        portT = nodeConnectionPort1 > nodeConnectionPort2 ? ++nodeConnectionPort1 : ++nodeConnectionPort2;
+
+                        control.addConnection(nodeFrom, portF, virtualNodeTo, portT);
+                        hidePortSetup();
+                        containerPictureBox.Refresh();
+                    }
+                    else
+                        showPortSetup(nodeFrom, virtualNodeTo);
 
                     
                     nodeFrom = null;
