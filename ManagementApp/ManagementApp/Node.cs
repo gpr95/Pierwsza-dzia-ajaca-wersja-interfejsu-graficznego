@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,8 +13,12 @@ namespace ManagementApp
     {
         protected Point position;
         protected String name;
-        protected const int GAP = 10;
+        protected int localPort;
+        protected int ManagmentPort = 7777;
+        protected int CloudCablePort = 7776;
         protected Thread threadHandle;
+        protected TcpClient tcpClient;
+
         //Porty
         public Point Position
         {
@@ -38,6 +43,19 @@ namespace ManagementApp
             set
             {
                 name = value;
+            }
+        }
+
+        public int LocalPort
+        {
+            get
+            {
+                return CloudCablePort;
+            }
+
+            set
+            {
+                CloudCablePort = value;
             }
         }
 

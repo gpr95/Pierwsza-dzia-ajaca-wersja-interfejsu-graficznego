@@ -11,10 +11,11 @@ namespace ManagementApp
 
     public class NetNode : Node
     {
-        public NetNode(int x , int y,String name)
+        public NetNode(int x , int y,String name, int localPort)
         {
             Position = new Point(x, y);
             this.name = name;
+            this.localPort = localPort;
         }
     }
 }

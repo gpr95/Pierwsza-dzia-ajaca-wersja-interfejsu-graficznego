@@ -27,6 +27,8 @@ namespace ManagementApp
         private DataTable table;
 
         // PAINTING VARS
+        private Node aNode;
+        private Node bNode;
         private Bitmap containerPoints;
         private Node nodeFrom;
         private Node virtualNodeTo;
@@ -62,6 +64,7 @@ namespace ManagementApp
         {
             //TODO: start chmury kablowej
             InitializeComponent();
+            hidePortSetup();
             RenderTable();
             this.table = table;
             this.nodeList = nodeList;
@@ -85,6 +88,36 @@ namespace ManagementApp
                 }
             }
             myGraphics = containerPictureBox.CreateGraphics();
+        }
+
+        private void hidePortSetup()
+        {
+            label1.Visible = false;
+            label2.Visible = false;
+            textBox1.Visible = false;
+            textBox2.Visible = false;
+            button2.Visible = false;
+        }
+
+        private void showPortSetup(Node from, Node to)
+        {
+            
+            aNode = from;
+            bNode = to;
+            //myGraphics.DrawLine(new Pen(Color.Red, 3), aNode.Position, bNode.Position);
+            containerPictureBox.Update();
+            if (from == null)
+                return;
+            if (to == null)
+                return;
+            label1.Text = aNode.Name + " port:";
+            label2.Text = bNode.Name + " port:";
+            
+            label1.Visible = true;
+            label2.Visible = true;
+            textBox1.Visible = true;
+            textBox2.Visible = true;
+            button2.Visible = true;
         }
 
         private void RenderTable()
@@ -204,7 +237,39 @@ namespace ManagementApp
                     if (nodeFrom == null)
                         break;
                     Node nodeTo = getNodeFrom(x, y);
-                    control.addConnection(nodeFrom, virtualNodeTo);
+                    if (checkBox1.Checked)
+                    {
+                        int portF;
+                        int portT;
+                        int nodeConnectionPort1;
+                        int nodeConnectionPort2;
+                        if (connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.VirtualPortFrom).Any())
+                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.VirtualPortFrom).Max();
+                        else
+                            nodeConnectionPort1 = 0;
+                        if(connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.VirtualPortTo).Any())
+                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.VirtualPortTo).Max();
+                        else
+                            nodeConnectionPort2 = 0;
+                        portF = nodeConnectionPort1 > nodeConnectionPort2 ? ++nodeConnectionPort1 : ++nodeConnectionPort2;
+                        if(connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.VirtualPortFrom).Any())
+                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.VirtualPortFrom).Max();
+                        else
+                            nodeConnectionPort1 = 0;
+                        if (connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.VirtualPortTo).Any())
+                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.VirtualPortTo).Max();
+                        else
+                            nodeConnectionPort2 = 0;
+                        portT = nodeConnectionPort1 > nodeConnectionPort2 ? ++nodeConnectionPort1 : ++nodeConnectionPort2;
+
+                        control.addConnection(nodeFrom, portF, virtualNodeTo, portT);
+                        hidePortSetup();
+                        containerPictureBox.Refresh();
+                    }
+                    else
+                        showPortSetup(nodeFrom, virtualNodeTo);
+
+                    
                     nodeFrom = null;
                     break;
 
@@ -258,12 +323,13 @@ namespace ManagementApp
                     }
 
                     Point oldPosition = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
-                    control.updateNode(nodeFrom, x, y);
+                    control.isSpaceAvailable(nodeFrom, x, y, containerPictureBox.Size.Height, containerPictureBox.Size.Width);
+                    //control.updateNode(nodeFrom, x, y);
                     foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
-                            control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), nodeFrom);
+                            control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo);
                         else if (elem.End.Equals(oldPosition))
-                            control.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), nodeFrom);
+                            control.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom);
 
                     consoleTextBox.AppendText("Node moved from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
                         x + "," + y);
@@ -541,13 +607,13 @@ namespace ManagementApp
 
         private void drawNode(Node node, Graphics panel)
         {
-            Rectangle rect = new Rectangle(node.Position.X - 5, node.Position.Y - 5, GAP + 1, GAP + 1);
+            Rectangle rect = new Rectangle(node.Position.X - GAP / 2, node.Position.Y - GAP / 2, GAP + 1, GAP + 1);
             if (node is NetNode)
                 panel.FillEllipse(Brushes.DodgerBlue, rect);
             else if (node is ClientNode)
                 panel.FillEllipse(Brushes.YellowGreen, rect);
             panel.DrawEllipse(Pens.Black, rect);
-            panel.DrawString(node.Name, new Font("Arial", GAP / 2), Brushes.Gainsboro, new Point(node.Position.X + 3,
+            panel.DrawString(node.Name, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + 3,
                 node.Position.Y + 3));
         }
 
@@ -555,8 +621,8 @@ namespace ManagementApp
         {
             Point from = elem.Start.Equals(nodeFrom.Position) ?
                             elem.End : elem.Start;
-            myGraphics.DrawLine(new Pen(Color.WhiteSmoke, 2), from, end);
-            myGraphics.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + end.X) / 2 + 3,
+            panel.DrawLine(new Pen(Color.WhiteSmoke, 2), from, end);
+            panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + end.X) / 2 + 3,
                (from.Y + end.Y) / 2 + 3));
         }
 
@@ -608,18 +674,47 @@ namespace ManagementApp
         private void testBtn_Click(object sender, EventArgs e)
         {
             List<List<String>> paths = control.findPaths(nodeList.Where(i => i.Name.Equals("CN0")).FirstOrDefault());
-
-            foreach (List<String> list in paths)
+            if(paths == null)
             {
-                consoleTextBox.AppendText("Path: ");
+                consoleTextBox.AppendText("No paths available.");
                 consoleTextBox.AppendText(Environment.NewLine);
-                foreach (String str in list)
-                {
-                    consoleTextBox.AppendText(str);
-                    consoleTextBox.AppendText(Environment.NewLine);
-                }
-
             }
+            else
+                foreach (List<String> list in paths)
+                {
+                    consoleTextBox.AppendText("Path: ");
+                    consoleTextBox.AppendText(Environment.NewLine);
+                    foreach (String str in list)
+                    {
+                        consoleTextBox.AppendText(str);
+                        consoleTextBox.AppendText(Environment.NewLine);
+                    }
+                }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            String portFrom = textBox1.Text;
+            String portTo = textBox2.Text;
+            if (portFrom.Equals("") || portTo.Equals(""))
+                return;
+            int portF;
+            int portT;
+            if (!int.TryParse(portFrom,out portF))
+            {
+                consoleTextBox.AppendText("Please enter correct ports.");
+                consoleTextBox.AppendText(Environment.NewLine);
+                return;
+            }
+            if (!int.TryParse(portTo, out portT))
+            {
+                consoleTextBox.AppendText("Please enter correct ports in To.");
+                consoleTextBox.AppendText(Environment.NewLine);
+                return;
+            }
+            control.addConnection(aNode, portF, bNode, portT);
+            hidePortSetup();
+            containerPictureBox.Refresh();
         }
 
 

@@ -10,9 +10,9 @@ namespace ManagementApp
 {
     public class ClientNode : Node
     {
-        public ClientNode(int x, int y,String name, int input, int output)
+        public ClientNode(int x, int y,String name, int localPort)
             {
-                string parameters = "127.0.0.1" + " " + input + " " + output;
+                this.localPort = localPort;
                 //System.Diagnostics.Process.Start("ClientNode.exe", parameters);
                 Position = new Point(x, y);
                 this.Name = name;
