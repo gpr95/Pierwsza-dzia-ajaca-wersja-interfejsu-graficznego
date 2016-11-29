@@ -18,7 +18,6 @@ namespace NetNode
         public Ports ports;
         public ManagementAgent agent;
 
-        //tcp dla komunikacji z chmura kablowa listener
         public int physicalPort;
         private TcpListener listener;
 
@@ -46,13 +45,27 @@ namespace NetNode
             }
         }
 
-        private static void ListenThread(Object client)
+        private void ListenThread(Object client)
         {
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
+            JMessage received_object = JMessage.Deserialize(received_data);
+            if (received_object.Type == typeof(Frame))
+            {
+                Frame received_frame = received_object.Value.ToObject<Frame>();
+                toVirtualPort(received_frame);
+                
+            }
             Console.WriteLine(received_data);
             reader.Close();
+        }
+
+        private void toVirtualPort(Frame received_frame)
+        {
+            //TODO evaluate frame header
+            int iport=0;//temporary
+            ports.iports[iport].addToInQueue(received_frame);
         }
 
         private void ConsoleInterface()
@@ -65,27 +78,29 @@ namespace NetNode
             {
                 foreach(IPort iport in this.ports.iports)
                 {
-                    //check if there is packet in queue and try to process it 
+                    //check if there is frame in queue and try to process it 
                     if(iport.input.Count > 0)
                     {
                         //zabranie z kolejki pakietu
-                        ClientNode.Packet pack = iport.input.Dequeue();
+                        ClientNode.Frame frame = iport.input.Dequeue();
                         //wyliczenie wyjscia na ktore ma przejsc pakiet zgodnie z tablica forwardowania
-                        int oport = this.switchField.commutePacket(pack, iport.port, pack.sourceAddress);
+                        int oport = this.switchField.commuteFrame(frame, frame.sourceAddress);
+                        //TODO zmiana stm-1 dodanie portu wyjsciowego
+
                         //dopisanie do odpowiedniego portu wyjsciowego
-                        this.ports.oports[oport].addToOutQueue(pack);
+                        this.ports.oports[oport].addToOutQueue(frame);
                     }
                 }
                 foreach (OPort oport in this.ports.oports)
                 {
-                    //check if there is packet in queue and try to send it 
+                    //check if there is frame in queue and try to send it 
                     if (oport.output.Count > 0)
                     {
-                        Packet packet = oport.output.Dequeue();
+                        Frame frame = oport.output.Dequeue();
                         TcpClient client = new TcpClient();
                         client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
                         BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
-                        string data = JMessage.Serialize(JMessage.FromValue(packet));
+                        string data = JMessage.Serialize(JMessage.FromValue(frame));
                         writeOutput.Write(data);
                     }
                 }

@@ -15,17 +15,16 @@ namespace NetNode
     class IPort
     {
         public int port;
-        public Queue<Packet> input = new Queue<Packet>();
-        private TcpListener listener;
+        public Queue<Frame> input = new Queue<Frame>();
 
         public IPort(int port)
         {
             this.port = port;
         }
 
-        public void addToInQueue(ClientNode.Packet packet)
+        public void addToInQueue(ClientNode.Frame frame)
         {
-            input.Enqueue(packet);
+            input.Enqueue(frame);
         }
     }
 }

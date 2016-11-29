@@ -37,7 +37,6 @@ namespace ClientNode
 
             while (true)
             {
-
                 TcpClient client = listener.AcceptTcpClient();
                 Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
                 clientThread.Start(client);
@@ -50,10 +49,10 @@ namespace ClientNode
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(Packet))
+            if (received_object.Type == typeof(Frame))
             {
-                Packet received_packet = received_object.Value.ToObject<Packet>();
-                Console.WriteLine("Message received: " + received_packet.message);
+                Frame received_frame = received_object.Value.ToObject<Frame>();
+                Console.WriteLine("Message received: " + received_frame.message);
             }
             else
             {
@@ -69,9 +68,9 @@ namespace ClientNode
             BinaryReader reader = new BinaryReader(managmentClient.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(Packet))
+            if (received_object.Type == typeof(Frame))
             {
-                Packet received_packet = received_object.Value.ToObject<Packet>();
+                Frame received_frame = received_object.Value.ToObject<Frame>();
                 //TO DO odbierz od marka tablice adresow i ich portow i wpisz u siebie lokalnie
             }
             else
@@ -118,10 +117,10 @@ namespace ClientNode
                             }
                             Console.WriteLine("\nEnter message: ");
                             string message = Console.ReadLine();
-                            Packet packet = new Packet();
-                            packet.sourceAddress = address;
-                            packet.message = message;
-                            string data = JMessage.Serialize(JMessage.FromValue(packet));
+                            Frame frame = new Frame();
+                            frame.sourceAddress = address;
+                            frame.message = message;
+                            string data = JMessage.Serialize(JMessage.FromValue(frame));
                             writeOutput.Write(data);
                             output.Close();
                             break;
@@ -175,10 +174,10 @@ namespace ClientNode
 
             Thread myThread = new Thread(async delegate()
             {
-                Packet packet = new Packet();
-                packet.sourceAddress = address;
-                packet.message = message;
-                string data = JMessage.Serialize(JMessage.FromValue(packet));
+                Frame frame = new Frame();
+                frame.sourceAddress = address;
+                frame.message = message;
+                string data = JMessage.Serialize(JMessage.FromValue(frame));
 
                 while (cyclic_sending)
                 {

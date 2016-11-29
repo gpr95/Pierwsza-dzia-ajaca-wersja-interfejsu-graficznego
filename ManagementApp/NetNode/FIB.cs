@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 
 namespace NetNode
 {
-    //forwarding information table: iport destination oport
+    //forwarding information table: destination mask oport
     class FIB
     {
-        public int iport, oport;
+        public int oport;
         public string destination;
-        public FIB(int iport, string destination, int oport)
+        public int mask;
+        public FIB(string destination, int mask, int oport)
         {
-            this.iport = iport;
             this.destination = destination;
+            this.mask = mask;
             this.oport = oport;
         }
     }

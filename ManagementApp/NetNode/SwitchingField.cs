@@ -7,35 +7,35 @@ using ClientNode;
 
 namespace NetNode
 {
-    //switching field that have FIB and commutate packet from inport to outport
+    //switching field that have FIB and commutate frame from inport to outport
     class SwitchingField
     {
         private List<FIB> fib = new List<FIB>();
+
         public SwitchingField()
         {
-            fib.Add(new FIB(0, "192.168.1.10", 0));
-            fib.Add(new FIB(0, "192.168.1.11", 1));
-            fib.Add(new FIB(0, "192.168.1.12", 2));
-            fib.Add(new FIB(0, "192.168.56.1", 3));
-            fib.Add(new FIB(1, "192.168.1.10", 0));
-            fib.Add(new FIB(1, "192.168.1.11", 1));
-            fib.Add(new FIB(1, "192.168.1.12", 2));
-            fib.Add(new FIB(1, "192.168.1.13", 3));
-            fib.Add(new FIB(2, "192.168.1.10", 0));
-            fib.Add(new FIB(2, "192.168.1.11", 1));
-            fib.Add(new FIB(2, "192.168.1.12", 2));
-            fib.Add(new FIB(2, "192.168.1.13", 3));
-            fib.Add(new FIB(3, "192.168.1.10", 0));
-            fib.Add(new FIB(3, "192.168.1.11", 1));
-            fib.Add(new FIB(3, "192.168.1.12", 2));
-            fib.Add(new FIB(3, "192.168.1.13", 3));
+            this.fib.Add(new FIB("192.168.1.0", 24, 0));
+            this.fib.Add(new FIB("192.168.2.0", 24, 0));
+            this.fib.Add(new FIB("192.168.3.0", 24, 0));
+            this.fib.Add(new FIB("192.169.0.0", 16, 0));
+
         }
 
-        public int commutePacket(ClientNode.Packet packet, int iport, string destination)
+        public int commuteFrame(ClientNode.Frame frame, string destination)
         {
-            int oport = fib.Find(c => c.iport == iport && c.destination == destination).oport;
-            Console.WriteLine("commutate packet from " + iport + " to output port " + oport);
-            return oport;
+            int oport;
+            foreach (var row in fib)
+            {
+                string dest = row.destination;
+                //TODO check subnetworks
+                if (dest == destination)
+                {
+                    oport = row.mask;
+                    Console.WriteLine("commutate frame to output port " + oport);
+                    return oport;
+                }
+            }
+            return -1;
         }
     }
 }
