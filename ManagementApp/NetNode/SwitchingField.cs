@@ -38,7 +38,7 @@ namespace NetNode
                         {
                             if(ipDestBytes[i] == ipTableBytes[i])
                             {
-                                oport = row.mask;
+                                oport = row.oport;
                                 Console.WriteLine("commutate frame to output port " + oport);
                                 return oport;
                             }

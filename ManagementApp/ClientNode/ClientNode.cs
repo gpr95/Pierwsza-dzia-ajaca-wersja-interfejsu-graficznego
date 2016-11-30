@@ -20,7 +20,7 @@ namespace ClientNode
         private static bool cyclic_sending = false;
         string[] args2 = new string[3];
         //obecna przeplywnosc, mozna potem zmienic jak dostanie na VC-4 (4) całe mozliwosc
-        private int currentSpeed = 3;
+        private int currentSpeed = 1;
 
         public ClientNode(string[] args)
         {
@@ -186,6 +186,7 @@ namespace ClientNode
                 else
                 {
                     STM1 frame = new STM1();
+                    frame.VC4 = new VirtualContainer4(0);//POH
                     frame.VC4.message = message;
                     frame.VC4.sourceAddress = address;
                     //tu dopasowac port dla adresu, narazie domyslny jakis
@@ -229,6 +230,7 @@ namespace ClientNode
                 else
                 {
                     STM1 frame = new STM1();
+                    frame.VC4 = new VirtualContainer4(0);//POH
                     frame.VC4.message = message;
                     frame.VC4.sourceAddress = address;
                     //tu dopasowac port dla adresu, narazie domyslny jakis
