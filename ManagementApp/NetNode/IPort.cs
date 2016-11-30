@@ -15,14 +15,14 @@ namespace NetNode
     class IPort
     {
         public int port;
-        public Queue<Frame> input = new Queue<Frame>();
+        public Queue<STM1> input = new Queue<STM1>();
 
         public IPort(int port)
         {
             this.port = port;
         }
 
-        public void addToInQueue(ClientNode.Frame frame)
+        public void addToInQueue(STM1 frame)
         {
             input.Enqueue(frame);
         }

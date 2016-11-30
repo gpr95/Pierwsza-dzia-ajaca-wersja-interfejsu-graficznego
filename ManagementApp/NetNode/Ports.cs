@@ -12,7 +12,7 @@ namespace NetNode
         public List<OPort> oports = new List<OPort>();
         public Ports()
         {
-            for (int i = 0; i <= 3; i++)
+            for (int i = 0; i <= 20; i++)
             {
                 this.iports.Add(new IPort(i));
                 this.oports.Add(new OPort(i));

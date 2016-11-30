@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ClientNode;
 
 namespace NetNode
 {
@@ -41,8 +42,8 @@ namespace NetNode
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
-            Console.WriteLine(received_data);
-            //do smth with received data, configure FIB
+            JMessage received_object = JMessage.Deserialize(received_data);
+            //TODO receive FIB from management
             reader.Close();
         }
     }

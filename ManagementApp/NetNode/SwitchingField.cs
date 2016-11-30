@@ -21,21 +21,38 @@ namespace NetNode
 
         }
 
-        public int commuteFrame(ClientNode.Frame frame, string destination)
+        public int commuteFrame(STM1 frame, string destination)
         {
-            int oport;
+            int oport = -1;
             foreach (var row in fib)
             {
                 string dest = row.destination;
                 //TODO check subnetworks
+                string[] ipTableBytes = dest.Split('.');
+                string[] ipDestBytes = destination.Split('.');
+                if(row.mask < 32)
+                {
+                    if(row.mask == 8 || row.mask == 16 || row.mask == 24)
+                    {
+                        for(int i=0;i<row.mask/8;i++)
+                        {
+                            if(ipDestBytes[i] == ipTableBytes[i])
+                            {
+                                oport = row.mask;
+                                Console.WriteLine("commutate frame to output port " + oport);
+                                return oport;
+                            }
+                        }
+                    }
+                }
                 if (dest == destination)
                 {
-                    oport = row.mask;
+                    oport = row.oport;
                     Console.WriteLine("commutate frame to output port " + oport);
                     return oport;
                 }
             }
-            return -1;
+            return oport;
         }
     }
 }

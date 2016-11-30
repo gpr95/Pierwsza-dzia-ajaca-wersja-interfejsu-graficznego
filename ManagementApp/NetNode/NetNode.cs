@@ -51,9 +51,9 @@ namespace NetNode
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(Frame))
+            if (received_object.Type == typeof(STM1))
             {
-                Frame received_frame = received_object.Value.ToObject<Frame>();
+                STM1 received_frame = received_object.Value.ToObject<STM1>();
                 toVirtualPort(received_frame);
                 
             }
@@ -61,7 +61,7 @@ namespace NetNode
             reader.Close();
         }
 
-        private void toVirtualPort(Frame received_frame)
+        private void toVirtualPort(STM1 received_frame)
         {
             //TODO evaluate frame header
             int iport=0;//temporary
@@ -82,10 +82,10 @@ namespace NetNode
                     if(iport.input.Count > 0)
                     {
                         //zabranie z kolejki pakietu
-                        ClientNode.Frame frame = iport.input.Dequeue();
+                        STM1 frame = iport.input.Dequeue();
                         //wyliczenie wyjscia na ktore ma przejsc pakiet zgodnie z tablica forwardowania
-                        int oport = this.switchField.commuteFrame(frame, frame.sourceAddress);
-                        //TODO zmiana stm-1 dodanie portu wyjsciowego
+                        int oport = this.switchField.commuteFrame(frame, frame.VC4.sourceAddress);
+                        //TODO zmiana stm-1 etykiety dodanie portu wyjsciowego
 
                         //dopisanie do odpowiedniego portu wyjsciowego
                         this.ports.oports[oport].addToOutQueue(frame);
@@ -96,7 +96,7 @@ namespace NetNode
                     //check if there is frame in queue and try to send it 
                     if (oport.output.Count > 0)
                     {
-                        Frame frame = oport.output.Dequeue();
+                        STM1 frame = oport.output.Dequeue();
                         TcpClient client = new TcpClient();
                         client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
                         BinaryWriter writeOutput = new BinaryWriter(client.GetStream());

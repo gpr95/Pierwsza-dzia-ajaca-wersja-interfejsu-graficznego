@@ -14,14 +14,14 @@ namespace NetNode
     class OPort
     {
         private int port;
-        public Queue<Frame> output = new Queue<Frame>();
+        public Queue<STM1> output = new Queue<STM1>();
 
         public OPort(int port)
         {
             this.port = port;
         }
 
-        public void addToOutQueue(ClientNode.Frame frame)
+        public void addToOutQueue(STM1 frame)
         {
             this.output.Enqueue(frame);
         }
