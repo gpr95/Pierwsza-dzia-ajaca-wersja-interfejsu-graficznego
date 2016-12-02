@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,15 +18,23 @@ namespace ManagementApp
         MainWindow mainWindow;
 
         private DataTable table;
-
+        private readonly int MANAGMENTPORT = 7777;
         private int clientNodesNumber;
         private int networkNodesNumber;
-
+        private bool run = true;
+        private TcpListener listener;
+        private static ManagmentProtocol protocol = new ManagmentProtocol();
         //private List<ClientNode> clientNodeList = new List<ClientNode>();
         //private List<NetNode> networkNodeList = new List<NetNode>();
         private List<Node> nodeList = new List<Node>();
         private List<NodeConnection> connectionList = new List<NodeConnection>();
         private List<Domain> domainList = new List<Domain>();
+
+        private class threadPasser
+        {
+            public ControlPlane control;
+            public TcpClient client;
+        }
 
         public ControlPlane()
         {
@@ -31,6 +43,47 @@ namespace ManagementApp
             Application.Run(mainWindow);
             clientNodesNumber = 0;
             networkNodesNumber = 0;
+            
+
+            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), MANAGMENTPORT);
+            Thread thread = new Thread(new ParameterizedThreadStart(Listen));
+            thread.Start(this);
+        }
+        private void Listen(Object controlP)
+        {
+            listener.Start();
+
+            while (run)
+            {
+                TcpClient client = listener.AcceptTcpClient();
+                threadPasser tp = new threadPasser();
+                tp.client = client;
+                tp.control = (ControlPlane) controlP;
+                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
+                clientThread.Start(tp);
+            }
+        }
+
+        private static void ListenThread(Object threadPasser)
+        {
+            threadPasser tp = (threadPasser) threadPasser;
+            TcpClient clienttmp = tp.client;
+            BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
+            //protocol.State = protocol.WHOIS;
+            writer.Write(protocol.WHOIS);
+            BinaryReader reader = new BinaryReader(clienttmp.GetStream());
+            string received_data = reader.ReadString();
+            JSON received_object = JSON.Deserialize(received_data);
+            ManagmentProtocol received_Protocol = received_object.Value.ToObject<ManagmentProtocol>();
+            String nodeName = received_Protocol.Name;
+            tp.control.allocateNode(nodeName, clienttmp, Thread.CurrentThread);
+        }
+
+        public void allocateNode(String nodeName, TcpClient nodePort, Thread nodeThreadHandle)
+        {
+            Node currentNode = nodeList.Where(i => i.Name.Equals(nodeName)).FirstOrDefault();
+            currentNode.ThreadHandle = nodeThreadHandle;
+            currentNode.TcpClient = nodePort;
         }
 
         private DataTable MakeTable()
@@ -70,7 +123,7 @@ namespace ManagementApp
             return table;
         }
 
-        public void addClientNode(int x , int y)
+        public void addClientNode(int x, int y)
         {
             foreach (Node node in nodeList)
                 if (node.Position.Equals(new Point(x, y)))
@@ -79,7 +132,7 @@ namespace ManagementApp
                     return;
                 }
             ClientNode client = new ClientNode(x, y, "CN" + clientNodesNumber, 8000 + clientNodesNumber);
-            
+
             nodeList.Add(client);
             var row = table.NewRow();
             row["id"] = clientNodesNumber;
@@ -91,8 +144,8 @@ namespace ManagementApp
 
         public void addNetworkNode(int x, int y)
         {
-            foreach(Node node in nodeList)
-                if(node.Position.Equals(new Point(x, y)))
+            foreach (Node node in nodeList)
+                if (node.Position.Equals(new Point(x, y)))
                 {
                     mainWindow.errorMessage("There is already node in that position.");
                     return;
@@ -124,7 +177,7 @@ namespace ManagementApp
                     return;
                 }
             if (to != null)
-                if (connectionList.Where(i => (i.From.Equals(from) && i.To.Equals(to))||(i.From.Equals(to) && i.To.Equals(from))).Any())
+                if (connectionList.Where(i => (i.From.Equals(from) && i.To.Equals(to)) || (i.From.Equals(to) && i.To.Equals(from))).Any())
                 {
                     mainWindow.errorMessage("That connection alredy exist!");
                 }
@@ -143,15 +196,15 @@ namespace ManagementApp
                     {
                         connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
                         mainWindow.bind();
-                    }   
+                    }
                 }
         }
 
         public void isSpaceAvailable(Node node, int x, int y, int maxW, int maxH)
         {
-            foreach(Node n in nodeList)
+            foreach (Node n in nodeList)
             {
-                if(n.Position.Equals(new Point(x, y)))
+                if (n.Position.Equals(new Point(x, y)))
                 {
                     if (x + 10 < maxW - 1)
                         isSpaceAvailable(node, x + 10, y, maxW, maxH);
@@ -265,18 +318,18 @@ namespace ManagementApp
                         }
                         else
                             pathInProggress = false;
-                        
+
                     }
 
-                        finder.Remove(nodeList);
+                    finder.Remove(nodeList);
                 }
-                foreach (List<Node> nodeListPath in finder)
-                {
-                    if (nodeListPath.Last() is ClientNode)
-                        pathInProggress = false;
-                    else
-                        pathInProggress = true;
-                }
+                //foreach (List<Node> nodeListPath in finder)
+                //{
+                //    if (nodeListPath.Last() is ClientNode)
+                //        pathInProggress = false;
+                //    else
+                //        pathInProggress = true;
+                //}
 
             }
 
@@ -298,7 +351,12 @@ namespace ManagementApp
                 }
                 found.Add(temp);
             }
-        return found;
+            return found;
+        }
+
+        public void stopRunning()
+        {
+            run = false;
         }
     }
 }

@@ -365,6 +365,7 @@ namespace ManagementApp
             this.Controls.Add(this.containerPictureBox);
             this.Name = "MainWindow";
             this.Text = "Oversight Application";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.Load += new System.EventHandler(this.MainWindow_Load);
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).EndInit();
             this.tabControl1.ResumeLayout(false);

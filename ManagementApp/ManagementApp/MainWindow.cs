@@ -717,6 +717,11 @@ namespace ManagementApp
             containerPictureBox.Refresh();
         }
 
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            control.stopRunning();
+        }
+
 
         //private int isVarInFrame(int va)
         //{

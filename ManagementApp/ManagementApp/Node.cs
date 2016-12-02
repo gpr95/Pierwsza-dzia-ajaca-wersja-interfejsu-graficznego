@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Net.Sockets;
@@ -18,6 +19,7 @@ namespace ManagementApp
         protected int CloudCablePort = 7776;
         protected Thread threadHandle;
         protected TcpClient tcpClient;
+        protected Process processHandle;
 
         //Porty
         public Point Position
@@ -69,6 +71,19 @@ namespace ManagementApp
             set
             {
                 threadHandle = value;
+            }
+        }
+
+        public TcpClient TcpClient
+        {
+            get
+            {
+                return tcpClient;
+            }
+
+            set
+            {
+                tcpClient = value;
             }
         }
     }
