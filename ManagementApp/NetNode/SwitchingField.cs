@@ -10,49 +10,32 @@ namespace NetNode
     //switching field that have FIB and commutate frame from inport to outport
     class SwitchingField
     {
-        private List<FIB> fib = new List<FIB>();
+        public List<FIB> fib = new List<FIB>();
 
         public SwitchingField()
         {
-            this.fib.Add(new FIB("192.168.1.0", 24, 0));
-            this.fib.Add(new FIB("192.168.2.0", 24, 0));
-            this.fib.Add(new FIB("192.168.3.0", 24, 0));
-            this.fib.Add(new FIB("192.169.0.0", 16, 0));
+            this.fib.Add(new FIB(1, 0, 1));
+            this.fib.Add(new FIB(1.1, 1, 1.2));
+            this.fib.Add(new FIB(1.2, 1, 1.3));
+            this.fib.Add(new FIB(1.3, 1, 1.1));
 
         }
 
-        public int commuteFrame(STM1 frame, string destination)
+        public int commuteContainer(VC container)
         {
-            int oport = -1;
             foreach (var row in fib)
             {
-                string dest = row.destination;
-                //TODO check subnetworks
-                string[] ipTableBytes = dest.Split('.');
-                string[] ipDestBytes = destination.Split('.');
-                if(row.mask < 32)
+                int oport = row.oport;
+                double out_cont = row.out_cont;
+
+                if(container.cont_no == row.in_cont)
                 {
-                    if(row.mask == 8 || row.mask == 16 || row.mask == 24)
-                    {
-                        for(int i=0;i<row.mask/8;i++)
-                        {
-                            if(ipDestBytes[i] == ipTableBytes[i])
-                            {
-                                oport = row.oport;
-                                Console.WriteLine("commutate frame to output port " + oport);
-                                return oport;
-                            }
-                        }
-                    }
-                }
-                if (dest == destination)
-                {
-                    oport = row.oport;
                     Console.WriteLine("commutate frame to output port " + oport);
+                    container.cont_no = out_cont;
                     return oport;
                 }
             }
-            return oport;
+            return -1;
         }
     }
 }

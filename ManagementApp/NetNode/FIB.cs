@@ -10,14 +10,14 @@ namespace NetNode
     //forwarding information table: destination mask oport
     class FIB
     {
+        public double in_cont;
         public int oport;
-        public string destination;
-        public int mask;
-        public FIB(string destination, int mask, int oport)
+        public double out_cont;
+        public FIB(double in_cont, int oport, double out_cont)
         {
-            this.destination = destination;
-            this.mask = mask;
+            this.in_cont = in_cont;
             this.oport = oport;
+            this.out_cont = out_cont;
         }
     }
 }

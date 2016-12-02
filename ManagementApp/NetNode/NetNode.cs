@@ -14,7 +14,7 @@ namespace NetNode
     class NetNode
     {
         private string virtualIp;
-        public SwitchingField switchField;
+        private static SwitchingField switchField;
         public Ports ports;
         public ManagementAgent agent;
 
@@ -26,7 +26,7 @@ namespace NetNode
             this.virtualIp = args[0];
             //TODO readConfig()
             this.ports = new Ports();
-            this.switchField = new SwitchingField();
+            //this.switchField = new SwitchingField();
             this.agent = new ManagementAgent(Convert.ToInt32(args[1]));
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[2]));
             this.physicalPort = Convert.ToInt32(args[2]);
@@ -81,14 +81,22 @@ namespace NetNode
                     //check if there is frame in queue and try to process it 
                     if(iport.input.Count > 0)
                     {
-                        //zabranie z kolejki pakietu
-                        STM1 frame = iport.input.Dequeue();
-                        //wyliczenie wyjscia na ktore ma przejsc pakiet zgodnie z tablica forwardowania
-                        int oport = this.switchField.commuteFrame(frame, frame.VC4.sourceAddress);
-                        //TODO zmiana stm-1 etykiety dodanie portu wyjsciowego
+                        //zabranie z kolejki kontenera
+                        var container = iport.input.Dequeue();
 
-                        //dopisanie do odpowiedniego portu wyjsciowego
-                        this.ports.oports[oport].addToOutQueue(frame);
+                        //wyliczenie wyjscia na ktore ma przejsc kontener zgodnie z tablica forwardowania
+                        //w tej metodzie zmieniany jest tez container_no z wejsciowego na wyjsciowy
+                        int oport = switchField.commuteContainer(container);
+
+                        if (oport != -1)
+                        {
+                            //dopisanie do odpowiedniego bufora wyjsciowego
+                            this.ports.oports[oport].addToOutQueue(container);
+                        }
+                        else
+                        {
+                            Console.WriteLine("there is no path to follow");
+                        }
                     }
                 }
                 foreach (OPort oport in this.ports.oports)
@@ -107,6 +115,10 @@ namespace NetNode
             }
         }
 
+        public static void addToFib(FIB row)
+        {
+            switchField.fib.Add(row);
+        }
         static void Main(string[] args)
         {
             string[] parameters = new string[] { "192.168.56.55", "111", "112" };

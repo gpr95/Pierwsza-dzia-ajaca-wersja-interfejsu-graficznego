@@ -21,8 +21,10 @@ namespace NetNode
             this.port = port;
         }
 
-        public void addToOutQueue(STM1 frame)
+        public void addToOutQueue(VC container)
         {
+            //TODO pakownie w STM1
+            STM1 frame = new STM1();
             this.output.Enqueue(frame);
         }
     }

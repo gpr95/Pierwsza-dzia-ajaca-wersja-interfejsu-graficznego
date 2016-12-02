@@ -44,6 +44,16 @@ namespace NetNode
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
             //TODO receive FIB from management
+            if (received_object.Type == typeof(FIB))
+            {
+                FIB received_fib = received_object.Value.ToObject<FIB>();
+                //add to switching field list
+                NetNode.addToFib(received_fib);
+            }
+            else
+            {
+                //TODO received management signal
+            }
             reader.Close();
         }
     }

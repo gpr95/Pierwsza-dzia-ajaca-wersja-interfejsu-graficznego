@@ -24,7 +24,12 @@ namespace NetNode
 
         public void addToInQueue(STM1 frame)
         {
-            input.Enqueue(frame);
+            //TODO rozpakowac STM1 i zostawic tylko VC i je dorzucac pokolei do kolejki
+            foreach(var container in frame)
+            {
+                input.Enqueue(container);
+            }
+            //input.Enqueue(frame);
         }
     }
 }
