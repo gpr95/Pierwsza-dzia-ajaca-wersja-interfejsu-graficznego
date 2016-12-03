@@ -20,6 +20,7 @@ namespace ManagementApp
         protected Thread threadHandle;
         protected TcpClient tcpClient;
         protected Process processHandle;
+        protected int state;
 
         //Porty
         public Point Position

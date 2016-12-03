@@ -82,7 +82,7 @@ namespace ClientNode
             if (received_object.Type == typeof(STM1))
             {
                 STM1 received_frame = received_object.Value.ToObject<STM1>();
-                //TO DO odbierz od marka tablice adresow i ich portow i wpisz u siebie lokalnie
+                //TO DO odbierz od Marka tablice adresow i ich portow i wpisz u siebie lokalnie
             }
             else
             {
