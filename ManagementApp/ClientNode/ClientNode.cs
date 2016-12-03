@@ -20,7 +20,7 @@ namespace ClientNode
         private static bool cyclic_sending = false;
         string[] args2 = new string[3];
         //obecna przeplywnosc, mozna potem zmienic jak dostanie na VC-4 (4) całe mozliwosc
-        private int currentSpeed = 1;
+        private int currentSpeed = 3;
 
         public ClientNode(string[] args)
         {
@@ -54,16 +54,7 @@ namespace ClientNode
             if (received_object.Type == typeof(STM1))
             {
                 STM1 received_frame = received_object.Value.ToObject<STM1>();
-                if (received_frame.VC4.POH == 0)
-                {
-                    Console.WriteLine("Message received: " + received_frame.VC4.message);
-                }else
-                {
-                    foreach(VirtualContainer3 con in received_frame.VC4.C4)
-                    {
-                        Console.WriteLine("Message received: " + con.message);
-                    }
-                }
+               //cos wypakowuje 
             } 
             else
             {
@@ -82,7 +73,7 @@ namespace ClientNode
             if (received_object.Type == typeof(STM1))
             {
                 STM1 received_frame = received_object.Value.ToObject<STM1>();
-                //TO DO odbierz od Marka tablice adresow i ich portow i wpisz u siebie lokalnie
+                //TO DO odbierz od marka tablice adresow i ich portow i wpisz u siebie lokalnie
             }
             else
             {
@@ -112,21 +103,18 @@ namespace ClientNode
                     switch (choice)
                     {
                         case 1:
-                            Console.WriteLine("\nEnter node address: ");
-                            string address = Console.ReadLine();                     
+                                                 
                             Console.WriteLine("\nEnter message: ");
                             string message = Console.ReadLine();
-                            this.send(address, message);
+                            this.send(message);
                             break;
                         case 2:
-                            Console.WriteLine("\nEnter node address: ");
-                            string address2 = Console.ReadLine();
                             Console.WriteLine("\nEnter period(in seconds): ");
                             string period_tmp = Console.ReadLine();
                             int period = Convert.ToInt32(period_tmp);
                             Console.WriteLine("\nEnter message: ");
                             string message2 = Console.ReadLine();
-                            this.sendPeriodically(address2, period, message2);
+                            this.sendPeriodically(period, message2);
                             cyclic_sending = true;
 
                             break;
@@ -161,7 +149,7 @@ namespace ClientNode
             }
         }
 
-        private void send(string address,string message)
+        private void send(string message)
         {
             TcpClient output = new TcpClient();
             try
@@ -170,28 +158,35 @@ namespace ClientNode
                 writeOutput = new BinaryWriter(output.GetStream());
                 if (currentSpeed == 3)
                 {
-                    STM1 frame = new STM1();
-                    VirtualContainer3 vc3 = new VirtualContainer3();
-                    vc3.message = message;
-                    vc3.sourceAddress = address;
-                    //tu dopasowac port dla adresu, narazie domyslny jakis
-                    vc3.port = 43333;
-                    frame.VC4.C4.Add(vc3);
-                   
-                    string data = JMessage.Serialize(JMessage.FromValue(frame));
+                    
+                    VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
+                    //od zarządzania znam pozycje gdzie wpisac kontener jesli chce go wyslać do klienta jakiegoś tam
+                    //po stronie klienta moja tablica ma jeden element, ale net node moze juz wywolac z 2 lub 3 na raz
+                    VirtualContainer3[] vc3List = new VirtualContainer3[0];
+                    vc3List[0] = vc3;
+                    int[] pos = new int[0];
+                    // z zarzadania wstawiam w pozycje 1 w stm
+                    pos[0] = 1;
+                    STM1 frame = new STM1(vc3List,pos);
+                    //port ktory wiem z zarzadzania
+                    int virtualPort = 4000;
+                    //SYGNAL
+                    Singal signal = new Singal(getTime(), virtualPort, frame);             
+                    string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writeOutput.Write(data);
                     output.Close();
 
                 }
                 else
                 {
-                    STM1 frame = new STM1();
-                    frame.VC4 = new VirtualContainer4(0);//POH
-                    frame.VC4.message = message;
-                    frame.VC4.sourceAddress = address;
-                    //tu dopasowac port dla adresu, narazie domyslny jakis
-                    frame.VC4.port = 43333;
-                    string data = JMessage.Serialize(JMessage.FromValue(frame));
+                    VirtualContainer4 vc4 = new VirtualContainer4(adaptation(), message);
+                    //tutaj wiem ze moge wykorzystac wieksza przepływnosc, wiec pakuje vc4 do stm i wysylam
+                    STM1 frame = new STM1(vc4);
+                    //port ktory wiem z zarzadzania
+                    int virtualPort = 4000;
+                    //SYGNAL
+                    Singal signal = new Singal(getTime(), virtualPort, frame);
+                    string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writeOutput.Write(data);
                     output.Close();
                 }
@@ -206,7 +201,27 @@ namespace ClientNode
            
 
         }
-        private void sendPeriodically(string address, int period, string message)
+        //to add  POH
+        private byte[] adaptation()
+        {
+            Random rnd = new Random();
+            byte[] POH = new Byte[8];
+            rnd.NextBytes(POH);
+            //debug
+            //Console.WriteLine("The Random bytes are: ");
+            //for (int i = 0; i <= POH.GetUpperBound(0); i++)
+            //    Console.WriteLine("{0}: {1}", i, POH[i]);
+            return POH;
+        }
+        //losowy czas sygnalu z przedzialu od 0 do 125 mikro sekund
+        private int getTime()
+        {
+            Random r = new Random();
+            int time = r.Next(0, 125);
+            return time;
+        }
+    
+        private void sendPeriodically(int period, string message)
         {
 
 
@@ -215,28 +230,34 @@ namespace ClientNode
                 string data;
                 if (currentSpeed == 1)
                 {
-                    STM1 frame = new STM1();
-                    VirtualContainer3 vc3 = new VirtualContainer3();
-                    vc3.message = message;
-                    vc3.sourceAddress = address;
-                    //tu dopasowac port dla adresu, narazie domyslny jakis
-                    vc3.port = 43333;
-                    frame.VC4.C4.Add(vc3);
-
-                    data = JMessage.Serialize(JMessage.FromValue(frame));
+                    VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
+                    //od zarządzania znam pozycje gdzie wpisac kontener jesli chce go wyslać do klienta jakiegoś tam
+                    //po stronie klienta moja tablica ma jeden element, ale net node moze juz wywolac z 2 lub 3 na raz
+                    VirtualContainer3[] vc3List = new VirtualContainer3[0];
+                    vc3List[0] = vc3;
+                    int[] pos = new int[0];
+                    // z zarzadania wstawiam w pozycje 1 w stm
+                    pos[0] = 1;
+                    STM1 frame = new STM1(vc3List, pos);
+                    //port ktory wiem z zarzadzania
+                    int virtualPort = 4000;
+                    //SYGNAL
+                    Singal signal = new Singal(getTime(), virtualPort, frame);
+                    data = JMessage.Serialize(JMessage.FromValue(signal));
 
 
                 }
                 else
                 {
-                    STM1 frame = new STM1();
-                    frame.VC4 = new VirtualContainer4(0);//POH
-                    frame.VC4.message = message;
-                    frame.VC4.sourceAddress = address;
-                    //tu dopasowac port dla adresu, narazie domyslny jakis
-                    frame.VC4.port = 43333;
-                    data = JMessage.Serialize(JMessage.FromValue(frame));
-                   
+                    VirtualContainer4 vc4 = new VirtualContainer4(adaptation(), message);
+                    //tutaj wiem ze moge wykorzystac wieksza przepływnosc, wiec pakuje vc4 do stm i wysylam
+                    STM1 frame = new STM1(vc4);
+                    //port ktory wiem z zarzadzania
+                    int virtualPort = 4000;
+                    //SYGNAL
+                    Singal signal = new Singal(getTime(), virtualPort, frame);
+                    data = JMessage.Serialize(JMessage.FromValue(signal));
+
                 }
 
                 while (cyclic_sending)
