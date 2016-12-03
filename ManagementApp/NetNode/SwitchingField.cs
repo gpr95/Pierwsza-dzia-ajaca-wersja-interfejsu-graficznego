@@ -15,27 +15,47 @@ namespace NetNode
         public SwitchingField()
         {
             this.fib.Add(new FIB(1, 0, 1));
-            this.fib.Add(new FIB(1.1, 1, 1.2));
-            this.fib.Add(new FIB(1.2, 1, 1.3));
-            this.fib.Add(new FIB(1.3, 1, 1.1));
+            this.fib.Add(new FIB(11, 1, 12));
+            this.fib.Add(new FIB(12, 1, 13));
+            this.fib.Add(new FIB(13, 1, 11));
 
         }
 
-        public int commuteContainer(VC container)
+        public int[] commuteContainer(VirtualContainer4 container)
         {
-            foreach (var row in fib)
+            int[] out_pos = { -1, -1 };
+            if (container != null)
             {
-                int oport = row.oport;
-                double out_cont = row.out_cont;
-
-                if(container.cont_no == row.in_cont)
+                //mamy do czynienia z vc4
+                foreach (var row in fib)
                 {
-                    Console.WriteLine("commutate frame to output port " + oport);
-                    container.cont_no = out_cont;
-                    return oport;
+                    if (row.in_cont == 1)
+                    {
+                        out_pos[0] = row.oport;
+                        out_pos[1] = row.out_cont;
+                        return out_pos;
+                    }
                 }
             }
-            return -1;
+            return out_pos;
+        }
+        public int[] commuteContainer(VirtualContainer3 container, int pos)
+        {
+            int[] out_pos = { -1, -1 };
+            if (container != null)
+            {
+                //mamy do czynienia z vc3
+                foreach (var row in fib)
+                {
+                    if (row.in_cont == pos)
+                        {
+                            out_pos[0] = row.oport;
+                            out_pos[1] = row.out_cont;
+                            return out_pos;
+                        }
+                }
+            }
+            return out_pos;
         }
     }
 }

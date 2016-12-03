@@ -15,17 +15,48 @@ namespace NetNode
     {
         private int port;
         public Queue<STM1> output = new Queue<STM1>();
+        private STM1 currentFrame = new STM1();
 
         public OPort(int port)
         {
             this.port = port;
         }
 
-        public void addToOutQueue(VC container)
+        public void addToOutQueue(VirtualContainer4 container)
+        {
+            this.currentFrame.vc4 = container;
+            this.output.Enqueue(currentFrame);
+            this.currentFrame.vc4 = null;
+        }
+        public void addToTempQueue(VirtualContainer3 container, int pos)
         {
             //TODO pakownie w STM1
-            STM1 frame = new STM1();
-            this.output.Enqueue(frame);
+            int i = 0;
+            if(pos == 13)
+            {
+                i = 3;
+            }
+            else if(i == 12)
+            {
+                i = 2;
+            }
+            else{
+                i = 1;
+            }
+            if (i != 0)
+            {
+                this.currentFrame.vc3List[i - 1] = container;
+            }
+        }
+        public void addToOutQueue()
+        {
+            if (this.currentFrame.vc3List[0] != null && this.currentFrame.vc3List[1] != null && this.currentFrame.vc3List[2] != null)
+            {
+                this.output.Enqueue(this.currentFrame);
+                this.currentFrame.vc3List[0] = null;
+                this.currentFrame.vc3List[1] = null;
+                this.currentFrame.vc3List[2] = null;
+            }
         }
     }
 }

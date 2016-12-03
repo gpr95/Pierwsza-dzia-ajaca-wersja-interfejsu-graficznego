@@ -12,9 +12,13 @@ namespace ClientNode
     {
         //RSOH
         //MSOH
-        VirtualContainer4 vc4;
-        VirtualContainer3[] vc3List = new VirtualContainer3[3];//sa trzy kontenery vc3 a nie dwa
+        public VirtualContainer4 vc4;
+        public VirtualContainer3[] vc3List = new VirtualContainer3[3];//sa trzy kontenery vc3 a nie dwa
 
+        public STM1()
+        {
+            //stub
+        }
         public STM1(VirtualContainer4 vc4)
         {
             this.vc4 = vc4;
@@ -36,7 +40,6 @@ namespace ClientNode
 
     public class VirtualContainer3
     {
-        // defines if container has low level containers 0 - NO, 1 - YES
         byte[] POH;
         string C3;
         public VirtualContainer3(byte[] POH, string C3)

@@ -51,21 +51,21 @@ namespace NetNode
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(STM1))
+            if (received_object.Type == typeof(Signal))
             {
-                STM1 received_frame = received_object.Value.ToObject<STM1>();
-                toVirtualPort(received_frame);
+                Signal received_signal = received_object.Value.ToObject<Signal>();
+                STM1 frame = received_signal.stm1;
+                int virtPort = received_signal.port;
+                toVirtualPort(virtPort, frame);
                 
             }
             Console.WriteLine(received_data);
             reader.Close();
         }
 
-        private void toVirtualPort(STM1 received_frame)
+        private void toVirtualPort(int virtPort, STM1 received_frame)
         {
-            //TODO evaluate frame header
-            int iport=0;//temporary
-            ports.iports[iport].addToInQueue(received_frame);
+            ports.iports[virtPort].addToInQueue(received_frame);
         }
 
         private void ConsoleInterface()
@@ -81,23 +81,45 @@ namespace NetNode
                     //check if there is frame in queue and try to process it 
                     if(iport.input.Count > 0)
                     {
-                        //zabranie z kolejki kontenera
-                        var container = iport.input.Dequeue();
+                        int[] out_pos;
+                        //zabranie z kolejki stm
+                        STM1 frame = iport.input.Dequeue();
 
-                        //wyliczenie wyjscia na ktore ma przejsc kontener zgodnie z tablica forwardowania
-                        //w tej metodzie zmieniany jest tez container_no z wejsciowego na wyjsciowy
-                        int oport = switchField.commuteContainer(container);
-
-                        if (oport != -1)
+                        if(frame.vc4 != null)
                         {
-                            //dopisanie do odpowiedniego bufora wyjsciowego
-                            this.ports.oports[oport].addToOutQueue(container);
+                            VirtualContainer4 vc4 = frame.vc4;
+                            out_pos = switchField.commuteContainer(vc4);
+                            if(out_pos[0] != -1)
+                            {
+                                this.ports.oports[out_pos[0]].addToOutQueue(vc4);
+                            }
+                        }
+                        else if(frame.vc3List.Length != 0)
+                        {
+                            int op;
+                            for(int i=0;i<frame.vc3List.Length;i++)
+                            {
+                                VirtualContainer3 vc3 = frame.vc3List[i];
+                                if (vc3 != null)
+                                {
+                                    out_pos = switchField.commuteContainer(vc3, 11 + i);
+                                    if (out_pos[0] != -1)
+                                    {
+                                        this.ports.oports[out_pos[0]].addToTempQueue(vc3, out_pos[1]);
+                                    }
+                                }
+                            }
                         }
                         else
                         {
-                            Console.WriteLine("there is no path to follow");
+                            Console.WriteLine("smth wrong with stm1");
                         }
                     }
+                }
+                foreach (OPort oport in this.ports.oports)
+                {
+                    //pakowanie w STM to co jest w tempQueue
+                    oport.addToOutQueue();
                 }
                 foreach (OPort oport in this.ports.oports)
                 {
@@ -105,6 +127,10 @@ namespace NetNode
                     if (oport.output.Count > 0)
                     {
                         STM1 frame = oport.output.Dequeue();
+
+                        //TODO from management
+                        int virtualPort = 3;
+                        Signal signal = new Signal(DateTimeToInt(), virtualPort, frame);
                         TcpClient client = new TcpClient();
                         client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
                         BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
@@ -118,6 +144,11 @@ namespace NetNode
         public static void addToFib(FIB row)
         {
             switchField.fib.Add(row);
+        }
+        public static int DateTimeToInt()
+        {
+            int unixTime = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
+            return unixTime;
         }
         static void Main(string[] args)
         {

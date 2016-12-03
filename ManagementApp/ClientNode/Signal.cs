@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ClientNode
 {
-    class Signal
+    public class Signal
     {
         int time;
-        int port;
-        STM1 stm1;
+        public int port;
+        public STM1 stm1;
 
         public Signal(int time, int port, STM1 stm1)
         {
