@@ -276,82 +276,83 @@ namespace ManagementApp
             connectionList.RemoveAt(connectionList.IndexOf(conn));
         }
 
-        public List<List<String>> findPaths(Node client)
+        public List<List<String>> findPaths(Node client, bool onlyClients)
         {
-            bool pathInProggress = true;
-            //List<Node> listOfAllDestinations = new List<Node>();
-            List<Node> listOfAllNodes = new List<Node>();
+            List<Node> path = new List<Node>();
+            List<Node> neighbors = new List<Node>();
+            List<Node> listOfWhiteNodes = new List<Node>(nodeList);
+            List<Node> listOfGrayNodes = new List<Node>();
+            List<Node> listOfBlackNodes = new List<Node>();
             List<List<Node>> finder = new List<List<Node>>();
             List<List<String>> found = new List<List<String>>();
 
             if (client == null)
                 return null;
 
-            foreach (Node node in nodeList)
+            listOfWhiteNodes.Remove(client);
+            listOfGrayNodes.Add(client);
+            path.Add(client);
+            finder.Add(path);
+            while (listOfGrayNodes.Any())
             {
-                //if (node is ClientNode)
-                //    listOfAllDestinations.Add(node);
-                listOfAllNodes.Add(node);
-            }
-            listOfAllNodes.Remove(client);
-
-            List<Node> tmp = new List<Node>();
-            tmp.Add(client);
-            finder.Add(tmp);
-            while (pathInProggress)
-            {
-                List<List<Node>> finderCopy = new List<List<Node>>(finder);
-                foreach (List<Node> nodeListPath in finderCopy)
+                List<Node> copyOflistOfGrayNodes = new List<Node>(listOfGrayNodes);
+                foreach (Node nodeInCurrentStep in copyOflistOfGrayNodes)
                 {
-                    Node last = nodeListPath.Last();
-                    List<NodeConnection> possibeNodesConn = connectionList.Where(i => i.From.Equals(last) || i.To.Equals(last)).ToList();
-                    foreach (NodeConnection con in possibeNodesConn)
+                    neighbors = findNeighborNodes(nodeInCurrentStep);
+                    foreach(List<Node> pathiInFinder in finder)
                     {
-                        Node target = con.From.Equals(last) ? con.To : con.From;
-                        if (listOfAllNodes.Contains(target))
-                        {
-                            List<Node> temp = new List<Node>(nodeListPath);
-                            temp.Add(target);
-                            finder.Add(temp);
-                            listOfAllNodes.Remove(target);
-                            pathInProggress = true;
-                        }
-                        else
-                            pathInProggress = false;
-
+                        if (pathiInFinder.Last().Equals(nodeInCurrentStep))
+                            path = pathiInFinder;
                     }
-
-                    finder.Remove(nodeList);
+                    
+                    foreach (Node nodeProcessing in neighbors)
+                    {
+                        if (listOfWhiteNodes.Where(i => i.Equals(nodeProcessing)).Any())
+                        {
+                            List<Node> newPath = new List<Node>(path);
+                            listOfGrayNodes.Add(nodeProcessing);
+                            listOfWhiteNodes.Remove(nodeProcessing);
+                            newPath.Add(nodeProcessing);
+                            finder.Add(newPath);
+                        }
+                    }
+                    listOfBlackNodes.Add(nodeInCurrentStep);
+                    listOfGrayNodes.Remove(nodeInCurrentStep);
                 }
-                //foreach (List<Node> nodeListPath in finder)
-                //{
-                //    if (nodeListPath.Last() is ClientNode)
-                //        pathInProggress = false;
-                //    else
-                //        pathInProggress = true;
-                //}
-
             }
 
-            List<List<Node>> finderCopyTwo = new List<List<Node>>(finder);
-            foreach (List<Node> nodeListPath in finderCopyTwo)
+
+            if (onlyClients)
             {
-                if (!(nodeListPath.Last() is ClientNode))
-                    finder.Remove(nodeListPath);
-                if (nodeListPath.Count() == 1)
-                    finder.Remove(nodeListPath);
+                List<List<Node>> copyOfFinder = new List<List<Node>>(finder);
+                foreach (List<Node> nodeListPath in copyOfFinder)
+                {
+                    if (!(nodeListPath.Last() is ClientNode))
+                        finder.Remove(nodeListPath);
+                }
             }
+
             foreach (List<Node> nodeListPath in finder)
             {
-
-                List<String> temp = new List<string>();
+                List<String> nodeName = new List<string>();
                 foreach (Node node in nodeListPath)
                 {
-                    temp.Add(node.Name);
+                    nodeName.Add(node.Name);
                 }
-                found.Add(temp);
+                found.Add(nodeName);
             }
             return found;
+        }
+
+        private List<Node> findNeighborNodes(Node n)
+        {
+            List<Node> neighborNodes = new List<Node>();
+            List<NodeConnection> possibeNodesConn = connectionList.Where(i => i.From.Equals(n) || i.To.Equals(n)).ToList();
+            foreach (NodeConnection con in possibeNodesConn)
+            {
+                neighborNodes.Add(con.From.Equals(n) ? con.To : con.From);
+            }
+            return neighborNodes;
         }
 
         public void stopRunning()

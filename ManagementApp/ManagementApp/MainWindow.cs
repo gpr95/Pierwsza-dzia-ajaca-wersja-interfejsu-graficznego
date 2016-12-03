@@ -63,7 +63,7 @@ namespace ManagementApp
         public MainWindow(DataTable table, List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
         {
             //TODO: start chmury kablowej
-            cableHandler = new CloudCableHandler(connectionList, 7776);
+            //cableHandler = new CloudCableHandler(connectionList, 7776);
             InitializeComponent();
             hidePortSetup();
             RenderTable();
@@ -674,7 +674,7 @@ namespace ManagementApp
 
         private void testBtn_Click(object sender, EventArgs e)
         {
-            List<List<String>> paths = control.findPaths(nodeList.Where(i => i.Name.Equals("CN0")).FirstOrDefault());
+            List<List<String>> paths = control.findPaths(nodeList.Where(i => i.Name.Equals("CN0")).FirstOrDefault(), true);
             if(paths == null)
             {
                 consoleTextBox.AppendText("No paths available.");

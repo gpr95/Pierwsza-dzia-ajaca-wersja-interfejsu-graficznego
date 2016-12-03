@@ -52,15 +52,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientNode.cs" />
+    <Compile Include="CloudCableHandler.cs" />
     <Compile Include="ContainerElement.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="Domain.cs" />
+    <Compile Include="JSON.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="ManagmentProtocol.cs" />
     <Compile Include="NetNode.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="NodeConnection.cs" />
