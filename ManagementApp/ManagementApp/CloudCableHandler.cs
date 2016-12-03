@@ -21,7 +21,7 @@ namespace ManagementApp
         public CloudCableHandler(List<NodeConnection> connections, int cloudPort)
         {
             this.connections = connections;
-            TcpListener listener = new TcpListener(IPAddress.Parse("localhost"), cloudPort);
+            TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
             listener.Start();
             client = listener.AcceptTcpClient();
             writer = new BinaryWriter(client.GetStream());

@@ -1,17 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ManagementApp
 {
     class ManagmentProtocol
     {
-        private static readonly int whoIs = 0;
-        private static readonly int routingTables = 1;
-        private static readonly int possibleDestinations = 2;
+        private static readonly int wHOIS = 0;
+        private static readonly int rOUTINGTABLES = 1;
+        private static readonly int pOSSIBLEDESITATIONS = 2;
         private static readonly int cONFIRMATION = 3;
 
         private int state;
@@ -19,11 +15,11 @@ namespace ManagementApp
         private List<List<String>> routingTable;
         private String name;
 
-        public int WHOIS
+        public static int WHOIS
         {
             get
             {
-                return whoIs;
+                return wHOIS;
             }
         }
 
@@ -31,15 +27,23 @@ namespace ManagementApp
         {
             get
             {
-                return routingTables;
+                return rOUTINGTABLES;
             }
         }
 
-        public static int POSSIBLEDESTINATIONS
+        public static int POSSIBLEDESITATIONS
         {
             get
             {
-                return possibleDestinations;
+                return pOSSIBLEDESITATIONS;
+            }
+        }
+
+        public static int CONFIRMATION
+        {
+            get
+            {
+                return cONFIRMATION;
             }
         }
 
@@ -92,14 +96,6 @@ namespace ManagementApp
             set
             {
                 name = value;
-            }
-        }
-
-        public static int CONFIRMATION
-        {
-            get
-            {
-                return cONFIRMATION;
             }
         }
     }

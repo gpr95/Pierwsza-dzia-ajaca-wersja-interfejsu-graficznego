@@ -12,17 +12,16 @@ namespace ManagementApp
 {
     public class Node
     {
-        protected Point position;
-        protected String name;
+        protected int state;
         protected int localPort;
         protected int ManagmentPort = 7777;
         protected int CloudCablePort = 7776;
+        protected String name;
+        protected Point position;
         protected Thread threadHandle;
         protected TcpClient tcpClient;
         protected Process processHandle;
-        protected int state;
-
-        //Porty
+        
         public Point Position
         {
             get
