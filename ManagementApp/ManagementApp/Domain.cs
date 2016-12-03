@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
-    public class Domain : ContainerElement
+    public class Domain
     {
-        private Point pointFrom;
+        private const int GAP = 10;
         private int width;
         private int height;
         private Point pointTo;
+        private Point pointFrom;
         private Size size;
-
+        private String name;
+       
         public Domain(Point from, Point to)
         {
             this.pointFrom = from;

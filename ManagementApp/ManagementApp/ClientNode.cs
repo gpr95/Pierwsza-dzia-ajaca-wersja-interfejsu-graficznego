@@ -14,6 +14,7 @@ namespace ManagementApp
             {
                 String parameters = null;
                 this.localPort = localPort;
+                //TODO Starting ClientNodes with constructor
                 //this.processHandle = System.Diagnostics.Process.Start("ClientNode.exe", parameters);
                 Position = new Point(x, y);
                 this.Name = name;

@@ -11,28 +11,24 @@ namespace ManagementApp
     {
         // CONSTS
         private const int GAP = 10;
-        private ControlPlane control;
+
         // LOGICAL VARS
         private OperationType oType;
-        //private List<ContainerElement> elements = new List<ContainerElement>();
-
-        //private List<ClientNode> clientNodeList;
-        //private List<NetNode> networkNodeList;
+        private ControlPlane control;
+        private DataTable table;
         private List<Node> nodeList;
         private List<NodeConnection> connectionList;
         private List<NodeConnection> connectionTemp = new List<NodeConnection>();
         private List<Domain> domainList;
-
-
-        private DataTable table;
         private CloudCableHandler cableHandler;
+
         // PAINTING VARS
+        private bool isDrawing = false;
         private Node aNode;
         private Node bNode;
-        private Bitmap containerPoints;
         private Node nodeFrom;
         private Node virtualNodeTo;
-        private bool isDrawing = false;
+        private Bitmap containerPoints;
         private Point domainFrom;
         private Graphics myGraphics;
 
@@ -69,13 +65,11 @@ namespace ManagementApp
             RenderTable();
             this.table = table;
             this.nodeList = nodeList;
-            //this.networkNodeList = networkNodeList;
             this.connectionList = connectionList;
             this.domainList = domainList;
 
         }
 
-        // MAIN WINDOW ACTIONS
         private void MainWindow_Load(object sender, EventArgs e)
         {
             containerPoints = new Bitmap(containerPictureBox.ClientSize.Width, containerPictureBox.ClientSize.Height);
@@ -105,7 +99,6 @@ namespace ManagementApp
             
             aNode = from;
             bNode = to;
-            //myGraphics.DrawLine(new Pen(Color.Red, 3), aNode.Position, bNode.Position);
             containerPictureBox.Update();
             if (from == null)
                 return;
@@ -129,7 +122,6 @@ namespace ManagementApp
             this.dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
         }
 
-        // CONTAINER ACTIONS
         private void containerPictureBox_Paint(object sender, PaintEventArgs e)
         {
             Graphics panel = e.Graphics;
@@ -275,7 +267,6 @@ namespace ManagementApp
                     break;
 
                 case OperationType.ADD_DOMAIN:
-                    //Add domain thrue control
                     Point domainTo = new Point(x,y);
                     if (domainFrom.X > x && domainFrom.Y < y)
                     {
@@ -325,7 +316,6 @@ namespace ManagementApp
 
                     Point oldPosition = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
                     control.isSpaceAvailable(nodeFrom, x, y, containerPictureBox.Size.Height, containerPictureBox.Size.Width);
-                    //control.updateNode(nodeFrom, x, y);
                     foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
                             control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo);
@@ -555,8 +545,7 @@ namespace ManagementApp
 
             return result;
         }
-
-        // Binding from  Node A to Node B with NodeConnection
+        
         public void bind()
         {
             consoleTextBox.AppendText("Connection  added");
@@ -636,14 +625,10 @@ namespace ManagementApp
                (conn.Start.Y + conn.End.Y) / 2 + 3));
         }
 
-        private void drawElement(ContainerElement elem, Graphics panel)
+        private void drawElement(Domain domain, Graphics panel)
         {
-            if (elem is Domain)
-            {
-                Domain tmp = (Domain)elem;
-                Rectangle rect = new Rectangle(tmp.PointFrom, tmp.Size);
+                Rectangle rect = new Rectangle(domain.PointFrom, domain.Size);
                 panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
-            }
         }
 
         private void putToGrid(ref int x, ref int y)
@@ -722,26 +707,5 @@ namespace ManagementApp
         {
             control.stopRunning();
         }
-
-
-        //private int isVarInFrame(int va)
-        //{
-
-        //}
-        //public void addNN(NetNode nN)
-        //{
-        //    networkNodeList.Add(nN);
-        //    consoleTextBox.AppendText("Network Node added at: " + nN.Position.X + "," + nN.Position.Y);
-        //    consoleTextBox.AppendText(Environment.NewLine);
-        //    var bSource = new BindingSource();
-        //    bSource.DataSource = table;
-        //    dataGridView1.DataSource = bSource;
-        //    dataGridView1.Update();
-        //    dataGridView1.Refresh();
-        //    containerPictureBox.Refresh();
-        //}
-
     }
-
-
 }

@@ -70,7 +70,7 @@ namespace ManagementApp
             TcpClient clienttmp = tp.client;
             BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
             //protocol.State = protocol.WHOIS;
-            writer.Write(protocol.WHOIS);
+            writer.Write(ManagmentProtocol.WHOIS);
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JSON received_object = JSON.Deserialize(received_data);
@@ -221,7 +221,7 @@ namespace ManagementApp
             node.Position = new Point(x, y);
         }
 
-        public void updateElement(ContainerElement elem)
+        public void updateDomain(Domain domain)
         { }
 
         public void deleteNode(Node nodeToDelete)
