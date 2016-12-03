@@ -13,7 +13,7 @@ namespace ClientNode
         //RSOH
         //MSOH
         VirtualContainer4 vc4;
-        VirtualContainer3[] vc3List = new VirtualContainer3[2];
+        VirtualContainer3[] vc3List = new VirtualContainer3[3];//sa trzy kontenery vc3 a nie dwa
 
         public STM1(VirtualContainer4 vc4)
         {
@@ -23,7 +23,7 @@ namespace ClientNode
         {
             for(int i=0; i<pos.Length; i++)
             {
-                vc3List[pos[i]] = vc3[i];
+                this.vc3List[pos[i]] = vc3[i];
             }
         }
         

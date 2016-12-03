@@ -171,7 +171,7 @@ namespace ClientNode
                     //port ktory wiem z zarzadzania
                     int virtualPort = 4000;
                     //SYGNAL
-                    Singal signal = new Singal(getTime(), virtualPort, frame);             
+                    Signal signal = new Signal(getTime(), virtualPort, frame);             
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writeOutput.Write(data);
                     output.Close();
@@ -185,7 +185,7 @@ namespace ClientNode
                     //port ktory wiem z zarzadzania
                     int virtualPort = 4000;
                     //SYGNAL
-                    Singal signal = new Singal(getTime(), virtualPort, frame);
+                    Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writeOutput.Write(data);
                     output.Close();
@@ -242,7 +242,7 @@ namespace ClientNode
                     //port ktory wiem z zarzadzania
                     int virtualPort = 4000;
                     //SYGNAL
-                    Singal signal = new Singal(getTime(), virtualPort, frame);
+                    Signal signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
 
 
@@ -255,7 +255,7 @@ namespace ClientNode
                     //port ktory wiem z zarzadzania
                     int virtualPort = 4000;
                     //SYGNAL
-                    Singal signal = new Singal(getTime(), virtualPort, frame);
+                    Signal signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
 
                 }
