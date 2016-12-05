@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
+    [Serializable]
     public class ClientNode : Node
     {
-        [Serializable]
         public ClientNode(int x, int y,String name, int localPort)
             {
                 String parameters = null;
