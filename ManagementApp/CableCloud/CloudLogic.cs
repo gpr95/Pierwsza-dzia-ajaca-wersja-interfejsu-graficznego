@@ -21,6 +21,7 @@ namespace CableCloud
         public CloudLogic()
         {
             table = new DataTable("Connections");
+            portToThreadMap = new Dictionary<int, NodeConnectionThread>();
             table.Columns.Add("fromPort", typeof(int)).AllowDBNull = false;
             table.Columns.Add("virtualFromPort", typeof(int)).AllowDBNull = false;
             table.Columns.Add("toPort", typeof(int)).AllowDBNull = false;
@@ -58,10 +59,12 @@ namespace CableCloud
                                     int toPort, int virtualToPort)
         {
             TcpClient connectionFrom = new TcpClient("localhost", fromPort);
-            NodeConnectionThread fromArg = new NodeConnectionThread(ref connectionFrom, virtualToPort, table);
+            NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, ref portToThreadMap, virtualToPort, table);
+            portToThreadMap.Add(virtualFromPort, fromThread);
 
             TcpClient connectionTo = new TcpClient("localhost", toPort);
-            NodeConnectionThread toArg = new NodeConnectionThread(ref connectionFrom, virtualFromPort, table);
+            NodeConnectionThread toThread = new NodeConnectionThread(ref connectionFrom, ref portToThreadMap, virtualFromPort, table);
+            portToThreadMap.Add(virtualToPort, toThread);
 
             addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
         }
@@ -91,10 +94,13 @@ namespace CableCloud
             private TcpClient connection;
             private int virtualToPort;
             private DataTable table;
+            private Dictionary<int, NodeConnectionThread> portToThreadMap;
 
-            public NodeConnectionThread(ref TcpClient connection, int virtualToPort, DataTable table)
+            public NodeConnectionThread(ref TcpClient connection, 
+                ref  Dictionary<int,NodeConnectionThread> portToThreadMap,  int virtualToPort, DataTable table)
             {
                 this.virtualToPort = virtualToPort;
+                this.portToThreadMap = portToThreadMap;
                 this.connection = connection;
                 this.table = table;
 
@@ -107,13 +113,13 @@ namespace CableCloud
                 BinaryReader reader = new BinaryReader(connection.GetStream());
                 string received_data = reader.ReadString();
                 JMessage received_object = JMessage.Deserialize(received_data);
-                // TODO Poki co string , potem bedzie tu klasa kontenera , przekazywanie dalej wiadomosci
-                if (received_object.Type == typeof(int))
+                if (received_object.Type == typeof(Signal))
                 {
-                    int virtualFromPort = received_object.Value.ToObject<int>();
+                    Signal signal = received_object.Value.ToObject<Signal>();
+                    int virtualFromPort = signal.port;
                     var fromPort = ((IPEndPoint)connection.Client.RemoteEndPoint).Port;
-                    int virtualToPort;
-                    int toPort;
+                    int virtualToPort = 0;
+                    int toPort = 0;
                     for (int i = table.Rows.Count - 1; i >= 0; i--)
                     {
                         DataRow dr = table.Rows[i];
@@ -123,6 +129,9 @@ namespace CableCloud
                             toPort = (int) dr["virtualToPort"];
                         }
                     }
+                    signal.port = virtualToPort;
+                    portToThreadMap[toPort].sendSignal(signal, toPort);
+
                 }
                 else
                 {
@@ -130,6 +139,11 @@ namespace CableCloud
                 }
 
                 reader.Close();
+            }
+
+            public void sendSignal(Signal toSend, int port)
+            {
+
             }
         
         }
