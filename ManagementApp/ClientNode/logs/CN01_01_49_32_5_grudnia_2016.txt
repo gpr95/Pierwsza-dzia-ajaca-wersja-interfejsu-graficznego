@@ -1,0 +1,8 @@
+
+01:49:37 5 grudnia 2016 : OUT CN01 37 VC-4 14868 meeeeeeesage
+
+01:49:37 5 grudnia 2016 : IN CN01 37 VC-4 14868 meeeeeeesage
+
+01:49:48 5 grudnia 2016 : OUT CN01 85 VC-4 34007 kutaz
+
+01:49:48 5 grudnia 2016 : IN CN01 85 VC-4 34007 kutaz

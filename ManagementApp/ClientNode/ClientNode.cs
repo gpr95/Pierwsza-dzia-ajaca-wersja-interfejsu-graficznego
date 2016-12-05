@@ -20,14 +20,20 @@ namespace ClientNode
         private static bool cyclic_sending = false;
         string[] args2 = new string[3];
         //obecna przeplywnosc, mozna potem zmienic jak dostanie na VC-4 (4) całe mozliwosc
-        private int currentSpeed = 3;
+        private int currentSpeed = 4;
+        private static string name;
+        private static string path;
 
         public ClientNode(string[] args)
         {
             virtualIP = args[0];
-            int managmentPort = Convert.ToInt32(args[1]); 
-            int inputPort = Convert.ToInt32(args[2]);
-            outputPort = Convert.ToInt32(args[2]);
+            //int managmentPort = Convert.ToInt32(args[1]); 
+            int inputPort = Convert.ToInt32(args[1]);
+            //DEBUG normlanie args[2]
+            outputPort = Convert.ToInt32(args[1]);
+            name = args[3];
+            string fileName = args[3] + "_" + DateTime.Now.ToLongTimeString().Replace(":","_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
+            path = @"D:\TSSTRepo\ManagementApp\ClientNode\logs\"+fileName+".txt";
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), inputPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
@@ -51,14 +57,30 @@ namespace ClientNode
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(STM1))
+            if (received_object.Type == typeof(Signal))
             {
-                STM1 received_frame = received_object.Value.ToObject<STM1>();
-               //cos wypakowuje 
-            } 
+                Signal received_signal = received_object.Value.ToObject<Signal>();
+                STM1 received_frame = received_signal.stm1;
+                if (received_frame.vc4 != null)
+                {
+                    Console.WriteLine("Message received: "+received_frame.vc4.C4);
+                    Log1("IN", name, received_signal.time.ToString(), "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
+                }
+                else if (received_frame.vc3List.Length != 0)
+                {
+
+                    for (int i = 0; i < received_frame.vc3List.Length; i++)
+                    {
+                        Console.WriteLine("Message received: " + received_frame.vc3List[i].C3);
+                        Log1("IN", name, received_signal.time.ToString(), "VC-3", received_frame.vc3List[i].POH.ToString(), received_frame.vc3List[i].C3);
+
+                    }
+                }
+            }
             else
             {
-                Console.WriteLine("\n Odebrano uszkodzony pakiet");
+                Console.WriteLine("\n Received unknown data type");
+                Log2("ERR", "Received unknown data type");
             }
 
             reader.Close();
@@ -77,7 +99,7 @@ namespace ClientNode
             }
             else
             {
-                Console.WriteLine("\n Odebrano uszkodzony pakiet");
+                Console.WriteLine("\n Unknown data type");
             }
         }
 
@@ -93,9 +115,9 @@ namespace ClientNode
                 Console.WriteLine("\n 1) Send message");
                 Console.WriteLine("\n 2) Send message periodically");
                 Console.WriteLine("\n 3) Stop sending");
-                Console.WriteLine("\n 4) Quit");
+                Console.WriteLine("\n 4) Check logs");
+                Console.WriteLine("\n 5) Quit");
 
-                //int choice = Convert.ToInt32(Console.ReadLine());
                 int choice;
                 bool res = int.TryParse(Console.ReadLine(), out choice);
                 if (res)
@@ -130,7 +152,9 @@ namespace ClientNode
                             }
                             break;
                         case 4:
-                            Environment.Exit(1);
+                            DumpLog();
+                            break;
+                        case 5:
                             quit = true;
                             break;
                         default:
@@ -143,10 +167,11 @@ namespace ClientNode
                 else
                 {
                     Console.WriteLine("Wrong format");
-                    quit = true;
+                    ConsoleInterface();
                 }
 
             }
+            Environment.Exit(1);
         }
 
         private void send(string message)
@@ -173,6 +198,8 @@ namespace ClientNode
                     //SYGNAL
                     Signal signal = new Signal(getTime(), virtualPort, frame);             
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
+                    
+                    Log1("OUT", name, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
                     writeOutput.Write(data);
                     output.Close();
 
@@ -186,7 +213,8 @@ namespace ClientNode
                     int virtualPort = 4000;
                     //SYGNAL
                     Signal signal = new Signal(getTime(), virtualPort, frame);
-                    string data = JMessage.Serialize(JMessage.FromValue(signal));
+                    string data = JMessage.Serialize(JMessage.FromValue(signal));        
+                    Log1("OUT", name, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                     writeOutput.Write(data);
                     output.Close();
                 }
@@ -194,25 +222,31 @@ namespace ClientNode
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
-                Console.WriteLine("\nCould not connect to host.");
-                
+                Console.WriteLine("\nError sending signal: "+e.Message);
+                Log2("ERR", "\nError sending signal: " + e.Message);
             }
            
 
         }
         //to add  POH
-        private byte[] adaptation()
+        //private byte[] adaptation()
+        //{
+        //    Random rnd = new Random();
+        //    byte[] POH = new Byte[8];
+        //    rnd.NextBytes(POH);
+        //    //debug
+        //    //Console.WriteLine("The Random bytes are: ");
+        //    //for (int i = 0; i <= POH.GetUpperBound(0); i++)
+        //    //    Console.WriteLine("{0}: {1}", i, POH[i]);
+        //    return POH;
+        //}
+        private int adaptation()
         {
-            Random rnd = new Random();
-            byte[] POH = new Byte[8];
-            rnd.NextBytes(POH);
-            //debug
-            //Console.WriteLine("The Random bytes are: ");
-            //for (int i = 0; i <= POH.GetUpperBound(0); i++)
-            //    Console.WriteLine("{0}: {1}", i, POH[i]);
+            Random r = new Random();
+            int POH = r.Next(0, 50000);
             return POH;
         }
+
         //losowy czas sygnalu z przedzialu od 0 do 125 mikro sekund
         private int getTime()
         {
@@ -228,7 +262,7 @@ namespace ClientNode
             Thread myThread = new Thread(async delegate()
             {
                 string data;
-                if (currentSpeed == 1)
+                if (currentSpeed == 3)
                 {
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
                     //od zarządzania znam pozycje gdzie wpisac kontener jesli chce go wyslać do klienta jakiegoś tam
@@ -272,8 +306,9 @@ namespace ClientNode
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.ToString());
-                        Console.WriteLine("Could not connect to host.");
+
+                        Console.WriteLine("\nError sending signal: " + e.Message);
+                        Log2("ERR", "\nError sending signal: " + e.Message);
                         break;
                     }
 
@@ -284,6 +319,46 @@ namespace ClientNode
             myThread.Start();
         }
 
+        public static void Log1(string type,string clientNodeName,string signalDuration, string containerType,string POH, string message)
+        {
+            
+            StreamWriter writer = File.AppendText(path);
+            writer.WriteLine("\r\n{0} {1} : {2} {3} {4} {5} {6} {7}", DateTime.Now.ToLongTimeString(),
+                DateTime.Now.ToLongDateString(),
+                type,
+                clientNodeName,
+                signalDuration,
+                containerType,
+                POH,
+                message);
+                writer.Flush();
+            writer.Close();
+        }
+
+        public static void Log2(string type, string message)
+        {
+            
+            StreamWriter writer = File.AppendText(path);
+            writer.WriteLine("\r\n{0} {1} : {2} {3}", DateTime.Now.ToLongTimeString(),
+                DateTime.Now.ToLongDateString(),
+                type,
+                message);
+                writer.Flush();
+            writer.Close();
+        }
+
+        public void DumpLog()
+        {
+          
+            StreamReader reader = File.OpenText(path);
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                Console.WriteLine(line);
+            }
+            reader.Close();
+        }
+        
 
     }
 }

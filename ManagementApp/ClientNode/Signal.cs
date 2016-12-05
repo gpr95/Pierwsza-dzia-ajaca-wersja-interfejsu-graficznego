@@ -8,7 +8,7 @@ namespace ClientNode
 {
     public class Signal
     {
-        int time;
+        public int time;
         public int port;
         public STM1 stm1;
 

@@ -40,9 +40,9 @@ namespace ClientNode
 
     public class VirtualContainer3
     {
-        byte[] POH;
-        string C3;
-        public VirtualContainer3(byte[] POH, string C3)
+        public int POH;
+        public string C3;
+        public VirtualContainer3(int POH, string C3)
         {
             this.POH = POH;
             this.C3 = C3;
@@ -51,9 +51,9 @@ namespace ClientNode
 
     public class VirtualContainer4
     {
-        byte[] POH;
-        string C4;
-        public VirtualContainer4(byte[] POH, string C4)
+        public int POH;
+        public string C4;
+        public VirtualContainer4(int POH, string C4)
         {
             this.POH = POH;
             this.C4 = C4;

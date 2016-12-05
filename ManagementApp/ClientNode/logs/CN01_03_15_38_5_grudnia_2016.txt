@@ -1,0 +1,4 @@
+
+03:15:46 5 grudnia 2016 : OUT CN01 72 VC-4 29109 hello
+
+03:15:46 5 grudnia 2016 : IN CN01 72 VC-4 29109 hello
