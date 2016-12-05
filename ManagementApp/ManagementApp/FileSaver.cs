@@ -37,7 +37,7 @@ namespace ManagementApp
         public List<Node> ReadFromBinaryFileNodes()
         {
             if (!File.Exists(FILE_PATH_NODES))
-                return null;
+                return new List<Node>();
             using (Stream stream = File.Open(FILE_PATH_NODES, FileMode.Open))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
@@ -48,7 +48,7 @@ namespace ManagementApp
         public List<NodeConnection> ReadFromBinaryFileNodeConnections()
         {
             if (!File.Exists(FILE_PATH_NODECONNECTIONS))
-                return null;
+                return new List<NodeConnection>();
             using (Stream stream = File.Open(FILE_PATH_NODECONNECTIONS, FileMode.Open))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
@@ -59,7 +59,7 @@ namespace ManagementApp
         public List<Domain> ReadFromBinaryFileDomains()
         {
             if (!File.Exists(FILE_PATH_DOMAINS))
-                return null;
+                return new List<Domain>();
             using (Stream stream = File.Open(FILE_PATH_DOMAINS, FileMode.Open))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
