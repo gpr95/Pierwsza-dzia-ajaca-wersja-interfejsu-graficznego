@@ -15,6 +15,7 @@ namespace ManagementApp
 
         public void WriteToBinaryFile(List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
         {
+            System.IO.Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, @"Data\"));
             using (Stream stream = File.Open(FILE_PATH_NODES, FileMode.Create))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();

@@ -49,7 +49,7 @@ namespace CableCloud
                 if (received_object.Type == typeof(NodeConnection))
                 {
                     NodeConnection received_connection = received_object.Value.ToObject<NodeConnection>();
-                    if (received_connection.LocalPortTo == null && received_connection.VirtualPortTo == null)
+                    if (received_connection.LocalPortTo == 0 && received_connection.VirtualPortTo == 0)
                         deleteCable(received_connection.LocalPortFrom, received_connection.VirtualPortFrom);
                     connectToNodes(received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
                        received_connection.LocalPortTo, received_connection.VirtualPortTo);
