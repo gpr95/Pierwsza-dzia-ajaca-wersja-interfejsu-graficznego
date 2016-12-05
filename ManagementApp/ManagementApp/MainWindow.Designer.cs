@@ -54,6 +54,7 @@ namespace ManagementApp
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.saveConfBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -280,7 +281,7 @@ namespace ManagementApp
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label1.Location = new System.Drawing.Point(614, 178);
+            this.label1.Location = new System.Drawing.Point(614, 207);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(51, 13);
             this.label1.TabIndex = 11;
@@ -290,7 +291,7 @@ namespace ManagementApp
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label2.Location = new System.Drawing.Point(614, 204);
+            this.label2.Location = new System.Drawing.Point(614, 237);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(51, 13);
             this.label2.TabIndex = 12;
@@ -301,7 +302,7 @@ namespace ManagementApp
             this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBox1.ForeColor = System.Drawing.Color.Gainsboro;
-            this.textBox1.Location = new System.Drawing.Point(671, 176);
+            this.textBox1.Location = new System.Drawing.Point(671, 205);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(83, 20);
             this.textBox1.TabIndex = 13;
@@ -311,7 +312,7 @@ namespace ManagementApp
             this.textBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBox2.ForeColor = System.Drawing.Color.Gainsboro;
-            this.textBox2.Location = new System.Drawing.Point(671, 202);
+            this.textBox2.Location = new System.Drawing.Point(671, 235);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(83, 20);
             this.textBox2.TabIndex = 14;
@@ -322,7 +323,7 @@ namespace ManagementApp
             this.button2.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button2.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button2.Location = new System.Drawing.Point(614, 228);
+            this.button2.Location = new System.Drawing.Point(614, 261);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(140, 22);
             this.button2.TabIndex = 15;
@@ -334,12 +335,26 @@ namespace ManagementApp
             // 
             this.checkBox1.AutoSize = true;
             this.checkBox1.ForeColor = System.Drawing.Color.Gainsboro;
-            this.checkBox1.Location = new System.Drawing.Point(614, 153);
+            this.checkBox1.Location = new System.Drawing.Point(614, 182);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(128, 17);
             this.checkBox1.TabIndex = 16;
             this.checkBox1.Text = "Auto port aggregation";
             this.checkBox1.UseVisualStyleBackColor = true;
+            // 
+            // saveConfBtn
+            // 
+            this.saveConfBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.saveConfBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.saveConfBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.saveConfBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.saveConfBtn.Location = new System.Drawing.Point(614, 152);
+            this.saveConfBtn.Name = "saveConfBtn";
+            this.saveConfBtn.Size = new System.Drawing.Size(140, 22);
+            this.saveConfBtn.TabIndex = 17;
+            this.saveConfBtn.Text = "Zapisz stan";
+            this.saveConfBtn.UseVisualStyleBackColor = false;
+            this.saveConfBtn.Click += new System.EventHandler(this.saveConfBtn_Click);
             // 
             // MainWindow
             // 
@@ -347,6 +362,7 @@ namespace ManagementApp
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.ClientSize = new System.Drawing.Size(1058, 544);
+            this.Controls.Add(this.saveConfBtn);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.textBox2);
@@ -400,6 +416,7 @@ namespace ManagementApp
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Button saveConfBtn;
     }
 }
 

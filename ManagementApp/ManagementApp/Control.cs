@@ -24,6 +24,7 @@ namespace ManagementApp
         private bool run = true;
         private TcpListener listener;
         private static ManagmentProtocol protocol = new ManagmentProtocol();
+        private FileSaver configuration = new FileSaver();
         //private List<ClientNode> clientNodeList = new List<ClientNode>();
         //private List<NetNode> networkNodeList = new List<NetNode>();
         private List<Node> nodeList = new List<Node>();
@@ -38,6 +39,10 @@ namespace ManagementApp
 
         public ControlPlane()
         {
+            nodeList = configuration.ReadFromBinaryFileNodes();
+            connectionList = configuration.ReadFromBinaryFileNodeConnections();
+            domainList = configuration.ReadFromBinaryFileDomains();
+
             mainWindow = new MainWindow(MakeTable(), nodeList, connectionList, domainList);
             mainWindow.Control = this;
             Application.Run(mainWindow);
