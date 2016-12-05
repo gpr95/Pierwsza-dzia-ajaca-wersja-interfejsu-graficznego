@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
+    [Serializable]
     public class Domain
     {
         private const int GAP = 10;

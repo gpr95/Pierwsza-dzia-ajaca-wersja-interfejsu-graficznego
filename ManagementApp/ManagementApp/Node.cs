@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
+    [Serializable]
     public class Node
     {
         protected int state;

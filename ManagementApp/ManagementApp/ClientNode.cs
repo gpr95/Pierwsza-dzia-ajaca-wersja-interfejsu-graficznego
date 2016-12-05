@@ -10,6 +10,7 @@ namespace ManagementApp
 {
     public class ClientNode : Node
     {
+        [Serializable]
         public ClientNode(int x, int y,String name, int localPort)
             {
                 String parameters = null;
