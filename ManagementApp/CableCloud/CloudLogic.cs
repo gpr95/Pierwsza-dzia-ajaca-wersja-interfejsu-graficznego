@@ -39,19 +39,21 @@ namespace CableCloud
         {
             TcpClient clienttmp = (TcpClient)connection;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
-            string received_data = reader.ReadString();
-            JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(NodeConnection))
+            while (true)
             {
-                NodeConnection received_connection = received_object.Value.ToObject<NodeConnection>();
-                connectToNodes( received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
-                   received_connection.LocalPortTo, received_connection.VirtualPortTo);
+                string received_data = reader.ReadString();
+                JMessage received_object = JMessage.Deserialize(received_data);
+                if (received_object.Type == typeof(NodeConnection))
+                {
+                    NodeConnection received_connection = received_object.Value.ToObject<NodeConnection>();
+                    connectToNodes(received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
+                       received_connection.LocalPortTo, received_connection.VirtualPortTo);
+                }
+                else
+                {
+                    Console.WriteLine("\n Connection with Window Application: WRONG DATA");
+                }
             }
-            else
-            {
-                Console.WriteLine("\n Connection with Window Application: WRONG DATA");
-            }
-
             reader.Close();
         }
 
