@@ -480,6 +480,8 @@ namespace ManagementApp
 
             foreach(Node node in nodeList)
             {
+                if (node is ClientNode)
+                    continue;
                 BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
                 ManagmentProtocol protocol = new ManagmentProtocol();
                 protocol.State = ManagmentProtocol.ROUTINGTABLES;
@@ -487,14 +489,15 @@ namespace ManagementApp
                
                 String send_object = JSON.Serialize(JSON.FromValue(protocol));
                 writer.Write(send_object);
-                //ManagmentProtocol received_Protocol = send_object.Value.ToObject<ManagmentProtocol>();
+
+            }   
+            //ManagmentProtocol received_Protocol = send_object.Value.ToObject<ManagmentProtocol>();
                 //all node to setup
                 //foreach(FIB f in mailingList.Where(n => n.Value.Equals(str)).Select(k => k.Key).ToList())
                 //{
                 //    mainWindow.errorMessage(str + ": " + f.toString());
                 //}
                 //mainWindow.errorMessage(str);
-            }
             //foreach (String name in nodeList.Select(n => n.Name))
             //{
             //    List<FIB> tempList = malinigList.Where(n => n.Value.All(k => k.Equals(name))).Select(m => m.Key).ToList();

@@ -13,9 +13,8 @@ namespace ManagementApp
 
         private int state;
         private String[] message;
-        private List<List<String>> routingTable;
+        private List<FIB> routingTable;
         private String name;
-        //private List<FIB> listOfFibs;
 
         public static int WHOIS
         {
@@ -75,7 +74,7 @@ namespace ManagementApp
             }
         }
 
-        public List<List<string>> RoutingTable
+        public List<FIB> RoutingTable
         {
             get
             {
