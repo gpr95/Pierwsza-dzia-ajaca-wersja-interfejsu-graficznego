@@ -29,9 +29,9 @@ namespace ManagementApp
         private FileSaver configuration = new FileSaver();
         //private List<ClientNode> clientNodeList = new List<ClientNode>();
         //private List<NetNode> networkNodeList = new List<NetNode>();
-        private List<Node> nodeList;
-        private List<NodeConnection> connectionList;
-        private List<Domain> domainList;
+        private List<Node> nodeList = new List<Node>();
+        private List<NodeConnection> connectionList = new List<NodeConnection>();
+        private List<Domain> domainList = new List<Domain>();
 
         private class threadPasser
         {
@@ -41,10 +41,6 @@ namespace ManagementApp
 
         public ControlPlane()
         {
-            nodeList = configuration.ReadFromBinaryFileNodes();
-            connectionList = configuration.ReadFromBinaryFileNodeConnections();
-            domainList = configuration.ReadFromBinaryFileDomains();
-
             mainWindow = new MainWindow(MakeTable(), nodeList, connectionList, domainList);
             mainWindow.Control = this;
             Application.Run(mainWindow);
@@ -55,6 +51,16 @@ namespace ManagementApp
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), MANAGMENTPORT);
             Thread thread = new Thread(new ParameterizedThreadStart(Listen));
             thread.Start(this);
+        }
+        public void load()
+        {
+            nodeList = null;
+            connectionList = null;
+            domainList = null;
+            nodeList = configuration.ReadFromBinaryFileNodes();
+            connectionList = configuration.ReadFromBinaryFileNodeConnections();
+            domainList = configuration.ReadFromBinaryFileDomains();
+            mainWindow.updateLists(nodeList, connectionList, domainList);
         }
         private void Listen(Object controlP)
         {
