@@ -477,6 +477,7 @@ namespace ManagementApp
                 }
             }
             mainWindow.errorMessage("Possible destinations:");
+
             foreach(Node node in nodeList)
             {
                 BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
