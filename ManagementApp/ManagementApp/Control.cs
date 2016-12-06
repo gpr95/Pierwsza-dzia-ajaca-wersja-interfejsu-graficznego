@@ -404,7 +404,7 @@ namespace ManagementApp
 
         public void sendOutInformation()
         {
-            Dictionary<FIB, String> malinigList = new Dictionary<FIB, string>();
+            Dictionary<FIB, String> mailingList = new Dictionary<FIB, string>();
             Dictionary<FIB, String> possibleDestinations = new Dictionary<FIB, string>();
             int portIn, portOut;
             foreach (Node node in nodeList)
@@ -470,19 +470,35 @@ namespace ManagementApp
                             }
 
                                 FIB newFib = new FIB(portIn, in_cout, portOut, in_cout);
-                                malinigList.Add(newFib, nodeName.ElementAt(i));
+                                mailingList.Add(newFib, nodeName.ElementAt(i));
                         }
                         in_cout++;
                     }
                 }
             }
             mainWindow.errorMessage("Possible destinations:");
-            foreach (System.Collections.Generic.KeyValuePair<FIB, string> oneFib in possibleDestinations)
+            foreach(String str in mailingList.Values.Distinct().ToList())
             {
-                mainWindow.errorMessage(oneFib.Value + ": " + oneFib.Key.toString());
+                //all node to setup
+                foreach(FIB f in mailingList.Where(n => n.Value.Equals(str)).Select(k => k.Key).ToList())
+                {
+                    mainWindow.errorMessage(str + ": " + f.toString());
+                }
+                //mainWindow.errorMessage(str);
             }
+            //foreach (String name in nodeList.Select(n => n.Name))
+            //{
+            //    List<FIB> tempList = malinigList.Where(n => n.Value.All(k => k.Equals(name))).Select(m => m.Key).ToList();
+            //    foreach(FIB f in tempList)
+            //    {
+            //        String t = "Test";
+            //        malinigList.TryGetValue(f,out t);
+            //        mainWindow.errorMessage(t + ": " + f.toString());
+            //    }
+                
+            //}
             mainWindow.errorMessage("Fibs:");
-            foreach (System.Collections.Generic.KeyValuePair<FIB, string> oneFib in malinigList)
+            foreach (System.Collections.Generic.KeyValuePair<FIB, string> oneFib in mailingList)
             {
                 mainWindow.errorMessage(oneFib.Value + ": " + oneFib.Key.toString());
             }
