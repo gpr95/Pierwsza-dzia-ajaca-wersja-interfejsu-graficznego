@@ -27,17 +27,6 @@ namespace ManagementApp
         [NonSerialized]
         protected Process processHandle;
 
-        public Node()
-        {
-
-        }
-        public Node(int state, int localPort, String name, Point position)
-        {
-            this.state = state;
-            this.localPort = localPort;
-            this.name = name;
-            this.position = position;
-        }
 
         public Point Position
         {
