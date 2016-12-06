@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
+    [Serializable()]
     public class ClientNode : Node
     {
         public ClientNode(int x, int y,String name, int localPort)

@@ -16,13 +16,21 @@ namespace ManagementApp
         private List<NodeConnection> connections;
         private TcpClient client;
         private BinaryWriter writer;
-                private    BinaryReader reader;
+        private    BinaryReader reader;
+        private TcpListener listener;
 
         public CloudCableHandler(List<NodeConnection> connections, int cloudPort)
         {
             this.connections = connections;
-            TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
+            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
+            Thread thread = new Thread(new ThreadStart(listenForCloud));
+            thread.Start();
+        }
+
+        private void listenForCloud()
+        {
             listener.Start();
+
             client = listener.AcceptTcpClient();
             writer = new BinaryWriter(client.GetStream());
             reader = new BinaryReader(client.GetStream());

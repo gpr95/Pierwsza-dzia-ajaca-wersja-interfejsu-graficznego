@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace ManagementApp
 {
 
+    [Serializable()]
     public class NetNode : Node
     {
         public NetNode(int x , int y,String name, int localPort)

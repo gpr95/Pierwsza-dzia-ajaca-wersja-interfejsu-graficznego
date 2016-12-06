@@ -4,9 +4,11 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ManagementApp
 {
+    [Serializable()]
     public class Domain
     {
         private const int GAP = 10;
@@ -15,8 +17,19 @@ namespace ManagementApp
         private Point pointTo;
         private Point pointFrom;
         private Size size;
-        private String name;
-       
+        private String name { get; set; }
+
+        public Domain(int width, int height, Point pointTo, Point pointFrom, Size size, String name)
+        {
+            this.width = width;
+            this.height = height;
+            this.pointTo = pointTo;
+            this.pointFrom = pointFrom;
+            this.size = size;
+            this.name = name;
+        }
+
+
         public Domain(Point from, Point to)
         {
             this.pointFrom = from;

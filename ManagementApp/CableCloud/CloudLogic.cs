@@ -10,14 +10,17 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace CableCloud
 {
     class CloudLogic
     {
+        /** TABLE WITH CONNECTION */
         private DataTable table;
+
+        /** HANDLERS MAP - localPORT-Thread with connection to this port */
         private Dictionary<int, NodeConnectionThread> portToThreadMap;
+
         public CloudLogic()
         {
             table = new DataTable("Connections");
@@ -39,32 +42,36 @@ namespace CableCloud
         {
             TcpClient clienttmp = (TcpClient)connection;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
-            string received_data = reader.ReadString();
-            JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(NodeConnection))
+            while (true)
             {
-                NodeConnection received_connection = received_object.Value.ToObject<NodeConnection>();
-                connectToNodes( received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
-                   received_connection.LocalPortTo, received_connection.VirtualPortTo);
+                string received_data = reader.ReadString();
+                JMessage received_object = JMessage.Deserialize(received_data);
+                if (received_object.Type == typeof(NodeConnection))
+                {
+                    NodeConnection received_connection = received_object.Value.ToObject<NodeConnection>();
+                    if (received_connection.LocalPortTo == 0 && received_connection.VirtualPortTo == 0)
+                        deleteCable(received_connection.LocalPortFrom, received_connection.VirtualPortFrom);
+                    connectToNodes(received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
+                       received_connection.LocalPortTo, received_connection.VirtualPortTo);
+                }
+                else
+                {
+                    Console.WriteLine("\n Connection with Window Application: WRONG DATA");
+                }
             }
-            else
-            {
-                Console.WriteLine("\n Connection with Window Application: WRONG DATA");
-            }
-
-            reader.Close();
         }
 
         public void connectToNodes(int fromPort, int virtualFromPort,
                                     int toPort, int virtualToPort)
         {
+
             TcpClient connectionFrom = new TcpClient("localhost", fromPort);
             NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, ref portToThreadMap, virtualToPort, table);
-            portToThreadMap.Add(virtualFromPort, fromThread);
+            portToThreadMap.Add(fromPort, fromThread);
 
             TcpClient connectionTo = new TcpClient("localhost", toPort);
             NodeConnectionThread toThread = new NodeConnectionThread(ref connectionFrom, ref portToThreadMap, virtualFromPort, table);
-            portToThreadMap.Add(virtualToPort, toThread);
+            portToThreadMap.Add(toPort, toThread);
 
             addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
         }
@@ -76,14 +83,16 @@ namespace CableCloud
             table.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
         }
 
-        private void deleteCable(int fromPort, int virtualFromPort, int  toPort, int  virtualToPort)
+        private void deleteCable(int fromPort, int virtualFromPort)
         {
             for (int i = table.Rows.Count - 1; i >= 0; i--)
             {
                 DataRow dr = table.Rows[i];
-                if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort)
-                    && dr["toPort"].Equals(toPort) && dr["virtualToPort"].Equals(virtualToPort))
+                if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort))
+                {
                     table.Rows.Remove(dr);
+                    portToThreadMap.Remove(fromPort);
+                }
             }
         }
 
@@ -95,6 +104,7 @@ namespace CableCloud
             private int virtualToPort;
             private DataTable table;
             private Dictionary<int, NodeConnectionThread> portToThreadMap;
+            private BinaryWriter writer;
 
             public NodeConnectionThread(ref TcpClient connection, 
                 ref  Dictionary<int,NodeConnectionThread> portToThreadMap,  int virtualToPort, DataTable table)
@@ -103,6 +113,7 @@ namespace CableCloud
                 this.portToThreadMap = portToThreadMap;
                 this.connection = connection;
                 this.table = table;
+                writer = new BinaryWriter(connection.GetStream());
 
                 thread = new Thread(nodeConnectionThread);
                 thread.Start();
@@ -131,7 +142,6 @@ namespace CableCloud
                     }
                     signal.port = virtualToPort;
                     portToThreadMap[toPort].sendSignal(signal, toPort);
-
                 }
                 else
                 {
@@ -143,7 +153,9 @@ namespace CableCloud
 
             public void sendSignal(Signal toSend, int port)
             {
-
+                toSend.port = port;
+                String data = JSON.Serialize(JSON.FromValue(toSend));
+                writer.Write(data);
             }
         
         }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
+    [Serializable()]
     public class NodeConnection
     {
         private Point start;
@@ -100,21 +101,25 @@ namespace ManagementApp
         public int VirtualPortFrom
         {
             get {  return virtualPortFrom; }
+            set { virtualPortFrom = value; }
         }
 
         public int VirtualPortTo
         {
             get {  return virtualPortTo; }
+            set { virtualPortTo = value; }
         }
 
         public int LocalPortFrom
         {
             get { return localPortFrom; }
+            set { localPortFrom = value; }
         }
 
         public int LocalPortTo
         {
             get { return localPortTo; }
+            set { localPortTo = value; }
         }
     }
 }

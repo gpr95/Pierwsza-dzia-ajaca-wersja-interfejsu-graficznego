@@ -687,5 +687,11 @@ namespace ManagementApp
         {
             control.stopRunning();
         }
+
+        private void saveConfBtn_Click(object sender, EventArgs e)
+        {
+            FileSaver configuration = new FileSaver();
+            configuration.WriteToBinaryFile(nodeList, connectionList, domainList);
+        }
     }
 }
