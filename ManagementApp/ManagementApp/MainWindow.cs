@@ -693,5 +693,18 @@ namespace ManagementApp
             FileSaver configuration = new FileSaver();
             configuration.WriteToBinaryFile(nodeList, connectionList, domainList);
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            control.load();
+            containerPictureBox.Refresh();
+        }
+
+        public void updateLists(List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
+        {
+            this.nodeList = nodeList;
+            this.connectionList = connectionList;
+            this.domainList = domainList;
+        }
     }
 }
