@@ -67,13 +67,14 @@ namespace CableCloud
 
             TcpClient connectionFrom = new TcpClient("localhost", fromPort);
             NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, ref portToThreadMap, virtualToPort, table);
-            portToThreadMap.Add(fromPort, fromThread);
-
+            portToThreadMap.Add(((IPEndPoint)connectionFrom.Client.RemoteEndPoint).Port, fromThread);
+            Console.WriteLine("\n MAKING CLOUD IN/OUT CONNECTION: PORT:" + ((IPEndPoint)connectionFrom.Client.RemoteEndPoint).Port);
             TcpClient connectionTo = new TcpClient("localhost", toPort);
-            NodeConnectionThread toThread = new NodeConnectionThread(ref connectionFrom, ref portToThreadMap, virtualFromPort, table);
-            portToThreadMap.Add(toPort, toThread);
-
-            addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
+            NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo, ref portToThreadMap, virtualFromPort, table);
+            portToThreadMap.Add(((IPEndPoint)connectionTo.Client.RemoteEndPoint).Port, toThread);
+            Console.WriteLine("\n MAKING CLOUD IN/OUT CONNECTION: PORT:" + ((IPEndPoint)connectionTo.Client.RemoteEndPoint).Port);
+            addNewCable(((IPEndPoint)connectionFrom.Client.RemoteEndPoint).Port, virtualFromPort,
+                ((IPEndPoint)connectionTo.Client.RemoteEndPoint).Port, virtualToPort);
         }
 
         
@@ -105,6 +106,7 @@ namespace CableCloud
             private DataTable table;
             private Dictionary<int, NodeConnectionThread> portToThreadMap;
             private BinaryWriter writer;
+            private BinaryReader reader;
 
             public NodeConnectionThread(ref TcpClient connection, 
                 ref  Dictionary<int,NodeConnectionThread> portToThreadMap,  int virtualToPort, DataTable table)
@@ -114,41 +116,45 @@ namespace CableCloud
                 this.connection = connection;
                 this.table = table;
                 writer = new BinaryWriter(connection.GetStream());
-
+                reader = new BinaryReader(connection.GetStream());
                 thread = new Thread(nodeConnectionThread);
                 thread.Start();
             }
 
             private void nodeConnectionThread()
             {
-                BinaryReader reader = new BinaryReader(connection.GetStream());
-                string received_data = reader.ReadString();
-                JMessage received_object = JMessage.Deserialize(received_data);
-                if (received_object.Type == typeof(Signal))
+                Console.Write("THREAD STARTED\n");
+                while (true)
                 {
-                    Signal signal = received_object.Value.ToObject<Signal>();
-                    int virtualFromPort = signal.port;
-                    var fromPort = ((IPEndPoint)connection.Client.RemoteEndPoint).Port;
-                    int virtualToPort = 0;
-                    int toPort = 0;
-                    for (int i = table.Rows.Count - 1; i >= 0; i--)
+                    string received_data = reader.ReadString();
+                    if (received_data == null || received_data.Length == 0)
+                        continue;
+                    Console.Write("THREAD RECEIVED:\n"+received_data);
+                    JMessage received_object = JMessage.Deserialize(received_data);
+                    if (received_object.Type == typeof(Signal))
                     {
-                        DataRow dr = table.Rows[i];
-                        if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort))
+                        Signal signal = received_object.Value.ToObject<Signal>();
+                        int virtualFromPort = signal.port;
+                        var fromPort = ((IPEndPoint)connection.Client.RemoteEndPoint).Port;
+                        int virtualToPort = 0;
+                        int toPort = 0;
+                        for (int i = table.Rows.Count - 1; i >= 0; i--)
                         {
-                            virtualToPort = (int) dr["toPort"];
-                            toPort = (int) dr["virtualToPort"];
+                            DataRow dr = table.Rows[i];
+                            if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort))
+                            {
+                                toPort = (int)dr["toPort"];
+                                virtualToPort = (int)dr["virtualToPort"];
+                            }
                         }
+                        signal.port = virtualToPort;
+                        portToThreadMap[toPort].sendSignal(signal, toPort);
                     }
-                    signal.port = virtualToPort;
-                    portToThreadMap[toPort].sendSignal(signal, toPort);
+                    else
+                    {
+                        Console.WriteLine("\n Connection with Node: WRONG DATA");
+                    }
                 }
-                else
-                {
-                    Console.WriteLine("\n Connection with Node: WRONG DATA");
-                }
-
-                reader.Close();
             }
 
             public void sendSignal(Signal toSend, int port)
@@ -156,6 +162,7 @@ namespace CableCloud
                 toSend.port = port;
                 String data = JSON.Serialize(JSON.FromValue(toSend));
                 writer.Write(data);
+                Console.WriteLine("Sended data OUT");
             }
         
         }
