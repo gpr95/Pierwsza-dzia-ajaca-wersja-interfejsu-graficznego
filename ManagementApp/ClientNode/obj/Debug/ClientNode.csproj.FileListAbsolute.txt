@@ -13,3 +13,4 @@ D:\TSSTRepo\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.dll
 D:\TSSTRepo\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.xml
 D:\TSSTRepo\ManagementApp\ClientNode\obj\Debug\ClientNode.exe
 D:\TSSTRepo\ManagementApp\ClientNode\obj\Debug\ClientNode.pdb
+D:\TSSTRepo\ManagementApp\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
