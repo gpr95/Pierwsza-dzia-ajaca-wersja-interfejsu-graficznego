@@ -90,10 +90,10 @@ namespace ClientNode
 
                 else
                 {
-                    foreach (VirtualContainer3 vc3 in received_frame.vc3List)
+                    foreach (int key  in received_frame.vc3List.Keys)
                     {
-                        Console.WriteLine("Message received: " + vc3.C3);
-                        Log1("IN", name, received_signal.time.ToString(), "VC-3", vc3.POH.ToString(), vc3.C3);
+                        Console.WriteLine("Message received: " + received_frame.vc3List[key].C3);
+                        Log1("IN", name, received_signal.time.ToString(), "VC-3", received_frame.vc3List[key].POH.ToString(), received_frame.vc3List[key].C3);
                     }
                 }
             }
@@ -103,7 +103,7 @@ namespace ClientNode
                 Log2("ERR", "Received unknown data type");
             }
 
-            reader.Close();
+           // reader.Close();
         }
 
         private static void ListenOutThread(Object client)
@@ -213,11 +213,11 @@ namespace ClientNode
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
                     //od zarządzania znam pozycje gdzie wpisac kontener jesli chce go wyslać do klienta jakiegoś tam
                     //po stronie klienta moja tablica ma jeden element, ale net node moze juz wywolac z 2 lub 3 na raz
-                    VirtualContainer3[] vc3List = new VirtualContainer3[0];
+                    VirtualContainer3[] vc3List = new VirtualContainer3[1];
                     vc3List[0] = vc3;
-                    int[] pos = new int[0];
+                    int[] pos = {0,0,0};
                     // z zarzadania wstawiam w pozycje 1 w stm
-                    pos[0] = 1;
+                    pos[0] = 11;
                     STM1 frame = new STM1(vc3List, pos);
                     //port ktory wiem z zarzadzania
                     int virtualPort = 1;
@@ -296,17 +296,18 @@ namespace ClientNode
                 string data;
                 if (currentSpeed == 3)
                 {
+
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
                     //od zarządzania znam pozycje gdzie wpisac kontener jesli chce go wyslać do klienta jakiegoś tam
                     //po stronie klienta moja tablica ma jeden element, ale net node moze juz wywolac z 2 lub 3 na raz
-                    VirtualContainer3[] vc3List = new VirtualContainer3[0];
+                    VirtualContainer3[] vc3List = new VirtualContainer3[1];
                     vc3List[0] = vc3;
-                    int[] pos = new int[0];
+                    int[] pos = { 0, 0, 0 };
                     // z zarzadania wstawiam w pozycje 1 w stm
-                    pos[0] = 1;
+                    pos[0] = 11;
                     frame = new STM1(vc3List, pos);
                     //port ktory wiem z zarzadzania
-                    int virtualPort = 4000;
+                    int virtualPort = 1;
                     //SYGNAL
                     signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -319,7 +320,7 @@ namespace ClientNode
                     //tutaj wiem ze moge wykorzystac wieksza przepływnosc, wiec pakuje vc4 do stm i wysylam
                     frame = new STM1(vc4);
                     //port ktory wiem z zarzadzania
-                    int virtualPort = 4000;
+                    int virtualPort = 1;
                     //SYGNAL
                     signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));

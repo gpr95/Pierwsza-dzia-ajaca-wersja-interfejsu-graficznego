@@ -13,7 +13,8 @@ namespace ClientNode
         //RSOH
         //MSOH
         public VirtualContainer4 vc4;
-        public VirtualContainer3[] vc3List = new VirtualContainer3[3];//sa trzy kontenery vc3 a nie dwa
+       // public VirtualContainer3[] vc3List = new VirtualContainer3[3];//sa trzy kontenery vc3 a nie dwa
+        public Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
 
         public STM1()
         {
@@ -25,9 +26,10 @@ namespace ClientNode
         }
         public STM1(VirtualContainer3[] vc3, int[] pos)
         {
-            for(int i=0; i<pos.Length; i++)
+            for(int i=0; i<vc3.Length; i++)
             {
-                this.vc3List[pos[i]] = vc3[i];
+
+                this.vc3List.Add(pos[i], vc3[i]);
             }
         }
         
