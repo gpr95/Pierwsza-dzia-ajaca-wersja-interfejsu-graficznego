@@ -55,6 +55,7 @@
     <Compile Include="CloudCableHandler.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="Domain.cs" />
+    <Compile Include="FIB.cs" />
     <Compile Include="FileSaver.cs" />
     <Compile Include="JSON.cs" />
     <Compile Include="MainWindow.cs">
