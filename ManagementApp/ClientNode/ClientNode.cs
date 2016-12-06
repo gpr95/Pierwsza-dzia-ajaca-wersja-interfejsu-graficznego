@@ -13,7 +13,8 @@ namespace ClientNode
     class ClientNode
     {
         private string virtualIP;
-        private TcpListener listener;
+        private TcpListener listenerInput;
+        private TcpListener listenerOutput;
         private TcpClient managmentClient;
         private static BinaryWriter writeOutput;
         private static int outputPort;
@@ -30,28 +31,48 @@ namespace ClientNode
             //int managmentPort = Convert.ToInt32(args[1]); 
             int inputPort = Convert.ToInt32(args[1]);
             //DEBUG normlanie args[2]
-            outputPort = Convert.ToInt32(args[1]);
+            outputPort = Convert.ToInt32(args[2]);
             name = args[3];
-            string fileName = args[3] + "_" + DateTime.Now.ToLongTimeString().Replace(":","_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
-            path = @"D:\TSSTRepo\ManagementApp\ClientNode\logs\"+fileName+".txt";
-            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), inputPort);
-            Thread thread = new Thread(new ThreadStart(Listen));
-            thread.Start();
+            string fileName = args[3] + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
+            // path = @"D:\TSSTRepo\ManagementApp\ClientNode\logs\"+fileName+".txt";
+            path = Path.Combine(Environment.CurrentDirectory, @"logs\", fileName + ".txt");
+            System.IO.Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, @"logs\"));
+            listenerInput = new TcpListener(IPAddress.Parse("127.0.0.1"), inputPort);
+            Thread threadIn = new Thread(new ThreadStart(ListenIn));
+            threadIn.Start();
+
+
+            listenerOutput = new TcpListener(IPAddress.Parse("127.0.0.1"), outputPort);
+            Thread threadOut = new Thread(new ThreadStart(ListenOut));
+            threadOut.Start();
+
             ConsoleInterface();
         }
-        private void Listen()
+        private void ListenIn()
         {
-            listener.Start();
+            listenerInput.Start();
 
             while (true)
             {
-                TcpClient client = listener.AcceptTcpClient();
-                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
+                TcpClient client = listenerInput.AcceptTcpClient();
+                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenInThread));
                 clientThread.Start(client);
             }
         }
 
-        private static void ListenThread(Object client)
+        private void ListenOut()
+        {
+            listenerOutput.Start();
+
+            while (true)
+            {
+                TcpClient client = listenerOutput.AcceptTcpClient();
+                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenOutThread));
+                clientThread.Start(client);
+            }
+        }
+
+        private static void ListenInThread(Object client)
         {
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
@@ -63,17 +84,16 @@ namespace ClientNode
                 STM1 received_frame = received_signal.stm1;
                 if (received_frame.vc4 != null)
                 {
-                    Console.WriteLine("Message received: "+received_frame.vc4.C4);
+                    Console.WriteLine("Message received: " + received_frame.vc4.C4);
                     Log1("IN", name, received_signal.time.ToString(), "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
                 }
-                else if (received_frame.vc3List.Length != 0)
+
+                else
                 {
-
-                    for (int i = 0; i < received_frame.vc3List.Length; i++)
+                    foreach (VirtualContainer3 vc3 in received_frame.vc3List)
                     {
-                        Console.WriteLine("Message received: " + received_frame.vc3List[i].C3);
-                        Log1("IN", name, received_signal.time.ToString(), "VC-3", received_frame.vc3List[i].POH.ToString(), received_frame.vc3List[i].C3);
-
+                        Console.WriteLine("Message received: " + vc3.C3);
+                        Log1("IN", name, received_signal.time.ToString(), "VC-3", vc3.POH.ToString(), vc3.C3);
                     }
                 }
             }
@@ -84,6 +104,13 @@ namespace ClientNode
             }
 
             reader.Close();
+        }
+
+        private static void ListenOutThread(Object client)
+        {
+            TcpClient clienttmp = (TcpClient)client;
+            writeOutput = new BinaryWriter(clienttmp.GetStream());
+            Console.WriteLine("\n MAKING CLOUD OUTLIST CONNECTION: PORT:" + ((IPEndPoint)clienttmp.Client.RemoteEndPoint).Port);
         }
 
         private void initManagmentConnection(int sessionPort)
@@ -125,7 +152,7 @@ namespace ClientNode
                     switch (choice)
                     {
                         case 1:
-                                                 
+
                             Console.WriteLine("\nEnter message: ");
                             string message = Console.ReadLine();
                             this.send(message);
@@ -176,14 +203,13 @@ namespace ClientNode
 
         private void send(string message)
         {
-            TcpClient output = new TcpClient();
+            //  TcpClient output = new TcpClient();
             try
             {
-                output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
-                writeOutput = new BinaryWriter(output.GetStream());
+                // output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
                 if (currentSpeed == 3)
                 {
-                    
+
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
                     //od zarządzania znam pozycje gdzie wpisac kontener jesli chce go wyslać do klienta jakiegoś tam
                     //po stronie klienta moja tablica ma jeden element, ale net node moze juz wywolac z 2 lub 3 na raz
@@ -192,16 +218,17 @@ namespace ClientNode
                     int[] pos = new int[0];
                     // z zarzadania wstawiam w pozycje 1 w stm
                     pos[0] = 1;
-                    STM1 frame = new STM1(vc3List,pos);
+                    STM1 frame = new STM1(vc3List, pos);
                     //port ktory wiem z zarzadzania
-                    int virtualPort = 4000;
+                    int virtualPort = 1;
                     //SYGNAL
-                    Signal signal = new Signal(getTime(), virtualPort, frame);             
+                    Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
-                    
-                    Log1("OUT", name, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
+
+
                     writeOutput.Write(data);
-                    output.Close();
+                    Log1("OUT", name, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
+                    //       output.Close();
 
                 }
                 else
@@ -210,22 +237,23 @@ namespace ClientNode
                     //tutaj wiem ze moge wykorzystac wieksza przepływnosc, wiec pakuje vc4 do stm i wysylam
                     STM1 frame = new STM1(vc4);
                     //port ktory wiem z zarzadzania
-                    int virtualPort = 4000;
+                    int virtualPort = 1;
                     //SYGNAL
                     Signal signal = new Signal(getTime(), virtualPort, frame);
-                    string data = JMessage.Serialize(JMessage.FromValue(signal));        
-                    Log1("OUT", name, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                    string data = JMessage.Serialize(JMessage.FromValue(signal));
+
                     writeOutput.Write(data);
-                    output.Close();
+                    //output.Close();
+                    Log1("OUT", name, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                 }
-                
+
             }
             catch (Exception e)
             {
-                Console.WriteLine("\nError sending signal: "+e.Message);
+                Console.WriteLine("\nError sending signal: " + e.Message);
                 Log2("ERR", "\nError sending signal: " + e.Message);
             }
-           
+
 
         }
         //to add  POH
@@ -251,16 +279,20 @@ namespace ClientNode
         private int getTime()
         {
             Random r = new Random();
-            int time = r.Next(0, 125);
+            int time = r.Next(10, 125);
             return time;
         }
-    
+
         private void sendPeriodically(int period, string message)
         {
 
 
-            Thread myThread = new Thread(async delegate()
+            Thread myThread = new Thread(async delegate ()
             {
+                bool isVc3 = false;
+                Signal signal;
+                STM1 frame;
+
                 string data;
                 if (currentSpeed == 3)
                 {
@@ -272,24 +304,24 @@ namespace ClientNode
                     int[] pos = new int[0];
                     // z zarzadania wstawiam w pozycje 1 w stm
                     pos[0] = 1;
-                    STM1 frame = new STM1(vc3List, pos);
+                    frame = new STM1(vc3List, pos);
                     //port ktory wiem z zarzadzania
                     int virtualPort = 4000;
                     //SYGNAL
-                    Signal signal = new Signal(getTime(), virtualPort, frame);
+                    signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
-
+                    isVc3 = true;
 
                 }
                 else
                 {
                     VirtualContainer4 vc4 = new VirtualContainer4(adaptation(), message);
                     //tutaj wiem ze moge wykorzystac wieksza przepływnosc, wiec pakuje vc4 do stm i wysylam
-                    STM1 frame = new STM1(vc4);
+                    frame = new STM1(vc4);
                     //port ktory wiem z zarzadzania
                     int virtualPort = 4000;
                     //SYGNAL
-                    Signal signal = new Signal(getTime(), virtualPort, frame);
+                    signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
 
                 }
@@ -302,6 +334,10 @@ namespace ClientNode
                         output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
                         writeOutput = new BinaryWriter(output.GetStream());
                         writeOutput.Write(data);
+                        if (isVc3)
+                            Log1("OUT", name, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
+                        else
+                            Log1("OUT", name, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                         await Task.Delay(TimeSpan.FromSeconds(period));
                     }
                     catch (Exception e)
@@ -319,9 +355,9 @@ namespace ClientNode
             myThread.Start();
         }
 
-        public static void Log1(string type,string clientNodeName,string signalDuration, string containerType,string POH, string message)
+        public static void Log1(string type, string clientNodeName, string signalDuration, string containerType, string POH, string message)
         {
-            
+
             StreamWriter writer = File.AppendText(path);
             writer.WriteLine("\r\n{0} {1} : {2} {3} {4} {5} {6} {7}", DateTime.Now.ToLongTimeString(),
                 DateTime.Now.ToLongDateString(),
@@ -331,25 +367,25 @@ namespace ClientNode
                 containerType,
                 POH,
                 message);
-                writer.Flush();
+            writer.Flush();
             writer.Close();
         }
 
         public static void Log2(string type, string message)
         {
-            
+
             StreamWriter writer = File.AppendText(path);
             writer.WriteLine("\r\n{0} {1} : {2} {3}", DateTime.Now.ToLongTimeString(),
                 DateTime.Now.ToLongDateString(),
                 type,
                 message);
-                writer.Flush();
+            writer.Flush();
             writer.Close();
         }
 
         public void DumpLog()
         {
-          
+
             StreamReader reader = File.OpenText(path);
             string line;
             while ((line = reader.ReadLine()) != null)
@@ -358,7 +394,7 @@ namespace ClientNode
             }
             reader.Close();
         }
-        
+
 
     }
 }
