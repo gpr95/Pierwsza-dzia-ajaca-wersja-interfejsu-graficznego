@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetNode;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -19,6 +20,7 @@ namespace ManagementApp
 
         private DataTable table;
         private readonly int MANAGMENTPORT = 7777;
+        private readonly int NETNODECONNECTIONS = 4;
         private int clientNodesNumber;
         private int networkNodesNumber;
         private bool run = true;
@@ -166,14 +168,27 @@ namespace ManagementApp
             if (from is ClientNode)
                 if (connectionList.Where(i => i.From.Equals(from) || i.To.Equals(from)).Any())
                 {
-                    mainWindow.errorMessage("Client node can have onli one connection!");
+                    mainWindow.errorMessage("Client node can have only one connection!");
                     return;
                 }
 
             if (to is ClientNode)
                 if (connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).Any())
                 {
-                    mainWindow.errorMessage("Client node can have onli one connection!");
+                    mainWindow.errorMessage("Client node can have only one connection!");
+                    return;
+                }
+            if (from is NetNode)
+                if (connectionList.Where(i => i.From.Equals(from) || i.To.Equals(from)).Count() == NETNODECONNECTIONS)
+                {
+                    mainWindow.errorMessage("Network node have " + NETNODECONNECTIONS + " ports");
+                    return;
+                }
+
+            if (to is NetNode)
+                if (connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).Count() == NETNODECONNECTIONS)
+                {
+                    mainWindow.errorMessage("Network node have " + NETNODECONNECTIONS + " ports");
                     return;
                 }
             if (to != null)
@@ -329,6 +344,8 @@ namespace ManagementApp
                 {
                     if (!(nodeListPath.Last() is ClientNode))
                         finder.Remove(nodeListPath);
+                    if (nodeListPath.Count() == 1)
+                        finder.Remove(nodeListPath);
                 }
             }
 
@@ -358,6 +375,106 @@ namespace ManagementApp
         public void stopRunning()
         {
             run = false;
+        }
+
+        public int getPort(Node node)
+        {
+            int port1, port2;
+            if (connectionList.Where(i => i.From.Equals(node)).Select(c => c.VirtualPortFrom).Any())
+                port1 = connectionList.Where(i => i.From.Equals(node)).Select(c => c.VirtualPortFrom).Max();
+            else
+                port1 = 0;
+            if (connectionList.Where(i => i.To.Equals(node)).Select(c => c.VirtualPortTo).Any())
+                port2 = connectionList.Where(i => i.To.Equals(node)).Select(c => c.VirtualPortTo).Max();
+            else
+                port2 = 0;
+            return port1 > port2 ? ++port1 : ++port2;
+        }
+
+        public void sendOutInformation()
+        {
+            Dictionary<FIB, String> malinigList = new Dictionary<FIB, string>();
+            Dictionary<FIB, String> possibleDestinations = new Dictionary<FIB, string>();
+            int portIn, portOut;
+            foreach (Node node in nodeList)
+            {
+                if(node is ClientNode)
+                {
+                    List<List<String>> possiblePaths = new List<List<String>>();
+                    possiblePaths = findPaths(node, true);
+                    possiblePaths.Reverse();
+                    possiblePaths.Take(3);
+                    int in_cout = 0;
+                    foreach(List<String> nodeName in possiblePaths)
+                    {
+                        for(int i = 0; i < nodeName.Count(); i++)
+                        {
+                            if (i == 0)
+                            {
+                                //Start of path
+                                FIB destination1 = new FIB(-1, -1, 0, in_cout);
+                                possibleDestinations.Add(destination1, nodeName.ElementAt(i));
+                                continue;
+                            }
+                            if (i == nodeName.Count() - 1)
+                            {
+                                //End of path
+                                FIB destination2 = new FIB(0, in_cout, -1, -1);
+                                possibleDestinations.Add(destination2, nodeName.ElementAt(i));
+                                continue;
+                            }
+
+                            NodeConnection conIn = connectionList.Where(n =>
+                            n.From.Name.Equals(nodeName.ElementAt(i - 1)) &&
+                            n.To.Name.Equals(nodeName.ElementAt(i))
+                            ).FirstOrDefault();
+                            if(conIn == default(NodeConnection))
+                            {
+                                conIn = connectionList.Where(n =>
+                                n.To.Name.Equals(nodeName.ElementAt(i - 1)) &&
+                                n.From.Name.Equals(nodeName.ElementAt(i))
+                                ).FirstOrDefault();
+                                portIn = conIn.VirtualPortFrom;
+                            }
+                            else
+                            {
+                                portIn = conIn.VirtualPortTo;
+                            }
+
+                            NodeConnection conOut = connectionList.Where(n =>
+                            n.From.Name.Equals(nodeName.ElementAt(i)) &&
+                            n.To.Name.Equals(nodeName.ElementAt(i + 1))
+                            ).FirstOrDefault();
+                            if (conOut == default(NodeConnection))
+                            {
+                                conOut = connectionList.Where(n =>
+                                n.To.Name.Equals(nodeName.ElementAt(i)) &&
+                                n.From.Name.Equals(nodeName.ElementAt(i + 1))
+                                ).FirstOrDefault();
+                                portOut = conOut.VirtualPortTo;
+                            }
+                            else
+                            {
+                                portOut = conOut.VirtualPortFrom;
+                            }
+
+                                FIB newFib = new FIB(portIn, in_cout, portOut, in_cout);
+                                malinigList.Add(newFib, nodeName.ElementAt(i));
+                        }
+                        in_cout++;
+                    }
+                }
+            }
+            mainWindow.errorMessage("Possible destinations:");
+            foreach (System.Collections.Generic.KeyValuePair<FIB, string> oneFib in possibleDestinations)
+            {
+                mainWindow.errorMessage(oneFib.Value + ": " + oneFib.Key.toString());
+            }
+            mainWindow.errorMessage("Fibs:");
+            foreach (System.Collections.Generic.KeyValuePair<FIB, string> oneFib in malinigList)
+            {
+                mainWindow.errorMessage(oneFib.Value + ": " + oneFib.Key.toString());
+            }
         }
     }
 }

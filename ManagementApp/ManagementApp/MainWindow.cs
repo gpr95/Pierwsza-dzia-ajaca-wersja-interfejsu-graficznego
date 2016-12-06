@@ -232,30 +232,8 @@ namespace ManagementApp
                     Node nodeTo = getNodeFrom(x, y);
                     if (checkBox1.Checked)
                     {
-                        int portF;
-                        int portT;
-                        int nodeConnectionPort1;
-                        int nodeConnectionPort2;
-                        if (connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.VirtualPortFrom).Any())
-                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(nodeFrom)).Select(c => c.VirtualPortFrom).Max();
-                        else
-                            nodeConnectionPort1 = 0;
-                        if(connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.VirtualPortTo).Any())
-                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(nodeFrom)).Select(c => c.VirtualPortTo).Max();
-                        else
-                            nodeConnectionPort2 = 0;
-                        portF = nodeConnectionPort1 > nodeConnectionPort2 ? ++nodeConnectionPort1 : ++nodeConnectionPort2;
-                        if(connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.VirtualPortFrom).Any())
-                            nodeConnectionPort1 = connectionList.Where(i => i.From.Equals(virtualNodeTo)).Select(c => c.VirtualPortFrom).Max();
-                        else
-                            nodeConnectionPort1 = 0;
-                        if (connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.VirtualPortTo).Any())
-                            nodeConnectionPort2 = connectionList.Where(i => i.To.Equals(virtualNodeTo)).Select(c => c.VirtualPortTo).Max();
-                        else
-                            nodeConnectionPort2 = 0;
-                        portT = nodeConnectionPort1 > nodeConnectionPort2 ? ++nodeConnectionPort1 : ++nodeConnectionPort2;
-
-                        control.addConnection(nodeFrom, portF, virtualNodeTo, portT);
+                        //if(portF > 4)
+                        control.addConnection(nodeFrom, control.getPort(nodeFrom), virtualNodeTo, control.getPort(virtualNodeTo));
                         hidePortSetup();
                         containerPictureBox.Refresh();
                     }
@@ -659,8 +637,9 @@ namespace ManagementApp
 
         private void testBtn_Click(object sender, EventArgs e)
         {
+            
             List<List<String>> paths = control.findPaths(nodeList.Where(i => i.Name.Equals("CN0")).FirstOrDefault(), true);
-            if(paths == null)
+            if (paths == null)
             {
                 consoleTextBox.AppendText("No paths available.");
                 consoleTextBox.AppendText(Environment.NewLine);
@@ -676,6 +655,7 @@ namespace ManagementApp
                         consoleTextBox.AppendText(Environment.NewLine);
                     }
                 }
+            control.sendOutInformation();
         }
 
         private void button2_Click(object sender, EventArgs e)
