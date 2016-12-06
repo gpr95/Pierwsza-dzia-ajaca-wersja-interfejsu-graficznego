@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ManagementApp
 {
-    class ManagmentProtocol
+    public class ManagmentProtocol
     {
         private static readonly int wHOIS = 0;
         private static readonly int rOUTINGTABLES = 1;

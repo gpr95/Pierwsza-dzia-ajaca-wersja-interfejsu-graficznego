@@ -67,6 +67,10 @@
       <Project>{c348fc9f-8edb-415f-8984-2fb7da94b364}</Project>
       <Name>ClientNode</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ManagementApp\ManagementApp.csproj">
+      <Project>{5a2b0de4-65be-4605-a9cc-96342f13f000}</Project>
+      <Name>ManagementApp</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

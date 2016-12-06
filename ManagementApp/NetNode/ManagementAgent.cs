@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ClientNode;
+using ManagementApp;
 
 namespace NetNode
 {
@@ -18,10 +19,12 @@ namespace NetNode
     {
         private TcpListener listener;
         public int port;
+        private string virtualIp;
 
-        public ManagementAgent(int port)
+        public ManagementAgent(int port,string ip)
         {
             this.port = port;
+            this.virtualIp = ip;
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
@@ -41,20 +44,36 @@ namespace NetNode
         {
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
+            BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
-            //TODO receive FIB from management
-            if (received_object.Type == typeof(FIB))
+            ManagmentProtocol received_Protocol = received_object.Value.ToObject<ManagmentProtocol>();
+            
+            if (received_Protocol.State == ManagmentProtocol.WHOIS)
             {
-                FIB received_fib = received_object.Value.ToObject<FIB>();
-                //add to switching field list
-                NetNode.addToFib(received_fib);
+                //send name to management
+                ManagmentProtocol protocol = new ManagmentProtocol();
+                protocol.Name = this.virtualIp;
+                String send_object = JSON.Serialize(JSON.FromValue(protocol));
+                writer.Write(send_object);
+            }
+            else if(received_Protocol.State == ManagmentProtocol.ROUTINGTABLES)
+            {
+                //receiving fibs
+                if(received_Protocol.RoutingTable != null)
+                {
+                    foreach(var fib in received_Protocol.RoutingTable)
+                    {
+                        SwitchingField.addToSwitch(fib);
+                    }
+                }
             }
             else
             {
-                //TODO received management signal
+                Console.WriteLine("undefined protocol");
             }
             reader.Close();
         }
+
     }
 }

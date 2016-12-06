@@ -53,10 +53,10 @@ namespace NetNode
         }
         public void addToOutQueue()
         {
-            if (this.currentFrame.vc3List[0] != null && this.currentFrame.vc3List[1] != null && this.currentFrame.vc3List[2] != null)
-            {
+            //if (this.currentFrame.vc3List[0] != null && this.currentFrame.vc3List[1] != null && this.currentFrame.vc3List[2] != null)
+            //{
                 this.output.Enqueue(this.currentFrame);
-            }
+            //}
         }
     }
 }

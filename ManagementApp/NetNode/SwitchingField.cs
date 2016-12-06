@@ -10,16 +10,7 @@ namespace NetNode
     //switching field that have FIB and commutate frame from inport to outport
     class SwitchingField
     {
-        public List<FIB> fib = new List<FIB>();
-
-        public SwitchingField()
-        {
-            this.fib.Add(new FIB(1, 0, 1));
-            this.fib.Add(new FIB(11, 1, 12));
-            this.fib.Add(new FIB(12, 1, 13));
-            this.fib.Add(new FIB(13, 1, 11));
-
-        }
+        public static List<FIB> fib = new List<FIB>();
 
         public int[] commuteContainer(VirtualContainer4 container)
         {
@@ -56,6 +47,10 @@ namespace NetNode
                 }
             }
             return out_pos;
+        }
+        public static void addToSwitch(FIB row)
+        {
+            fib.Add(row);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace NetNode
             //TODO readConfig()
             this.ports = new Ports();
             //this.switchField = new SwitchingField();
-            this.agent = new ManagementAgent(Convert.ToInt32(args[1]));
+            this.agent = new ManagementAgent(Convert.ToInt32(args[1]),this.virtualIp);
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[2]));
             this.physicalPort = Convert.ToInt32(args[2]);
             Thread thread = new Thread(new ThreadStart(Listen));
@@ -96,13 +96,12 @@ namespace NetNode
                         }
                         else if (frame.vc3List[0] != null && frame.vc3List[1] != null && frame.vc3List[2] != null)
                         {
-                            int op;
-                            for(int i=0;i<frame.vc3List.Length;i++)
+                            foreach(var vc in frame.vc3List)
                             {
-                                VirtualContainer3 vc3 = frame.vc3List[i];
+                                VirtualContainer3 vc3 = vc.Value;
                                 if (vc3 != null)
                                 {
-                                    out_pos = switchField.commuteContainer(vc3, 11 + i);
+                                    out_pos = switchField.commuteContainer(vc3, vc.Key);
                                     if (out_pos[0] != -1)
                                     {
                                         this.ports.oports[out_pos[0]].addToTempQueue(vc3, out_pos[1]);
@@ -144,18 +143,15 @@ namespace NetNode
             }
         }
 
-        public static void addToFib(FIB row)
-        {
-            switchField.fib.Add(row);
-        }
         public static int DateTimeToInt()
         {
             int unixTime = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
             return unixTime;
         }
+
         static void Main(string[] args)
         {
-            string[] parameters = new string[] { "192.168.56.55", "111", "112" };
+            string[] parameters = new string[] { "192.168.56.55", "7776", "7777" };
             NetNode netnode = new NetNode(parameters);
         }
     }
