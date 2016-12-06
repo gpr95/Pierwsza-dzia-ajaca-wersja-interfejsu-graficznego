@@ -24,9 +24,12 @@ namespace NetNode
 
         public void addToOutQueue(VirtualContainer4 container)
         {
-            this.currentFrame.vc4 = container;
-            this.output.Enqueue(currentFrame);
+            this.currentFrame.vc3List[0] = null;
+            this.currentFrame.vc3List[1] = null;
+            this.currentFrame.vc3List[2] = null;
             this.currentFrame.vc4 = null;
+            this.currentFrame.vc4 = container;
+            this.output.Enqueue(this.currentFrame);
         }
         public void addToTempQueue(VirtualContainer3 container, int pos)
         {
@@ -53,9 +56,6 @@ namespace NetNode
             if (this.currentFrame.vc3List[0] != null && this.currentFrame.vc3List[1] != null && this.currentFrame.vc3List[2] != null)
             {
                 this.output.Enqueue(this.currentFrame);
-                this.currentFrame.vc3List[0] = null;
-                this.currentFrame.vc3List[1] = null;
-                this.currentFrame.vc3List[2] = null;
             }
         }
     }

@@ -14,7 +14,7 @@ namespace NetNode
     class NetNode
     {
         private string virtualIp;
-        private static SwitchingField switchField;
+        private static SwitchingField switchField = new SwitchingField();
         public Ports ports;
         public ManagementAgent agent;
 
@@ -94,7 +94,7 @@ namespace NetNode
                                 this.ports.oports[out_pos[0]].addToOutQueue(vc4);
                             }
                         }
-                        else if(frame.vc3List.Length != 0)
+                        else if (frame.vc3List[0] != null && frame.vc3List[1] != null && frame.vc3List[2] != null)
                         {
                             int op;
                             for(int i=0;i<frame.vc3List.Length;i++)
@@ -127,15 +127,18 @@ namespace NetNode
                     if (oport.output.Count > 0)
                     {
                         STM1 frame = oport.output.Dequeue();
-
-                        //TODO from management
-                        int virtualPort = 3;
-                        Signal signal = new Signal(DateTimeToInt(), virtualPort, frame);
-                        TcpClient client = new TcpClient();
-                        client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
-                        BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
-                        string data = JMessage.Serialize(JMessage.FromValue(frame));
-                        writeOutput.Write(data);
+                        if (frame.vc4 != null)
+                        {   
+                            //TODO from management
+                            int virtualPort = 3;
+                            Signal signal = new Signal(DateTimeToInt(), virtualPort, frame);
+                            Console.WriteLine(signal);
+                            TcpClient client = new TcpClient();
+                            client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
+                            BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
+                            string data = JMessage.Serialize(JMessage.FromValue(signal));
+                            writeOutput.Write(data);
+                        }
                     }
                 }
             }
