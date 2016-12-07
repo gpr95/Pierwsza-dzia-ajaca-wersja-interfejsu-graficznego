@@ -59,7 +59,7 @@ namespace ManagementApp
         public MainWindow(DataTable table, List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
         {
             //TODO: start chmury kablowej
-            //cableHandler = new CloudCableHandler(connectionList, 7776);
+            cableHandler = new CloudCableHandler(connectionList, 7776);
             InitializeComponent();
             hidePortSetup();
             RenderTable();
@@ -526,6 +526,7 @@ namespace ManagementApp
         
         public void bind()
         {
+            cableHandler.updateOneConnection();
             consoleTextBox.AppendText("Connection  added");
             consoleTextBox.AppendText(Environment.NewLine);
         }

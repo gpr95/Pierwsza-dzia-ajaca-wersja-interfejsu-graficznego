@@ -25,6 +25,8 @@ namespace ManagementApp
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
             Thread thread = new Thread(new ThreadStart(listenForCloud));
             thread.Start();
+            String parameters = "" + cloudPort;
+            System.Diagnostics.Process.Start("CableCloud.exe", parameters);
         }
 
         private void listenForCloud()

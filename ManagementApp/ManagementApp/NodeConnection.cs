@@ -13,6 +13,7 @@ namespace ManagementApp
         private Point start;
         private Point end;
         private String name;
+        [NonSerialized()]
         private Node from, to;
         private int virtualPortFrom;
         private int virtualPortTo;

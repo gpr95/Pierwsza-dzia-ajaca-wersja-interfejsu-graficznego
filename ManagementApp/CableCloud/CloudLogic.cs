@@ -44,9 +44,9 @@ namespace CableCloud
 
         private void writeToLog(String logMsg)
         {
-            StreamWriter writer = File.AppendText(pathToLogFile);
-            writer.WriteLine("#" + DateTime.Now.ToLongTimeString() + 
-                DateTime.Now.ToLongDateString()+"#:" +logMsg);
+        //    StreamWriter writer = File.AppendText(pathToLogFile);
+        //    writer.WriteLine("#" + DateTime.Now.ToLongTimeString() + 
+        //        DateTime.Now.ToLongDateString()+"#:" +logMsg);
         }
 
         public void connectToWindowApplication(int port)

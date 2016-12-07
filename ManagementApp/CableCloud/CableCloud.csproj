@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="CloudLogic.cs" />
     <Compile Include="JSON.cs" />
+    <Compile Include="NodeConnectionThread.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
