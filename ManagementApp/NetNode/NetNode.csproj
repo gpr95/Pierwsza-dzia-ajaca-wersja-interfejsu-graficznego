@@ -46,7 +46,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FIB.cs" />
     <Compile Include="IPort.cs" />
     <Compile Include="ManagementAgent.cs" />
     <Compile Include="OPort.cs" />

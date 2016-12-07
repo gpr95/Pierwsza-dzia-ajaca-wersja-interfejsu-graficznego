@@ -3,7 +3,7 @@ using System;
 
 namespace ManagementApp
 {
-    class JSON
+    public class JSON
     {
         public Type Type { get; set; }
         public JToken Value { get; set; }
@@ -20,6 +20,7 @@ namespace ManagementApp
 
         public static JSON Deserialize(string data)
         {
+            Console.WriteLine(data);
             return JToken.Parse(data).ToObject<JSON>();
         }
     }

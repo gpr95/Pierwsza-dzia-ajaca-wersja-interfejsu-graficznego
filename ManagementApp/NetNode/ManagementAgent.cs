@@ -25,40 +25,43 @@ namespace NetNode
         {
             this.port = port;
             this.virtualIp = ip;
-            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+            //listener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
         }
 
         private void Listen()
         {
-            listener.Start();
-            while (true)
-            {
-                TcpClient client = listener.AcceptTcpClient();
-                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
-                clientThread.Start(client);
-            }
+            //listener.Start();
+            //while (true)
+            //{
+                //TcpClient client = listener.AcceptTcpClient();
+                //Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
+                //clientThread.Start(client);
+                ListenThread();
+            //}
         }
-        private void ListenThread(Object client)
+        private void ListenThread()
         {
-            TcpClient clienttmp = (TcpClient)client;
+            TcpClient clienttmp = new TcpClient("127.0.0.1", 7778);
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
             string received_data = reader.ReadString();
-            JMessage received_object = JMessage.Deserialize(received_data);
+            JSON received_object = JSON.Deserialize(received_data);
             ManagmentProtocol received_Protocol = received_object.Value.ToObject<ManagmentProtocol>();
             
             if (received_Protocol.State == ManagmentProtocol.WHOIS)
             {
+                Console.WriteLine("receivedWhoIs");
                 //send name to management
                 ManagmentProtocol protocol = new ManagmentProtocol();
-                protocol.Name = this.virtualIp;
-                String send_object = JSON.Serialize(JSON.FromValue(protocol));
+                protocol.Name = "NN0";//NN0
+                String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
                 writer.Write(send_object);
             }
             else if(received_Protocol.State == ManagmentProtocol.ROUTINGTABLES)
             {
+                Console.WriteLine("receivedroutingtable");
                 //receiving fibs
                 if(received_Protocol.RoutingTable != null)
                 {

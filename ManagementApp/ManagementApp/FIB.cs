@@ -5,10 +5,10 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NetNode
+namespace ManagementApp
 {
     //forwarding information table: destination mask oport
-    class FIB
+    public class FIB
     {
         //Nie ma to jak enkapsulacja
         public int iport;

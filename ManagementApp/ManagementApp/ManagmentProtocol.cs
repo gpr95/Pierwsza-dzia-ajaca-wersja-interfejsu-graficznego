@@ -1,6 +1,6 @@
 ﻿using System;
-using NetNode;
 using System.Collections.Generic;
+
 
 namespace ManagementApp
 {
@@ -15,6 +15,7 @@ namespace ManagementApp
         private String[] message;
         private List<FIB> routingTable;
         private String name;
+        private Dictionary<String, int> possibleDestinations;
 
         public static int WHOIS
         {

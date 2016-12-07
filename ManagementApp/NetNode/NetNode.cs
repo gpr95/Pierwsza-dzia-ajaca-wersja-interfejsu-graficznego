@@ -151,7 +151,7 @@ namespace NetNode
 
         static void Main(string[] args)
         {
-            string[] parameters = new string[] { "192.168.56.55", "7776", "7777" };
+            string[] parameters = new string[] { "192.168.56.55", "7777", "7776" };
             NetNode netnode = new NetNode(parameters);
         }
     }

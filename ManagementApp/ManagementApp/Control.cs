@@ -1,5 +1,4 @@
-﻿using NetNode;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -19,7 +18,7 @@ namespace ManagementApp
         MainWindow mainWindow;
 
         private DataTable table;
-        private readonly int MANAGMENTPORT = 7777;
+        private readonly int MANAGMENTPORT = 7778;
         private readonly int NETNODECONNECTIONS = 4;
         private int clientNodesNumber;
         private int networkNodesNumber;
@@ -33,7 +32,9 @@ namespace ManagementApp
         private List<NodeConnection> connectionList = new List<NodeConnection>();
         private List<Domain> domainList = new List<Domain>();
 
-        private class threadPasser
+        //TcpClient client;
+
+        private class ThreadPasser
         {
             public ControlPlane control;
             public TcpClient client;
@@ -41,16 +42,16 @@ namespace ManagementApp
 
         public ControlPlane()
         {
+            clientNodesNumber = 0;
+            networkNodesNumber = 0;
+
+            listener = new TcpListener(IPAddress.Any, MANAGMENTPORT);
+            Thread thread = new Thread(new ParameterizedThreadStart(Listen));
+            thread.Start(this);
+
             mainWindow = new MainWindow(MakeTable(), nodeList, connectionList, domainList);
             mainWindow.Control = this;
             Application.Run(mainWindow);
-            clientNodesNumber = 0;
-            networkNodesNumber = 0;
-            
-
-            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), MANAGMENTPORT);
-            Thread thread = new Thread(new ParameterizedThreadStart(Listen));
-            thread.Start(this);
         }
         public void load()
         {
@@ -65,13 +66,13 @@ namespace ManagementApp
         private void Listen(Object controlP)
         {
             listener.Start();
-
+            ThreadPasser tp = new ThreadPasser();
+            
+            tp.control = (ControlPlane)controlP;
             while (run)
-            {
+            {                
                 TcpClient client = listener.AcceptTcpClient();
-                threadPasser tp = new threadPasser();
                 tp.client = client;
-                tp.control = (ControlPlane) controlP;
                 Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
                 clientThread.Start(tp);
             }
@@ -79,11 +80,18 @@ namespace ManagementApp
 
         private static void ListenThread(Object threadPasser)
         {
-            threadPasser tp = (threadPasser) threadPasser;
+            ThreadPasser tp = (ThreadPasser) threadPasser;
             TcpClient clienttmp = tp.client;
             BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
+
             //protocol.State = protocol.WHOIS;
-            writer.Write(ManagmentProtocol.WHOIS);
+            ManagmentProtocol toSend = new ManagmentProtocol();
+            toSend.State = ManagmentProtocol.WHOIS;
+            string data = JSON.Serialize(JSON.FromValue(toSend));
+            Console.WriteLine("whois");
+            //tp.control.mainWindow.errorMessage("whois");
+            writer.Write(data);
+
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JSON received_object = JSON.Deserialize(received_data);
@@ -415,7 +423,7 @@ namespace ManagementApp
                     possiblePaths = findPaths(node, true);
                     possiblePaths.Reverse();
                     possiblePaths.Take(3);
-                    int in_cout = 0;
+                    int in_cout = 0; //11
                     foreach(List<String> nodeName in possiblePaths)
                     {
                         for(int i = 0; i < nodeName.Count(); i++)
@@ -485,6 +493,7 @@ namespace ManagementApp
                 BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
                 ManagmentProtocol protocol = new ManagmentProtocol();
                 protocol.State = ManagmentProtocol.ROUTINGTABLES;
+                Console.WriteLine("routingtable");
                 protocol.RoutingTable = mailingList.Where(n => n.Value.Equals(node.Name)).Select(k => k.Key).ToList();
                
                 String send_object = JSON.Serialize(JSON.FromValue(protocol));
