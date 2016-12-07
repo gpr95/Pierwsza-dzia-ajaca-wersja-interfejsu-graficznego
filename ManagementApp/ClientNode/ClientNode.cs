@@ -12,70 +12,56 @@ namespace ClientNode
 {
     class ClientNode
     {
-        private string virtualIP;
-        private TcpListener listenerInput;
-        private TcpListener listenerOutput;
+        private static string virtualIP;
+        private TcpListener listener;
         private TcpClient managmentClient;
-        private static BinaryWriter writeOutput;
-        private static int outputPort;
+        private static BinaryWriter writer;
         private static bool cyclic_sending = false;
         string[] args2 = new string[3];
         //obecna przeplywnosc, mozna potem zmienic jak dostanie na VC-4 (4) całe mozliwosc
         private int currentSpeed = 4;
-        private static string name;
+        private int currentSlot;
         private static string path;
+        private Dictionary<String, int> possibleDestinations = new Dictionary<string,int>();
 
         public ClientNode(string[] args)
         {
             virtualIP = args[0];
             //int managmentPort = Convert.ToInt32(args[1]); 
-            int inputPort = Convert.ToInt32(args[1]);
-            //DEBUG normlanie args[2]
-            outputPort = Convert.ToInt32(args[2]);
-            name = args[3];
-            string fileName = args[3] + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
+            int cloudPort = Convert.ToInt32(args[1]);
+
+            int managementPort = Convert.ToInt32(args[2]);
+           
+            string fileName = virtualIP + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
             // path = @"D:\TSSTRepo\ManagementApp\ClientNode\logs\"+fileName+".txt";
             path = Path.Combine(Environment.CurrentDirectory, @"logs\", fileName + ".txt");
             System.IO.Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, @"logs\"));
-            listenerInput = new TcpListener(IPAddress.Parse("127.0.0.1"), inputPort);
-            Thread threadIn = new Thread(new ThreadStart(ListenIn));
-            threadIn.Start();
-
-
-            listenerOutput = new TcpListener(IPAddress.Parse("127.0.0.1"), outputPort);
-            Thread threadOut = new Thread(new ThreadStart(ListenOut));
-            threadOut.Start();
-
+            listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
+            Thread thread = new Thread(new ThreadStart(Listen));
+            thread.Start();
+            Console.WriteLine(managementPort);
+            Thread managementThreadad = new Thread(new ParameterizedThreadStart(initManagmentConnection));
+            managementThreadad.Start(managementPort);
             ConsoleInterface();
         }
-        private void ListenIn()
+        private void Listen()
         {
-            listenerInput.Start();
+            listener.Start();
 
             while (true)
             {
-                TcpClient client = listenerInput.AcceptTcpClient();
-                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenInThread));
+                TcpClient client = listener.AcceptTcpClient();
+                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
                 clientThread.Start(client);
             }
         }
 
-        private void ListenOut()
-        {
-            listenerOutput.Start();
 
-            while (true)
-            {
-                TcpClient client = listenerOutput.AcceptTcpClient();
-                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenOutThread));
-                clientThread.Start(client);
-            }
-        }
-
-        private static void ListenInThread(Object client)
+        private static void ListenThread(Object client)
         {
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
+            writer = new BinaryWriter(clienttmp.GetStream());
             string received_data = reader.ReadString();
             JMessage received_object = JMessage.Deserialize(received_data);
             if (received_object.Type == typeof(Signal))
@@ -85,7 +71,7 @@ namespace ClientNode
                 if (received_frame.vc4 != null)
                 {
                     Console.WriteLine("Message received: " + received_frame.vc4.C4);
-                    Log1("IN", name, received_signal.time.ToString(), "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
+                    Log1("IN", virtualIP, received_signal.time.ToString(), "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
                 }
 
                 else
@@ -93,7 +79,7 @@ namespace ClientNode
                     foreach (int key  in received_frame.vc3List.Keys)
                     {
                         Console.WriteLine("Message received: " + received_frame.vc3List[key].C3);
-                        Log1("IN", name, received_signal.time.ToString(), "VC-3", received_frame.vc3List[key].POH.ToString(), received_frame.vc3List[key].C3);
+                        Log1("IN", virtualIP, received_signal.time.ToString(), "VC-3", received_frame.vc3List[key].POH.ToString(), received_frame.vc3List[key].C3);
                     }
                 }
             }
@@ -106,27 +92,51 @@ namespace ClientNode
            // reader.Close();
         }
 
-        private static void ListenOutThread(Object client)
-        {
-            TcpClient clienttmp = (TcpClient)client;
-            writeOutput = new BinaryWriter(clienttmp.GetStream());
-            Console.WriteLine("\n MAKING CLOUD OUTLIST CONNECTION: PORT:" + ((IPEndPoint)clienttmp.Client.RemoteEndPoint).Port);
-        }
 
-        private void initManagmentConnection(int sessionPort)
+        private void initManagmentConnection(Object managementPort)
         {
-            managmentClient.Connect("127.0.0.1", sessionPort);
-            BinaryReader reader = new BinaryReader(managmentClient.GetStream());
-            string received_data = reader.ReadString();
-            JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(STM1))
+            try
             {
-                STM1 received_frame = received_object.Value.ToObject<STM1>();
-                //TO DO odbierz od marka tablice adresow i ich portow i wpisz u siebie lokalnie
+                //managmentClient.Connect("127.0.0.1", managementPort);
+                managmentClient = new TcpClient("127.0.0.1", (int) managementPort);
+                BinaryReader reader = new BinaryReader(managmentClient.GetStream());
+                BinaryWriter writer = new BinaryWriter(managmentClient.GetStream());
+                while(true)
+                {
+                    string received_data = reader.ReadString();
+                    JMessage received_object = JMessage.Deserialize(received_data);
+                    if (received_object.Type == typeof(ManagementApp.ManagmentProtocol))
+                    {
+                        ManagementApp.ManagmentProtocol management_packet = received_object.Value.ToObject<ManagementApp.ManagmentProtocol>();
+                        if (management_packet.State == ManagementApp.ManagmentProtocol.WHOIS)
+                        {
+                            ManagementApp.ManagmentProtocol packet_to_management = new ManagementApp.ManagmentProtocol();
+                            packet_to_management.Name = virtualIP;
+                            String send_object = JMessage.Serialize(JMessage.FromValue(packet_to_management));
+                            writer.Write(send_object);
+                        }
+                        else if (management_packet.State == ManagementApp.ManagmentProtocol.POSSIBLEDESITATIONS)
+                        {
+                            this.possibleDestinations = management_packet.possibleDestinations;
+
+                        }
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("\n Unknown data type");
+                    }
+                }
+                
             }
-            else
+            catch (Exception e)
             {
-                Console.WriteLine("\n Unknown data type");
+                Console.WriteLine("Could not connect on management interface");
+                //debug
+                Console.WriteLine(e.Message);
+                Thread.Sleep(2000);
+                Environment.Exit(1);
+                
             }
         }
 
@@ -152,20 +162,10 @@ namespace ClientNode
                     switch (choice)
                     {
                         case 1:
-
-                            Console.WriteLine("\nEnter message: ");
-                            string message = Console.ReadLine();
-                            this.send(message);
+                            prepareDestinations(1);
                             break;
                         case 2:
-                            Console.WriteLine("\nEnter period(in seconds): ");
-                            string period_tmp = Console.ReadLine();
-                            int period = Convert.ToInt32(period_tmp);
-                            Console.WriteLine("\nEnter message: ");
-                            string message2 = Console.ReadLine();
-                            this.sendPeriodically(period, message2);
-                            cyclic_sending = true;
-
+                            prepareDestinations(2);
                             break;
                         case 3:
                             if (cyclic_sending == true)
@@ -201,6 +201,59 @@ namespace ClientNode
             Environment.Exit(1);
         }
 
+        private void prepareDestinations(int type)
+        {
+            Console.WriteLine("Choose destination");
+            List<string> destinations = new List<string>(this.possibleDestinations.Keys);
+            for (int i=0; i < destinations.Count; i++)
+            {
+                Console.WriteLine("{0}) {1}", i, destinations[i]);
+            }
+             int choice;
+                bool res = int.TryParse(Console.ReadLine(), out choice);
+                if (res)
+                {
+                    if (choice < destinations.Count)
+                    {
+                        currentSlot = possibleDestinations[destinations[choice]];
+                        if (currentSlot == 1)
+                        {
+                            currentSpeed = 4;
+                        }
+                        else
+                        {
+                            currentSpeed = 3;
+                        }
+                        if (type == 1)
+                        {
+                            Console.WriteLine("\nEnter message: ");
+                            string message = Console.ReadLine();
+                            this.send(message);
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nEnter period(in seconds): ");
+                            string period_tmp = Console.ReadLine();
+                            int period = Convert.ToInt32(period_tmp);
+                            Console.WriteLine("\nEnter message: ");
+                            string message2 = Console.ReadLine();
+                            this.sendPeriodically(period, message2);
+                            cyclic_sending = true;
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Wrong option");
+                        ConsoleInterface();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Wrong format");
+                    ConsoleInterface();
+                }
+
+        }
         private void send(string message)
         {
             //  TcpClient output = new TcpClient();
@@ -217,7 +270,7 @@ namespace ClientNode
                     vc3List[0] = vc3;
                     int[] pos = {0,0,0};
                     // z zarzadania wstawiam w pozycje 1 w stm
-                    pos[0] = 11;
+                    pos[0] = currentSlot;
                     STM1 frame = new STM1(vc3List, pos);
                     //port ktory wiem z zarzadzania
                     int virtualPort = 1;
@@ -226,8 +279,8 @@ namespace ClientNode
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
 
 
-                    writeOutput.Write(data);
-                    Log1("OUT", name, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
+                    writer.Write(data);
+                    Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
                     //       output.Close();
 
                 }
@@ -242,9 +295,9 @@ namespace ClientNode
                     Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
 
-                    writeOutput.Write(data);
+                    writer.Write(data);
                     //output.Close();
-                    Log1("OUT", name, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                    Log1("OUT", virtualIP, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                 }
 
             }
@@ -329,16 +382,15 @@ namespace ClientNode
 
                 while (cyclic_sending)
                 {
-                    TcpClient output = new TcpClient();
+                   
                     try
                     {
-                        output.Connect(IPAddress.Parse("127.0.0.1"), outputPort);
-                        writeOutput = new BinaryWriter(output.GetStream());
-                        writeOutput.Write(data);
+                        
+                        writer.Write(data);
                         if (isVc3)
-                            Log1("OUT", name, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
+                            Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
                         else
-                            Log1("OUT", name, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                            Log1("OUT", virtualIP, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                         await Task.Delay(TimeSpan.FromSeconds(period));
                     }
                     catch (Exception e)

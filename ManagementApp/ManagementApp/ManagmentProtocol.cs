@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 
-
 namespace ManagementApp
 {
     public class ManagmentProtocol
@@ -15,7 +14,7 @@ namespace ManagementApp
         private String[] message;
         private List<FIB> routingTable;
         private String name;
-        private Dictionary<String, int> possibleDestinations;
+        public Dictionary<String, int> possibleDestinations;
 
         public static int WHOIS
         {

@@ -18,7 +18,7 @@ namespace ManagementApp
         MainWindow mainWindow;
 
         private DataTable table;
-        private readonly int MANAGMENTPORT = 7778;
+        private readonly int MANAGMENTPORT = 7777;
         private readonly int NETNODECONNECTIONS = 4;
         private int clientNodesNumber;
         private int networkNodesNumber;
@@ -413,7 +413,7 @@ namespace ManagementApp
         public void sendOutInformation()
         {
             Dictionary<FIB, String> mailingList = new Dictionary<FIB, string>();
-            Dictionary<FIB, String> possibleDestinations = new Dictionary<FIB, string>();
+            Dictionary<Dictionary<String, int>, String> possibleDestinations = new Dictionary<Dictionary<string, int>, String>();
             int portIn, portOut;
             foreach (Node node in nodeList)
             {
@@ -431,15 +431,14 @@ namespace ManagementApp
                             if (i == 0)
                             {
                                 //Start of path
-                                FIB destination1 = new FIB(-1, -1, 0, in_cout);
-                                possibleDestinations.Add(destination1, nodeName.ElementAt(i));
+                                Dictionary<String, int> temp = new Dictionary<String, int>();
+                                temp.Add(nodeName.Last(), in_cout);
+                                possibleDestinations.Add(temp, nodeName.First());
                                 continue;
                             }
                             if (i == nodeName.Count() - 1)
                             {
                                 //End of path
-                                FIB destination2 = new FIB(0, in_cout, -1, -1);
-                                possibleDestinations.Add(destination2, nodeName.ElementAt(i));
                                 continue;
                             }
 
@@ -489,15 +488,40 @@ namespace ManagementApp
             foreach(Node node in nodeList)
             {
                 if (node is ClientNode)
+                {
+                    if (node.Name.Equals("CN0"))
+                        continue;
+                    BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
+                    ManagmentProtocol protocol = new ManagmentProtocol();
+                    protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
+                    protocol.possibleDestinations = new Dictionary<string, int>();
+
+                    foreach (KeyValuePair<Dictionary<string, int>, string> dic in possibleDestinations)
+                    {
+                        if (dic.Value.Equals(node.Name))
+                            protocol.possibleDestinations = dic.Key;
+                        //protocol.possibleDestinations.Add("BOCZEK", 12);
+                    }
+                    //protocol.possibleDestinations = new Dictionary<string, int>();//dic.Value;
+                    //protocol.possibleDestinations.Add("BOCZEK", 12);
+
+                    String send_object = JSON.Serialize(JSON.FromValue(protocol));
+                    writer.Write(send_object);
+                }
+                else
+                {
+                    //Hotfix
                     continue;
-                BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
-                ManagmentProtocol protocol = new ManagmentProtocol();
-                protocol.State = ManagmentProtocol.ROUTINGTABLES;
-                Console.WriteLine("routingtable");
-                protocol.RoutingTable = mailingList.Where(n => n.Value.Equals(node.Name)).Select(k => k.Key).ToList();
-               
-                String send_object = JSON.Serialize(JSON.FromValue(protocol));
-                writer.Write(send_object);
+                    BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
+                    ManagmentProtocol protocol = new ManagmentProtocol();
+                    protocol.State = ManagmentProtocol.ROUTINGTABLES;
+                    Console.WriteLine("routingtable");
+                    protocol.RoutingTable = mailingList.Where(n => n.Value.Equals(node.Name)).Select(k => k.Key).ToList();
+
+                    String send_object = JSON.Serialize(JSON.FromValue(protocol));
+                    writer.Write(send_object);
+                }
+
 
             }   
             //ManagmentProtocol received_Protocol = send_object.Value.ToObject<ManagmentProtocol>();
