@@ -422,8 +422,8 @@ namespace ManagementApp
                     List<List<String>> possiblePaths = new List<List<String>>();
                     possiblePaths = findPaths(node, true);
                     possiblePaths.Reverse();
-                    possiblePaths.Take(3);
-                    int in_cout = 0; //11
+                    possiblePaths = possiblePaths.Take(3).ToList();
+                    int in_cout = 11; //11
                     foreach(List<String> nodeName in possiblePaths)
                     {
                         for(int i = 0; i < nodeName.Count(); i++)
@@ -484,13 +484,18 @@ namespace ManagementApp
                 }
             }
             mainWindow.errorMessage("Possible destinations:");
-
+            foreach (KeyValuePair<Dictionary<string, int>, string> dic in possibleDestinations)
+            {
+                mainWindow.errorMessage(dic.Value + ":");
+                foreach(KeyValuePair<string, int> d in dic.Key)
+                {
+                    mainWindow.errorMessage(d.Key);
+                }
+            }
             foreach(Node node in nodeList)
             {
                 if (node is ClientNode)
                 {
-                    if (node.Name.Equals("CN0"))
-                        continue;
                     BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
                     ManagmentProtocol protocol = new ManagmentProtocol();
                     protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
@@ -499,11 +504,11 @@ namespace ManagementApp
                     foreach (KeyValuePair<Dictionary<string, int>, string> dic in possibleDestinations)
                     {
                         if (dic.Value.Equals(node.Name))
-                            protocol.possibleDestinations = dic.Key;
-                        //protocol.possibleDestinations.Add("BOCZEK", 12);
+                        {
+                            foreach(KeyValuePair<string, int> d in dic.Key)
+                            protocol.possibleDestinations.Add(d.Key, d.Value);
+                        }
                     }
-                    //protocol.possibleDestinations = new Dictionary<string, int>();//dic.Value;
-                    //protocol.possibleDestinations.Add("BOCZEK", 12);
 
                     String send_object = JSON.Serialize(JSON.FromValue(protocol));
                     writer.Write(send_object);

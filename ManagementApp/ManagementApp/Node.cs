@@ -17,7 +17,7 @@ namespace ManagementApp
         protected int state { get; set; }
         protected int localPort;
         protected int ManagmentPort = 7777;
-        protected int CloudCablePort = 7776;
+        //protected int CloudCablePort = 7776;
         protected String name;
         protected Point position;
         [NonSerialized]
@@ -58,12 +58,12 @@ namespace ManagementApp
         {
             get
             {
-                return CloudCablePort;
+                return localPort;
             }
 
             set
             {
-                CloudCablePort = value;
+                localPort = value;
             }
         }
 
