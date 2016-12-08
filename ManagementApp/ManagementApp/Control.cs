@@ -179,7 +179,7 @@ namespace ManagementApp
                     return;
                 }
             NetNode network = new NetNode(x, y, "NN" + networkNodesNumber, 8500 + networkNodesNumber);
-            network.LocalPort = 8500 + networkNodesNumber;
+            //network.LocalPort = 8500 + networkNodesNumber;
             nodeList.Add(network);
             var row = table.NewRow();
             row["id"] = networkNodesNumber;

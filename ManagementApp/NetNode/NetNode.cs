@@ -24,9 +24,7 @@ namespace NetNode
         public NetNode(string[] args)
         {
             this.virtualIp = args[0];
-            //TODO readConfig()
             this.ports = new Ports();
-            //this.switchField = new SwitchingField();
             this.agent = new ManagementAgent(Convert.ToInt32(args[2]),this.virtualIp);
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
             this.physicalPort = Convert.ToInt32(args[1]);
@@ -71,7 +69,7 @@ namespace NetNode
 
         private void ConsoleInterface()
         {
-            Console.WriteLine("NetNode " + this.virtualIp);
+            Console.WriteLine("NetNode "+this.virtualIp+" "+ this.agent.port+" "+ this.physicalPort);
 
             while(true)
             {
