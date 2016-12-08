@@ -24,9 +24,7 @@ namespace NetNode
 
         public void addToOutQueue(VirtualContainer4 container)
         {
-            this.currentFrame.vc3List[0] = null;
-            this.currentFrame.vc3List[1] = null;
-            this.currentFrame.vc3List[2] = null;
+            this.currentFrame.vc3List.Clear();
             this.currentFrame.vc4 = null;
             this.currentFrame.vc4 = container;
             this.output.Enqueue(this.currentFrame);
@@ -52,7 +50,7 @@ namespace NetNode
         }
         public void addToOutQueue()
         {
-            if (this.currentFrame.vc3List[0] != null || this.currentFrame.vc3List[1] != null || this.currentFrame.vc3List[2] != null)
+            if (this.currentFrame.vc3List.Count != 0)
             {
                 this.output.Enqueue(this.currentFrame);
             }

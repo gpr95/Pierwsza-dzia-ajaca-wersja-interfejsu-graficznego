@@ -32,7 +32,7 @@ namespace NetNode
 
         private void Listen()
         {
-            TcpClient clienttmp = new TcpClient("127.0.0.1", 7778);
+            TcpClient clienttmp = new TcpClient("127.0.0.1", this.port);
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
             string received_data = reader.ReadString();

@@ -92,7 +92,7 @@ namespace NetNode
                                 this.ports.oports[out_pos].addToOutQueue(vc4);
                             }
                         }
-                        else if (frame.vc3List != null)
+                        else if (frame.vc3List.Count != 0)
                         {
                             foreach(var vc in frame.vc3List)
                             {
