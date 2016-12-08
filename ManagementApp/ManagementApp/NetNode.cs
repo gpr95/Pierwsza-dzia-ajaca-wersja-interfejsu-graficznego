@@ -15,8 +15,8 @@ namespace ManagementApp
         public NetNode(int x , int y,String name, int localPort)
         {
             Position = new Point(x, y);
-            //TODO Starting NettNodes with constructor
-            //this.processHandle = System.Diagnostics.Process.Start("NetNode.exe");
+            String parameters = name + " " + this.localPort + " " + this.ManagmentPort;
+            this.processHandle = System.Diagnostics.Process.Start("NetNode.exe", parameters);
             this.name = name;
             this.localPort = localPort;
         }

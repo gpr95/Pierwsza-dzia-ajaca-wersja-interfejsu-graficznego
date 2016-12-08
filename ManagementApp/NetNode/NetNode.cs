@@ -27,9 +27,9 @@ namespace NetNode
             //TODO readConfig()
             this.ports = new Ports();
             //this.switchField = new SwitchingField();
-            this.agent = new ManagementAgent(Convert.ToInt32(args[1]),this.virtualIp);
-            this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[2]));
-            this.physicalPort = Convert.ToInt32(args[2]);
+            this.agent = new ManagementAgent(Convert.ToInt32(args[2]),this.virtualIp);
+            this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
+            this.physicalPort = Convert.ToInt32(args[1]);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
             ConsoleInterface();
@@ -150,7 +150,9 @@ namespace NetNode
 
         static void Main(string[] args)
         {
-            string[] parameters = new string[] { "NN0", "7777", "7776" };
+            //string[] parameters = new string[] { "NN0", "7777", "7776" };
+            string[] parameters = new string[] { args[0], args[1], args[2] };
+
             NetNode netnode = new NetNode(parameters);
         }
     }
