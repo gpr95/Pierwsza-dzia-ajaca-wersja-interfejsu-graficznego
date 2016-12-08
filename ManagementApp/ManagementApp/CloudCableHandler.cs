@@ -26,7 +26,7 @@ namespace ManagementApp
             Thread thread = new Thread(new ThreadStart(listenForCloud));
             thread.Start();
             String parameters = "" + cloudPort;
-       //     System.Diagnostics.Process.Start("CableCloud.exe", parameters);
+            System.Diagnostics.Process.Start("CableCloud.exe", parameters);
         }
 
         private void listenForCloud()

@@ -76,8 +76,16 @@ namespace CableCloud
         public void connectToNodes(int fromPort, int virtualFromPort,
                                     int toPort, int virtualToPort)
         {
-
-            TcpClient connectionFrom = new TcpClient("localhost", fromPort);
+            TcpClient connectionFrom;
+            try
+            {
+                connectionFrom = new TcpClient("localhost", fromPort);
+            }
+            catch(SocketException ex)
+            {
+                consoleWriter("Connection can't be made on port " + fromPort);
+                return;
+            }
             consoleWriter("Initialize connection: real port:" + fromPort +
                           " virtual port:" + virtualFromPort);
             NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, 

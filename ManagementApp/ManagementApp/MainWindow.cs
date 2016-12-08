@@ -691,11 +691,16 @@ namespace ManagementApp
 
         private void saveConfBtn_Click(object sender, EventArgs e)
         {
-            FileSaver configuration = new FileSaver();
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "Save an topology";
+            saveFileDialog.ShowDialog();
+            String path = saveFileDialog.InitialDirectory;
+            String fileName = saveFileDialog.FileName;
+            FileSaver configuration = new FileSaver(path + fileName);
             configuration.WriteToBinaryFile(nodeList, connectionList, domainList);
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void readConfBtn_Click(object sender, EventArgs e)
         {
             control.load();
             containerPictureBox.Refresh();

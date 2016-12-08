@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
+    [Serializable()]
     public class NodeConnection
     {
         private Point start;

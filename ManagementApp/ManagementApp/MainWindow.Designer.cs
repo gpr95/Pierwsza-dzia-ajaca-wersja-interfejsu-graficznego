@@ -55,7 +55,7 @@ namespace ManagementApp
             this.button2 = new System.Windows.Forms.Button();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.saveConfBtn = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
+            this.readConfBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -357,19 +357,19 @@ namespace ManagementApp
             this.saveConfBtn.UseVisualStyleBackColor = false;
             this.saveConfBtn.Click += new System.EventHandler(this.saveConfBtn_Click);
             // 
-            // button3
+            // readConfBtn
             // 
-            this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.button3.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
-            this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button3.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button3.Location = new System.Drawing.Point(687, 152);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(67, 22);
-            this.button3.TabIndex = 18;
-            this.button3.Text = "Wczytaj";
-            this.button3.UseVisualStyleBackColor = false;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.readConfBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.readConfBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.readConfBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.readConfBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.readConfBtn.Location = new System.Drawing.Point(687, 152);
+            this.readConfBtn.Name = "readConfBtn";
+            this.readConfBtn.Size = new System.Drawing.Size(67, 22);
+            this.readConfBtn.TabIndex = 18;
+            this.readConfBtn.Text = "Wczytaj";
+            this.readConfBtn.UseVisualStyleBackColor = false;
+            this.readConfBtn.Click += new System.EventHandler(this.readConfBtn_Click);
             // 
             // MainWindow
             // 
@@ -377,7 +377,7 @@ namespace ManagementApp
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.ClientSize = new System.Drawing.Size(1058, 544);
-            this.Controls.Add(this.button3);
+            this.Controls.Add(this.readConfBtn);
             this.Controls.Add(this.saveConfBtn);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.button2);
@@ -433,7 +433,7 @@ namespace ManagementApp
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button saveConfBtn;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button readConfBtn;
     }
 }
 

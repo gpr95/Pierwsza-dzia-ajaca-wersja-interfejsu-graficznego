@@ -25,7 +25,6 @@ namespace ManagementApp
         private bool run = true;
         private TcpListener listener;
         private static ManagmentProtocol protocol = new ManagmentProtocol();
-        private FileSaver configuration = new FileSaver();
         //private List<ClientNode> clientNodeList = new List<ClientNode>();
         //private List<NetNode> networkNodeList = new List<NetNode>();
         private List<Node> nodeList = new List<Node>();
@@ -55,13 +54,21 @@ namespace ManagementApp
         }
         public void load()
         {
-            nodeList = null;
-            connectionList = null;
-            domainList = null;
-            nodeList = configuration.ReadFromBinaryFileNodes();
-            connectionList = configuration.ReadFromBinaryFileNodeConnections();
-            domainList = configuration.ReadFromBinaryFileDomains();
-            mainWindow.updateLists(nodeList, connectionList, domainList);
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Save an topology";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                nodeList = null;
+                connectionList = null;
+                domainList = null;
+                String path = openFileDialog.InitialDirectory;
+                String fileName = openFileDialog.FileName;
+                FileSaver configuration = new FileSaver(path + fileName);
+                nodeList = configuration.ReadFromBinaryFileNodes();
+                connectionList = configuration.ReadFromBinaryFileNodeConnections();
+                domainList = configuration.ReadFromBinaryFileDomains();
+                mainWindow.updateLists(nodeList, connectionList, domainList);
+            }
         }
         private void Listen(Object controlP)
         {
