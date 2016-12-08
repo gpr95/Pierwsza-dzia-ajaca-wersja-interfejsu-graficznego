@@ -33,7 +33,6 @@ namespace NetNode
         }
         public void addToTempQueue(VirtualContainer3 container, int pos)
         {
-            //TODO pakownie w STM1
             int i = 0;
             if(pos == 13)
             {
@@ -53,10 +52,10 @@ namespace NetNode
         }
         public void addToOutQueue()
         {
-            //if (this.currentFrame.vc3List[0] != null && this.currentFrame.vc3List[1] != null && this.currentFrame.vc3List[2] != null)
-            //{
+            if (this.currentFrame.vc3List[0] != null || this.currentFrame.vc3List[1] != null || this.currentFrame.vc3List[2] != null)
+            {
                 this.output.Enqueue(this.currentFrame);
-            //}
+            }
         }
     }
 }

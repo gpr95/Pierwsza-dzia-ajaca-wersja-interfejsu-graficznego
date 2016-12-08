@@ -13,25 +13,24 @@ namespace NetNode
     {
         public static List<FIB> fib = new List<FIB>();
 
-        public int[] commuteContainer(VirtualContainer4 container)
+        public int commuteContainer(VirtualContainer4 container, int iport)
         {
-            int[] out_pos = { -1, -1 };
+            int out_pos = 1;
             if (container != null)
             {
                 //mamy do czynienia z vc4
                 foreach (var row in fib)
                 {
-                    if (row.in_cont == 1)
+                    if (row.iport == iport && row.in_cont == 1)
                     {
-                        out_pos[0] = row.oport;
-                        out_pos[1] = row.out_cont;
+                        out_pos = row.oport;
                         return out_pos;
                     }
                 }
             }
             return out_pos;
         }
-        public int[] commuteContainer(VirtualContainer3 container, int pos)
+        public int[] commuteContainer(VirtualContainer3 container, int iport, int pos)
         {
             int[] out_pos = { -1, -1 };
             if (container != null)
@@ -39,7 +38,7 @@ namespace NetNode
                 //mamy do czynienia z vc3
                 foreach (var row in fib)
                 {
-                    if (row.in_cont == pos)
+                    if (row.iport == iport && row.in_cont == pos)
                         {
                             out_pos[0] = row.oport;
                             out_pos[1] = row.out_cont;

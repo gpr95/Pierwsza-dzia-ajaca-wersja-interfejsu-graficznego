@@ -56,6 +56,7 @@ namespace NetNode
                 Signal received_signal = received_object.Value.ToObject<Signal>();
                 STM1 frame = received_signal.stm1;
                 int virtPort = received_signal.port;
+                Console.WriteLine("received signal time: " + received_signal.time + " on port: "+virtPort);
                 toVirtualPort(virtPort, frame);
                 
             }
@@ -70,10 +71,8 @@ namespace NetNode
 
         private void ConsoleInterface()
         {
-            //main for testing netNode
-            Console.WriteLine("NetNode");
+            Console.WriteLine("NetNode " + this.virtualIp);
 
-            //sprawdza czy sa jakies pakiety w kolejkach w portach wejsciowych
             while(true)
             {
                 foreach(IPort iport in this.ports.iports)
@@ -81,27 +80,27 @@ namespace NetNode
                     //check if there is frame in queue and try to process it 
                     if(iport.input.Count > 0)
                     {
-                        int[] out_pos;
-                        //zabranie z kolejki stm
                         STM1 frame = iport.input.Dequeue();
 
                         if(frame.vc4 != null)
                         {
+                            int out_pos;
                             VirtualContainer4 vc4 = frame.vc4;
-                            out_pos = switchField.commuteContainer(vc4);
-                            if(out_pos[0] != -1)
+                            out_pos = switchField.commuteContainer(vc4, iport.port);
+                            if(out_pos != -1)
                             {
-                                this.ports.oports[out_pos[0]].addToOutQueue(vc4);
+                                this.ports.oports[out_pos].addToOutQueue(vc4);
                             }
                         }
-                        else if (frame.vc3List[0] != null && frame.vc3List[1] != null && frame.vc3List[2] != null)
+                        else if (frame.vc3List != null)
                         {
                             foreach(var vc in frame.vc3List)
                             {
                                 VirtualContainer3 vc3 = vc.Value;
                                 if (vc3 != null)
                                 {
-                                    out_pos = switchField.commuteContainer(vc3, vc.Key);
+                                    int [] out_pos;
+                                    out_pos = switchField.commuteContainer(vc3, iport.port, vc.Key);
                                     if (out_pos[0] != -1)
                                     {
                                         this.ports.oports[out_pos[0]].addToTempQueue(vc3, out_pos[1]);
@@ -126,7 +125,7 @@ namespace NetNode
                     if (oport.output.Count > 0)
                     {
                         STM1 frame = oport.output.Dequeue();
-                        if (frame.vc4 != null)
+                        if (frame.vc4 != null || frame.vc3List != null)
                         {   
                             //TODO from management
                             int virtualPort = 3;
@@ -151,7 +150,7 @@ namespace NetNode
 
         static void Main(string[] args)
         {
-            string[] parameters = new string[] { "192.168.56.55", "7777", "7776" };
+            string[] parameters = new string[] { "NN0", "7777", "7776" };
             NetNode netnode = new NetNode(parameters);
         }
     }

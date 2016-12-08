@@ -32,17 +32,6 @@ namespace NetNode
 
         private void Listen()
         {
-            //listener.Start();
-            //while (true)
-            //{
-                //TcpClient client = listener.AcceptTcpClient();
-                //Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
-                //clientThread.Start(client);
-                ListenThread();
-            //}
-        }
-        private void ListenThread()
-        {
             TcpClient clienttmp = new TcpClient("127.0.0.1", 7778);
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
@@ -55,7 +44,7 @@ namespace NetNode
                 Console.WriteLine("receivedWhoIs");
                 //send name to management
                 ManagmentProtocol protocol = new ManagmentProtocol();
-                protocol.Name = "NN0";//NN0
+                protocol.Name = this.virtualIp;
                 String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
                 writer.Write(send_object);
             }
