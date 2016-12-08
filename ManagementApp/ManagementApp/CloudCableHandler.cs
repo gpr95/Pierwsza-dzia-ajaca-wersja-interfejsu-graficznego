@@ -26,7 +26,7 @@ namespace ManagementApp
             Thread thread = new Thread(new ThreadStart(listenForCloud));
             thread.Start();
             String parameters = "" + cloudPort;
-            System.Diagnostics.Process.Start("CableCloud.exe", parameters);
+       //     System.Diagnostics.Process.Start("CableCloud.exe", parameters);
         }
 
         private void listenForCloud()
@@ -42,13 +42,13 @@ namespace ManagementApp
         {
             foreach(NodeConnection con in connections)
             {
-                String data = JSON.Serialize(JSON.FromValue(con));
+                String data = JSON.Serialize(JSON.FromValue(con.Prop));
                 writer.Write(data);
             }
         }
         public void updateOneConnection()
         {
-            String data = JSON.Serialize(JSON.FromValue(connections.Last()));
+            String data = JSON.Serialize(JSON.FromValue(connections.Last().Prop));
             writer.Write(data);
         }
     }

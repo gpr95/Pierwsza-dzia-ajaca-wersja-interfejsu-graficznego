@@ -14,3 +14,13 @@ D:\TSSTRepo\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.xml
 D:\TSSTRepo\ManagementApp\ClientNode\obj\Debug\ClientNode.exe
 D:\TSSTRepo\ManagementApp\ClientNode\obj\Debug\ClientNode.pdb
 D:\TSSTRepo\ManagementApp\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\bin\Debug\ClientNode.exe.config
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\bin\Debug\ClientNode.exe
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\bin\Debug\ClientNode.pdb
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\bin\Debug\ManagementApp.exe
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\bin\Debug\ManagementApp.pdb
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\obj\Debug\ClientNode.exe
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\obj\Debug\ClientNode.pdb

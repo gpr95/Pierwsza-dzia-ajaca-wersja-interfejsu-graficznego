@@ -7,18 +7,17 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
-    [Serializable()]
     public class NodeConnection
     {
         private Point start;
         private Point end;
         private String name;
-        [NonSerialized()]
         private Node from, to;
         private int virtualPortFrom;
         private int virtualPortTo;
         private int localPortFrom;
         private int localPortTo;
+        private ConnectionProperties prop;
 
         public NodeConnection(Node from, int virtualPortFrom, Node to, int virtualPortTo, String name)
         {
@@ -27,6 +26,7 @@ namespace ManagementApp
             this.From = from;
             this.To = to;
             this.Name = name;
+            this.Prop = new ConnectionProperties(from.LocalPort, virtualPortFrom, to.LocalPort, virtualPortTo);
 
             localPortFrom = from.LocalPort;
             localPortTo = to.LocalPort;
@@ -121,6 +121,19 @@ namespace ManagementApp
         {
             get { return localPortTo; }
             set { localPortTo = value; }
+        }
+
+        internal ConnectionProperties Prop
+        {
+            get
+            {
+                return prop;
+            }
+
+            set
+            {
+                prop = value;
+            }
         }
     }
 }

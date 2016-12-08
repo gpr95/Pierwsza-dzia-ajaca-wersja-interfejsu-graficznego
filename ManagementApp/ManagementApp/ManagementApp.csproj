@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="ClientNode.cs" />
     <Compile Include="CloudCableHandler.cs" />
+    <Compile Include="ConnectionProperties.cs" />
     <Compile Include="Control.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="FIB.cs" />

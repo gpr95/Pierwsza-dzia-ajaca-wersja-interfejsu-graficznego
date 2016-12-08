@@ -17,7 +17,6 @@ namespace CableCloud
         private const string ERROR_MSG = "ERROR: ";
 
         private Thread thread;
-        private string pathToLogFile;
         private TcpClient connection;
         private DataTable table;
         private Dictionary<int, NodeConnectionThread> portToThreadMap;
@@ -25,12 +24,11 @@ namespace CableCloud
         private BinaryReader reader;
 
         public NodeConnectionThread(ref TcpClient connection,
-            ref Dictionary<int, NodeConnectionThread> portToThreadMap, DataTable table, string pathToLogFile)
+            ref Dictionary<int, NodeConnectionThread> portToThreadMap, DataTable table)
         {
             this.connection = connection;
             this.portToThreadMap = portToThreadMap;
             this.table = table;
-            this.pathToLogFile = pathToLogFile;
 
             writer = new BinaryWriter(connection.GetStream());
             reader = new BinaryReader(connection.GetStream());
@@ -41,14 +39,14 @@ namespace CableCloud
 
         private void nodeConnectionThread()
         {
-            writeToLog("Connection made with: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
+            consoleWriter("Connection made with: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
             while (true)
             {
                 string received_data = reader.ReadString();
                 if (received_data == null || received_data.Length == 0)
                     continue;
 
-                writeToLog("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object.");
+                consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object.");
                 JMessage received_object = JMessage.Deserialize(received_data);
                 if (received_object.Type == typeof(Signal))
                 {
@@ -64,7 +62,14 @@ namespace CableCloud
                         {
                             toPort = (int)dr["toPort"];
                             virtualToPort = (int)dr["virtualToPort"];
-                            writeToLog("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object:"+
+                            consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object:"+
+                                fromPort + ":" + virtualFromPort + "-" + toPort + ":" + virtualToPort);
+                        }
+                        if (dr["toPort"].Equals(fromPort) && dr["virtualToPort"].Equals(virtualFromPort))
+                        {
+                            toPort = (int)dr["fromPort"];
+                            virtualToPort = (int)dr["virtualFromPort"];
+                            consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object:" +
                                 fromPort + ":" + virtualFromPort + "-" + toPort + ":" + virtualToPort);
                         }
                     }
@@ -73,7 +78,7 @@ namespace CableCloud
                 }
                 else
                 {
-                    writeToLog(ERROR_MSG + "received from node wrong data format. Node TCP PORT: "+ ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
+                    consoleWriter(ERROR_MSG + "received from node wrong data format. Node TCP PORT: "+ ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
                 }
             }
         }
@@ -84,14 +89,13 @@ namespace CableCloud
             String data = JSON.Serialize(JSON.FromValue(toSend));
 
             writer.Write(data);
-            writeToLog("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " sended data OUT.");
+            consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " sended data OUT.");
         }
 
-        private void writeToLog(String logMsg)
+        private void consoleWriter(String msg)
         {
-            StreamWriter writer = File.AppendText(pathToLogFile);
-            writer.WriteLine("#" + DateTime.Now.ToLongTimeString() +
-                DateTime.Now.ToLongDateString() + "#:" + logMsg);
+            Console.WriteLine();
+            Console.Write("#" + DateTime.Now.ToLongTimeString() + DateTime.Now.ToLongDateString() + "#:" + msg);
         }
 
     }
