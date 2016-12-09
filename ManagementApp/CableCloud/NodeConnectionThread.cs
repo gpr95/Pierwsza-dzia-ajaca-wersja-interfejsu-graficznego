@@ -65,13 +65,6 @@ namespace CableCloud
                             consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object:"+
                                 fromPort + ":" + virtualFromPort + "-" + toPort + ":" + virtualToPort);
                         }
-                        if (dr["toPort"].Equals(fromPort) && dr["virtualToPort"].Equals(virtualFromPort))
-                        {
-                            toPort = (int)dr["fromPort"];
-                            virtualToPort = (int)dr["virtualFromPort"];
-                            consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object:" +
-                                fromPort + ":" + virtualFromPort + "-" + toPort + ":" + virtualToPort);
-                        }
                     }
                     signal.port = virtualToPort;
                     portToThreadMap[toPort + ":" + virtualToPort].sendSignal(signal, toPort);
@@ -85,7 +78,6 @@ namespace CableCloud
 
         public void sendSignal(Signal toSend, int port)
         {
-            //toSend.port = port;
             String data = JSON.Serialize(JSON.FromValue(toSend));
 
             writer.Write(data);

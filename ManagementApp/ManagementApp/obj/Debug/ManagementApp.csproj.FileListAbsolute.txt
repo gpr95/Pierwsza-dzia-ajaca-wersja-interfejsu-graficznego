@@ -57,3 +57,4 @@ C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\Man
 C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csproj.GenerateResource.Cache
 D:\TSSTRepo\ManagementApp\ManagementApp\bin\Debug\Newtonsoft.Json.dll
 D:\TSSTRepo\ManagementApp\ManagementApp\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ManagementApp\obj\Debug\ManagementApp.csprojResolveAssemblyReference.cache
