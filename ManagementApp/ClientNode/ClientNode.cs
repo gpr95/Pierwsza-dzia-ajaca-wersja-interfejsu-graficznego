@@ -19,7 +19,7 @@ namespace ClientNode
         private static bool cyclic_sending = false;
         string[] args2 = new string[3];
         //obecna przeplywnosc, mozna potem zmienic jak dostanie na VC-4 (4) całe mozliwosc
-        private int currentSpeed = 4;
+        private int currentSpeed = 3;
         private int currentSlot;
         private static string path;
         private Dictionary<String, int> possibleDestinations = new Dictionary<string,int>();

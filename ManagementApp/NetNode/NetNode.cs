@@ -21,6 +21,7 @@ namespace NetNode
 
         public int physicalPort;
         private TcpListener listener;
+        private static BinaryWriter writer;
 
         public NetNode(string[] args)
         {
@@ -33,6 +34,7 @@ namespace NetNode
             thread.Start();
             Thread threadConsole = new Thread(new ThreadStart(ConsoleInterface));
             threadConsole.Start();
+            this.commutation();
         }
         private void Listen()
         {
@@ -49,6 +51,7 @@ namespace NetNode
         {
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
+            writer = new BinaryWriter(clienttmp.GetStream());
             while (true)
             {
                 string received_data = reader.ReadString();
@@ -112,35 +115,34 @@ namespace NetNode
             {
                 foreach (IPort iport in this.ports.iports)
                 {
-                    Console.WriteLine("debugiports");
                     //check if there is frame in queue and try to process it 
                     if (iport.input.Count > 0)
                     {
-                        Console.WriteLine("debugcount");
                         STM1 frame = iport.input.Dequeue();
 
                         if (frame.vc4 != null)
                         {
-                            int out_pos;
+                            int out_pos = -1;
                             VirtualContainer4 vc4 = frame.vc4;
-                            Console.WriteLine("debugcomm");
                             out_pos = switchField.commuteContainer(vc4, iport.port);
                             if (out_pos != -1)
                             {
+                                Console.WriteLine("ok");
                                 this.ports.oports[out_pos].addToOutQueue(vc4);
                             }
                         }
-                        else if (frame.vc3List.Count != 0)
+                        else if (frame.vc3List.Count > 0)
                         {
                             foreach (var vc in frame.vc3List)
                             {
                                 VirtualContainer3 vc3 = vc.Value;
                                 if (vc3 != null)
                                 {
-                                    int[] out_pos;
+                                    int[] out_pos = {-1,-1};
                                     out_pos = switchField.commuteContainer(vc3, iport.port, vc.Key);
                                     if (out_pos[0] != -1)
                                     {
+                                        Console.WriteLine("ok");
                                         this.ports.oports[out_pos[0]].addToTempQueue(vc3, out_pos[1]);
                                     }
                                 }
@@ -154,29 +156,25 @@ namespace NetNode
                 }
                 foreach (OPort oport in this.ports.oports)
                 {
-                    //pakowanie w STM to co jest w tempQueue
-                    Console.WriteLine("debug");
+                    //packing STM from tempQueue to outqueue
                     oport.addToOutQueue();
                 }
+
                 foreach (OPort oport in this.ports.oports)
                 {
-                    Console.WriteLine("debugoports");
                     //check if there is frame in queue and try to send it 
                     if (oport.output.Count > 0)
                     {
-                        Console.WriteLine("debugCount");
                         STM1 frame = oport.output.Dequeue();
-                        if (frame.vc4 != null || frame.vc3List != null)
+                        if (frame.vc4 != null || frame.vc3List.Count > 0)
                         {
-                            //TODO from management
-                            int virtualPort = 3;
-                            Signal signal = new Signal(getTime(), virtualPort, frame);
-                            consoleWriter("sending signal to port: " + signal.port);
-                            TcpClient client = new TcpClient();
-                            client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
-                            BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
+                            Signal signal = new Signal(getTime(), oport.port, frame);
+                            consoleWriter("sending signal port: " + signal.port);
+                            //TcpClient client = new TcpClient();
+                            //client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
+                            //BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
                             string data = JMessage.Serialize(JMessage.FromValue(signal));
-                            writeOutput.Write(data);
+                            writer.Write(data);
                         }
                     }
                 }
