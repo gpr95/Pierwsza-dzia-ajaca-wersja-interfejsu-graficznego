@@ -18,12 +18,13 @@ namespace ManagementApp
         private BinaryWriter writer;
         private    BinaryReader reader;
         private TcpListener listener;
+        Thread thread;
 
         public CloudCableHandler(List<NodeConnection> connections, int cloudPort)
         {
             this.connections = connections;
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
-            Thread thread = new Thread(new ThreadStart(listenForCloud));
+            thread = new Thread(new ThreadStart(listenForCloud));
             thread.Start();
             String parameters = "" + cloudPort;
             System.Diagnostics.Process.Start("CableCloud.exe", parameters);
@@ -50,6 +51,11 @@ namespace ManagementApp
         {
             String data = JSON.Serialize(JSON.FromValue(connections.Last().Prop));
             writer.Write(data);
+        }
+
+        public void stopRunning()
+        {
+            thread.Interrupt();
         }
     }
 }

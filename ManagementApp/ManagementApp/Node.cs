@@ -92,5 +92,18 @@ namespace ManagementApp
                 tcpClient = value;
             }
         }
+
+        public Process ProcessHandle
+        {
+            get
+            {
+                return processHandle;
+            }
+
+            set
+            {
+                processHandle = value;
+            }
+        }
     }
 }

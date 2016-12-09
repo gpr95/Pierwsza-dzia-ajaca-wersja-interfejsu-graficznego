@@ -9,6 +9,10 @@ namespace ManagementApp
 {
     public partial class MainWindow : Form
     {
+        [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        private static extern bool SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int uFlags);
+        //private static extern bool ShowWindow(IntPtr hWnd, int  nCmdShow);
         // CONSTS
         private const int GAP = 10;
 
@@ -687,6 +691,7 @@ namespace ManagementApp
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
             control.stopRunning();
+            cableHandler.stopRunning();
         }
 
         private void saveConfBtn_Click(object sender, EventArgs e)
@@ -711,6 +716,12 @@ namespace ManagementApp
             this.nodeList = nodeList;
             this.connectionList = connectionList;
             this.domainList = domainList;
+        }
+
+        private void containerPictureBox_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            Node n = getNodeFrom(e.X, e.Y);
+            SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
         }
     }
 }

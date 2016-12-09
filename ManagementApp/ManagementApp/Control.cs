@@ -74,14 +74,21 @@ namespace ManagementApp
         {
             listener.Start();
             ThreadPasser tp = new ThreadPasser();
-            
             tp.control = (ControlPlane)controlP;
+
             while (run)
-            {                
-                TcpClient client = listener.AcceptTcpClient();
-                tp.client = client;
-                Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
-                clientThread.Start(tp);
+            {
+                try
+                {
+                    TcpClient client = listener.AcceptTcpClient();
+                    tp.client = client;
+                    Thread clientThread = new Thread(new ParameterizedThreadStart(ListenThread));
+                    clientThread.Start(tp);
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
             }
         }
 
@@ -401,6 +408,7 @@ namespace ManagementApp
         public void stopRunning()
         {
             run = false;
+                listener.Stop();
         }
 
         public int getPort(Node node)
@@ -429,7 +437,7 @@ namespace ManagementApp
                     List<List<String>> possiblePaths = new List<List<String>>();
                     possiblePaths = findPaths(node, true);
                     possiblePaths.Reverse();
-                    possiblePaths = possiblePaths.Take(3).ToList();
+                    possiblePaths = possiblePaths.Take(4).ToList();
                     int in_cout = 11; //11
                     foreach(List<String> nodeName in possiblePaths)
                     {
@@ -486,7 +494,10 @@ namespace ManagementApp
                                 FIB newFib = new FIB(portIn, in_cout, portOut, in_cout);
                                 mailingList.Add(newFib, nodeName.ElementAt(i));
                         }
-                        in_cout++;
+                        if (in_cout != nodeName.Count() + 9)
+                            in_cout++;
+                        else
+                            in_cout = 1;
                     }
                 }
             }

@@ -72,6 +72,7 @@ namespace ManagementApp
             this.containerPictureBox.TabStop = false;
             this.containerPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.containerPictureBox_Paint);
             this.containerPictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseClick);
+            this.containerPictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseDoubleClick);
             this.containerPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseDown);
             this.containerPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseMove);
             this.containerPictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseUp);
