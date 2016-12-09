@@ -19,12 +19,12 @@ namespace CableCloud
         private Thread thread;
         private TcpClient connection;
         private DataTable table;
-        private Dictionary<int, NodeConnectionThread> portToThreadMap;
+        private Dictionary<String, NodeConnectionThread> portToThreadMap;
         private BinaryWriter writer;
         private BinaryReader reader;
 
         public NodeConnectionThread(ref TcpClient connection,
-            ref Dictionary<int, NodeConnectionThread> portToThreadMap, DataTable table)
+            ref Dictionary<String, NodeConnectionThread> portToThreadMap, DataTable table)
         {
             this.connection = connection;
             this.portToThreadMap = portToThreadMap;
@@ -74,7 +74,7 @@ namespace CableCloud
                         }
                     }
                     signal.port = virtualToPort;
-                    portToThreadMap[toPort].sendSignal(signal, toPort);
+                    portToThreadMap[toPort + ":" + virtualToPort].sendSignal(signal, toPort);
                 }
                 else
                 {

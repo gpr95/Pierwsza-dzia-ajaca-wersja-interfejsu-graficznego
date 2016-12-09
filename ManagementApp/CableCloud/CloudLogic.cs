@@ -22,13 +22,13 @@ namespace CableCloud
         private DataTable tableWithPorts;
 
         /** HANDLERS MAP - localPORT-Thread with connection to this port */
-        private Dictionary<int, NodeConnectionThread> portToThreadMap;
+        private Dictionary<String, NodeConnectionThread> portToThreadMap;
 
 
         public CloudLogic()
         {
             tableWithPorts = new DataTable("Connections");
-            portToThreadMap = new Dictionary<int, NodeConnectionThread>();
+            portToThreadMap = new Dictionary<String, NodeConnectionThread>();
             tableWithPorts.Columns.Add("fromPort", typeof(int)).AllowDBNull = false;
             tableWithPorts.Columns.Add("virtualFromPort", typeof(int)).AllowDBNull = false;
             tableWithPorts.Columns.Add("toPort", typeof(int)).AllowDBNull = false;
@@ -91,15 +91,24 @@ namespace CableCloud
             NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, 
                 ref portToThreadMap, tableWithPorts);
 
-            portToThreadMap.Add(fromPort, fromThread);
+            portToThreadMap.Add(fromPort + ":" + virtualFromPort, fromThread);
 
             TcpClient connectionTo = new TcpClient("localhost", toPort);
+            try
+            {
+                connectionTo = new TcpClient("localhost", toPort);
+            }
+            catch (SocketException ex)
+            {
+                consoleWriter("Connection can't be made on port " + toPort);
+                return;
+            }
             consoleWriter("Initialize connection: real port:" + toPort +
                            " virtual port:" + virtualToPort);
             NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
                 ref portToThreadMap, tableWithPorts);
 
-            portToThreadMap.Add(toPort, toThread);
+            portToThreadMap.Add(toPort + ":" + virtualToPort, toThread);
 
             /** Add new cable to table */
             addNewCable(fromPort, virtualFromPort,
@@ -125,7 +134,7 @@ namespace CableCloud
                 if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort))
                 {
                     tableWithPorts.Rows.Remove(dr);
-                    portToThreadMap.Remove(fromPort);
+                    portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
                 }
             }
         }

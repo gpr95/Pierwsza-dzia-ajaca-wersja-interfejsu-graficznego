@@ -582,7 +582,7 @@ namespace ManagementApp
             else if (node is ClientNode)
                 panel.FillEllipse(Brushes.YellowGreen, rect);
             panel.DrawEllipse(Pens.Black, rect);
-            panel.DrawString(node.Name, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + 3,
+            panel.DrawString(node.Name + ":" + node.LocalPort, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + 3,
                 node.Position.Y + 3));
         }
 
