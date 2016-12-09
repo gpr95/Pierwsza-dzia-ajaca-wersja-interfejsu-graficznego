@@ -49,18 +49,20 @@ namespace NetNode
         {
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
-            string received_data = reader.ReadString();
-            JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(Signal))
+            while (true)
             {
-                Signal received_signal = received_object.Value.ToObject<Signal>();
-                STM1 frame = received_signal.stm1;
-                int virtPort = received_signal.port;
-                consoleWriter("received signal time: " + received_signal.time + " on port: " + virtPort);
-                toVirtualPort(virtPort, frame);
+                string received_data = reader.ReadString();
+                JMessage received_object = JMessage.Deserialize(received_data);
+                if (received_object.Type == typeof(Signal))
+                {
+                    Signal received_signal = received_object.Value.ToObject<Signal>();
+                    STM1 frame = received_signal.stm1;
+                    int virtPort = received_signal.port;
+                    consoleWriter("received signal time: " + received_signal.time + " on port: " + virtPort);
+                    toVirtualPort(virtPort, frame);
 
+                }
             }
-            reader.Close();
         }
 
         private void toVirtualPort(int virtPort, STM1 received_frame)
