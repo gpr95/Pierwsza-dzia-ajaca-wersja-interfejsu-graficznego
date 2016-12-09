@@ -25,6 +25,7 @@ namespace NetNode
         public void addToInQueue(STM1 frame)
         {
             input.Enqueue(frame);
+            Console.WriteLine("Stm1 added to input queue");
         }
     }
 }

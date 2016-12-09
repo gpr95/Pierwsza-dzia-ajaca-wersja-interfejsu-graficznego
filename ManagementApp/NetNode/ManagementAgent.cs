@@ -41,16 +41,17 @@ namespace NetNode
             
             if (received_Protocol.State == ManagmentProtocol.WHOIS)
             {
-                Console.WriteLine("receivedWhoIs");
+                Console.WriteLine("Signal from management: receivedWhoIs");
                 //send name to management
                 ManagmentProtocol protocol = new ManagmentProtocol();
                 protocol.Name = this.virtualIp;
                 String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
                 writer.Write(send_object);
+                Console.WriteLine("sending name to management: " + protocol.Name);
             }
             else if(received_Protocol.State == ManagmentProtocol.ROUTINGTABLES)
             {
-                Console.WriteLine("receivedroutingtable");
+                Console.WriteLine("Signal from management: receivedroutingtable");
                 //receiving fibs
                 if(received_Protocol.RoutingTable != null)
                 {
@@ -62,7 +63,7 @@ namespace NetNode
             }
             else
             {
-                Console.WriteLine("undefined protocol");
+                Console.WriteLine("Signal from management: undefined protocol");
             }
             reader.Close();
         }
