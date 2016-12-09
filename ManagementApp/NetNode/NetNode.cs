@@ -54,11 +54,10 @@ namespace NetNode
                 Signal received_signal = received_object.Value.ToObject<Signal>();
                 STM1 frame = received_signal.stm1;
                 int virtPort = received_signal.port;
-                Console.WriteLine("received signal time: " + received_signal.time + " on port: "+virtPort);
+                consoleWriter("received signal time: " + received_signal.time + " on port: "+virtPort);
                 toVirtualPort(virtPort, frame);
                 
             }
-            Console.WriteLine(received_data);
             reader.Close();
         }
 
@@ -127,8 +126,8 @@ namespace NetNode
                         {   
                             //TODO from management
                             int virtualPort = 3;
-                            Signal signal = new Signal(DateTimeToInt(), virtualPort, frame);
-                            Console.WriteLine(signal);
+                            Signal signal = new Signal(getTime(), virtualPort, frame);
+                            consoleWriter("sending signal to port: " + signal.port);
                             TcpClient client = new TcpClient();
                             client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
                             BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
@@ -140,10 +139,16 @@ namespace NetNode
             }
         }
 
-        public static int DateTimeToInt()
+        private void consoleWriter(String msg)
         {
-            int unixTime = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
-            return unixTime;
+            Console.WriteLine("#" + DateTime.Now.ToLongTimeString() + DateTime.Now.ToLongDateString() + "#:" + msg);
+        }
+
+        private int getTime()
+        {
+            Random r = new Random();
+            int time = r.Next(10, 125);
+            return time;
         }
 
         static void Main(string[] args)

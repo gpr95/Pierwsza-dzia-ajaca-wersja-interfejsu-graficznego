@@ -28,6 +28,7 @@ namespace NetNode
             this.currentFrame.vc4 = null;
             this.currentFrame.vc4 = container;
             this.output.Enqueue(this.currentFrame);
+            Console.WriteLine("Stm1 added to output queue");
         }
         public void addToTempQueue(VirtualContainer3 container, int pos)
         {
@@ -53,6 +54,7 @@ namespace NetNode
             if (this.currentFrame.vc3List.Count != 0)
             {
                 this.output.Enqueue(this.currentFrame);
+                Console.WriteLine("Stm1 added to output queue");
             }
         }
     }

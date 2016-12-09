@@ -24,6 +24,7 @@ namespace NetNode
                     if (row.iport == iport && row.in_cont == 1)
                     {
                         out_pos = row.oport;
+                        Console.WriteLine("Commuting container from:" + row.iport + " to " + row.oport);
                         return out_pos;
                     }
                 }
@@ -42,6 +43,7 @@ namespace NetNode
                         {
                             out_pos[0] = row.oport;
                             out_pos[1] = row.out_cont;
+                            Console.WriteLine("Commuting container from:" + row.iport + " "+ row.in_cont + "to " + row.oport + " " + row.oport);
                             return out_pos;
                         }
                 }
@@ -51,6 +53,7 @@ namespace NetNode
         public static void addToSwitch(FIB row)
         {
             fib.Add(row);
+            Console.WriteLine("New fib row added");
         }
     }
 }

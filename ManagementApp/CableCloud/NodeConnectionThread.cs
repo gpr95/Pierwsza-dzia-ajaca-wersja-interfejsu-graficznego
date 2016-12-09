@@ -85,7 +85,7 @@ namespace CableCloud
 
         public void sendSignal(Signal toSend, int port)
         {
-            toSend.port = port;
+            //toSend.port = port;
             String data = JSON.Serialize(JSON.FromValue(toSend));
 
             writer.Write(data);
