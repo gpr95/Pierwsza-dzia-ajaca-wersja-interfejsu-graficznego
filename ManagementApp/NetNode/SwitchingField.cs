@@ -54,6 +54,10 @@ namespace NetNode
         {
             fib.Add(row);
             Console.WriteLine("New fib row added");
+            foreach(var temp in fib)
+            {
+                Console.WriteLine(temp.iport + " " + temp.in_cont + " " + temp.oport + " " + temp.out_cont);
+            }
         }
     }
 }
