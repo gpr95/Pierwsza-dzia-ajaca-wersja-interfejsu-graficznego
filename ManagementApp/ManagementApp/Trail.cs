@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
+    [Serializable()]
     class Trail
     {
         private Node from;

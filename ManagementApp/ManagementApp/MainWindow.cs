@@ -714,7 +714,7 @@ namespace ManagementApp
                 String path = saveFileDialog.InitialDirectory;
                 String fileName = saveFileDialog.FileName;
                 FileSaver configuration = new FileSaver(path + fileName);
-                configuration.WriteToBinaryFile(nodeList, connectionList, domainList);
+                configuration.WriteToBinaryFile(nodeList, connectionList, domainList,control.TrailList);
             }
         }
 

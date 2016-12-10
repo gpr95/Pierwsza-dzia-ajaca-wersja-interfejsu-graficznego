@@ -30,6 +30,7 @@ namespace ManagementApp
         private List<Trail> trailList = new List<Trail>();
         private static ManagmentProtocol protocol = new ManagmentProtocol();
 
+   
 
         private class ThreadPasser
         {
@@ -83,7 +84,13 @@ namespace ManagementApp
                       domainList.Add(new Domain(d)); Thread.Sleep(500);
                     });
 
-
+                List<Trail> trailList = new List<Trail>();
+                configuration.ReadFromBinaryFileTrails().ForEach(
+                    t =>
+                    {
+                        //TODO
+                      //  trailList.Add(new Trail(t)); Thread.Sleep(500);
+                    });
                 nodeList.AddRange(tmpNodeList);
                 domainList.AddRange(tmpDomainList);
 
@@ -662,6 +669,19 @@ namespace ManagementApp
             trailList.Add(trail);
             mainWindow.errorMessage("The Trail has been added!");
             mainWindow.errorMessage(trail.toString());
+        }
+
+        internal List<Trail> TrailList
+        {
+            get
+            {
+                return trailList;
+            }
+
+            set
+            {
+                trailList = value;
+            }
         }
     }
 }
