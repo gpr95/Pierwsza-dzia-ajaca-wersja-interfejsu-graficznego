@@ -64,28 +64,33 @@ namespace CableCloud
                 try
                 {
                     received_data = reader.ReadString();
+                    JMessage receivedMessage = JMessage.Deserialize(received_data);
+                    if (receivedMessage.Type == typeof(ConnectionProperties))
+                    {
+                        ConnectionProperties received_connection = receivedMessage.Value.ToObject<ConnectionProperties>();
+                        if (received_connection.LocalPortTo == 0 && received_connection.VirtualPortTo == 0)
+                        {
+                            deleteCable(received_connection.LocalPortFrom, received_connection.VirtualPortFrom);
+                            consoleWriter("Deleted connection: real port:" + received_connection.LocalPortFrom +
+                                "virtual port:" + received_connection.VirtualPortFrom);
+                        }
+                        connectToNodes(received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
+                           received_connection.LocalPortTo, received_connection.VirtualPortTo);
+                    }
+                    else
+                    {
+                        consoleWriter(ERROR_MSG + "received from window application wrong data format.");
+                    }
                 }
                 catch(EndOfStreamException ex)
                 {
-                    consoleWriter("ERROR: End of stream with window application.");
+                    break;
                 }
-                JMessage receivedMessage = JMessage.Deserialize(received_data);
-                if (receivedMessage.Type == typeof(ConnectionProperties))
+                catch (IOException ex)
                 {
-                    ConnectionProperties received_connection = receivedMessage.Value.ToObject<ConnectionProperties>();
-                    if (received_connection.LocalPortTo == 0 && received_connection.VirtualPortTo == 0)
-                    {
-                        deleteCable(received_connection.LocalPortFrom, received_connection.VirtualPortFrom);
-                        consoleWriter("Deleted connection: real port:" + received_connection.LocalPortFrom +
-                            "virtual port:" + received_connection.VirtualPortFrom);
-                    }
-                    connectToNodes(received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
-                       received_connection.LocalPortTo, received_connection.VirtualPortTo);
+                    break;
                 }
-                else
-                {
-                    consoleWriter(ERROR_MSG + "received from window application wrong data format.");
-                }
+                
             }
         }
 
