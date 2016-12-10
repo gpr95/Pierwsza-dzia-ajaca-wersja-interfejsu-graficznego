@@ -16,7 +16,7 @@ namespace ManagementApp
         private List<NodeConnection> connections;
         private TcpClient client;
         private BinaryWriter writer;
-        private    BinaryReader reader;
+        private BinaryReader reader;
         private TcpListener listener;
         Thread thread;
 

@@ -159,57 +159,110 @@ namespace ManagementApp
             this.to = path.Last();
             this.componentNodes = new List<Node>(path);
             if (createdByUser)
+            {
                 priority = Priority.USER_CREATED;
+
+                int portIn, portOut;
+                int slot = 0;
+                for (int n = 0; n < path.Count(); n++)
+                {
+                    points.Add(path.ElementAt(n).Position);
+                    if (n == 0)
+                    {
+                        //Start of path
+                        portFrom = findConnection(path.ElementAt(0), path.ElementAt(1), con).From.Equals(path.ElementAt(0)) ?
+                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom :
+                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo;
+                        StartingSlot = findFirstFreeSlot(findConnection(from, path.ElementAt(n + 1), con));
+                        slot = StartingSlot;
+                        findConnection(from, path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
+                        findConnection(from, path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
+                        continue;
+                    }
+                    if (n == path.Count() - 1)
+                    {
+                        //End of path
+                        portFrom = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).To.Equals(path.ElementAt(n)) ?
+                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo :
+                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom;
+                        continue;
+                    }
+                    NodeConnection conIn = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con);
+                    NodeConnection conOut = findConnection(path.ElementAt(n), path.ElementAt(n + 1), con);
+                    portIn = conIn.To.Equals(path.ElementAt(n)) ? conIn.VirtualPortTo : conIn.VirtualPortFrom;
+                    portOut = conOut.From.Equals(path.ElementAt(n)) ? conOut.VirtualPortFrom : conOut.VirtualPortTo;
+                    int slotTemp = findFirstFreeSlot(conOut);
+                    if (slotTemp == -1)
+                    {
+                        clearTrail(this);
+                        break;
+                    }
+
+                    if (slot == -1)
+                    {
+                        clearTrail(this);
+                        break;
+                    }
+                    //StartingSlot = startinS;
+                    FIB newFib = new FIB(portIn, slot, portOut, slotTemp);
+                    slot = slotTemp;
+                    findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
+                    findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
+                    ComponentFIBs.Add(path.ElementAt(n), newFib);
+                }
+            }
+                
             else
+            {
                 priority = Priority.AUTO;
 
-            int portIn, portOut;
-            int slot = 0;
-            for(int n = 0; n < path.Count(); n++)
-            {
-                points.Add(path.ElementAt(n).Position);
-                if (n == 0)
+                int portIn, portOut;
+                int slot = 0;
+                for (int n = 0; n < path.Count(); n++)
                 {
-                    //Start of path
-                    portFrom = findConnection(path.ElementAt(0), path.ElementAt(1), con).From.Equals(path.ElementAt(0)) ?
-                        findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom :
-                        findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo;
-                    StartingSlot = findFirstFreeSlot(findConnection(from, path.ElementAt(n + 1), con));
-                    slot = StartingSlot;
-                    findConnection(from, path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
-                    continue;
-                }
-                if (n == path.Count() - 1)
-                {
-                    //End of path
-                    portFrom = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).To.Equals(path.ElementAt(n)) ?
-                        findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo :
-                        findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom;
-                    continue;
-                }
-                NodeConnection conIn = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con);
-                NodeConnection conOut = findConnection(path.ElementAt(n), path.ElementAt(n + 1), con);
-                portIn = conIn.To.Equals(path.ElementAt(n)) ? conIn.VirtualPortTo : conIn.VirtualPortFrom;
-                portOut = conOut.From.Equals(path.ElementAt(n)) ? conOut.VirtualPortFrom : conOut.VirtualPortTo;
-                int slotTemp = findFirstFreeSlot(conOut);
-                //StartingSlot = startinS;
-                FIB newFib = new FIB(portIn, slot, portOut, slotTemp);
-                slot = slotTemp;
-                findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
-                ComponentFIBs.Add(path.ElementAt(n), newFib);
-            }
+                    points.Add(path.ElementAt(n).Position);
+                    if (n == 0)
+                    {
+                        //Start of path
+                        portFrom = findConnection(path.ElementAt(0), path.ElementAt(1), con).From.Equals(path.ElementAt(0)) ?
+                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom :
+                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo;
+                        StartingSlot = findFirstAutoFreeSlot(findConnection(from, path.ElementAt(n + 1), con));
+                        slot = StartingSlot;
+                        findConnection(from, path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
+                        continue;
+                    }
+                    if (n == path.Count() - 1)
+                    {
+                        //End of path
+                        portFrom = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).To.Equals(path.ElementAt(n)) ?
+                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo :
+                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom;
+                        continue;
+                    }
+                    NodeConnection conIn = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con);
+                    NodeConnection conOut = findConnection(path.ElementAt(n), path.ElementAt(n + 1), con);
+                    portIn = conIn.To.Equals(path.ElementAt(n)) ? conIn.VirtualPortTo : conIn.VirtualPortFrom;
+                    portOut = conOut.From.Equals(path.ElementAt(n)) ? conOut.VirtualPortFrom : conOut.VirtualPortTo;
+                    int slotTemp = findFirstAutoFreeSlot(conOut);
+                    if (slotTemp == -1)
+                    {
+                        clearTrail(this);
+                        break;
+                    }
 
-            //a = this.from;
-            //componentNodes.Add(a);
-            //points.Add(a.Position);
-            //foreach (KeyValuePair<FIB, String> fibForNode in mailingList)
-            //{
-            //    b = nodes.Where(n => n.Name.Equals(fibForNode.Value)).FirstOrDefault();
-            //    connectionDictionary.Add(findConnection(a, b, con), fibForNode.Key.in_cont);
-            //    componentNodes.Add(b);
-            //    points.Add(b.Position);
-            //    a = nodes.Where(n => n.Name.Equals(fibForNode.Value)).FirstOrDefault();
-            //}
+                    if (slot == -1)
+                    {
+                        clearTrail(this);
+                        break;
+                    }
+                    //StartingSlot = startinS;
+                    FIB newFib = new FIB(portIn, slot, portOut, slotTemp);
+                    slot = slotTemp;
+                    findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
+                    ComponentFIBs.Add(path.ElementAt(n), newFib);
+                } 
+            }
         }
 
         private NodeConnection findConnection(Node start, Node end, List<NodeConnection> con)
@@ -223,11 +276,37 @@ namespace ManagementApp
         private int findFirstFreeSlot(NodeConnection connection)
         {
             if (!connection.OccupiedSlots.Any())
-                return 1;
-            else if (connection.OccupiedSlots.Min() == 3)
+                return 11;
+            else if (connection.OccupiedSlots.Max() >= 13)
                 return -1;
             else
                 return connection.OccupiedSlots.Max() + 1;
+        }
+
+        private int findFirstAutoFreeSlot(NodeConnection connection)
+        {
+            if (!connection.AutoOccupiedSlots.Any())
+                return 11;
+            else if (connection.AutoOccupiedSlots.Max() >= 13)
+                return -1;
+            else
+                return connection.AutoOccupiedSlots.Max() + 1;
+        }
+
+        private void clearTrail(Trail trail)
+        {
+            if(!componentFIBs.Any())
+            {
+                trail.from = null;
+                trail.to = null;
+                return;
+            }
+            foreach(KeyValuePair<NodeConnection, int> kvp in trail.connectionDictionary)
+            {
+                kvp.Key.OccupiedSlots.Remove(kvp.Value);
+                kvp.Key.AutoOccupiedSlots.Remove(kvp.Value);
+            }
+            trail.from = null;
         }
 
         public String toString()

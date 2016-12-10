@@ -15,6 +15,7 @@ namespace ManagementApp
         private String name;
         private Node from, to;
         private List<int> occupiedSlots = new List<int>();
+        private List<int> autoOccupiedSlots = new List<int>();
         private int virtualPortFrom;
         private int virtualPortTo;
         private int localPortFrom;
@@ -148,6 +149,18 @@ namespace ManagementApp
             set
             {
                 occupiedSlots = value;
+            }
+        }
+        public List<int> AutoOccupiedSlots
+        {
+            get
+            {
+                return autoOccupiedSlots;
+            }
+
+            set
+            {
+                autoOccupiedSlots = value;
             }
         }
     }

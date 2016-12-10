@@ -505,7 +505,7 @@ namespace ManagementApp
                     List<List<Node>> possiblePaths = new List<List<Node>>();
                     possiblePaths = findPathsLN(node, true);
                     possiblePaths.Reverse();
-                    possiblePaths = possiblePaths.Take(4).ToList();
+                    //possiblePaths = possiblePaths.Take(4).ToList();
                     foreach(List<Node> n in possiblePaths)
                     {
                         trailList.Add(new Trail(n, connectionList, false));
@@ -515,6 +515,8 @@ namespace ManagementApp
 
             foreach(Trail trail in trailList)
             {
+                if (trail.From == null)
+                    continue;
                 BinaryWriter writer = new BinaryWriter(trail.From.TcpClient.GetStream());
                 ManagmentProtocol protocol = new ManagmentProtocol();
                 protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
@@ -538,6 +540,14 @@ namespace ManagementApp
                     send_object = JSON.Serialize(JSON.FromValue(protocol));
                     writer.Write(send_object);
                 }
+            }
+
+            List<Trail> copyTrailList = new List<Trail>(trailList);
+
+            foreach (Trail t in copyTrailList)
+            {
+                if (t.From == null || t.To == null)
+                    trailList.Remove(t);
             }
 
             foreach(Trail t in trailList)
