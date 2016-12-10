@@ -13,9 +13,9 @@ namespace NetNode
     //output port
     class OPort
     {
-        private int port;
+        public int port;
         public Queue<STM1> output = new Queue<STM1>();
-        private STM1 currentFrame = new STM1();
+        public STM1 currentFrame = new STM1();
 
         public OPort(int port)
         {
@@ -24,10 +24,9 @@ namespace NetNode
 
         public void addToOutQueue(VirtualContainer4 container)
         {
-            this.currentFrame.vc3List.Clear();
-            this.currentFrame.vc4 = null;
             this.currentFrame.vc4 = container;
             this.output.Enqueue(this.currentFrame);
+            this.clear();
             Console.WriteLine("Stm1 added to output queue");
         }
         public void addToTempQueue(VirtualContainer3 container, int pos)
@@ -51,11 +50,16 @@ namespace NetNode
         }
         public void addToOutQueue()
         {
-            if (this.currentFrame.vc3List.Count != 0)
+            if (this.currentFrame.vc3List.Count > 0)
             {
                 this.output.Enqueue(this.currentFrame);
+                this.clear();
                 Console.WriteLine("Stm1 added to output queue");
             }
+        }
+        public void clear()
+        {
+            this.currentFrame = new STM1();
         }
     }
 }

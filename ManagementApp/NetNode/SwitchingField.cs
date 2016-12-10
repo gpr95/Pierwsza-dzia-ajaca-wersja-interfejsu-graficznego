@@ -43,7 +43,7 @@ namespace NetNode
                         {
                             out_pos[0] = row.oport;
                             out_pos[1] = row.out_cont;
-                            Console.WriteLine("Commuting container from:" + row.iport + " "+ row.in_cont + "to " + row.oport + " " + row.oport);
+                            Console.WriteLine("Commuting container from:" + row.iport + " " + row.in_cont + "to " + row.oport + " " + row.out_cont);
                             return out_pos;
                         }
                 }
@@ -54,6 +54,10 @@ namespace NetNode
         {
             fib.Add(row);
             Console.WriteLine("New fib row added");
+            foreach(var temp in fib)
+            {
+                Console.WriteLine(temp.iport + " " + temp.in_cont + " " + temp.oport + " " + temp.out_cont);
+            }
         }
     }
 }
