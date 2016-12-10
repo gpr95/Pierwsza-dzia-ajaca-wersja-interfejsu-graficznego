@@ -86,10 +86,12 @@ namespace CableCloud
                 consoleWriter("Connection can't be made on port " + fromPort);
                 return;
             }
-            consoleWriter("Initialize connection: real port:" + fromPort +
-                          " virtual port:" + virtualFromPort);
+            String connection1Name = +fromPort +
+                          "(virtual:" + virtualFromPort + ")-->" + toPort +
+                           "(virtual:" + virtualToPort + ")";
+            consoleWriter("Initialize connection: " + connection1Name);
             NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, 
-                ref portToThreadMap, tableWithPorts);
+                ref portToThreadMap, tableWithPorts, connection1Name);
 
             portToThreadMap.Add(fromPort + ":" + virtualFromPort, fromThread);
 
@@ -103,10 +105,12 @@ namespace CableCloud
                 consoleWriter("Connection can't be made on port " + toPort);
                 return;
             }
-            consoleWriter("Initialize connection: real port:" + toPort +
-                           " virtual port:" + virtualToPort);
+            String connection2Name = toPort +
+                          "(virtual:" + virtualToPort + ")-->" + fromPort +
+                           "(virtual:" + virtualFromPort + ")";
+            consoleWriter("Initialize connection: " + connection2Name);
             NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
-                ref portToThreadMap, tableWithPorts);
+                ref portToThreadMap, tableWithPorts, connection2Name);
 
             portToThreadMap.Add(toPort + ":" + virtualToPort, toThread);
 

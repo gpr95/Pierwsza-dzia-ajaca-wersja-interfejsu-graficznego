@@ -22,13 +22,15 @@ namespace CableCloud
         private Dictionary<String, NodeConnectionThread> portToThreadMap;
         private BinaryWriter writer;
         private BinaryReader reader;
+        private String name;
 
         public NodeConnectionThread(ref TcpClient connection,
-            ref Dictionary<String, NodeConnectionThread> portToThreadMap, DataTable table)
+            ref Dictionary<String, NodeConnectionThread> portToThreadMap, DataTable table, String name)
         {
             this.connection = connection;
             this.portToThreadMap = portToThreadMap;
             this.table = table;
+            this.name = name;
 
             writer = new BinaryWriter(connection.GetStream());
             reader = new BinaryReader(connection.GetStream());
@@ -39,22 +41,23 @@ namespace CableCloud
 
         private void nodeConnectionThread()
         {
-            consoleWriter("Connection made with: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
             while (true)
             {
                 string received_data = reader.ReadString();
                 if (received_data == null || received_data.Length == 0)
                     continue;
 
-                consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object.");
                 JMessage received_object = JMessage.Deserialize(received_data);
                 if (received_object.Type == typeof(Signal))
                 {
-                    Signal signal = received_object.Value.ToObject<Signal>();
-                    int virtualFromPort = signal.port;
+                    Signal signal = received_object.Value.ToObject<Signal>();  
+
                     var fromPort = ((IPEndPoint)connection.Client.RemoteEndPoint).Port;
-                    int virtualToPort = 0;
+                    int virtualFromPort = signal.port;
+                    
                     int toPort = 0;
+                    int virtualToPort = 0;
+
                     for (int i = table.Rows.Count - 1; i >= 0; i--)
                     {
                         DataRow dr = table.Rows[i];
@@ -62,16 +65,16 @@ namespace CableCloud
                         {
                             toPort = (int)dr["toPort"];
                             virtualToPort = (int)dr["virtualToPort"];
-                            consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " received object:"+
-                                fromPort + ":" + virtualFromPort + "-" + toPort + ":" + virtualToPort);
+                            consoleWriter("Connection: " + name + " received data.");
                         }
                     }
                     signal.port = virtualToPort;
+                    consoleWriter("Connection: " + name + " sending data.");
                     portToThreadMap[toPort + ":" + virtualToPort].sendSignal(signal, toPort);
                 }
                 else
                 {
-                    consoleWriter(ERROR_MSG + "received from node wrong data format. Node TCP PORT: "+ ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
+                    consoleWriter(ERROR_MSG + "received from node wrong data format. Node PORT: "+ ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
                 }
             }
         }
@@ -79,9 +82,7 @@ namespace CableCloud
         public void sendSignal(Signal toSend, int port)
         {
             String data = JSON.Serialize(JSON.FromValue(toSend));
-
             writer.Write(data);
-            consoleWriter("Connection: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port + " sended data OUT.");
         }
 
         private void consoleWriter(String msg)
