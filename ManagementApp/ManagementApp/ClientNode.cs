@@ -19,5 +19,9 @@ namespace ManagementApp
             this.processHandle = System.Diagnostics.Process.Start("ClientNode.exe", parameters);
             Position = new Point(x, y);
         }
+
+        public ClientNode(ClientNode cnode) : this(cnode.Position.X, cnode.Position.Y, cnode.Name, cnode.LocalPort)
+        {
+        }
     }
 }
