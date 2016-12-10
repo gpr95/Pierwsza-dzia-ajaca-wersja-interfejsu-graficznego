@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace ManagementApp
 {
@@ -17,13 +18,14 @@ namespace ManagementApp
         protected int state { get; set; }
         protected int localPort;
         protected int ManagmentPort = 7777;
-        //protected int CloudCablePort = 7776;
         protected String name;
         protected Point position;
         [NonSerialized]
         protected Thread threadHandle;
         [NonSerialized]
         protected TcpClient tcpClient;
+        [NonSerialized]
+        protected BinaryWriter socketWriter;
         [NonSerialized]
         protected Process processHandle;
 
@@ -103,6 +105,19 @@ namespace ManagementApp
             set
             {
                 processHandle = value;
+            }
+        }
+
+        public BinaryWriter SocketWriter
+        {
+            get
+            {
+                return socketWriter;
+            }
+
+            set
+            {
+                socketWriter = value;
             }
         }
     }

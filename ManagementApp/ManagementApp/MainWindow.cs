@@ -14,8 +14,8 @@ namespace ManagementApp
         private static extern bool SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int uFlags);
         //private static extern bool ShowWindow(IntPtr hWnd, int  nCmdShow);
         // CONSTS
-        private const int GAP = 10;
-
+        private const int GAP = 16;
+        private readonly int CLOUDPORT = 7776;
         // LOGICAL VARS
         private OperationType oType;
         private ControlPlane control;
@@ -63,7 +63,7 @@ namespace ManagementApp
         public MainWindow(DataTable table, List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
         {
             //TODO: start chmury kablowej
-            cableHandler = new CloudCableHandler(connectionList, 7778);
+            cableHandler = new CloudCableHandler(connectionList, CLOUDPORT);
             InitializeComponent();
             hidePortSetup();
             RenderTable();
@@ -87,6 +87,7 @@ namespace ManagementApp
                 }
             }
             myGraphics = containerPictureBox.CreateGraphics();
+            myGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
         }
 
         private void hidePortSetup()
@@ -580,38 +581,41 @@ namespace ManagementApp
 
         private void drawNode(Node node, Graphics panel)
         {
+            panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             Rectangle rect = new Rectangle(node.Position.X - GAP / 2, node.Position.Y - GAP / 2, GAP + 1, GAP + 1);
             if (node is NetNode)
                 panel.FillEllipse(Brushes.DodgerBlue, rect);
             else if (node is ClientNode)
                 panel.FillEllipse(Brushes.YellowGreen, rect);
             panel.DrawEllipse(Pens.Black, rect);
-            panel.DrawString(node.Name + ":" + node.LocalPort, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + 3,
+            panel.DrawString(node.Name + ":" + node.LocalPort, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + (GAP / 2),
                 node.Position.Y + 3));
         }
 
         private void drawMovingConnection(Graphics panel, NodeConnection elem, Point end)
         {
+            panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             Point from = elem.Start.Equals(nodeFrom.Position) ?
                             elem.End : elem.Start;
             panel.DrawLine(new Pen(Color.WhiteSmoke, 2), from, end);
-            panel.DrawString(elem.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((from.X + end.X) / 2 + 3,
-               (from.Y + end.Y) / 2 + 3));
+            panel.DrawString(elem.Name, new Font("Arial", GAP / 2), Brushes.Gainsboro, new Point((from.X + end.X) / 2 + 3,
+               (from.Y + end.Y) / 2 + (GAP / 2)));
         }
 
         private void drawConnection(NodeConnection conn, Graphics panel)
         {
-
+            panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             Pen blackPen = new Pen(Color.WhiteSmoke, 2);
             panel.DrawLine(blackPen, conn.Start, conn.End);
-            panel.DrawString(conn.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point((conn.Start.X + conn.End.X) / 2 + 3,
-               (conn.Start.Y + conn.End.Y) / 2 + 3));
+            panel.DrawString(conn.Name, new Font("Arial", GAP / 2), Brushes.Gainsboro, new Point((conn.Start.X + conn.End.X) / 2 + (GAP / 2),
+               (conn.Start.Y + conn.End.Y) / 2 + (GAP / 2)));
         }
 
         private void drawElement(Domain domain, Graphics panel)
         {
-                Rectangle rect = new Rectangle(domain.PointFrom, domain.Size);
-                panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
+            panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            Rectangle rect = new Rectangle(domain.PointFrom, domain.Size);
+            panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
         }
 
         private void putToGrid(ref int x, ref int y)
@@ -721,7 +725,7 @@ namespace ManagementApp
         private void containerPictureBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             Node n = getNodeFrom(e.X, e.Y);
-            SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
+            //SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
         }
     }
 }

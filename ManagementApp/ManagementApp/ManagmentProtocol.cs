@@ -8,11 +8,14 @@ namespace ManagementApp
         private static readonly int wHOIS = 0;
         private static readonly int rOUTINGTABLES = 1;
         private static readonly int pOSSIBLEDESITATIONS = 2;
-        private static readonly int cONFIRMATION = 3;
+        private static readonly int rOUTINGENTRY = 3;
+        private static readonly int cONFIRMATION = 4;
 
         private int state;
+        private int port;
         private String[] message;
         private List<FIB> routingTable;
+        private FIB routingEntry;
         private String name;
         public Dictionary<String, int> possibleDestinations;
 
@@ -97,6 +100,40 @@ namespace ManagementApp
             set
             {
                 name = value;
+            }
+        }
+
+        public int Port
+        {
+            get
+            {
+                return port;
+            }
+
+            set
+            {
+                port = value;
+            }
+        }
+
+        public FIB RoutingEntry
+        {
+            get
+            {
+                return routingEntry;
+            }
+
+            set
+            {
+                routingEntry = value;
+            }
+        }
+
+        public static int ROUTINGENTRY
+        {
+            get
+            {
+                return rOUTINGENTRY;
             }
         }
     }

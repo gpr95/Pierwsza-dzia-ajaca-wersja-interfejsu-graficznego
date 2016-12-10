@@ -44,13 +44,27 @@ namespace ManagementApp
             foreach(NodeConnection con in connections)
             {
                 String data = JSON.Serialize(JSON.FromValue(con.Prop));
-                writer.Write(data);
+                try
+                {
+                    writer.Write(data);
+                }
+                catch (SocketException e)
+                {
+                    Console.WriteLine(e.StackTrace);
+                }
             }
         }
         public void updateOneConnection()
         {
             String data = JSON.Serialize(JSON.FromValue(connections.Last().Prop));
-            writer.Write(data);
+            try
+            {
+                writer.Write(data);
+            }catch(SocketException e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+            
         }
 
         public void stopRunning()

@@ -14,6 +14,7 @@ namespace ManagementApp
         private Point end;
         private String name;
         private Node from, to;
+        private List<int> occupiedSlots = new List<int>();
         private int virtualPortFrom;
         private int virtualPortTo;
         private int localPortFrom;
@@ -134,6 +135,19 @@ namespace ManagementApp
             set
             {
                 prop = value;
+            }
+        }
+
+        public List<int> OccupiedSlots
+        {
+            get
+            {
+                return occupiedSlots;
+            }
+
+            set
+            {
+                occupiedSlots = value;
             }
         }
     }

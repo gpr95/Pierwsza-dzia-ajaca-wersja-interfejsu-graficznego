@@ -15,23 +15,21 @@ namespace ManagementApp
 {
     class ControlPlane
     {
-        MainWindow mainWindow;
-
+        private MainWindow mainWindow;
         private DataTable table;
         private readonly int MANAGMENTPORT = 7777;
         private readonly int NETNODECONNECTIONS = 4;
-        private int clientNodesNumber;
-        private int networkNodesNumber;
+        private readonly int GAP = 16;
+        private int clientNodesNumber = 0;
+        private int networkNodesNumber = 0;
         private bool run = true;
         private TcpListener listener;
-        private static ManagmentProtocol protocol = new ManagmentProtocol();
-        //private List<ClientNode> clientNodeList = new List<ClientNode>();
-        //private List<NetNode> networkNodeList = new List<NetNode>();
         private List<Node> nodeList = new List<Node>();
         private List<NodeConnection> connectionList = new List<NodeConnection>();
         private List<Domain> domainList = new List<Domain>();
+        private List<Trail> trailList = new List<Trail>();
+        private static ManagmentProtocol protocol = new ManagmentProtocol();
 
-        //TcpClient client;
 
         private class ThreadPasser
         {
@@ -41,9 +39,6 @@ namespace ManagementApp
 
         public ControlPlane()
         {
-            clientNodesNumber = 0;
-            networkNodesNumber = 0;
-
             listener = new TcpListener(IPAddress.Any, MANAGMENTPORT);
             Thread thread = new Thread(new ParameterizedThreadStart(Listen));
             thread.Start(this);
@@ -98,12 +93,9 @@ namespace ManagementApp
             TcpClient clienttmp = tp.client;
             BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
 
-            //protocol.State = protocol.WHOIS;
             ManagmentProtocol toSend = new ManagmentProtocol();
             toSend.State = ManagmentProtocol.WHOIS;
             string data = JSON.Serialize(JSON.FromValue(toSend));
-            Console.WriteLine("whois");
-            //tp.control.mainWindow.errorMessage("whois");
             writer.Write(data);
 
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
@@ -111,18 +103,20 @@ namespace ManagementApp
             JSON received_object = JSON.Deserialize(received_data);
             ManagmentProtocol received_Protocol = received_object.Value.ToObject<ManagmentProtocol>();
             String nodeName = received_Protocol.Name;
-            tp.control.allocateNode(nodeName, clienttmp, Thread.CurrentThread);
+            tp.control.allocateNode(nodeName, clienttmp, Thread.CurrentThread, writer);
         }
 
-        public void allocateNode(String nodeName, TcpClient nodePort, Thread nodeThreadHandle)
+        public void allocateNode(String nodeName, TcpClient nodePort, Thread nodeThreadHandle, BinaryWriter writer)
         {
-            Node currentNode = nodeList.Where(i => i.Name.Equals(nodeName)).FirstOrDefault();
-            currentNode.ThreadHandle = nodeThreadHandle;
-            currentNode.TcpClient = nodePort;
+            Node nodeBeingAllocated = nodeList.Where(i => i.Name.Equals(nodeName)).FirstOrDefault();
+            nodeBeingAllocated.ThreadHandle = nodeThreadHandle;
+            nodeBeingAllocated.TcpClient = nodePort;
+            nodeBeingAllocated.SocketWriter = writer;
         }
 
         private DataTable MakeTable()
         {
+            //Fix needed
             table = new DataTable("threadManagment");
             var column = new DataColumn();
             column.DataType = System.Type.GetType("System.Int32");
@@ -131,7 +125,6 @@ namespace ManagementApp
             column.Caption = "ParentItem";
             column.ReadOnly = true;
             column.Unique = false;
-            // Add the column to the table.
             table.Columns.Add(column);
 
 
@@ -166,14 +159,10 @@ namespace ManagementApp
                     mainWindow.errorMessage("There is already node in that position.");
                     return;
                 }
-            ClientNode client = new ClientNode(x, y, "CN" + clientNodesNumber, 8000 + clientNodesNumber);
-
+            ClientNode client = new ClientNode(x, y, "CN." + clientNodesNumber, 8000 + clientNodesNumber);
+            ++clientNodesNumber;
             nodeList.Add(client);
-            var row = table.NewRow();
-            row["id"] = clientNodesNumber;
-            row["Type"] = "Client";
-            row["Name"] = "CN" + clientNodesNumber++;
-            table.Rows.Add(row);
+            addNodeToTable(client);
             mainWindow.addNode(client);
         }
 
@@ -185,15 +174,22 @@ namespace ManagementApp
                     mainWindow.errorMessage("There is already node in that position.");
                     return;
                 }
-            NetNode network = new NetNode(x, y, "NN" + networkNodesNumber, 8500 + networkNodesNumber);
-            //network.LocalPort = 8500 + networkNodesNumber;
+            NetNode network = new NetNode(x, y, "NN." + networkNodesNumber, 8500 + networkNodesNumber);
+            ++networkNodesNumber;
             nodeList.Add(network);
-            var row = table.NewRow();
-            row["id"] = networkNodesNumber;
-            row["Type"] = "Network";
-            row["Name"] = "NN" + networkNodesNumber++;
-            table.Rows.Add(row);
+            addNodeToTable(network);
             mainWindow.addNode(network);
+        }
+
+        private void addNodeToTable(Node n)
+        {
+            var row = table.NewRow();
+            int nodeNumber;
+            int.TryParse(n.Name.Split('.')[1], out nodeNumber);
+            row["id"] = nodeNumber;
+            row["Type"] = n is NetNode ? "Network" : "Client";
+            row["Name"] = n is NetNode ? "NN" + nodeNumber : "CN" + nodeNumber;
+            table.Rows.Add(row);
         }
 
         public void addConnection(Node from, int portFrom, Node to, int portTo)
@@ -212,20 +208,20 @@ namespace ManagementApp
                     return;
                 }
             if (from is NetNode)
-                if (connectionList.Where(i => i.From.Equals(from) || i.To.Equals(from)).Count() == NETNODECONNECTIONS)
+                if (numberOfNodeConnections(from) == NETNODECONNECTIONS)
                 {
                     mainWindow.errorMessage("Network node have " + NETNODECONNECTIONS + " ports");
                     return;
                 }
 
             if (to is NetNode)
-                if (connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).Count() == NETNODECONNECTIONS)
+                if (numberOfNodeConnections(to) == NETNODECONNECTIONS)
                 {
                     mainWindow.errorMessage("Network node have " + NETNODECONNECTIONS + " ports");
                     return;
                 }
             if (to != null)
-                if (connectionList.Where(i => (i.From.Equals(from) && i.To.Equals(to)) || (i.From.Equals(to) && i.To.Equals(from))).Any())
+                if (isConnectionExist(from, to))
                 {
                     mainWindow.errorMessage("That connection alredy exist!");
                 }
@@ -248,16 +244,26 @@ namespace ManagementApp
                 }
         }
 
+        private int numberOfNodeConnections(Node n)
+        {
+            return connectionList.Where(i => i.From.Equals(n) || i.To.Equals(n)).Count();
+        }
+
+        private bool isConnectionExist(Node f, Node t)
+        {
+            return connectionList.Where(i => (i.From.Equals(f) && i.To.Equals(t)) || (i.From.Equals(t) && i.To.Equals(f))).Any();
+        }
+
         public void isSpaceAvailable(Node node, int x, int y, int maxW, int maxH)
         {
             foreach (Node n in nodeList)
             {
                 if (n.Position.Equals(new Point(x, y)))
                 {
-                    if (x + 10 < maxW - 1)
-                        isSpaceAvailable(node, x + 10, y, maxW, maxH);
+                    if (x + GAP < maxW - 1)
+                        isSpaceAvailable(node, x + GAP, y, maxW, maxH);
                     else
-                        isSpaceAvailable(node, x - 10, y, maxW, maxH);
+                        isSpaceAvailable(node, x - GAP, y, maxW, maxH);
                     return;
                 }
             }
@@ -270,7 +276,9 @@ namespace ManagementApp
         }
 
         public void updateDomain(Domain domain)
-        { }
+        {
+            //To be implrmented later.
+        }
 
         public void deleteNode(Node nodeToDelete)
         {
@@ -279,7 +287,7 @@ namespace ManagementApp
             nodeList.Remove(nodeToDelete);
         }
 
-        private int getNumberOfConnections(Node from, Node to)
+        private int getNumberOfConnectionsBetweenNodes(Node from, Node to)
         {
             return connectionList.Where(i => (
                         i.Start.Equals(from.Position) &&
@@ -394,6 +402,66 @@ namespace ManagementApp
             return found;
         }
 
+        public List<List<Node>> findPathsLN(Node client, bool onlyClients)
+        {
+            List<Node> path = new List<Node>();
+            List<Node> neighbors = new List<Node>();
+            List<Node> listOfWhiteNodes = new List<Node>(nodeList);
+            List<Node> listOfGrayNodes = new List<Node>();
+            List<Node> listOfBlackNodes = new List<Node>();
+            List<List<Node>> finder = new List<List<Node>>();
+
+            if (client == null)
+                return null;
+
+            listOfWhiteNodes.Remove(client);
+            listOfGrayNodes.Add(client);
+            path.Add(client);
+            finder.Add(path);
+            while (listOfGrayNodes.Any())
+            {
+                List<Node> copyOflistOfGrayNodes = new List<Node>(listOfGrayNodes);
+                foreach (Node nodeInCurrentStep in copyOflistOfGrayNodes)
+                {
+                    neighbors = findNeighborNodes(nodeInCurrentStep);
+                    foreach (List<Node> pathiInFinder in finder)
+                    {
+                        if (pathiInFinder.Last().Equals(nodeInCurrentStep))
+                            path = pathiInFinder;
+                    }
+
+                    foreach (Node nodeProcessing in neighbors)
+                    {
+                        if (listOfWhiteNodes.Where(i => i.Equals(nodeProcessing)).Any())
+                        {
+                            List<Node> newPath = new List<Node>(path);
+                            listOfGrayNodes.Add(nodeProcessing);
+                            listOfWhiteNodes.Remove(nodeProcessing);
+                            newPath.Add(nodeProcessing);
+                            finder.Add(newPath);
+                        }
+                    }
+                    listOfBlackNodes.Add(nodeInCurrentStep);
+                    listOfGrayNodes.Remove(nodeInCurrentStep);
+                }
+            }
+
+
+            if (onlyClients)
+            {
+                List<List<Node>> copyOfFinder = new List<List<Node>>(finder);
+                foreach (List<Node> nodeListPath in copyOfFinder)
+                {
+                    if (!(nodeListPath.Last() is ClientNode))
+                        finder.Remove(nodeListPath);
+                    if (nodeListPath.Count() == 1)
+                        finder.Remove(nodeListPath);
+                }
+            }
+
+            return finder;
+        }
+
         private List<Node> findNeighborNodes(Node n)
         {
             List<Node> neighborNodes = new List<Node>();
@@ -429,147 +497,97 @@ namespace ManagementApp
         {
             Dictionary<FIB, String> mailingList = new Dictionary<FIB, string>();
             Dictionary<Dictionary<String, int>, String> possibleDestinations = new Dictionary<Dictionary<string, int>, String>();
-            int portIn, portOut;
+            //int portIn, portOut;
             foreach (Node node in nodeList)
             {
                 if(node is ClientNode)
                 {
-                    List<List<String>> possiblePaths = new List<List<String>>();
-                    possiblePaths = findPaths(node, true);
+                    List<List<Node>> possiblePaths = new List<List<Node>>();
+                    possiblePaths = findPathsLN(node, true);
                     possiblePaths.Reverse();
                     possiblePaths = possiblePaths.Take(4).ToList();
-                    int in_cout = 11; //11
-                    foreach(List<String> nodeName in possiblePaths)
+                    foreach(List<Node> n in possiblePaths)
                     {
-                        for(int i = 0; i < nodeName.Count(); i++)
-                        {
-                            if (i == 0)
-                            {
-                                //Start of path
-                                Dictionary<String, int> temp = new Dictionary<String, int>();
-                                temp.Add(nodeName.Last(), in_cout);
-                                possibleDestinations.Add(temp, nodeName.First());
-                                continue;
-                            }
-                            if (i == nodeName.Count() - 1)
-                            {
-                                //End of path
-                                continue;
-                            }
-
-                            NodeConnection conIn = connectionList.Where(n =>
-                            n.From.Name.Equals(nodeName.ElementAt(i - 1)) &&
-                            n.To.Name.Equals(nodeName.ElementAt(i))
-                            ).FirstOrDefault();
-                            if(conIn == default(NodeConnection))
-                            {
-                                conIn = connectionList.Where(n =>
-                                n.To.Name.Equals(nodeName.ElementAt(i - 1)) &&
-                                n.From.Name.Equals(nodeName.ElementAt(i))
-                                ).FirstOrDefault();
-                                portIn = conIn.VirtualPortFrom;
-                            }
-                            else
-                            {
-                                portIn = conIn.VirtualPortTo;
-                            }
-
-                            NodeConnection conOut = connectionList.Where(n =>
-                            n.From.Name.Equals(nodeName.ElementAt(i)) &&
-                            n.To.Name.Equals(nodeName.ElementAt(i + 1))
-                            ).FirstOrDefault();
-                            if (conOut == default(NodeConnection))
-                            {
-                                conOut = connectionList.Where(n =>
-                                n.To.Name.Equals(nodeName.ElementAt(i)) &&
-                                n.From.Name.Equals(nodeName.ElementAt(i + 1))
-                                ).FirstOrDefault();
-                                portOut = conOut.VirtualPortTo;
-                            }
-                            else
-                            {
-                                portOut = conOut.VirtualPortFrom;
-                            }
-
-                                FIB newFib = new FIB(portIn, in_cout, portOut, in_cout);
-                                mailingList.Add(newFib, nodeName.ElementAt(i));
-                        }
-                        if (in_cout != nodeName.Count() + 9)
-                            in_cout++;
-                        else
-                            in_cout = 1;
+                        trailList.Add(new Trail(n, connectionList, false));
                     }
                 }
             }
-            mainWindow.errorMessage("Possible destinations:");
-            foreach (KeyValuePair<Dictionary<string, int>, string> dic in possibleDestinations)
-            {
-                mainWindow.errorMessage(dic.Value + ":");
-                foreach(KeyValuePair<string, int> d in dic.Key)
-                {
-                    mainWindow.errorMessage(d.Key);
-                }
-            }
-            foreach(Node node in nodeList)
-            {
-                if (node is ClientNode)
-                {
-                    BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
-                    ManagmentProtocol protocol = new ManagmentProtocol();
-                    protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
-                    protocol.possibleDestinations = new Dictionary<string, int>();
 
-                    foreach (KeyValuePair<Dictionary<string, int>, string> dic in possibleDestinations)
-                    {
-                        if (dic.Value.Equals(node.Name))
-                        {
-                            foreach(KeyValuePair<string, int> d in dic.Key)
-                            protocol.possibleDestinations.Add(d.Key, d.Value);
-                        }
-                    }
+            foreach(Trail trail in trailList)
+            {
+                BinaryWriter writer = new BinaryWriter(trail.From.TcpClient.GetStream());
+                ManagmentProtocol protocol = new ManagmentProtocol();
+                protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
+                protocol.possibleDestinations = new Dictionary<string, int>();
+              
+                protocol.possibleDestinations.Add(trail.To.Name, trail.StartingSlot);
+                protocol.Port = trail.PortFrom;
 
-                    String send_object = JSON.Serialize(JSON.FromValue(protocol));
-                    writer.Write(send_object);
-                }
-                else
+                String send_object = JSON.Serialize(JSON.FromValue(protocol));
+                writer.Write(send_object);
+
+                foreach(KeyValuePair<Node, FIB> fib in trail.ComponentFIBs)
                 {
-                    //Hotfix
                     continue;
-                    BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
-                    ManagmentProtocol protocol = new ManagmentProtocol();
-                    protocol.State = ManagmentProtocol.ROUTINGTABLES;
+                    writer = new BinaryWriter(fib.Key.TcpClient.GetStream());
+                    protocol = new ManagmentProtocol();
+                    protocol.State = ManagmentProtocol.ROUTINGENTRY;
                     Console.WriteLine("routingtable");
-                    protocol.RoutingTable = mailingList.Where(n => n.Value.Equals(node.Name)).Select(k => k.Key).ToList();
+                    protocol.RoutingEntry = fib.Value;
 
-                    String send_object = JSON.Serialize(JSON.FromValue(protocol));
+                    send_object = JSON.Serialize(JSON.FromValue(protocol));
                     writer.Write(send_object);
                 }
-
-
-            }   
-            //ManagmentProtocol received_Protocol = send_object.Value.ToObject<ManagmentProtocol>();
-                //all node to setup
-                //foreach(FIB f in mailingList.Where(n => n.Value.Equals(str)).Select(k => k.Key).ToList())
-                //{
-                //    mainWindow.errorMessage(str + ": " + f.toString());
-                //}
-                //mainWindow.errorMessage(str);
-            //foreach (String name in nodeList.Select(n => n.Name))
-            //{
-            //    List<FIB> tempList = malinigList.Where(n => n.Value.All(k => k.Equals(name))).Select(m => m.Key).ToList();
-            //    foreach(FIB f in tempList)
-            //    {
-            //        String t = "Test";
-            //        malinigList.TryGetValue(f,out t);
-            //        mainWindow.errorMessage(t + ": " + f.toString());
-            //    }
-                
-            //}
-            mainWindow.errorMessage("Fibs:");
-            foreach (System.Collections.Generic.KeyValuePair<FIB, string> oneFib in mailingList)
-            {
-                mainWindow.errorMessage(oneFib.Value + ": " + oneFib.Key.toString());
             }
+
+            foreach(Trail t in trailList)
+            {
+                mainWindow.errorMessage(t.toString());
+            }
+
+            //foreach(Node node in nodeList)
+            //{
+            //    if (node is ClientNode)
+            //    {
+            //        BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
+            //        ManagmentProtocol protocol = new ManagmentProtocol();
+            //        protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
+            //        protocol.possibleDestinations = new Dictionary<string, int>();
+
+            //        foreach (Trail trail in trailList.Where(t => t.From.Equals(node)).ToList())
+            //        {
+            //            if (trail.From.Equals(node))
+            //            {
+            //                //foreach(KeyValuePair<string, int> d in dic.Key)
+            //                protocol.possibleDestinations.Add(trail.To.Name, trail.StartingSlot);
+            //                protocol.Port = trail.PortFrom;
+            //            }
+            //        }
+            //        //if (connectionList.Where(n => n.From.Equals(node)).Any())
+            //        //    protocol.Port = connectionList.Where(n => n.From.Equals(node)).FirstOrDefault().VirtualPortFrom;
+            //        //else if (connectionList.Where(n => n.To.Equals(node)).Any())
+            //        //    protocol.Port = connectionList.Where(n => n.To.Equals(node)).FirstOrDefault().VirtualPortTo;
+
+            //        String send_object = JSON.Serialize(JSON.FromValue(protocol));
+            //        writer.Write(send_object);
+            //    }
+            //    else
+            //    {
+            //        BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
+            //        ManagmentProtocol protocol = new ManagmentProtocol();
+            //        protocol.State = ManagmentProtocol.ROUTINGTABLES;
+            //        Console.WriteLine("routingtable");
+            //        protocol.RoutingTable = mailingList.Where(n => n.Value.Equals(node.Name)).Select(k => k.Key).ToList();
+
+            //        String send_object = JSON.Serialize(JSON.FromValue(protocol));
+            //        writer.Write(send_object);
+            //    }
+            //}   
+            //mainWindow.errorMessage("Fibs:");
+            //foreach (System.Collections.Generic.KeyValuePair<FIB, string> oneFib in mailingList)
+            //{
+            //    mainWindow.errorMessage(oneFib.Value + ": " + oneFib.Key.toString());
+            //}
         }
     }
 }
