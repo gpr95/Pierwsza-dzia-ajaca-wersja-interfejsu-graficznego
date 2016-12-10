@@ -31,21 +31,9 @@ namespace NetNode
         }
         public void addToTempQueue(VirtualContainer3 container, int pos)
         {
-            int i = 0;
-            if(pos == 13)
+            if (pos != 0)
             {
-                i = 3;
-            }
-            else if(i == 12)
-            {
-                i = 2;
-            }
-            else{
-                i = 1;
-            }
-            if (i != 0)
-            {
-                this.currentFrame.vc3List[i - 1] = container;
+                this.currentFrame.vc3List.Add(pos,container);
             }
         }
         public void addToOutQueue()
