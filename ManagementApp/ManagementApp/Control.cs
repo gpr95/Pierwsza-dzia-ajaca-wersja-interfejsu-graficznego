@@ -551,7 +551,7 @@ namespace ManagementApp
               
                 protocol.possibleDestinations.Add(trail.To.Name, trail.StartingSlot);
                 protocol.Port = trail.PortFrom;
-
+                mainWindow.errorMessage(trail.From.Name + "<->" + protocol.Port);
                 String send_object = JSON.Serialize(JSON.FromValue(protocol));
                 writer.Write(send_object);
 
@@ -635,8 +635,15 @@ namespace ManagementApp
         public void addTrail(Trail trail)
         {
             trailList.Add(trail);
-            mainWindow.errorMessage("The Trail has been added!");
-            mainWindow.errorMessage(trail.toString());
+            if(trail != null)
+            {
+                mainWindow.errorMessage("The Trail has been added!");
+                mainWindow.errorMessage(trail.toString());
+            }
+            else
+            {
+                mainWindow.errorMessage("Error during trail creatbion.");
+            }
         }
     }
 }

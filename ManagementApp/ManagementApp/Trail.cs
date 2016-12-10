@@ -192,9 +192,9 @@ namespace ManagementApp
                     if (n == path.Count() - 1)
                     {
                         //End of path
-                        portFrom = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).To.Equals(path.ElementAt(n)) ?
-                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo :
-                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom;
+                        portTo = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).To.Equals(path.ElementAt(n)) ?
+                            findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).VirtualPortTo :
+                            findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).VirtualPortFrom;
                         continue;
                     }
                     NodeConnection conIn = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con);
@@ -236,8 +236,8 @@ namespace ManagementApp
                     {
                         //Start of path
                         portFrom = findConnection(path.ElementAt(0), path.ElementAt(1), con).From.Equals(path.ElementAt(0)) ?
-                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom :
-                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo;
+                           findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom :
+                           findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo;
                         StartingSlot = findFirstAutoFreeSlot(findConnection(from, path.ElementAt(n + 1), con));
                         slot = StartingSlot;
                         NodeConnection connection =
@@ -249,9 +249,9 @@ namespace ManagementApp
                     if (n == path.Count() - 1)
                     {
                         //End of path
-                        portFrom = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).To.Equals(path.ElementAt(n)) ?
-                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo :
-                            findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom;
+                        portTo = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).To.Equals(path.ElementAt(n)) ?
+                            findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).VirtualPortTo :
+                            findConnection(path.ElementAt(n - 1), path.ElementAt(n), con).VirtualPortFrom;
                         continue;
                     }
                     NodeConnection conIn = findConnection(path.ElementAt(n - 1), path.ElementAt(n), con);
