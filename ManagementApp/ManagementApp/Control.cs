@@ -497,6 +497,8 @@ namespace ManagementApp
 
         public Trail createTrail(Node from, Node to)
         {
+            if (from == null || to == null)
+                return null;
             List<List<Node>> paths = findPathsLN(from, true);
             List<Node> path;
             foreach(List<Node> tempPath in paths)
@@ -633,6 +635,8 @@ namespace ManagementApp
         public void addTrail(Trail trail)
         {
             trailList.Add(trail);
+            mainWindow.errorMessage("The Trail has been added!");
+            mainWindow.errorMessage(trail.toString());
         }
     }
 }

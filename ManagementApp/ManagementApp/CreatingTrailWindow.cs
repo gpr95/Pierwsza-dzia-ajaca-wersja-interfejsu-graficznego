@@ -98,6 +98,7 @@ namespace ManagementApp
         private void createBtn_Click(object sender, EventArgs e)
         {
             control.addTrail(control.createTrail(a, b));
+            this.Dispose();
         }
     }
 }
