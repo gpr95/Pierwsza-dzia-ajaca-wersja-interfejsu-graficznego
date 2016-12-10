@@ -14,7 +14,7 @@ namespace ManagementApp
         private static extern bool SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int uFlags);
         //private static extern bool ShowWindow(IntPtr hWnd, int  nCmdShow);
         // CONSTS
-        private const int GAP = 16;
+        private const int GAP = 10;
         private readonly int CLOUDPORT = 7776;
         // LOGICAL VARS
         private OperationType oType;
@@ -647,23 +647,23 @@ namespace ManagementApp
         private void testBtn_Click(object sender, EventArgs e)
         {
             
-            List<List<String>> paths = control.findPaths(nodeList.Where(i => i.Name.Equals("CN0")).FirstOrDefault(), true);
-            if (paths == null)
-            {
-                consoleTextBox.AppendText("No paths available.");
-                consoleTextBox.AppendText(Environment.NewLine);
-            }
-            else
-                foreach (List<String> list in paths)
-                {
-                    consoleTextBox.AppendText("Path: ");
-                    consoleTextBox.AppendText(Environment.NewLine);
-                    foreach (String str in list)
-                    {
-                        consoleTextBox.AppendText(str);
-                        consoleTextBox.AppendText(Environment.NewLine);
-                    }
-                }
+            //List<List<String>> paths = control.findPaths(nodeList.Where(i => i.Name.Equals("CN0")).FirstOrDefault(), true);
+            //if (paths == null)
+            //{
+            //    consoleTextBox.AppendText("No paths available.");
+            //    consoleTextBox.AppendText(Environment.NewLine);
+            //}
+            //else
+            //    foreach (List<String> list in paths)
+            //    {
+            //        consoleTextBox.AppendText("Path: ");
+            //        consoleTextBox.AppendText(Environment.NewLine);
+            //        foreach (String str in list)
+            //        {
+            //            consoleTextBox.AppendText(str);
+            //            consoleTextBox.AppendText(Environment.NewLine);
+            //        }
+            //    }
             control.sendOutInformation();
         }
 
@@ -726,6 +726,11 @@ namespace ManagementApp
         {
             Node n = getNodeFrom(e.X, e.Y);
             //SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            control.showTrailWindow();
         }
     }
 }

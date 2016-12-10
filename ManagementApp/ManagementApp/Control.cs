@@ -19,7 +19,7 @@ namespace ManagementApp
         private DataTable table;
         private readonly int MANAGMENTPORT = 7777;
         private readonly int NETNODECONNECTIONS = 4;
-        private readonly int GAP = 16;
+        private readonly int GAP = 10;
         private int clientNodesNumber = 0;
         private int networkNodesNumber = 0;
         private bool run = true;
@@ -50,7 +50,7 @@ namespace ManagementApp
         public void load()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Title = "Save an topology";
+            openFileDialog.Title = "Save topology";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 nodeList = null;
@@ -229,13 +229,15 @@ namespace ManagementApp
                 {
                     //List<NodeConnection> portList = connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).ToList();
                     if (connectionList.Where(i => i.From.Equals(to)).ToList().Where(i => i.VirtualPortFrom.Equals(portTo)).Any())
-                        mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.");
-                    else if (connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
-                        mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.");
+                        mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.1");
+                        //to fix
+                    //else if (connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
+                        //connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any();
+                        //mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.2");
                     else if (connectionList.Where(i => i.From.Equals(from)).ToList().Where(i => i.VirtualPortFrom.Equals(portFrom)).Any())
-                        mainWindow.errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.");
+                        mainWindow.errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.3");
                     else if (connectionList.Where(i => i.To.Equals(from)).ToList().Where(i => i.VirtualPortTo.Equals(portFrom)).Any())
-                        mainWindow.errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.");
+                        mainWindow.errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.4");
                     else
                     {
                         connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
@@ -493,8 +495,31 @@ namespace ManagementApp
             return port1 > port2 ? ++port1 : ++port2;
         }
 
+        public Trail createTrail(Node from, Node to)
+        {
+            List<List<Node>> paths = findPathsLN(from, true);
+            List<Node> path;
+            foreach(List<Node> tempPath in paths)
+            {
+                if(tempPath.Last().Equals(to))
+                {
+                    path = tempPath;
+                    return new Trail(path, connectionList, true);
+                }
+            }
+            return null;
+        }
         public void sendOutInformation()
         {
+            List<Trail> copyTrailList = new List<Trail>(trailList);
+            foreach (Trail trail in copyTrailList)
+            {
+                if (!trail.isCreadetByUser())
+                {
+                    trail.clearTrail(trail);
+                    trailList.Remove(trail);
+                }
+            }
             Dictionary<FIB, String> mailingList = new Dictionary<FIB, string>();
             Dictionary<Dictionary<String, int>, String> possibleDestinations = new Dictionary<Dictionary<string, int>, String>();
             //int portIn, portOut;
@@ -531,7 +556,7 @@ namespace ManagementApp
                 foreach(KeyValuePair<Node, FIB> fib in trail.ComponentFIBs)
                 {
                     continue;
-                    writer = new BinaryWriter(fib.Key.TcpClient.GetStream());
+                    writer = fib.Key.SocketWriter;//new BinaryWriter(fib.Key.TcpClient.GetStream());
                     protocol = new ManagmentProtocol();
                     protocol.State = ManagmentProtocol.ROUTINGENTRY;
                     Console.WriteLine("routingtable");
@@ -542,7 +567,7 @@ namespace ManagementApp
                 }
             }
 
-            List<Trail> copyTrailList = new List<Trail>(trailList);
+            copyTrailList = new List<Trail>(trailList);
 
             foreach (Trail t in copyTrailList)
             {
@@ -598,6 +623,16 @@ namespace ManagementApp
             //{
             //    mainWindow.errorMessage(oneFib.Value + ": " + oneFib.Key.toString());
             //}
+        }
+        public void showTrailWindow()
+        {
+            CreatingTrailWindow trailWindow = new CreatingTrailWindow(nodeList, connectionList, this);
+            trailWindow.TopMost = true;
+            trailWindow.ShowDialog();
+        }
+        public void addTrail(Trail trail)
+        {
+            trailList.Add(trail);
         }
     }
 }
