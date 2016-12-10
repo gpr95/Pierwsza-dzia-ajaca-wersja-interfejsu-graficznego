@@ -40,7 +40,15 @@ namespace CableCloud
 
         public void connectToWindowApplication(int port)
         {
-            TcpClient connection = new TcpClient("localhost", port);
+            TcpClient connection = null;
+            try
+            {
+                connection = new TcpClient("localhost", port);
+            }
+            catch(SocketException ex)
+            {
+                consoleWriter("ERROR: Cannot connect with window application.");
+            }
             Thread clientThread = new Thread(new ParameterizedThreadStart(windowConnectionThread));
             clientThread.Start(connection);
         }
@@ -52,11 +60,19 @@ namespace CableCloud
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             while (true)
             {
-                string received_data = reader.ReadString();
-                JMessage received_object = JMessage.Deserialize(received_data);
-                if (received_object.Type == typeof(ConnectionProperties))
+                string received_data = null;
+                try
                 {
-                    ConnectionProperties received_connection = received_object.Value.ToObject<ConnectionProperties>();
+                    received_data = reader.ReadString();
+                }
+                catch(EndOfStreamException ex)
+                {
+                    consoleWriter("ERROR: End of stream with window application.");
+                }
+                JMessage receivedMessage = JMessage.Deserialize(received_data);
+                if (receivedMessage.Type == typeof(ConnectionProperties))
+                {
+                    ConnectionProperties received_connection = receivedMessage.Value.ToObject<ConnectionProperties>();
                     if (received_connection.LocalPortTo == 0 && received_connection.VirtualPortTo == 0)
                     {
                         deleteCable(received_connection.LocalPortFrom, received_connection.VirtualPortFrom);
