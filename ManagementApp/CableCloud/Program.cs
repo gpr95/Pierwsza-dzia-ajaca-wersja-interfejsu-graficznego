@@ -11,10 +11,7 @@ namespace CableCloud
         static void Main(string[] args)
         {   
             CloudLogic logic = new CloudLogic();
-        //    logic.connectToWindowApplication(int.Parse(args[0]));
-            logic.connectToWindowApplication(7778);
-            // TESTY
-            //logic.connectToNodes(10001, 1, 10002, 1);
+            logic.connectToWindowApplication(int.Parse(args[0]));
         }
     }
 }

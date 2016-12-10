@@ -61,6 +61,15 @@ namespace NetNode
                     }
                 }
             }
+            else if (received_Protocol.State == ManagmentProtocol.ROUTINGENTRY)
+            {
+                Console.WriteLine("Signal from management: receivedroutingentry");
+                //receiving fibs
+                if (received_Protocol.RoutingEntry != null)
+                {
+                        SwitchingField.addToSwitch(received_Protocol.RoutingEntry);
+                }
+            }
             else
             {
                 Console.WriteLine("Signal from management: undefined protocol");
