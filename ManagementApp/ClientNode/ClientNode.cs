@@ -23,6 +23,7 @@ namespace ClientNode
         private int currentSlot;
         private static string path;
         private Dictionary<String, int> possibleDestinations = new Dictionary<string,int>();
+        private int virtualPort;
 
         public ClientNode(string[] args)
         {
@@ -62,31 +63,34 @@ namespace ClientNode
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             writer = new BinaryWriter(clienttmp.GetStream());
-            string received_data = reader.ReadString();
-            JMessage received_object = JMessage.Deserialize(received_data);
-            if (received_object.Type == typeof(Signal))
+            while (true)
             {
-                Signal received_signal = received_object.Value.ToObject<Signal>();
-                STM1 received_frame = received_signal.stm1;
-                if (received_frame.vc4 != null)
+                string received_data = reader.ReadString();
+                JMessage received_object = JMessage.Deserialize(received_data);
+                if (received_object.Type == typeof(Signal))
                 {
-                    Console.WriteLine("Message received: " + received_frame.vc4.C4);
-                    Log1("IN", virtualIP, received_signal.time.ToString(), "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
-                }
-
-                else
-                {
-                    foreach (int key  in received_frame.vc3List.Keys)
+                    Signal received_signal = received_object.Value.ToObject<Signal>();
+                    STM1 received_frame = received_signal.stm1;
+                    if (received_frame.vc4 != null)
                     {
-                        Console.WriteLine("Message received: " + received_frame.vc3List[key].C3);
-                        Log1("IN", virtualIP, received_signal.time.ToString(), "VC-3", received_frame.vc3List[key].POH.ToString(), received_frame.vc3List[key].C3);
+                        Console.WriteLine("Message received: " + received_frame.vc4.C4);
+                        Log1("IN", virtualIP, received_signal.time.ToString(), "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
+                    }
+
+                    else
+                    {
+                        foreach (int key in received_frame.vc3List.Keys)
+                        {
+                            Console.WriteLine("Message received: " + received_frame.vc3List[key].C3);
+                            Log1("IN", virtualIP, received_signal.time.ToString(), "VC-3", received_frame.vc3List[key].POH.ToString(), received_frame.vc3List[key].C3);
+                        }
                     }
                 }
-            }
-            else
-            {
-                Console.WriteLine("\n Received unknown data type");
-                Log2("ERR", "Received unknown data type");
+                else
+                {
+                    Console.WriteLine("\n Received unknown data type");
+                    Log2("ERR", "Received unknown data type");
+                }
             }
 
            // reader.Close();
@@ -118,6 +122,7 @@ namespace ClientNode
                         else if (management_packet.State == ManagementApp.ManagmentProtocol.POSSIBLEDESITATIONS)
                         {
                             this.possibleDestinations = management_packet.possibleDestinations;
+                            this.virtualPort = management_packet.Port;
 
                         }
 
@@ -133,7 +138,8 @@ namespace ClientNode
             {
                 Console.WriteLine("Could not connect on management interface");
                 //debug
-                Console.WriteLine(e.Message);
+                // Console.WriteLine(e.Message);
+                Log2("ERR", "Could not connect on management interface");
                 Thread.Sleep(2000);
                 Environment.Exit(1);
                 
@@ -185,7 +191,7 @@ namespace ClientNode
                             quit = true;
                             break;
                         default:
-                            Console.WriteLine("\n Wrong option");
+                            Console.WriteLine("\nWrong option");
                             break;
 
 
@@ -193,7 +199,7 @@ namespace ClientNode
                 }
                 else
                 {
-                    Console.WriteLine("Wrong format");
+                    Console.WriteLine("\nWrong format");
                     ConsoleInterface();
                 }
 
@@ -264,16 +270,14 @@ namespace ClientNode
                 {
 
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
-                    //od zarządzania znam pozycje gdzie wpisac kontener jesli chce go wyslać do klienta jakiegoś tam
-                    //po stronie klienta moja tablica ma jeden element, ale net node moze juz wywolac z 2 lub 3 na raz
                     VirtualContainer3[] vc3List = new VirtualContainer3[1];
                     vc3List[0] = vc3;
                     int[] pos = {0,0,0};
-                    // z zarzadania wstawiam w pozycje 1 w stm
+                    //slot od zarzadzania
                     pos[0] = currentSlot;
                     STM1 frame = new STM1(vc3List, pos);
                     //port ktory wiem z zarzadzania
-                    int virtualPort = 1;
+                   // int virtualPort = 1;
                     //SYGNAL
                     Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -290,7 +294,7 @@ namespace ClientNode
                     //tutaj wiem ze moge wykorzystac wieksza przepływnosc, wiec pakuje vc4 do stm i wysylam
                     STM1 frame = new STM1(vc4);
                     //port ktory wiem z zarzadzania
-                    int virtualPort = 1;
+                    //int virtualPort = 1;
                     //SYGNAL
                     Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -351,16 +355,14 @@ namespace ClientNode
                 {
 
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
-                    //od zarządzania znam pozycje gdzie wpisac kontener jesli chce go wyslać do klienta jakiegoś tam
-                    //po stronie klienta moja tablica ma jeden element, ale net node moze juz wywolac z 2 lub 3 na raz
                     VirtualContainer3[] vc3List = new VirtualContainer3[1];
                     vc3List[0] = vc3;
                     int[] pos = { 0, 0, 0 };
                     // z zarzadania wstawiam w pozycje 1 w stm
-                    pos[0] = 11;
+                    pos[0] = currentSlot;
                     frame = new STM1(vc3List, pos);
                     //port ktory wiem z zarzadzania
-                    int virtualPort = 1;
+                    //int virtualPort = 1;
                     //SYGNAL
                     signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -373,7 +375,7 @@ namespace ClientNode
                     //tutaj wiem ze moge wykorzystac wieksza przepływnosc, wiec pakuje vc4 do stm i wysylam
                     frame = new STM1(vc4);
                     //port ktory wiem z zarzadzania
-                    int virtualPort = 1;
+                    //int virtualPort = 1;
                     //SYGNAL
                     signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
