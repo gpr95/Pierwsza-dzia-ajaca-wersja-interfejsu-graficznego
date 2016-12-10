@@ -65,6 +65,9 @@ namespace ManagementApp
             }catch(SocketException e)
             {
                 Console.WriteLine(e.StackTrace);
+            }catch(IOException e)
+            {
+                Console.WriteLine(e.StackTrace);
             }
             
         }

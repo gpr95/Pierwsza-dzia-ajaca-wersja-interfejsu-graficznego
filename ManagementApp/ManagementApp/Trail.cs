@@ -143,6 +143,15 @@ namespace ManagementApp
             AUTO
         }
 
+        public bool isCreadetByUser()
+        {
+            if (priority == Priority.USER_CREATED)
+                return true;
+            else
+                return false;
+        }
+
+
         public Trail(bool createdByUser)
         {
             if (createdByUser)
@@ -177,6 +186,7 @@ namespace ManagementApp
                         slot = StartingSlot;
                         findConnection(from, path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
                         findConnection(from, path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
+                        connectionDictionary.Add(findConnection(from, path.ElementAt(n + 1), con), slot);
                         continue;
                     }
                     if (n == path.Count() - 1)
@@ -208,6 +218,7 @@ namespace ManagementApp
                     slot = slotTemp;
                     findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
                     findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
+                    connectionDictionary.Add(findConnection(path.ElementAt(n), path.ElementAt(n + 1), con), slot);
                     ComponentFIBs.Add(path.ElementAt(n), newFib);
                 }
             }
@@ -229,7 +240,10 @@ namespace ManagementApp
                             findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo;
                         StartingSlot = findFirstAutoFreeSlot(findConnection(from, path.ElementAt(n + 1), con));
                         slot = StartingSlot;
-                        findConnection(from, path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
+                        NodeConnection connection =
+                        findConnection(from, path.ElementAt(n + 1), con);
+                        connection.AutoOccupiedSlots.Add(slot);
+                        connectionDictionary.Add(connection, slot);
                         continue;
                     }
                     if (n == path.Count() - 1)
@@ -259,7 +273,10 @@ namespace ManagementApp
                     //StartingSlot = startinS;
                     FIB newFib = new FIB(portIn, slot, portOut, slotTemp);
                     slot = slotTemp;
-                    findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
+                    NodeConnection connectionTemp2 =
+                    findConnection(path.ElementAt(n), path.ElementAt(n + 1), con);
+                    connectionTemp2.AutoOccupiedSlots.Add(slot);
+                    connectionDictionary.Add(connectionTemp2, slot);
                     ComponentFIBs.Add(path.ElementAt(n), newFib);
                 } 
             }
@@ -293,7 +310,7 @@ namespace ManagementApp
                 return connection.AutoOccupiedSlots.Max() + 1;
         }
 
-        private void clearTrail(Trail trail)
+        public void clearTrail(Trail trail)
         {
             if(!componentFIBs.Any())
             {
