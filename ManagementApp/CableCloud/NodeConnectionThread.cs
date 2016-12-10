@@ -43,7 +43,16 @@ namespace CableCloud
         {
             while (true)
             {
-                string received_data = reader.ReadString();
+                string received_data = null;
+                try
+                {
+                    received_data = reader.ReadString();
+                }
+                catch(IOException ex)
+                {
+                    consoleWriter("ERROR: Connection LOST.");
+                    return;
+                }
                 if (received_data == null || received_data.Length == 0)
                     continue;
 

@@ -29,6 +29,10 @@ namespace ManagementApp
             this.name = name;
         }
 
+        public Domain(Domain d) : this(d.Width, d.Height, d.PointTo, d.PointFrom, d.Size, d.name)
+        {
+        }
+
 
         public Domain(Point from, Point to)
         {

@@ -536,6 +536,12 @@ namespace ManagementApp
             consoleTextBox.AppendText(Environment.NewLine);
         }
 
+        public void bind(NodeConnection newNodeConn)
+        {
+            connectionList.Add(newNodeConn);
+            bind();
+        }
+
         private void addDomainToElements(Domain toAdd)
         {
             bool add = true;
@@ -702,11 +708,14 @@ namespace ManagementApp
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Title = "Save an topology";
-            saveFileDialog.ShowDialog();
-            String path = saveFileDialog.InitialDirectory;
-            String fileName = saveFileDialog.FileName;
-            FileSaver configuration = new FileSaver(path + fileName);
-            configuration.WriteToBinaryFile(nodeList, connectionList, domainList);
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                String path = saveFileDialog.InitialDirectory;
+                String fileName = saveFileDialog.FileName;
+                FileSaver configuration = new FileSaver(path + fileName);
+                configuration.WriteToBinaryFile(nodeList, connectionList, domainList,control.TrailList);
+            }
         }
 
         private void readConfBtn_Click(object sender, EventArgs e)
@@ -717,9 +726,9 @@ namespace ManagementApp
 
         public void updateLists(List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
         {
-            this.nodeList = nodeList;
-            this.connectionList = connectionList;
-            this.domainList = domainList;
+            this.nodeList.AddRange(nodeList);
+            this.domainList.AddRange(domainList);
+          //  cableHandler.updateConnections(this.connectionList);
         }
 
         private void containerPictureBox_MouseDoubleClick(object sender, MouseEventArgs e)

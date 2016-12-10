@@ -37,6 +37,10 @@ namespace ManagementApp
             End = to.Position;
         }
 
+        public NodeConnection(NodeConnection nc) : this(nc.From, nc.virtualPortFrom, nc.To, nc.VirtualPortTo, nc.Name)
+        {
+        }
+
         public Point Start
         {
             get

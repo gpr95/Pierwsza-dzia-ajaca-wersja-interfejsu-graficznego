@@ -30,6 +30,7 @@ namespace ManagementApp
         private List<Trail> trailList = new List<Trail>();
         private static ManagmentProtocol protocol = new ManagmentProtocol();
 
+   
 
         private class ThreadPasser
         {
@@ -53,15 +54,46 @@ namespace ManagementApp
             openFileDialog.Title = "Save topology";
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                nodeList = null;
-                connectionList = null;
-                domainList = null;
                 String path = openFileDialog.InitialDirectory;
                 String fileName = openFileDialog.FileName;
                 FileSaver configuration = new FileSaver(path + fileName);
-                nodeList = configuration.ReadFromBinaryFileNodes();
-                connectionList = configuration.ReadFromBinaryFileNodeConnections();
-                domainList = configuration.ReadFromBinaryFileDomains();
+
+                List<Node> tmpNodeList = new List<Node>();
+                foreach(Node n in configuration.ReadFromBinaryFileNodes())
+                {
+                    if (n is ClientNode)
+                        nodeList.Add(new ClientNode((ClientNode)n));
+
+                    if (n is NetNode)
+                        nodeList.Add(new NetNode((NetNode)n));
+                    Thread.Sleep(1000);
+                }
+               
+              
+
+                List<NodeConnection> tmpNodeConnList = new List<NodeConnection>();
+                foreach(NodeConnection nc in configuration.ReadFromBinaryFileNodeConnections())
+                {
+                    mainWindow.bind(nc);
+                    Thread.Sleep(1000);
+                }
+
+                List<Domain> tmpDomainList = new List<Domain>();
+                configuration.ReadFromBinaryFileDomains().ForEach(
+                  d => {
+                      domainList.Add(new Domain(d)); Thread.Sleep(500);
+                    });
+
+                List<Trail> trailList = new List<Trail>();
+                configuration.ReadFromBinaryFileTrails().ForEach(
+                    t =>
+                    {
+                        //TODO
+                      //  trailList.Add(new Trail(t)); Thread.Sleep(500);
+                    });
+                nodeList.AddRange(tmpNodeList);
+                domainList.AddRange(tmpDomainList);
+
                 mainWindow.updateLists(nodeList, connectionList, domainList);
             }
         }
@@ -643,6 +675,19 @@ namespace ManagementApp
             else
             {
                 mainWindow.errorMessage("Error during trail creatbion.");
+            }
+        }
+
+        internal List<Trail> TrailList
+        {
+            get
+            {
+                return trailList;
+            }
+
+            set
+            {
+                trailList = value;
             }
         }
     }

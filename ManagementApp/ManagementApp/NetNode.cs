@@ -20,5 +20,9 @@ namespace ManagementApp
             this.processHandle = System.Diagnostics.Process.Start("NetNode.exe", parameters);
             this.name = name;
         }
+
+        public NetNode(NetNode nnode) : this(nnode.Position.X, nnode.Position.Y, nnode.Name, nnode.LocalPort)
+        {
+        }
     }
 }

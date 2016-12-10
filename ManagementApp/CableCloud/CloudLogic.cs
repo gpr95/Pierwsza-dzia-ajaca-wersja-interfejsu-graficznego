@@ -74,39 +74,33 @@ namespace CableCloud
                             consoleWriter("Deleted connection: real port:" + received_connection.LocalPortFrom +
                                 "virtual port:" + received_connection.VirtualPortFrom);
                         }
-                        connectToNodes(received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
-                           received_connection.LocalPortTo, received_connection.VirtualPortTo);
-                    }
+                        try
+                        {
+                            connectToNodes(received_connection.LocalPortFrom, received_connection.VirtualPortFrom,
+                               received_connection.LocalPortTo, received_connection.VirtualPortTo);
+                        }
+                        catch (SocketException ex)
+                        {
+                            consoleWriter("Connection can't be made on port " + received_connection.LocalPortFrom);
+                            return;
+                        }
+            }
                     else
                     {
                         consoleWriter(ERROR_MSG + "received from window application wrong data format.");
                     }
                 }
-                catch(EndOfStreamException ex)
-                {
-                    break;
-                }
                 catch (IOException ex)
                 {
                     break;
-                }
-                
+                }              
             }
         }
 
         public void connectToNodes(int fromPort, int virtualFromPort,
-                                    int toPort, int virtualToPort)
+                                    int toPort, int virtualToPort) 
         {
-            TcpClient connectionFrom;
-            try
-            {
-                connectionFrom = new TcpClient("localhost", fromPort);
-            }
-            catch(SocketException ex)
-            {
-                consoleWriter("Connection can't be made on port " + fromPort);
-                return;
-            }
+            TcpClient connectionFrom = new TcpClient("localhost", fromPort);
             String connection1Name = +fromPort +
                           "(virtual:" + virtualFromPort + ")-->" + toPort +
                            "(virtual:" + virtualToPort + ")";

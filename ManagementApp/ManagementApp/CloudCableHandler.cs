@@ -39,11 +39,13 @@ namespace ManagementApp
             reader = new BinaryReader(client.GetStream());
         }
 
-        public void updateConnections()
+        public void updateConnections(List<NodeConnection> connections)
         {
-            foreach(NodeConnection con in connections)
+            this.connections.AddRange(connections); 
+            for (int i = 0; i < connections.Count; i++)
             {
-                String data = JSON.Serialize(JSON.FromValue(con.Prop));
+                System.Threading.Thread.Sleep(5000);
+                String data = JSON.Serialize(JSON.FromValue(connections[i].Prop));
                 try
                 {
                     writer.Write(data);

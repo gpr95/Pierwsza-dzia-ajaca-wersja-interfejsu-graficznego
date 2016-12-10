@@ -13,6 +13,7 @@ namespace ManagementApp
         private string filePathNodes;
         private string filePathNodeConnection;
         private string filePathDomains;
+        private string filePathTrails;
 
         public FileSaver(String path)
         {
@@ -20,8 +21,9 @@ namespace ManagementApp
             this.filePathNodes = path + "_NODES.bin";
             this.filePathNodeConnection = path + "_NODE_CONNECTIONS.bin";
             this.filePathDomains = path + "_DOMAINS.bin";
+            this.filePathTrails = path + "_TRAILS";
         }
-        public void WriteToBinaryFile(List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
+        public void WriteToBinaryFile(List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList, List<Trail> trailList)
         {
             using (Stream stream = File.Open(path, FileMode.Create)) { }
             using (Stream stream = File.Open(filePathNodes, FileMode.Create))
@@ -40,6 +42,12 @@ namespace ManagementApp
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 binaryFormatter.Serialize(stream, domainList);
+            }
+
+            using (Stream stream = File.Open(filePathTrails, FileMode.Create))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, trailList);
             }
         }
 
@@ -73,6 +81,17 @@ namespace ManagementApp
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 return (List<Domain>)binaryFormatter.Deserialize(stream);
+            }
+        }
+
+        public List<Trail> ReadFromBinaryFileTrails()
+        {
+            if (!File.Exists(filePathTrails))
+                return new List<Trail>();
+            using (Stream stream = File.Open(filePathTrails, FileMode.Open))
+            {
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                return (List<Trail>)binaryFormatter.Deserialize(stream);
             }
         }
     }
