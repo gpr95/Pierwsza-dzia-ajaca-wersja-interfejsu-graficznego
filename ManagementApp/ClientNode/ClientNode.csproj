@@ -39,6 +39,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,6 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientNode.cs" />
+    <Compile Include="ClientWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ClientWindow.Designer.cs">
+      <DependentUpon>ClientWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Signal.cs" />
     <Compile Include="STM1.cs" />
     <Compile Include="JMessage.cs" />
@@ -63,6 +71,11 @@
       <Project>{5a2b0de4-65be-4605-a9cc-96342f13f000}</Project>
       <Name>ManagementApp</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ClientWindow.resx">
+      <DependentUpon>ClientWindow.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
