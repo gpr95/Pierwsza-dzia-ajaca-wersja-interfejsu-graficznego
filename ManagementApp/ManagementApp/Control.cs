@@ -557,6 +557,7 @@ namespace ManagementApp
             Dictionary<FIB, String> mailingList = new Dictionary<FIB, string>();
             Dictionary<Dictionary<String, int>, String> possibleDestinations = new Dictionary<Dictionary<string, int>, String>();
             //int portIn, portOut;
+
             foreach (Node node in nodeList)
             {
                 if(node is ClientNode)
@@ -567,8 +568,21 @@ namespace ManagementApp
                     //possiblePaths = possiblePaths.Take(4).ToList();
                     foreach(List<Node> n in possiblePaths)
                     {
-                        trailList.Add(new Trail(n, connectionList, false));
+                        //ZAKOMENTOWALEM ZEBY NIE ROBILO WSZYSTKICH MOZLIWYCH TRAILI
+                        //TYLKO BIERZE TE KTORE UTWORZYMY W CREATE TRAIL
+                        //trailList.Add(new Trail(n, connectionList, false));
                     }
+                }
+            }
+
+            Dictionary<Dictionary<string, int>, string> listDestinations = new Dictionary<Dictionary<string, int>, string>();
+            foreach (Trail trail in trailList)
+            {
+                if (trail.From != null && trail.To != null)
+                {
+                    Dictionary<string, int> temp = new Dictionary<string, int>();
+                    temp.Add(trail.To.Name, trail.StartingSlot);
+                    listDestinations.Add(temp, (trail.From.Name));
                 }
             }
 
@@ -580,8 +594,19 @@ namespace ManagementApp
                 ManagmentProtocol protocol = new ManagmentProtocol();
                 protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
                 protocol.possibleDestinations = new Dictionary<string, int>();
-              
-                protocol.possibleDestinations.Add(trail.To.Name, trail.StartingSlot);
+
+                foreach (var dest in listDestinations)
+                {
+                    if (dest.Value == trail.From.Name)
+                    {
+                        foreach (var temp in dest.Key)
+                        {
+                            protocol.possibleDestinations.Add(temp.Key, temp.Value);
+                        }
+                    }
+                }
+
+                //protocol.possibleDestinations.Add(trail.To.Name, trail.StartingSlot);
                 protocol.Port = trail.PortFrom;
                 mainWindow.errorMessage(trail.From.Name + "<->" + protocol.Port);
                 String send_object = JSON.Serialize(JSON.FromValue(protocol));
@@ -589,11 +614,11 @@ namespace ManagementApp
 
                 foreach(KeyValuePair<Node, FIB> fib in trail.ComponentFIBs)
                 {
-                    continue;
+                    //continue;
                     writer = fib.Key.SocketWriter;//new BinaryWriter(fib.Key.TcpClient.GetStream());
                     protocol = new ManagmentProtocol();
                     protocol.State = ManagmentProtocol.ROUTINGENTRY;
-                    Console.WriteLine("routingtable");
+                    Console.WriteLine("routingentry");
                     protocol.RoutingEntry = fib.Value;
 
                     send_object = JSON.Serialize(JSON.FromValue(protocol));
@@ -670,6 +695,7 @@ namespace ManagementApp
             if(trail != null)
             {
                 mainWindow.errorMessage("The Trail has been added!");
+                sendOutInformation();
                 mainWindow.errorMessage(trail.toString());
             }
             else
