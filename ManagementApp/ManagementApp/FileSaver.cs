@@ -44,11 +44,11 @@ namespace ManagementApp
                 binaryFormatter.Serialize(stream, domainList);
             }
 
-            using (Stream stream = File.Open(filePathTrails, FileMode.Create))
+     /*       using (Stream stream = File.Open(filePathTrails, FileMode.Create))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 binaryFormatter.Serialize(stream, trailList);
-            }
+            } */
         }
 
         public List<Node> ReadFromBinaryFileNodes()

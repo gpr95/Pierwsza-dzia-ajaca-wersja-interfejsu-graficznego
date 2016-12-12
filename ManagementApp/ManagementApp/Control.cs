@@ -75,6 +75,14 @@ namespace ManagementApp
                 foreach(NodeConnection nc in configuration.ReadFromBinaryFileNodeConnections())
                 {
                     mainWindow.bind(nc);
+                    foreach (Node realNode in tmpNodeList)
+                    {
+                        if (realNode.LocalPort == nc.From.LocalPort)
+                           nc.From = realNode;
+                        if (realNode.LocalPort == nc.To.LocalPort)
+                            nc.To = realNode;
+                    }
+                    tmpNodeConnList.Add(new NodeConnection(nc));
                     Thread.Sleep(1000);
                 }
 
@@ -84,16 +92,41 @@ namespace ManagementApp
                       domainList.Add(new Domain(d)); Thread.Sleep(500);
                     });
 
-                List<Trail> trailList = new List<Trail>();
+     /*           List<Trail> tmpTrailList = new List<Trail>();
                 configuration.ReadFromBinaryFileTrails().ForEach(
-                    t =>
+                    d =>
                     {
-                        //TODO
-                      //  trailList.Add(new Trail(t)); Thread.Sleep(500);
-                    });
-                nodeList.AddRange(tmpNodeList);
-                domainList.AddRange(tmpDomainList);
 
+                        List<Node> tmpComponentNodes = new List<Node>();
+                        foreach (Node realNode in tmpNodeList)
+                        {
+                            tmpComponentNodes.Add(tmpNodeList.Where(n => n.LocalPort == realNode.LocalPort).First());
+                            if (realNode.LocalPort == d.From.LocalPort)
+                                d.From = realNode;
+                            if (realNode.LocalPort == d.To.LocalPort)
+                                d.To = realNode;
+                        }
+
+                        List<NodeConnection> tmpComponentConnections = new List<NodeConnection>();
+                        foreach (NodeConnection realNodeConnection in tmpComponentConnections)
+                        {
+                            tmpComponentConnections.Add(tmpNodeConnList.Where(
+                                n => n.From.LocalPort == realNodeConnection.From.LocalPort &&
+                                 n.To.LocalPort == realNodeConnection.To.LocalPort).First());
+                        }
+
+                        d.ComponentNodes = tmpComponentNodes;
+                        tmpTrailList.Add(d);
+                    });
+                     */
+
+
+
+                nodeList.AddRange(tmpNodeList);
+                connectionList.AddRange(tmpNodeConnList);
+                domainList.AddRange(tmpDomainList);
+                // TODO ?
+        //        trailList.AddRange(tmpTrailList);
                 mainWindow.updateLists(nodeList, connectionList, domainList);
             }
         }

@@ -728,6 +728,7 @@ namespace ManagementApp
         {
             this.nodeList.AddRange(nodeList);
             this.domainList.AddRange(domainList);
+            this.connectionList.AddRange(connectionList);
           //  cableHandler.updateConnections(this.connectionList);
         }
 
