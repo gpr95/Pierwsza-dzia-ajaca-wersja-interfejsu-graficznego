@@ -13,10 +13,7 @@ namespace ManagementApp
         private int virtualPortTo;
         private int localPortFrom;
         private int localPortTo;
-        //public ConnectionProperties()
-        //{
 
-        //}
         public ConnectionProperties(int lFrom, int vFrom, int lTo, int vTo)
         {
             LocalPortFrom = lFrom;

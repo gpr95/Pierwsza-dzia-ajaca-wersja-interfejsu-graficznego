@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ManagementApp
 {
@@ -14,14 +10,17 @@ namespace ManagementApp
         public ClientNode(int x, int y, String name, int localPort)
         { 
             this.Name = name;
-            this.localPort = localPort;
-            String parameters = name + " " + this.localPort + " " + this.ManagmentPort;
-            this.processHandle = System.Diagnostics.Process.Start("ClientNode.exe", parameters);
-            Position = new Point(x, y);
+            this.LocalPort = localPort;
+            this.Position = new Point(x, y);
+
+            String parameters = name + " " + this.LocalPort + " " + this.ManagmentPort;
+            ProcessStartInfo startInfo = new ProcessStartInfo("ClientNode.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            startInfo.Arguments = parameters;
+
+            this.processHandle = Process.Start(startInfo);
         }
 
-        public ClientNode(ClientNode cnode) : this(cnode.Position.X, cnode.Position.Y, cnode.Name, cnode.LocalPort)
-        {
-        }
+        public ClientNode(ClientNode cnode) : this(cnode.Position.X, cnode.Position.Y, cnode.Name, cnode.LocalPort) { }
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ManagementApp
 {
@@ -14,15 +10,18 @@ namespace ManagementApp
     {
         public NetNode(int x , int y,String name, int localPort)
         {
-            this.localPort = localPort;
-            Position = new Point(x, y);
-            String parameters = name + " " + this.localPort + " " + this.ManagmentPort;
-            this.processHandle = System.Diagnostics.Process.Start("NetNode.exe", parameters);
-            this.name = name;
+            this.Name = name;
+            this.LocalPort = localPort;
+            this.Position = new Point(x, y);
+
+            String parameters = name + " " + this.LocalPort + " " + this.ManagmentPort;
+            ProcessStartInfo startInfo = new ProcessStartInfo("NetNode.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            startInfo.Arguments = parameters;
+
+            this.processHandle = Process.Start(startInfo);
         }
 
-        public NetNode(NetNode nnode) : this(nnode.Position.X, nnode.Position.Y, nnode.Name, nnode.LocalPort)
-        {
-        }
+        public NetNode(NetNode nnode) : this(nnode.Position.X, nnode.Position.Y, nnode.Name, nnode.LocalPort) { }
     }
 }

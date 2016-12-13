@@ -257,6 +257,27 @@ namespace ManagementApp
             table.Rows.Add(row);
         }
 
+        private bool addTrailToTable(Trail t)
+        {
+            var row = table.NewRow();
+            //int nodeNumber;
+            //int.TryParse(n.Name.Split('.')[1], out nodeNumber);
+            row["id"] = t.StartingSlot;
+            row["Type"] = "Trail";
+            row["Name"] = t.Name;
+            try
+            {
+                table.Rows.Add(row);
+            }
+            catch(ConstraintException e)
+            {
+                mainWindow.errorMessage("This trail alredy exist.");
+                return false;
+            }
+            return true;
+            
+        }
+
         public void addConnection(Node from, int portFrom, Node to, int portTo)
         {
             if (from is ClientNode)
@@ -344,7 +365,7 @@ namespace ManagementApp
 
         public void updateDomain(Domain domain)
         {
-            //To be implrmented later.
+            //To be implemented later.
         }
 
         public void deleteNode(Node nodeToDelete)
@@ -576,38 +597,23 @@ namespace ManagementApp
             }
             return null;
         }
-        public void sendOutInformation()
-        {
-            List<Trail> copyTrailList = new List<Trail>(trailList);
-            foreach (Trail trail in copyTrailList)
-            {
-                if (!trail.isCreadetByUser())
-                {
-                    trail.clearTrail(trail);
-                    trailList.Remove(trail);
-                }
-            }
-            Dictionary<FIB, String> mailingList = new Dictionary<FIB, string>();
-            Dictionary<Dictionary<String, int>, String> possibleDestinations = new Dictionary<Dictionary<string, int>, String>();
-            //int portIn, portOut;
 
-            foreach (Node node in nodeList)
+        public void sendOutInformation(bool clearAutoTrails = true)
+        {
+            if (clearAutoTrails)
             {
-                if(node is ClientNode)
+                List<Trail> copyTrailList = new List<Trail>(trailList);
+                foreach (Trail trail in copyTrailList)
                 {
-                    List<List<Node>> possiblePaths = new List<List<Node>>();
-                    possiblePaths = findPathsLN(node, true);
-                    possiblePaths.Reverse();
-                    //possiblePaths = possiblePaths.Take(4).ToList();
-                    foreach(List<Node> n in possiblePaths)
+                    if (!trail.isCreadetByUser())
                     {
-                        //ZAKOMENTOWALEM ZEBY NIE ROBILO WSZYSTKICH MOZLIWYCH TRAILI
-                        //TYLKO BIERZE TE KTORE UTWORZYMY W CREATE TRAIL
-                        //trailList.Add(new Trail(n, connectionList, false));
+                        trail.clearTrail(trail);
+                        trailList.Remove(trail);
                     }
                 }
             }
-
+            
+            Dictionary<Dictionary<String, int>, String> possibleDestinations = new Dictionary<Dictionary<string, int>, String>();
             Dictionary<Dictionary<string, int>, string> listDestinations = new Dictionary<Dictionary<string, int>, string>();
             foreach (Trail trail in trailList)
             {
@@ -619,7 +625,7 @@ namespace ManagementApp
                 }
             }
 
-            foreach(Trail trail in trailList)
+            foreach (Trail trail in trailList)
             {
                 if (trail.From == null)
                     continue;
@@ -645,7 +651,7 @@ namespace ManagementApp
                 String send_object = JSON.Serialize(JSON.FromValue(protocol));
                 writer.Write(send_object);
 
-                foreach(KeyValuePair<Node, FIB> fib in trail.ComponentFIBs)
+                foreach (KeyValuePair<Node, FIB> fib in trail.ComponentFIBs)
                 {
                     //continue;
                     writer = fib.Key.SocketWriter;//new BinaryWriter(fib.Key.TcpClient.GetStream());
@@ -656,6 +662,40 @@ namespace ManagementApp
 
                     send_object = JSON.Serialize(JSON.FromValue(protocol));
                     writer.Write(send_object);
+                }
+            }
+        }
+
+        public void createAutoTrails()
+        {
+            List<Trail> copyTrailList = new List<Trail>(trailList);
+            foreach (Trail trail in copyTrailList)
+            {
+                if (!trail.isCreadetByUser())
+                {
+                    trail.clearTrail(trail);
+                    trailList.Remove(trail);
+                }
+            }
+
+            Dictionary<FIB, String> mailingList = new Dictionary<FIB, string>();
+            Dictionary<Dictionary<String, int>, String> possibleDestinations = new Dictionary<Dictionary<string, int>, String>();
+
+
+            foreach (Node node in nodeList)
+            {
+                if(node is ClientNode)
+                {
+                    List<List<Node>> possiblePaths = new List<List<Node>>();
+                    possiblePaths = findPathsLN(node, true);
+                    possiblePaths.Reverse();
+                    //possiblePaths = possiblePaths.Take(4).ToList();
+                    foreach(List<Node> n in possiblePaths)
+                    {
+                        Trail t = new Trail(n, connectionList, false);
+                        trailList.Add(t);
+                        addTrail(t);
+                    }
                 }
             }
 
@@ -671,50 +711,6 @@ namespace ManagementApp
             {
                 mainWindow.errorMessage(t.toString());
             }
-
-            //foreach(Node node in nodeList)
-            //{
-            //    if (node is ClientNode)
-            //    {
-            //        BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
-            //        ManagmentProtocol protocol = new ManagmentProtocol();
-            //        protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
-            //        protocol.possibleDestinations = new Dictionary<string, int>();
-
-            //        foreach (Trail trail in trailList.Where(t => t.From.Equals(node)).ToList())
-            //        {
-            //            if (trail.From.Equals(node))
-            //            {
-            //                //foreach(KeyValuePair<string, int> d in dic.Key)
-            //                protocol.possibleDestinations.Add(trail.To.Name, trail.StartingSlot);
-            //                protocol.Port = trail.PortFrom;
-            //            }
-            //        }
-            //        //if (connectionList.Where(n => n.From.Equals(node)).Any())
-            //        //    protocol.Port = connectionList.Where(n => n.From.Equals(node)).FirstOrDefault().VirtualPortFrom;
-            //        //else if (connectionList.Where(n => n.To.Equals(node)).Any())
-            //        //    protocol.Port = connectionList.Where(n => n.To.Equals(node)).FirstOrDefault().VirtualPortTo;
-
-            //        String send_object = JSON.Serialize(JSON.FromValue(protocol));
-            //        writer.Write(send_object);
-            //    }
-            //    else
-            //    {
-            //        BinaryWriter writer = new BinaryWriter(node.TcpClient.GetStream());
-            //        ManagmentProtocol protocol = new ManagmentProtocol();
-            //        protocol.State = ManagmentProtocol.ROUTINGTABLES;
-            //        Console.WriteLine("routingtable");
-            //        protocol.RoutingTable = mailingList.Where(n => n.Value.Equals(node.Name)).Select(k => k.Key).ToList();
-
-            //        String send_object = JSON.Serialize(JSON.FromValue(protocol));
-            //        writer.Write(send_object);
-            //    }
-            //}   
-            //mainWindow.errorMessage("Fibs:");
-            //foreach (System.Collections.Generic.KeyValuePair<FIB, string> oneFib in mailingList)
-            //{
-            //    mainWindow.errorMessage(oneFib.Value + ": " + oneFib.Key.toString());
-            //}
         }
         public void showTrailWindow()
         {
@@ -724,11 +720,17 @@ namespace ManagementApp
         }
         public void addTrail(Trail trail)
         {
-            trailList.Add(trail);
             if(trail != null)
             {
                 mainWindow.errorMessage("The Trail has been added!");
-                sendOutInformation();
+                if (addTrailToTable(trail))
+                    sendOutInformation();
+                else
+                {
+                    trail.clearTrail(trail);
+                    return;
+                }
+                trailList.Add(trail);
                 mainWindow.errorMessage(trail.toString());
             }
             else
