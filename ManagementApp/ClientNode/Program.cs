@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ClientNode
 {
@@ -20,6 +21,12 @@ namespace ClientNode
             //virtual ip, listener in/out, port do managmentu
             //string[] parameters = new string[] { "165.23.12.32", "10002", "10001"};
             client = new ClientNode(parameters);
+            //GUI
+            //Application.EnableVisualStyles();
+            //Application.SetCompatibleTextRenderingDefault(false);
+
+            //ClientWindow window = new ClientWindow(parameters);
+            //Application.Run(window);
         }
     }
 }

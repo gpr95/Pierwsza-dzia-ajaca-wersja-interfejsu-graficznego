@@ -29,10 +29,10 @@
         private void InitializeComponent()
         {
             this.logPanel = new System.Windows.Forms.Panel();
-            this.errorLogTextBox = new System.Windows.Forms.TextBox();
-            this.errorLogLbl = new System.Windows.Forms.Label();
             this.logTextBox = new System.Windows.Forms.TextBox();
             this.logLbl = new System.Windows.Forms.Label();
+            this.receivedTextBox = new System.Windows.Forms.TextBox();
+            this.receivedLbl = new System.Windows.Forms.Label();
             this.sendingGroupBox = new System.Windows.Forms.GroupBox();
             this.stopSendingBtn = new System.Windows.Forms.Button();
             this.sendingTextBox = new System.Windows.Forms.TextBox();
@@ -48,55 +48,57 @@
             // logPanel
             // 
             this.logPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.logPanel.Controls.Add(this.errorLogTextBox);
-            this.logPanel.Controls.Add(this.errorLogLbl);
             this.logPanel.Controls.Add(this.logTextBox);
             this.logPanel.Controls.Add(this.logLbl);
+            this.logPanel.Controls.Add(this.receivedTextBox);
+            this.logPanel.Controls.Add(this.receivedLbl);
             this.logPanel.ForeColor = System.Drawing.Color.Red;
             this.logPanel.Location = new System.Drawing.Point(582, 13);
             this.logPanel.Name = "logPanel";
             this.logPanel.Size = new System.Drawing.Size(335, 219);
             this.logPanel.TabIndex = 1;
             // 
-            // errorLogTextBox
-            // 
-            this.errorLogTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.errorLogTextBox.ForeColor = System.Drawing.Color.Red;
-            this.errorLogTextBox.Location = new System.Drawing.Point(20, 154);
-            this.errorLogTextBox.Multiline = true;
-            this.errorLogTextBox.Name = "errorLogTextBox";
-            this.errorLogTextBox.Size = new System.Drawing.Size(301, 54);
-            this.errorLogTextBox.TabIndex = 3;
-            // 
-            // errorLogLbl
-            // 
-            this.errorLogLbl.AutoSize = true;
-            this.errorLogLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.errorLogLbl.Location = new System.Drawing.Point(13, 130);
-            this.errorLogLbl.Name = "errorLogLbl";
-            this.errorLogLbl.Size = new System.Drawing.Size(63, 17);
-            this.errorLogLbl.TabIndex = 2;
-            this.errorLogLbl.Text = "Error log";
-            // 
             // logTextBox
             // 
             this.logTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.logTextBox.ForeColor = System.Drawing.Color.Red;
-            this.logTextBox.Location = new System.Drawing.Point(20, 35);
+            this.logTextBox.ForeColor = System.Drawing.Color.White;
+            this.logTextBox.Location = new System.Drawing.Point(20, 124);
             this.logTextBox.Multiline = true;
             this.logTextBox.Name = "logTextBox";
-            this.logTextBox.Size = new System.Drawing.Size(301, 85);
-            this.logTextBox.TabIndex = 1;
+            this.logTextBox.Size = new System.Drawing.Size(301, 84);
+            this.logTextBox.TabIndex = 3;
             // 
             // logLbl
             // 
             this.logLbl.AutoSize = true;
             this.logLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.logLbl.Location = new System.Drawing.Point(13, 10);
+            this.logLbl.ForeColor = System.Drawing.Color.DarkOrange;
+            this.logLbl.Location = new System.Drawing.Point(13, 101);
             this.logLbl.Name = "logLbl";
             this.logLbl.Size = new System.Drawing.Size(32, 17);
-            this.logLbl.TabIndex = 0;
+            this.logLbl.TabIndex = 2;
             this.logLbl.Text = "Log";
+            // 
+            // receivedTextBox
+            // 
+            this.receivedTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.receivedTextBox.ForeColor = System.Drawing.Color.White;
+            this.receivedTextBox.Location = new System.Drawing.Point(20, 30);
+            this.receivedTextBox.Multiline = true;
+            this.receivedTextBox.Name = "receivedTextBox";
+            this.receivedTextBox.Size = new System.Drawing.Size(301, 61);
+            this.receivedTextBox.TabIndex = 1;
+            // 
+            // receivedLbl
+            // 
+            this.receivedLbl.AutoSize = true;
+            this.receivedLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
+            this.receivedLbl.ForeColor = System.Drawing.Color.DarkOrange;
+            this.receivedLbl.Location = new System.Drawing.Point(13, 10);
+            this.receivedLbl.Name = "receivedLbl";
+            this.receivedLbl.Size = new System.Drawing.Size(135, 17);
+            this.receivedLbl.TabIndex = 0;
+            this.receivedLbl.Text = "Received messages";
             // 
             // sendingGroupBox
             // 
@@ -110,7 +112,7 @@
             this.sendingGroupBox.Controls.Add(this.timeTextBox);
             this.sendingGroupBox.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.sendingGroupBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            this.sendingGroupBox.ForeColor = System.Drawing.Color.Red;
+            this.sendingGroupBox.ForeColor = System.Drawing.Color.DarkOrange;
             this.sendingGroupBox.Location = new System.Drawing.Point(17, 13);
             this.sendingGroupBox.Name = "sendingGroupBox";
             this.sendingGroupBox.Size = new System.Drawing.Size(559, 219);
@@ -122,7 +124,7 @@
             // 
             this.stopSendingBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.stopSendingBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.stopSendingBtn.Location = new System.Drawing.Point(303, 184);
+            this.stopSendingBtn.Location = new System.Drawing.Point(367, 184);
             this.stopSendingBtn.Name = "stopSendingBtn";
             this.stopSendingBtn.Size = new System.Drawing.Size(125, 24);
             this.stopSendingBtn.TabIndex = 6;
@@ -136,7 +138,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.sendingTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.sendingTextBox.ForeColor = System.Drawing.Color.Red;
+            this.sendingTextBox.ForeColor = System.Drawing.Color.White;
             this.sendingTextBox.Location = new System.Drawing.Point(16, 35);
             this.sendingTextBox.Multiline = true;
             this.sendingTextBox.Name = "sendingTextBox";
@@ -153,6 +155,7 @@
             this.sendComboBox.Name = "sendComboBox";
             this.sendComboBox.Size = new System.Drawing.Size(125, 21);
             this.sendComboBox.TabIndex = 3;
+            this.sendComboBox.SelectedIndexChanged += new System.EventHandler(this.sendComboBox_SelectedIndexChanged);
             // 
             // sendPeriodicallyBtn
             // 
@@ -171,11 +174,11 @@
             this.timeLbl.AutoSize = true;
             this.timeLbl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.timeLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.timeLbl.Location = new System.Drawing.Point(161, 187);
+            this.timeLbl.Location = new System.Drawing.Point(175, 187);
             this.timeLbl.Name = "timeLbl";
-            this.timeLbl.Size = new System.Drawing.Size(38, 17);
+            this.timeLbl.Size = new System.Drawing.Size(57, 17);
             this.timeLbl.TabIndex = 5;
-            this.timeLbl.Text = "time:";
+            this.timeLbl.Text = "time [s]:";
             // 
             // sendBtn
             // 
@@ -193,7 +196,7 @@
             // 
             this.timeTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.timeTextBox.ForeColor = System.Drawing.Color.Red;
-            this.timeTextBox.Location = new System.Drawing.Point(205, 184);
+            this.timeTextBox.Location = new System.Drawing.Point(238, 184);
             this.timeTextBox.Multiline = true;
             this.timeTextBox.Name = "timeTextBox";
             this.timeTextBox.Size = new System.Drawing.Size(92, 24);
@@ -219,10 +222,10 @@
 
         #endregion
         private System.Windows.Forms.Panel logPanel;
+        private System.Windows.Forms.Label receivedLbl;
         private System.Windows.Forms.Label logLbl;
-        private System.Windows.Forms.Label errorLogLbl;
+        private System.Windows.Forms.TextBox receivedTextBox;
         private System.Windows.Forms.TextBox logTextBox;
-        private System.Windows.Forms.TextBox errorLogTextBox;
         private System.Windows.Forms.GroupBox sendingGroupBox;
         private System.Windows.Forms.TextBox sendingTextBox;
         private System.Windows.Forms.ComboBox sendComboBox;

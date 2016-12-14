@@ -24,13 +24,9 @@ namespace ClientNode
         {
             this.vc4 = vc4;
         }
-        public STM1(VirtualContainer3[] vc3, int[] pos)
+        public STM1(Dictionary<int, VirtualContainer3> vc3List)
         {
-            for(int i=0; i<vc3.Length; i++)
-            {
-
-                this.vc3List.Add(pos[i], vc3[i]);
-            }
+            this.vc3List = vc3List;
         }
         
 
