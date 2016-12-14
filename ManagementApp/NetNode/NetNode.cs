@@ -178,6 +178,7 @@ namespace NetNode
                         }
                     }
                 }
+                Thread.Sleep(125);
             }
         }
 
