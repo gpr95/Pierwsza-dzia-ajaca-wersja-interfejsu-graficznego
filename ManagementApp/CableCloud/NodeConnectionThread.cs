@@ -85,6 +85,7 @@ namespace CableCloud
                 {
                     consoleWriter(ERROR_MSG + "received from node wrong data format. Node PORT: "+ ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
                 }
+                Thread.Sleep(150);
             }
         }
 

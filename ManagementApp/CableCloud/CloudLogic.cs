@@ -84,7 +84,7 @@ namespace CableCloud
                             consoleWriter("Connection can't be made on port " + received_connection.LocalPortFrom);
                             return;
                         }
-            }
+                    }
                     else
                     {
                         consoleWriter(ERROR_MSG + "received from window application wrong data format.");
@@ -93,7 +93,8 @@ namespace CableCloud
                 catch (IOException ex)
                 {
                     break;
-                }              
+                }
+                Thread.Sleep(150);            
             }
         }
 
@@ -104,7 +105,7 @@ namespace CableCloud
             String connection1Name = +fromPort +
                           "(virtual:" + virtualFromPort + ")-->" + toPort +
                            "(virtual:" + virtualToPort + ")";
-            consoleWriter("Initialize connection: " + connection1Name);
+        //    consoleWriter("Initialize connection: " + connection1Name);
             NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, 
                 ref portToThreadMap, tableWithPorts, connection1Name);
 
@@ -123,7 +124,7 @@ namespace CableCloud
             String connection2Name = toPort +
                           "(virtual:" + virtualToPort + ")-->" + fromPort +
                            "(virtual:" + virtualFromPort + ")";
-            consoleWriter("Initialize connection: " + connection2Name);
+       //     consoleWriter("Initialize connection: " + connection2Name);
             NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
                 ref portToThreadMap, tableWithPorts, connection2Name);
 
