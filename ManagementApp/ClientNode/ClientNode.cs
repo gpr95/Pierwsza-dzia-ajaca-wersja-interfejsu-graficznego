@@ -35,8 +35,7 @@ namespace ClientNode
            
             string fileName = virtualIP + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
             // path = @"D:\TSSTRepo\ManagementApp\ClientNode\logs\"+fileName+".txt";
-            path = Path.Combine(Environment.CurrentDirectory, @"logs\", fileName + ".txt");
-            System.IO.Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, @"logs\"));
+            path = System.IO.Directory.GetCurrentDirectory() + @"\logs\" + fileName + ".txt";
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
@@ -270,21 +269,14 @@ namespace ClientNode
                 {
 
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
-                    VirtualContainer3[] vc3List = new VirtualContainer3[1];
-                    vc3List[0] = vc3;
-                    int[] pos = {0,0,0};
-                    //slot od zarzadzania
-                    pos[0] = currentSlot;
-                    STM1 frame = new STM1(vc3List, pos);
-                    //port ktory wiem z zarzadzania
-                   // int virtualPort = 1;
+                    Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
+                    vc3List.Add(currentSlot, vc3);
+                    STM1 frame = new STM1(vc3List);
                     //SYGNAL
                     Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
-
-
                     writer.Write(data);
-                    Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
+                    Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", frame.vc3List[currentSlot].POH.ToString(), frame.vc3List[currentSlot].C3);
                     //       output.Close();
 
                 }
@@ -355,12 +347,9 @@ namespace ClientNode
                 {
 
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
-                    VirtualContainer3[] vc3List = new VirtualContainer3[1];
-                    vc3List[0] = vc3;
-                    int[] pos = { 0, 0, 0 };
-                    // z zarzadania wstawiam w pozycje 1 w stm
-                    pos[0] = currentSlot;
-                    frame = new STM1(vc3List, pos);
+                    Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
+                    vc3List.Add(currentSlot, vc3);
+                    frame = new STM1(vc3List);
                     //port ktory wiem z zarzadzania
                     //int virtualPort = 1;
                     //SYGNAL
@@ -390,7 +379,7 @@ namespace ClientNode
                         
                         writer.Write(data);
                         if (isVc3)
-                            Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", frame.vc3List[0].POH.ToString(), frame.vc3List[0].C3);
+                            Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", frame.vc3List[currentSlot].POH.ToString(), frame.vc3List[currentSlot].C3);
                         else
                             Log1("OUT", virtualIP, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                         await Task.Delay(TimeSpan.FromSeconds(period));
