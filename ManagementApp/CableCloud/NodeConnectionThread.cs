@@ -15,6 +15,9 @@ namespace CableCloud
     class NodeConnectionThread
     {
         private const string ERROR_MSG = "ERROR: ";
+        private const ConsoleColor ERROR_COLOR = ConsoleColor.DarkRed;
+        private const ConsoleColor ADMIN_COLOR = ConsoleColor.DarkGreen;
+        private const ConsoleColor INFO_COLOR = ConsoleColor.DarkBlue;
 
         private Thread thread;
         private TcpClient connection;
@@ -50,7 +53,7 @@ namespace CableCloud
                 }
                 catch(IOException ex)
                 {
-                    consoleWriter("ERROR: Connection LOST.");
+                    consoleWriter("ERROR: Connection LOST: " + name,ERROR_COLOR);
                     return;
                 }
                 if (received_data == null || received_data.Length == 0)
@@ -74,16 +77,16 @@ namespace CableCloud
                         {
                             toPort = (int)dr["toPort"];
                             virtualToPort = (int)dr["virtualToPort"];
-                            consoleWriter("Connection: " + name + " received data.");
+                            consoleWriter("Connection: " + name + " received data.",INFO_COLOR);
                         }
                     }
                     signal.port = virtualToPort;
-                    consoleWriter("Connection: " + name + " sending data.");
+                    consoleWriter("Connection: " + name + " sending data.",INFO_COLOR);
                     portToThreadMap[toPort + ":" + virtualToPort].sendSignal(signal, toPort);
                 }
                 else
                 {
-                    consoleWriter(ERROR_MSG + "received from node wrong data format. Node PORT: "+ ((IPEndPoint)connection.Client.RemoteEndPoint).Port);
+                    consoleWriter(ERROR_MSG + "received from node wrong data format. Node PORT: "+ ((IPEndPoint)connection.Client.RemoteEndPoint).Port,ERROR_COLOR);
                 }
                 Thread.Sleep(150);
             }
@@ -95,10 +98,11 @@ namespace CableCloud
             writer.Write(data);
         }
 
-        private void consoleWriter(String msg)
+        private void consoleWriter(String msg, ConsoleColor cc)
         {
+            Console.ForegroundColor = cc;
             Console.WriteLine();
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + DateTime.Now.ToLongDateString() + "#:" + msg);
+            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
         }
 
     }

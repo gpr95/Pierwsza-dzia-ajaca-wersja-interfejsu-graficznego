@@ -16,7 +16,9 @@ namespace CableCloud
     class CloudLogic
     {
         private const string ERROR_MSG = "ERROR: ";
-
+        private const ConsoleColor ERROR_COLOR = ConsoleColor.DarkRed;
+        private const ConsoleColor ADMIN_COLOR = ConsoleColor.DarkGreen;
+        private const ConsoleColor INFO_COLOR = ConsoleColor.DarkBlue;
 
         /** TABLE WITH CONNECTION */
         private DataTable tableWithPorts;
@@ -35,7 +37,7 @@ namespace CableCloud
             tableWithPorts.Columns.Add("virtualToPort", typeof(int)).AllowDBNull = false;
 
             /** LOGS CONSOLE  */
-            consoleWriter("Cloud start");
+            consoleWriter("Cloud start", ADMIN_COLOR);
         }
 
         public void connectToWindowApplication(int port)
@@ -47,7 +49,7 @@ namespace CableCloud
             }
             catch(SocketException ex)
             {
-                consoleWriter("ERROR: Cannot connect with window application.");
+                consoleWriter("ERROR: Cannot connect with window application.",ERROR_COLOR);
             }
             Thread clientThread = new Thread(new ParameterizedThreadStart(windowConnectionThread));
             clientThread.Start(connection);
@@ -55,7 +57,7 @@ namespace CableCloud
 
         private void windowConnectionThread(Object connection)
         {
-            consoleWriter("Connected with window application");
+            consoleWriter("Connected with window application",ADMIN_COLOR);
             TcpClient clienttmp = (TcpClient)connection;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             while (true)
@@ -72,7 +74,7 @@ namespace CableCloud
                         {
                             deleteCable(received_connection.LocalPortFrom, received_connection.VirtualPortFrom);
                             consoleWriter("Deleted connection: real port:" + received_connection.LocalPortFrom +
-                                "virtual port:" + received_connection.VirtualPortFrom);
+                                "virtual port:" + received_connection.VirtualPortFrom,INFO_COLOR);
                         }
                         try
                         {
@@ -81,13 +83,13 @@ namespace CableCloud
                         }
                         catch (SocketException ex)
                         {
-                            consoleWriter("Connection can't be made on port " + received_connection.LocalPortFrom);
+                            consoleWriter("Connection can't be made on port " + received_connection.LocalPortFrom,ERROR_COLOR);
                             return;
                         }
                     }
                     else
                     {
-                        consoleWriter(ERROR_MSG + "received from window application wrong data format.");
+                        consoleWriter(ERROR_MSG + "received from window application wrong data format.",ERROR_COLOR);
                     }
                 }
                 catch (IOException ex)
@@ -105,7 +107,7 @@ namespace CableCloud
             String connection1Name = +fromPort +
                           "(virtual:" + virtualFromPort + ")-->" + toPort +
                            "(virtual:" + virtualToPort + ")";
-        //    consoleWriter("Initialize connection: " + connection1Name);
+            consoleWriter("Initialize connection: " + connection1Name,INFO_COLOR);
             NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, 
                 ref portToThreadMap, tableWithPorts, connection1Name);
 
@@ -118,13 +120,13 @@ namespace CableCloud
             }
             catch (SocketException ex)
             {
-                consoleWriter("Connection can't be made on port " + toPort);
+                consoleWriter("Connection can't be made on port " + toPort,ERROR_COLOR);
                 return;
             }
             String connection2Name = toPort +
                           "(virtual:" + virtualToPort + ")-->" + fromPort +
                            "(virtual:" + virtualFromPort + ")";
-       //     consoleWriter("Initialize connection: " + connection2Name);
+            consoleWriter("Initialize connection: " + connection2Name,INFO_COLOR);
             NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
                 ref portToThreadMap, tableWithPorts, connection2Name);
 
@@ -141,9 +143,9 @@ namespace CableCloud
             tableWithPorts.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
             tableWithPorts.Rows.Add(toPort, virtualToPort, fromPort, virtualFromPort);
             consoleWriter("Made connection: from-" + fromPort + "(" + virtualFromPort + ")" + " to-" +
-                              toPort + "(" + virtualToPort + ")");
+                              toPort + "(" + virtualToPort + ")",ADMIN_COLOR);
             consoleWriter("Made connection: from-" + toPort + "(" + virtualToPort + ")" + " to-" +
-                              fromPort + "(" + virtualFromPort + ")");
+                              fromPort + "(" + virtualFromPort + ")",ADMIN_COLOR);
         }
 
         private void deleteCable(int fromPort, int virtualFromPort)
@@ -158,8 +160,9 @@ namespace CableCloud
                 }
             }
         }
-        private void consoleWriter(String msg)
+        private void consoleWriter(String msg, ConsoleColor cc)
         {
+            Console.ForegroundColor = cc;
             Console.WriteLine();
             Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
         }
