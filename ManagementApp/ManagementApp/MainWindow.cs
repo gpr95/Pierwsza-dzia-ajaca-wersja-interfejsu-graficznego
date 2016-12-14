@@ -724,12 +724,11 @@ namespace ManagementApp
             containerPictureBox.Refresh();
         }
 
-        public void updateLists(List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
+        public void updateLists(List<Node> nodeList, List<Domain> domainList)
         {
+            this.nodeList = new List<Node>();
             this.nodeList.AddRange(nodeList);
             this.domainList.AddRange(domainList);
-            this.connectionList.AddRange(connectionList);
-          //  cableHandler.updateConnections(this.connectionList);
         }
 
         private void containerPictureBox_MouseDoubleClick(object sender, MouseEventArgs e)

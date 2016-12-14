@@ -58,7 +58,7 @@ namespace ManagementApp
                 String fileName = openFileDialog.FileName;
                 FileSaver configuration = new FileSaver(path + fileName);
 
-                List<Node> tmpNodeList = new List<Node>();
+
                 foreach(Node n in configuration.ReadFromBinaryFileNodes())
                 {
                     if (n is ClientNode)
@@ -69,19 +69,18 @@ namespace ManagementApp
                     Thread.Sleep(1000);
                 }
                
-              
-
                 List<NodeConnection> tmpNodeConnList = new List<NodeConnection>();
                 foreach(NodeConnection nc in configuration.ReadFromBinaryFileNodeConnections())
                 {
-                    mainWindow.bind(nc);
-                    foreach (Node realNode in tmpNodeList)
+                    
+                    foreach (Node realNode in nodeList)
                     {
                         if (realNode.LocalPort == nc.From.LocalPort)
                            nc.From = realNode;
                         if (realNode.LocalPort == nc.To.LocalPort)
                             nc.To = realNode;
                     }
+                    mainWindow.bind(nc);
                     tmpNodeConnList.Add(new NodeConnection(nc));
                     Thread.Sleep(1000);
                 }
@@ -89,45 +88,16 @@ namespace ManagementApp
                 List<Domain> tmpDomainList = new List<Domain>();
                 configuration.ReadFromBinaryFileDomains().ForEach(
                   d => {
-                      domainList.Add(new Domain(d)); Thread.Sleep(500);
+                      tmpDomainList.Add(new Domain(d)); Thread.Sleep(500);
                     });
 
-     /*           List<Trail> tmpTrailList = new List<Trail>();
-                configuration.ReadFromBinaryFileTrails().ForEach(
-                    d =>
-                    {
+                connectionList = new List<NodeConnection>();
+                domainList = new List<Domain>();
 
-                        List<Node> tmpComponentNodes = new List<Node>();
-                        foreach (Node realNode in tmpNodeList)
-                        {
-                            tmpComponentNodes.Add(tmpNodeList.Where(n => n.LocalPort == realNode.LocalPort).First());
-                            if (realNode.LocalPort == d.From.LocalPort)
-                                d.From = realNode;
-                            if (realNode.LocalPort == d.To.LocalPort)
-                                d.To = realNode;
-                        }
-
-                        List<NodeConnection> tmpComponentConnections = new List<NodeConnection>();
-                        foreach (NodeConnection realNodeConnection in tmpComponentConnections)
-                        {
-                            tmpComponentConnections.Add(tmpNodeConnList.Where(
-                                n => n.From.LocalPort == realNodeConnection.From.LocalPort &&
-                                 n.To.LocalPort == realNodeConnection.To.LocalPort).First());
-                        }
-
-                        d.ComponentNodes = tmpComponentNodes;
-                        tmpTrailList.Add(d);
-                    });
-                     */
-
-
-
-                nodeList.AddRange(tmpNodeList);
                 connectionList.AddRange(tmpNodeConnList);
                 domainList.AddRange(tmpDomainList);
-                // TODO ?
-        //        trailList.AddRange(tmpTrailList);
-                mainWindow.updateLists(nodeList, connectionList, domainList);
+
+                mainWindow.updateLists(nodeList, domainList);
             }
         }
         private void Listen(Object controlP)
