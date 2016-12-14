@@ -14,7 +14,9 @@ namespace ManagementApp
         private Point end;
         private String name;
         private Node from, to;
+        [NonSerialized]
         private List<int> occupiedSlots = new List<int>();
+        [NonSerialized]
         private List<int> autoOccupiedSlots = new List<int>();
         private int virtualPortFrom;
         private int virtualPortTo;
