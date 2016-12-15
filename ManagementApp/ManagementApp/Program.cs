@@ -13,7 +13,7 @@ namespace ManagementApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            new ControlPlane();
+            new ManagementPlane();
         }
     }
 }

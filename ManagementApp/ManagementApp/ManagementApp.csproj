@@ -54,7 +54,7 @@
     <Compile Include="ClientNode.cs" />
     <Compile Include="CloudCableHandler.cs" />
     <Compile Include="ConnectionProperties.cs" />
-    <Compile Include="Control.cs" />
+    <Compile Include="Management.cs" />
     <Compile Include="CreatingTrailWindow.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -12,14 +12,14 @@ namespace ManagementApp
 {
     partial class CreatingTrailWindow : Form
     {
-        ControlPlane control;
+        ManagementPlane management;
         List<Node> nodeList;
         List<NodeConnection> connectionList;
         DataTable table;
         Node a, b;
-        public CreatingTrailWindow(List<Node> nodeList, List<NodeConnection> connectionList, ControlPlane c)
+        public CreatingTrailWindow(List<Node> nodeList, List<NodeConnection> connectionList, ManagementPlane c)
         {
-            this.control = c;
+            this.management = c;
             this.nodeList = nodeList;
             this.connectionList = connectionList;
             MakeTable();
@@ -73,7 +73,7 @@ namespace ManagementApp
                 b = nodeList.Where(n => n.Name.Equals(stopComboBox.Text)).FirstOrDefault();
                 if (a == default(Node) || b == default(Node))
                     return;
-                Trail t = control.createTrail(a, b);
+                Trail t = management.createTrail(a, b);
                 foreach(var con in t.ConnectionDictionary)
                 {
                     var row = table.NewRow();
@@ -97,7 +97,7 @@ namespace ManagementApp
 
         private void createBtn_Click(object sender, EventArgs e)
         {
-            control.addTrail(control.createTrail(a, b));
+            management.addTrail(management.createTrail(a, b));
             this.Dispose();
         }
     }
