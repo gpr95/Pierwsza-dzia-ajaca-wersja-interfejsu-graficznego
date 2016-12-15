@@ -52,19 +52,28 @@ namespace NetNode
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             writer = new BinaryWriter(clienttmp.GetStream());
-            while (true)
+            try
             {
-                string received_data = reader.ReadString();
-                JMessage received_object = JMessage.Deserialize(received_data);
-                if (received_object.Type == typeof(Signal))
+                while (true)
                 {
-                    Signal received_signal = received_object.Value.ToObject<Signal>();
-                    STM1 frame = received_signal.stm1;
-                    int virtPort = received_signal.port;
-                    consoleWriter("received signal time: " + received_signal.time + " on port: " + virtPort);
-                    toVirtualPort(virtPort, frame);
+                    string received_data = reader.ReadString();
+                    JMessage received_object = JMessage.Deserialize(received_data);
+                    if (received_object.Type == typeof(Signal))
+                    {
+                        Signal received_signal = received_object.Value.ToObject<Signal>();
+                        STM1 frame = received_signal.stm1;
+                        int virtPort = received_signal.port;
+                        consoleWriter("received signal time: " + received_signal.time + " on port: " + virtPort);
+                        toVirtualPort(virtPort, frame);
 
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("\nError sending signal: " + e.Message);
+                Thread.Sleep(2000);
+                Environment.Exit(1);
             }
         }
 
@@ -168,13 +177,19 @@ namespace NetNode
                         STM1 frame = oport.output.Dequeue();
                         if (frame.vc4 != null || frame.vc3List.Count > 0)
                         {
-                            Signal signal = new Signal(getTime(), oport.port, frame);
-                            consoleWriter("sending signal port: " + signal.port);
-                            //TcpClient client = new TcpClient();
-                            //client.Connect(IPAddress.Parse("127.0.0.1"), this.physicalPort);
-                            //BinaryWriter writeOutput = new BinaryWriter(client.GetStream());
-                            string data = JMessage.Serialize(JMessage.FromValue(signal));
-                            writer.Write(data);
+                            try
+                            {
+                                Signal signal = new Signal(getTime(), oport.port, frame);
+                                consoleWriter("sending signal port: " + signal.port);
+                                string data = JMessage.Serialize(JMessage.FromValue(signal));
+                                writer.Write(data);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("\nError sending signal: " + e.Message);
+                                Thread.Sleep(2000);
+                                Environment.Exit(1);
+                            }
                         }
                     }
                 }
@@ -211,7 +226,6 @@ namespace NetNode
 
         static void Main(string[] args)
         {
-            //string[] parameters = new string[] { "NN0", "7777", "7776" };
             string[] parameters = new string[] { args[0], args[1], args[2] };
 
             NetNode netnode = new NetNode(parameters);

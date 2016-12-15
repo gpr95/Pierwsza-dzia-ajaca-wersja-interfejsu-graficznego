@@ -741,5 +741,10 @@ namespace ManagementApp
         {
             control.showTrailWindow();
         }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            control.clearAllTrails();
+        }
     }
 }

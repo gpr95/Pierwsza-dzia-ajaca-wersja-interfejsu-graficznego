@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.startLbl = new System.Windows.Forms.Label();
             this.stopLbl = new System.Windows.Forms.Label();
             this.trailCreationGroupBox = new System.Windows.Forms.GroupBox();
@@ -108,6 +108,7 @@
             // 
             this.stopComboBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.stopComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.stopComboBox.ForeColor = System.Drawing.Color.Gainsboro;
             this.stopComboBox.FormattingEnabled = true;
             this.stopComboBox.Location = new System.Drawing.Point(80, 66);
             this.stopComboBox.Name = "stopComboBox";
@@ -118,6 +119,7 @@
             // 
             this.startComboBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.startComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.startComboBox.ForeColor = System.Drawing.Color.Gainsboro;
             this.startComboBox.FormattingEnabled = true;
             this.startComboBox.Location = new System.Drawing.Point(80, 33);
             this.startComboBox.Name = "startComboBox";
@@ -129,14 +131,14 @@
             this.connectionsDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.connectionsDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.connectionsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.connectionsDataGridView.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.connectionsDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this.connectionsDataGridView.Location = new System.Drawing.Point(13, 205);
             this.connectionsDataGridView.Name = "connectionsDataGridView";
             this.connectionsDataGridView.RowHeadersVisible = false;

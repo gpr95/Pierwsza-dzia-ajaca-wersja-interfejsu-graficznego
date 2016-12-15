@@ -37,15 +37,17 @@ namespace ClientNode
 
             string fileName = virtualIP + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
             // path = @"D:\TSSTRepo\ManagementApp\ClientNode\logs\"+fileName+".txt";
-            path = Path.Combine(Environment.CurrentDirectory, @"logs\", fileName + ".txt");
-            System.IO.Directory.CreateDirectory(Path.Combine(Environment.CurrentDirectory, @"logs\"));
+            path = System.IO.Directory.GetCurrentDirectory() + @"\logs\" + fileName + ".txt";
+            Log2("", "START LOG");
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
-            Console.WriteLine(managementPort);
+           // Console.WriteLine(managementPort);
             Thread managementThreadad = new Thread(new ParameterizedThreadStart(initManagmentConnection));
             managementThreadad.Start(managementPort);
             InitializeComponent();
+            this.Text=virtualIP;
+
         }
 
         private void Listen()
@@ -84,12 +86,12 @@ namespace ClientNode
 
                     else
                     {
-                        foreach (int key in received_frame.vc3List.Keys)
+                        foreach (KeyValuePair<int, VirtualContainer3> v in received_frame.vc3List)
                         {
                             
-                            receivedTextBox.AppendText(received_frame.vc3List[key].C3);
+                            receivedTextBox.AppendText(v.Value.C3);
                             receivedTextBox.AppendText(Environment.NewLine);
-                            Log1("IN", virtualIP, received_signal.time.ToString(), "VC-3", received_frame.vc3List[key].POH.ToString(), received_frame.vc3List[key].C3);
+                            Log1("IN", virtualIP, received_signal.time.ToString(), "VC-3", v.Value.POH.ToString(), v.Value.C3);
                         }
                     }
                 }
@@ -131,6 +133,7 @@ namespace ClientNode
                             this.virtualPort = management_packet.Port;
                             logTextBox.AppendText("Virtual Port: " + virtualPort);
                             List<string> destinations = new List<string>(this.possibleDestinations.Keys);
+                            sendComboBox.Items.Clear();
                             for (int i = 0; i < destinations.Count; i++)
                             {
                                 sendComboBox.Items.Add(destinations[i]);
@@ -173,7 +176,10 @@ namespace ClientNode
                     Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writer.Write(data);
-                    Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", frame.vc3List[currentSlot].POH.ToString(), frame.vc3List[currentSlot].C3);
+                    foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc3List)
+                    {
+                        Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                    }
                 }
                 else
                 {
@@ -253,7 +259,10 @@ namespace ClientNode
 
                         writer.Write(data);
                         if (isVc3)
-                            Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", frame.vc3List[currentSlot].POH.ToString(), frame.vc3List[currentSlot].C3);
+                            foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc3List)
+                            {
+                                Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                            }
                         else
                             Log1("OUT", virtualIP, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                         await Task.Delay(TimeSpan.FromSeconds(period));

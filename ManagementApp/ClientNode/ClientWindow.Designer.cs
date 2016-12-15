@@ -149,7 +149,7 @@
             // 
             this.sendComboBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.sendComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.sendComboBox.ForeColor = System.Drawing.Color.Red;
+            this.sendComboBox.ForeColor = System.Drawing.Color.White;
             this.sendComboBox.FormattingEnabled = true;
             this.sendComboBox.Location = new System.Drawing.Point(18, 124);
             this.sendComboBox.Name = "sendComboBox";
