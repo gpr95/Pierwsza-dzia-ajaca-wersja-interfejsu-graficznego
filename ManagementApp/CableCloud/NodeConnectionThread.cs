@@ -15,9 +15,9 @@ namespace CableCloud
     class NodeConnectionThread
     {
         private const string ERROR_MSG = "ERROR: ";
-        private const ConsoleColor ERROR_COLOR = ConsoleColor.DarkRed;
-        private const ConsoleColor ADMIN_COLOR = ConsoleColor.DarkGreen;
-        private const ConsoleColor INFO_COLOR = ConsoleColor.DarkBlue;
+        private const ConsoleColor ERROR_COLOR = ConsoleColor.Red;
+        private const ConsoleColor ADMIN_COLOR = ConsoleColor.Green;
+        private const ConsoleColor INFO_COLOR = ConsoleColor.Blue;
 
         private Thread thread;
         private TcpClient connection;
@@ -115,7 +115,14 @@ namespace CableCloud
         public void sendSignal(Signal toSend, int port)
         {
             String data = JSON.Serialize(JSON.FromValue(toSend));
-            writer.Write(data);
+            try
+            {
+                writer.Write(data);
+            }
+            catch(IOException ex)
+            {
+                consoleWriter(ERROR_MSG + "Trying to send data failed", ERROR_COLOR);
+            }
         }
         private void addNewCable(int fromPort, int virtualFromPort, int toPort, int virtualToPort)
         {

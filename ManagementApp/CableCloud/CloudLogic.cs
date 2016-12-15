@@ -16,9 +16,9 @@ namespace CableCloud
     class CloudLogic
     {
         private const string ERROR_MSG = "ERROR: ";
-        private const ConsoleColor ERROR_COLOR = ConsoleColor.DarkRed;
-        private const ConsoleColor ADMIN_COLOR = ConsoleColor.DarkGreen;
-        private const ConsoleColor INFO_COLOR = ConsoleColor.DarkBlue;
+        private const ConsoleColor ERROR_COLOR = ConsoleColor.Red;
+        private const ConsoleColor ADMIN_COLOR = ConsoleColor.Green;
+        private const ConsoleColor INFO_COLOR = ConsoleColor.Blue;
 
         /** TABLE WITH CONNECTION */
         private DataTable tableWithPorts;
