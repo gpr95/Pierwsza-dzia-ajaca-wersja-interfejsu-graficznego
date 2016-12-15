@@ -20,7 +20,6 @@ namespace ManagementApp
 
         public static JSON Deserialize(string data)
         {
-            Console.WriteLine(data);
             return JToken.Parse(data).ToObject<JSON>();
         }
     }

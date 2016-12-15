@@ -18,7 +18,7 @@ namespace ManagementApp
         private readonly int CLOUDPORT = 7776;
         // LOGICAL VARS
         private OperationType oType;
-        private ControlPlane control;
+        private ManagementPlane management;
         private DataTable table;
         private List<Node> nodeList;
         private List<NodeConnection> connectionList;
@@ -36,16 +36,16 @@ namespace ManagementApp
         private Point domainFrom;
         private Graphics myGraphics;
 
-        internal ControlPlane Control
+        internal ManagementPlane Management
         {
             get
             {
-                return control;
+                return management;
             }
 
             set
             {
-                control = value;
+                management = value;
             }
         }
 
@@ -156,10 +156,10 @@ namespace ManagementApp
             switch (oType)
             {
                 case OperationType.ADD_CLIENT_NODE:
-                    control.addClientNode(x, y);
+                    management.addClientNode(x, y);
                     break;
                 case OperationType.ADD_NETWORK_NODE:
-                    control.addNetworkNode(x, y);
+                    management.addNetworkNode(x, y);
                     break;
                 case OperationType.DELETE:
                     deleteListBox.Visible = false;
@@ -170,7 +170,7 @@ namespace ManagementApp
                     Node n = getNodeFrom(x, y);
                     if (n == null)
                         break;
-                    List<String> atPosition = control.findElemAtPosition(x, y);
+                    List<String> atPosition = management.findElemAtPosition(x, y);
 
                     foreach (String toDelete in atPosition)
                         deleteListBox.Items.Add(toDelete);
@@ -186,7 +186,7 @@ namespace ManagementApp
                     }
                     else if (atPosition.Count == 1)
                     {
-                        control.deleteNode(n);
+                        management.deleteNode(n);
                     }
                     break;
 
@@ -238,7 +238,7 @@ namespace ManagementApp
                     if (checkBox1.Checked)
                     {
                         //if(portF > 4)
-                        control.addConnection(nodeFrom, control.getPort(nodeFrom), virtualNodeTo, control.getPort(virtualNodeTo));
+                        management.addConnection(nodeFrom, management.getPort(nodeFrom), virtualNodeTo, management.getPort(virtualNodeTo));
                         hidePortSetup();
                         containerPictureBox.Refresh();
                     }
@@ -298,12 +298,12 @@ namespace ManagementApp
                     }
 
                     Point oldPosition = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
-                    control.isSpaceAvailable(nodeFrom, x, y, containerPictureBox.Size.Height, containerPictureBox.Size.Width);
+                    management.isSpaceAvailable(nodeFrom, x, y, containerPictureBox.Size.Height, containerPictureBox.Size.Width);
                     foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
-                            control.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo);
+                            management.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo);
                         else if (elem.End.Equals(oldPosition))
-                            control.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom);
+                            management.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom);
 
                     consoleTextBox.AppendText("Node moved from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
                         x + "," + y);
@@ -434,16 +434,16 @@ namespace ManagementApp
                     foreach (NodeConnection con in connectionsToDelete)
                     {
                         cableHandler.deleteConnection(con);
-                        control.removeConnection(con);
+                        management.removeConnection(con);
                     }
                         
 
-                    control.deleteNode(nodeList.ElementAt(idxOfElement));
+                    management.deleteNode(nodeList.ElementAt(idxOfElement));
                 }
                 else
                 {
                     cableHandler.deleteConnection(connectionList.ElementAt(idxOfElement));
-                    control.removeConnection(connectionList.ElementAt(idxOfElement));
+                    management.removeConnection(connectionList.ElementAt(idxOfElement));
                 }
                     
 
@@ -678,7 +678,7 @@ namespace ManagementApp
             //            consoleTextBox.AppendText(Environment.NewLine);
             //        }
             //    }
-            control.sendOutInformation();
+            management.sendOutInformation();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -701,14 +701,14 @@ namespace ManagementApp
                 consoleTextBox.AppendText(Environment.NewLine);
                 return;
             }
-            control.addConnection(aNode, portF, bNode, portT);
+            management.addConnection(aNode, portF, bNode, portT);
             hidePortSetup();
             containerPictureBox.Refresh();
         }
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            control.stopRunning();
+            management.stopRunning();
             cableHandler.stopRunning();
         }
 
@@ -722,13 +722,13 @@ namespace ManagementApp
                 String path = saveFileDialog.InitialDirectory;
                 String fileName = saveFileDialog.FileName;
                 FileSaver configuration = new FileSaver(path + fileName);
-                configuration.WriteToBinaryFile(nodeList, connectionList, domainList,control.TrailList);
+                configuration.WriteToBinaryFile(nodeList, connectionList, domainList,management.TrailList);
             }
         }
 
         private void readConfBtn_Click(object sender, EventArgs e)
         {
-            control.load();
+            management.load();
             containerPictureBox.Refresh();
         }
 
@@ -743,16 +743,17 @@ namespace ManagementApp
         {
             Node n = getNodeFrom(e.X, e.Y);
             //SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
+            
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            control.showTrailWindow();
+            management.showTrailWindow();
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            control.clearAllTrails();
+            management.clearAllTrails();
         }
     }
 }
