@@ -131,7 +131,7 @@ namespace ClientNode
                         {
                             this.possibleDestinations = management_packet.possibleDestinations;
                             this.virtualPort = management_packet.Port;
-                            logTextBox.AppendText("Virtual Port: " + virtualPort);
+                            //logTextBox.AppendText("Virtual Port: " + virtualPort);
                             List<string> destinations = new List<string>(this.possibleDestinations.Keys);
                             sendComboBox.Items.Clear();
                             for (int i = 0; i < destinations.Count; i++)
@@ -154,7 +154,7 @@ namespace ClientNode
                 logTextBox.AppendText(Environment.NewLine);
                 //debug
                 // Console.WriteLine(e.Message);
-                Log2("ERR", "Could not connect on management interface");
+                Log2("ERR", "Could not connect on management interface" + e.Message);
                 Thread.Sleep(4000);
                 Environment.Exit(1);
 
@@ -341,14 +341,14 @@ namespace ClientNode
 
         private void stopSendingBtn_Click(object sender, EventArgs e)
         {
-
+            cyclic_sending = false;
         }
 
         private void sendComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             currentSlot = possibleDestinations[sendComboBox.SelectedItem.ToString()];
             logTextBox.AppendText("Current slot: " + currentSlot);
-            receivedTextBox.AppendText(Environment.NewLine);
+            logTextBox.AppendText(Environment.NewLine);
 
             if (currentSlot == 1)
             {
