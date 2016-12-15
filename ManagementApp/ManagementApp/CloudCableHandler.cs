@@ -71,7 +71,34 @@ namespace ManagementApp
             {
                 Console.WriteLine(e.StackTrace);
             }
+            Console.WriteLine("Conn send" + DateTime.Now.ToLongTimeString());
+        }
 
+        public void deleteConnection(NodeConnection con)
+        {
+            ConnectionProperties conProp = con.Prop;
+            int tempVPortTo = conProp.VirtualPortTo;
+            int tempLPortTo = conProp.LocalPortTo;
+            conProp.VirtualPortTo = 0;
+            conProp.LocalPortTo = 0;
+            String data = JSON.Serialize(JSON.FromValue(conProp));
+            try
+            {
+                writerCableCloud.Write(data);
+                conProp = con.Prop;
+                conProp.VirtualPortFrom = tempVPortTo;
+                conProp.LocalPortFrom = tempLPortTo;
+                data = JSON.Serialize(JSON.FromValue(conProp));
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+            Console.WriteLine("Conn send" + DateTime.Now.ToLongTimeString());
         }
 
         public void stopRunning()

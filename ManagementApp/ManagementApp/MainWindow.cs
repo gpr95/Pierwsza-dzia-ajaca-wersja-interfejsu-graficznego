@@ -432,12 +432,20 @@ namespace ManagementApp
                         ).ToList();
 
                     foreach (NodeConnection con in connectionsToDelete)
+                    {
+                        cableHandler.deleteConnection(con);
                         control.removeConnection(con);
+                    }
+                        
 
                     control.deleteNode(nodeList.ElementAt(idxOfElement));
                 }
                 else
+                {
+                    cableHandler.deleteConnection(connectionList.ElementAt(idxOfElement));
                     control.removeConnection(connectionList.ElementAt(idxOfElement));
+                }
+                    
 
             }
             deleteListBox.Visible = false;
