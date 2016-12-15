@@ -25,18 +25,24 @@ namespace CableCloud
         private Dictionary<String, NodeConnectionThread> portToThreadMap;
         private BinaryWriter writer;
         private BinaryReader reader;
-        private String name;
+        private int fromPort;
+        private int virtualFromPort;
+        private int toPort;
+        private int virtualToPort;
+
+        private String name; 
 
         public NodeConnectionThread(ref TcpClient connection,
-            ref Dictionary<String, NodeConnectionThread> portToThreadMap, DataTable table, String name)
+            ref Dictionary<String, NodeConnectionThread> portToThreadMap, DataTable table, String name, int fromPort, int virtualFromPort, int toPort, int virtualToPort)
         {
             this.connection = connection;
             this.portToThreadMap = portToThreadMap;
             this.table = table;
             this.name = name;
-
-            writer = new BinaryWriter(connection.GetStream());
-            reader = new BinaryReader(connection.GetStream());
+            this.fromPort = fromPort;
+            this.virtualFromPort = virtualFromPort;
+            this.toPort = toPort;
+            this.virtualToPort = virtualToPort;
 
             thread = new Thread(nodeConnectionThread);
             thread.Start();
@@ -44,6 +50,13 @@ namespace CableCloud
 
         private void nodeConnectionThread()
         {
+            consoleWriter("Initialize connection: " + name, INFO_COLOR);
+            writer = new BinaryWriter(connection.GetStream());
+            reader = new BinaryReader(connection.GetStream());
+
+            /** Add new cable to table */
+            addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
+            portToThreadMap.Add(fromPort + ":" + virtualFromPort, this);
             while (true)
             {
                 string received_data = null;
@@ -97,7 +110,12 @@ namespace CableCloud
             String data = JSON.Serialize(JSON.FromValue(toSend));
             writer.Write(data);
         }
-
+        private void addNewCable(int fromPort, int virtualFromPort, int toPort, int virtualToPort)
+        {
+            table.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
+            consoleWriter("Made connection: from-" + fromPort + "(" + virtualFromPort + ")" + " to-" +
+                              toPort + "(" + virtualToPort + ")", ADMIN_COLOR);
+        }
         private void consoleWriter(String msg, ConsoleColor cc)
         {
             Console.ForegroundColor = cc;

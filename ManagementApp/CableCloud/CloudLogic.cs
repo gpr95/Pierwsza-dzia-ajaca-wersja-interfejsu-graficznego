@@ -75,6 +75,7 @@ namespace CableCloud
                             deleteCable(received_connection.LocalPortFrom, received_connection.VirtualPortFrom);
                             consoleWriter("Deleted connection: real port:" + received_connection.LocalPortFrom +
                                 "virtual port:" + received_connection.VirtualPortFrom,INFO_COLOR);
+                            continue;
                         }
                         try
                         {
@@ -95,25 +96,32 @@ namespace CableCloud
                 catch (IOException ex)
                 {
                     break;
-                }
-                Thread.Sleep(150);            
+                }          
             }
         }
 
         public void connectToNodes(int fromPort, int virtualFromPort,
                                     int toPort, int virtualToPort) 
         {
-            TcpClient connectionFrom = new TcpClient("localhost", fromPort);
+            TcpClient connectionFrom = null;
+            try
+            {
+                connectionFrom = new TcpClient("localhost", fromPort);
+            }
+            catch (SocketException ex)
+            {
+                consoleWriter("Connection can't be made on port " + toPort, ERROR_COLOR);
+                return;
+            }
             String connection1Name = +fromPort +
                           "(virtual:" + virtualFromPort + ")-->" + toPort +
                            "(virtual:" + virtualToPort + ")";
-            consoleWriter("Initialize connection: " + connection1Name,INFO_COLOR);
             NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, 
-                ref portToThreadMap, tableWithPorts, connection1Name);
+                ref portToThreadMap, tableWithPorts, connection1Name, fromPort, virtualFromPort,
+               toPort, virtualToPort);
 
-            portToThreadMap.Add(fromPort + ":" + virtualFromPort, fromThread);
 
-            TcpClient connectionTo = new TcpClient("localhost", toPort);
+            TcpClient connectionTo = null;
             try
             {
                 connectionTo = new TcpClient("localhost", toPort);
@@ -126,27 +134,10 @@ namespace CableCloud
             String connection2Name = toPort +
                           "(virtual:" + virtualToPort + ")-->" + fromPort +
                            "(virtual:" + virtualFromPort + ")";
-            consoleWriter("Initialize connection: " + connection2Name,INFO_COLOR);
             NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
-                ref portToThreadMap, tableWithPorts, connection2Name);
-
-            portToThreadMap.Add(toPort + ":" + virtualToPort, toThread);
-
-            /** Add new cable to table */
-            addNewCable(fromPort, virtualFromPort,
-               toPort, virtualToPort);
+                ref portToThreadMap, tableWithPorts, connection2Name, toPort, virtualToPort, fromPort, virtualFromPort);
         }
 
-        
-        private void  addNewCable(int fromPort, int virtualFromPort, int toPort, int virtualToPort)
-        {
-            tableWithPorts.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
-            tableWithPorts.Rows.Add(toPort, virtualToPort, fromPort, virtualFromPort);
-            consoleWriter("Made connection: from-" + fromPort + "(" + virtualFromPort + ")" + " to-" +
-                              toPort + "(" + virtualToPort + ")",ADMIN_COLOR);
-            consoleWriter("Made connection: from-" + toPort + "(" + virtualToPort + ")" + " to-" +
-                              fromPort + "(" + virtualFromPort + ")",ADMIN_COLOR);
-        }
 
         private void deleteCable(int fromPort, int virtualFromPort)
         {
@@ -163,8 +154,9 @@ namespace CableCloud
         private void consoleWriter(String msg, ConsoleColor cc)
         {
             Console.ForegroundColor = cc;
-            Console.WriteLine();
+            
             Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+            Console.Write(Environment.NewLine);
         }
     }
 }
