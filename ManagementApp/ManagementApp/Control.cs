@@ -692,16 +692,19 @@ namespace ManagementApp
         {
             if(trail != null)
             {
-                mainWindow.errorMessage("The Trail has been added!");
                 if (addTrailToTable(trail))
+                {
+                    mainWindow.errorMessage("The Trail has been added!");
+                    trailList.Add(trail);
+                    mainWindow.errorMessage(trail.toString());
                     sendOutInformation();
+                }
                 else
                 {
                     trail.clearTrail(trail);
                     return;
                 }
-                trailList.Add(trail);
-                mainWindow.errorMessage(trail.toString());
+                
             }
             else
             {
