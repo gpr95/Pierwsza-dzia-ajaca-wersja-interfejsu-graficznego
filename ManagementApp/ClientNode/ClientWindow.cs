@@ -265,7 +265,7 @@ namespace ClientNode
                             }
                         else
                             Log1("OUT", virtualIP, signal.time.ToString(), "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
-                        await Task.Delay(TimeSpan.FromSeconds(period));
+                        await Task.Delay(TimeSpan.FromMilliseconds(period));
                     }
                     catch (Exception e)
                     {
@@ -359,7 +359,5 @@ namespace ClientNode
                 currentSpeed = 3;
             }
         }
-
-      
     }
 }

@@ -95,7 +95,14 @@ namespace CableCloud
                     }
                     signal.port = virtualToPort;
                     consoleWriter("Connection: " + name + " sending data.",INFO_COLOR);
-                    portToThreadMap[toPort + ":" + virtualToPort].sendSignal(signal, toPort);
+                    try
+                    {
+                        portToThreadMap[toPort + ":" + virtualToPort].sendSignal(signal, toPort);
+                    }
+                    catch(KeyNotFoundException ex)
+                    {
+                        consoleWriter("There is no such a connection! Signal sended nowhere.", ERROR_COLOR);
+                    }
                 }
                 else
                 {

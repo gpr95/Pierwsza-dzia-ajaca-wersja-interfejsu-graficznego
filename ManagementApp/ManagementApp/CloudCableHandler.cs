@@ -89,6 +89,7 @@ namespace ManagementApp
                 conProp.VirtualPortFrom = tempVPortTo;
                 conProp.LocalPortFrom = tempLPortTo;
                 data = JSON.Serialize(JSON.FromValue(conProp));
+                writerCableCloud.Write(data);
             }
             catch (SocketException e)
             {

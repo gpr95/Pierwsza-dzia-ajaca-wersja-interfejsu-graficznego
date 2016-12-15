@@ -61,10 +61,12 @@
             // logTextBox
             // 
             this.logTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.logTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.logTextBox.ForeColor = System.Drawing.Color.White;
             this.logTextBox.Location = new System.Drawing.Point(20, 124);
             this.logTextBox.Multiline = true;
             this.logTextBox.Name = "logTextBox";
+            this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.logTextBox.Size = new System.Drawing.Size(301, 84);
             this.logTextBox.TabIndex = 3;
             // 
@@ -82,10 +84,12 @@
             // receivedTextBox
             // 
             this.receivedTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.receivedTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.receivedTextBox.ForeColor = System.Drawing.Color.White;
             this.receivedTextBox.Location = new System.Drawing.Point(20, 30);
             this.receivedTextBox.Multiline = true;
             this.receivedTextBox.Name = "receivedTextBox";
+            this.receivedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.receivedTextBox.Size = new System.Drawing.Size(301, 61);
             this.receivedTextBox.TabIndex = 1;
             // 
@@ -102,7 +106,7 @@
             // 
             // sendingGroupBox
             // 
-            this.sendingGroupBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.sendingGroupBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.sendingGroupBox.Controls.Add(this.stopSendingBtn);
             this.sendingGroupBox.Controls.Add(this.sendingTextBox);
             this.sendingGroupBox.Controls.Add(this.sendComboBox);
@@ -138,6 +142,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.sendingTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.sendingTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.sendingTextBox.ForeColor = System.Drawing.Color.White;
             this.sendingTextBox.Location = new System.Drawing.Point(16, 35);
             this.sendingTextBox.Multiline = true;
@@ -174,11 +179,11 @@
             this.timeLbl.AutoSize = true;
             this.timeLbl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.timeLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.timeLbl.Location = new System.Drawing.Point(175, 187);
+            this.timeLbl.Location = new System.Drawing.Point(170, 187);
             this.timeLbl.Name = "timeLbl";
-            this.timeLbl.Size = new System.Drawing.Size(57, 17);
+            this.timeLbl.Size = new System.Drawing.Size(68, 17);
             this.timeLbl.TabIndex = 5;
-            this.timeLbl.Text = "time [s]:";
+            this.timeLbl.Text = "time [ms]:";
             // 
             // sendBtn
             // 
@@ -194,13 +199,17 @@
             // 
             // timeTextBox
             // 
+            this.timeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.timeTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.timeTextBox.ForeColor = System.Drawing.Color.Red;
-            this.timeTextBox.Location = new System.Drawing.Point(238, 184);
-            this.timeTextBox.Multiline = true;
+            this.timeTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.timeTextBox.ForeColor = System.Drawing.Color.White;
+            this.timeTextBox.Location = new System.Drawing.Point(238, 187);
             this.timeTextBox.Name = "timeTextBox";
-            this.timeTextBox.Size = new System.Drawing.Size(92, 24);
+            this.timeTextBox.Size = new System.Drawing.Size(92, 20);
             this.timeTextBox.TabIndex = 4;
+            this.timeTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // ClientWindow
             // 
