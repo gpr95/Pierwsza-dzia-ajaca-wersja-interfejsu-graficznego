@@ -47,7 +47,7 @@
             // 
             // logPanel
             // 
-            this.logPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.logPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.logPanel.Controls.Add(this.logTextBox);
             this.logPanel.Controls.Add(this.logLbl);
             this.logPanel.Controls.Add(this.receivedTextBox);
@@ -177,9 +177,9 @@
             // timeLbl
             // 
             this.timeLbl.AutoSize = true;
-            this.timeLbl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.timeLbl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.timeLbl.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.25F);
-            this.timeLbl.Location = new System.Drawing.Point(170, 187);
+            this.timeLbl.Location = new System.Drawing.Point(170, 188);
             this.timeLbl.Name = "timeLbl";
             this.timeLbl.Size = new System.Drawing.Size(68, 17);
             this.timeLbl.TabIndex = 5;
