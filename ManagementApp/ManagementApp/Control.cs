@@ -721,5 +721,15 @@ namespace ManagementApp
                 trailList = value;
             }
         }
+
+        internal void clearAllTrails()
+        {
+            foreach(Trail t in trailList)
+            {
+                t.clearTrail(t);
+                table.Rows.Remove(table.Rows.Find(t.Name));
+            }
+            trailList = new List<Trail>();
+        }
     }
 }
