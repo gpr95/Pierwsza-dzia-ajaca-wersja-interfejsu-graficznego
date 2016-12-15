@@ -73,7 +73,7 @@ namespace ManagementApp
                 b = nodeList.Where(n => n.Name.Equals(stopComboBox.Text)).FirstOrDefault();
                 if (a == default(Node) || b == default(Node))
                     return;
-                Trail t = management.createTrail(a, b);
+                Trail t = management.createTrail(a, b, checkBox1.Checked);
                 foreach(var con in t.ConnectionDictionary)
                 {
                     var row = table.NewRow();
@@ -97,7 +97,7 @@ namespace ManagementApp
 
         private void createBtn_Click(object sender, EventArgs e)
         {
-            management.addTrail(management.createTrail(a, b));
+            management.addTrail(management.createTrail(a, b, checkBox1.Checked));
             this.Dispose();
         }
     }

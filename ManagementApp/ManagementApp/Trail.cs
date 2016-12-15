@@ -47,7 +47,8 @@ namespace ManagementApp
 
         public Trail(List<Node> path,
             List<NodeConnection> con,
-            bool createdByUser)
+            bool createdByUser,
+            bool vc4 = false)
         {
             if (path == null)
                 return;
@@ -70,7 +71,7 @@ namespace ManagementApp
                         portFrom = findConnection(path.ElementAt(0), path.ElementAt(1), con).From.Equals(path.ElementAt(0)) ?
                             findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortFrom :
                             findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo;
-                        StartingSlot = findFirstFreeSlot(findConnection(from, path.ElementAt(n + 1), con));
+                        StartingSlot = findFirstFreeSlot(findConnection(from, path.ElementAt(n + 1), con), vc4);
                         slot = StartingSlot;
                         findConnection(from, path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
                         findConnection(from, path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
@@ -89,7 +90,7 @@ namespace ManagementApp
                     NodeConnection conOut = findConnection(path.ElementAt(n), path.ElementAt(n + 1), con);
                     portIn = conIn.To.Equals(path.ElementAt(n)) ? conIn.VirtualPortTo : conIn.VirtualPortFrom;
                     portOut = conOut.From.Equals(path.ElementAt(n)) ? conOut.VirtualPortFrom : conOut.VirtualPortTo;
-                    int slotTemp = findFirstFreeSlot(conOut);
+                    int slotTemp = findFirstFreeSlot(conOut, vc4);
                     if (slotTemp == -1)
                     {
                         clearTrail(this);
@@ -179,17 +180,28 @@ namespace ManagementApp
                 return con.Where(n => n.From.Equals(end) && n.To.Equals(start)).FirstOrDefault();
         }
 
-        private int findFirstFreeSlot(NodeConnection connection)
+        private int findFirstFreeSlot(NodeConnection connection, bool vc4 = false)
         {
-            if (!connection.OccupiedSlots.Any())
-                return 11;
-            else if (connection.OccupiedSlots.Max() >= 13)
-                if (connection.OccupiedSlots.Min() != 1)
+            if (vc4)
+            {
+                if (!connection.OccupiedSlots.Any())
                     return 1;
                 else
-                    return -1;
+                    if (connection.OccupiedSlots.Min() != 1)
+                        return 1;
+                    else
+                        return -1;
+            }
             else
-                return connection.OccupiedSlots.Max() + 1;
+            {
+                if (!connection.OccupiedSlots.Any())
+                    return 11;
+                else if (connection.OccupiedSlots.Max() >= 13)
+                        return -1;
+                else
+                    return connection.OccupiedSlots.Max() + 1;
+            }
+
         }
 
         private int findFirstAutoFreeSlot(NodeConnection connection)

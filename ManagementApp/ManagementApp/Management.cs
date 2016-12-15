@@ -18,7 +18,7 @@ namespace ManagementApp
         private MainWindow mainWindow;
         private DataTable table;
         private readonly int MANAGMENTPORT = 7777;
-        private readonly int NETNODECONNECTIONS = 4;
+        private readonly int NETNODECONNECTIONS = 21;
         private readonly int GAP = 10;
         private int clientNodesNumber = 0;
         private int networkNodesNumber = 0;
@@ -551,7 +551,7 @@ namespace ManagementApp
             return port1 > port2 ? ++port1 : ++port2;
         }
 
-        public Trail createTrail(Node from, Node to)
+        public Trail createTrail(Node from, Node to, bool vc4 = false)
         {
             if (from == null || to == null)
                 return null;
@@ -562,7 +562,7 @@ namespace ManagementApp
                 if(tempPath.Last().Equals(to))
                 {
                     path = tempPath;
-                    return new Trail(path, connectionList, true);
+                    return new Trail(path, connectionList, true, vc4);
                 }
             }
             return null;
@@ -732,6 +732,17 @@ namespace ManagementApp
                 table.Rows.Remove(table.Rows.Find(t.Name));
             }
             trailList = new List<Trail>();
+        }
+
+        public List<Trail> getTrailForNode(Node n)
+        {
+            List<Trail> tList = new List<Trail>();
+            foreach(Trail t in trailList)
+            {
+                if (t.From.Equals(n))
+                    tList.Add(t);
+            }
+            return tList;
         }
     }
 }

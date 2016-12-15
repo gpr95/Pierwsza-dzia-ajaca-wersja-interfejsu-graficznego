@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.startLbl = new System.Windows.Forms.Label();
             this.stopLbl = new System.Windows.Forms.Label();
             this.trailCreationGroupBox = new System.Windows.Forms.GroupBox();
@@ -37,6 +37,7 @@
             this.stopComboBox = new System.Windows.Forms.ComboBox();
             this.startComboBox = new System.Windows.Forms.ComboBox();
             this.connectionsDataGridView = new System.Windows.Forms.DataGridView();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.trailCreationGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.connectionsDataGridView)).BeginInit();
             this.SuspendLayout();
@@ -65,6 +66,7 @@
             // 
             // trailCreationGroupBox
             // 
+            this.trailCreationGroupBox.Controls.Add(this.checkBox1);
             this.trailCreationGroupBox.Controls.Add(this.createBtn);
             this.trailCreationGroupBox.Controls.Add(this.calculateBtn);
             this.trailCreationGroupBox.Controls.Add(this.stopComboBox);
@@ -77,7 +79,7 @@
             this.trailCreationGroupBox.Margin = new System.Windows.Forms.Padding(4);
             this.trailCreationGroupBox.Name = "trailCreationGroupBox";
             this.trailCreationGroupBox.Padding = new System.Windows.Forms.Padding(4);
-            this.trailCreationGroupBox.Size = new System.Drawing.Size(209, 182);
+            this.trailCreationGroupBox.Size = new System.Drawing.Size(209, 201);
             this.trailCreationGroupBox.TabIndex = 2;
             this.trailCreationGroupBox.TabStop = false;
             this.trailCreationGroupBox.Text = "TRAIL CREATION";
@@ -85,9 +87,9 @@
             // createBtn
             // 
             this.createBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.createBtn.Location = new System.Drawing.Point(20, 139);
+            this.createBtn.Location = new System.Drawing.Point(7, 159);
             this.createBtn.Name = "createBtn";
-            this.createBtn.Size = new System.Drawing.Size(180, 29);
+            this.createBtn.Size = new System.Drawing.Size(195, 29);
             this.createBtn.TabIndex = 5;
             this.createBtn.Text = "CREATE";
             this.createBtn.UseVisualStyleBackColor = true;
@@ -96,9 +98,9 @@
             // calculateBtn
             // 
             this.calculateBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.calculateBtn.Location = new System.Drawing.Point(20, 104);
+            this.calculateBtn.Location = new System.Drawing.Point(7, 124);
             this.calculateBtn.Name = "calculateBtn";
-            this.calculateBtn.Size = new System.Drawing.Size(180, 29);
+            this.calculateBtn.Size = new System.Drawing.Size(195, 29);
             this.calculateBtn.TabIndex = 4;
             this.calculateBtn.Text = "CALCULATE";
             this.calculateBtn.UseVisualStyleBackColor = true;
@@ -112,7 +114,7 @@
             this.stopComboBox.FormattingEnabled = true;
             this.stopComboBox.Location = new System.Drawing.Point(80, 66);
             this.stopComboBox.Name = "stopComboBox";
-            this.stopComboBox.Size = new System.Drawing.Size(121, 24);
+            this.stopComboBox.Size = new System.Drawing.Size(122, 24);
             this.stopComboBox.TabIndex = 3;
             // 
             // startComboBox
@@ -123,7 +125,7 @@
             this.startComboBox.FormattingEnabled = true;
             this.startComboBox.Location = new System.Drawing.Point(80, 33);
             this.startComboBox.Name = "startComboBox";
-            this.startComboBox.Size = new System.Drawing.Size(121, 24);
+            this.startComboBox.Size = new System.Drawing.Size(122, 24);
             this.startComboBox.TabIndex = 2;
             // 
             // connectionsDataGridView
@@ -131,19 +133,30 @@
             this.connectionsDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.connectionsDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.connectionsDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.connectionsDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
-            this.connectionsDataGridView.Location = new System.Drawing.Point(13, 205);
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.connectionsDataGridView.DefaultCellStyle = dataGridViewCellStyle1;
+            this.connectionsDataGridView.Location = new System.Drawing.Point(13, 224);
             this.connectionsDataGridView.Name = "connectionsDataGridView";
             this.connectionsDataGridView.RowHeadersVisible = false;
-            this.connectionsDataGridView.Size = new System.Drawing.Size(209, 190);
+            this.connectionsDataGridView.Size = new System.Drawing.Size(209, 185);
             this.connectionsDataGridView.TabIndex = 3;
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(144, 96);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.checkBox1.Size = new System.Drawing.Size(58, 21);
+            this.checkBox1.TabIndex = 6;
+            this.checkBox1.Text = "VC-4";
+            this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // CreatingTrailWindow
             // 
@@ -174,5 +187,6 @@
         private System.Windows.Forms.ComboBox stopComboBox;
         private System.Windows.Forms.ComboBox startComboBox;
         private System.Windows.Forms.DataGridView connectionsDataGridView;
+        private System.Windows.Forms.CheckBox checkBox1;
     }
 }
