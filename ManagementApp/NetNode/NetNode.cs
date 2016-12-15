@@ -19,22 +19,29 @@ namespace NetNode
         public Ports ports;
         public ManagementAgent agent;
 
+        public static Boolean flag;
         public int physicalPort;
         private TcpListener listener;
         private static BinaryWriter writer;
+        private Thread threadListen;
+        private Thread threadConsole;
+        private Thread threadComutation;
 
         public NetNode(string[] args)
         {
+            flag = true;
             this.virtualIp = args[0];
             this.ports = new Ports();
             this.agent = new ManagementAgent(Convert.ToInt32(args[2]), this.virtualIp);
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
             this.physicalPort = Convert.ToInt32(args[1]);
-            Thread thread = new Thread(new ThreadStart(Listen));
-            thread.Start();
-            Thread threadConsole = new Thread(new ThreadStart(ConsoleInterface));
+            this.threadListen = new Thread(new ThreadStart(Listen));
+            threadListen.Start();
+            this.threadConsole = new Thread(new ThreadStart(ConsoleInterface));
             threadConsole.Start();
-            this.commutation();
+            this.threadComutation = new Thread(new ThreadStart(commutation));
+            threadComutation.Start();
+            //this.commutation();
         }
         private void Listen()
         {
@@ -82,6 +89,18 @@ namespace NetNode
             ports.iports[virtPort].addToInQueue(received_frame);
         }
 
+        private void freeze()
+        {
+            flag = false;
+        }
+
+        private void unfreeze()
+        {
+            flag = true;
+            this.threadComutation = new Thread(new ThreadStart(commutation));
+            this.threadComutation.Start();
+        }
+
         private void ConsoleInterface()
         {
             Console.WriteLine("NetNode " + this.virtualIp + " " + this.agent.port + " " + this.physicalPort);
@@ -92,6 +111,9 @@ namespace NetNode
                 Console.WriteLine("\n MENU: ");
                 Console.WriteLine("\n 1) Manually insert FIB");
                 Console.WriteLine("\n 2) Simulate failure");
+                Console.WriteLine("\n 3) Unfreeze netnode");
+                Console.WriteLine("\n 4) Show FIB table");
+				Console.WriteLine("\n");
 
                 int choice;
                 bool res = int.TryParse(Console.ReadLine(), out choice);
@@ -103,7 +125,13 @@ namespace NetNode
                             insertFib();
                             break;
                         case 2:
-                            //TODO
+                            freeze();
+                            break;
+                        case 3:
+                            unfreeze();
+                            break;
+                        case 4:
+                            SwitchingField.printFibTable();
                             break;
                         default:
                             Console.WriteLine("\n Wrong option");
@@ -120,7 +148,7 @@ namespace NetNode
         }
         private void commutation()
         {
-            while (true)
+            while (flag)
             {
                 foreach (IPort iport in this.ports.iports)
                 {
