@@ -77,11 +77,11 @@ namespace CableCloud
                 {
                     Signal signal = received_object.Value.ToObject<Signal>();  
 
-                    var fromPort = ((IPEndPoint)connection.Client.RemoteEndPoint).Port;
-                    int virtualFromPort = signal.port;
+                    fromPort = ((IPEndPoint)connection.Client.RemoteEndPoint).Port;
+                    virtualFromPort = signal.port;
                     
-                    int toPort = 0;
-                    int virtualToPort = 0;
+                    toPort = 0;
+                    virtualToPort = 0;
 
                     for (int i = table.Rows.Count - 1; i >= 0; i--)
                     {
