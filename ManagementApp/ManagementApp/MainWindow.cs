@@ -25,6 +25,7 @@ namespace ManagementApp
         private List<NodeConnection> connectionTemp = new List<NodeConnection>();
         private List<Domain> domainList;
         private CloudCableHandler cableHandler;
+        private List<Trail> tempTrailList = new List<Trail>();
 
         // PAINTING VARS
         private bool isDrawing = false;
@@ -138,6 +139,10 @@ namespace ManagementApp
             foreach (var elem in connectionList)
             {
                 drawConnection(elem, panel);
+            }
+            foreach (Trail t in tempTrailList)
+            {
+                drawTrail(t, panel);
             }
             foreach (var node in nodeList)
             {
@@ -632,6 +637,17 @@ namespace ManagementApp
             panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
         }
 
+        private void drawTrail(Trail t, Graphics panel)
+        {
+            panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            Pen orangePen = new Pen(Color.Orange, 3);
+            for (int i = 1; i < t.Points.Count(); i++)
+            {
+                panel.DrawLine(orangePen, t.Points.ElementAt(i - 1), t.Points.ElementAt(i));
+            }
+            //containerPictureBox.Refresh();
+        }
+
         private void putToGrid(ref int x, ref int y)
         {
             x = GAP * (int)Math.Round((double)x / GAP);
@@ -741,9 +757,16 @@ namespace ManagementApp
 
         private void containerPictureBox_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            Node n = getNodeFrom(e.X, e.Y);
+            int x = e.X;
+            int y = e.Y;
+            putToGrid(ref x, ref y);
+            Node n = getNodeFrom(x, y);
             //SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
-            
+            errorMessage("Paint Trails");
+            tempTrailList = new List<Trail>(management.getTrailForNode(n));
+            foreach(var a in tempTrailList)
+                errorMessage(a.toString());
+            //containerPictureBox.Refresh();
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -755,5 +778,7 @@ namespace ManagementApp
         {
             management.clearAllTrails();
         }
+
+
     }
 }
