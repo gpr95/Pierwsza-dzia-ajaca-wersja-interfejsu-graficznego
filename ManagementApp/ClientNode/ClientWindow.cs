@@ -76,7 +76,7 @@ namespace ClientNode
                 {
                     Signal received_signal = received_object.Value.ToObject<Signal>();
                     STM1 received_frame = received_signal.stm1;
-                    if (received_frame.vc4 != null)
+                    if (received_frame.vc4.C4 != null)
                     {
            
                         receivedTextBox.AppendText(received_frame.vc4.C4);
@@ -86,7 +86,7 @@ namespace ClientNode
 
                     else
                     {
-                        foreach (KeyValuePair<int, VirtualContainer3> v in received_frame.vc3List)
+                        foreach (KeyValuePair<int, VirtualContainer3> v in received_frame.vc4.vc3List)
                         {
                             
                             receivedTextBox.AppendText(v.Value.C3);
@@ -176,7 +176,7 @@ namespace ClientNode
                     Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writer.Write(data);
-                    foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc3List)
+                    foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                     {
                         Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", v.Value.POH.ToString(), v.Value.C3);
                     }
@@ -259,7 +259,7 @@ namespace ClientNode
 
                         writer.Write(data);
                         if (isVc3)
-                            foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc3List)
+                            foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                             {
                                 Log1("OUT", virtualIP, signal.time.ToString(), "VC-3", v.Value.POH.ToString(), v.Value.C3);
                             }

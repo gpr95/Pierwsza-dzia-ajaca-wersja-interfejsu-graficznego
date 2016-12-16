@@ -14,7 +14,7 @@ namespace ClientNode
         //MSOH
         public VirtualContainer4 vc4;
        // public VirtualContainer3[] vc3List = new VirtualContainer3[3];//sa trzy kontenery vc3 a nie dwa
-        public Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
+       // public Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
 
         public STM1()
         {
@@ -26,7 +26,8 @@ namespace ClientNode
         }
         public STM1(Dictionary<int, VirtualContainer3> vc3List)
         {
-            this.vc3List = vc3List;
+            this.vc4.vc3List = new Dictionary<int, VirtualContainer3>();
+            this.vc4 = new VirtualContainer4(vc3List);
         }
         
 
@@ -51,10 +52,16 @@ namespace ClientNode
     {
         public int POH;
         public string C4;
+        public Dictionary<int, VirtualContainer3> vc3List;
         public VirtualContainer4(int POH, string C4)
         {
             this.POH = POH;
             this.C4 = C4;
+        }
+
+        public VirtualContainer4(Dictionary<int, VirtualContainer3> vc3List)
+        {
+            this.vc3List = vc3List;
         }
     }
 
