@@ -183,6 +183,7 @@ namespace ManagementApp
                         break;
                     if (atPosition.Count > 1)
                     {
+                        deleteListBox.Items.Add("Restart " + atPosition.Last());
                         deleteListBox.Items.Add("Cancel");
                         deleteListBox.Location = new Point(x, y);
                         deleteListBox.Visible = true;
@@ -453,6 +454,11 @@ namespace ManagementApp
                     
 
             }
+            if(deleteListBox.Text.Contains("Restart"))
+            {
+                management.restartNode(deleteListBox.Text.Split(' ')[1]);
+            }
+
             deleteListBox.Visible = false;
             deleteListBox.Enabled = false;
             deleteListBox.Items.Clear();
@@ -483,6 +489,12 @@ namespace ManagementApp
             this.Cursor = Cursors.Hand;
             oType = OperationType.ADD_NETWORK_NODE;
         }
+
+        internal void updateConnections(List<NodeConnection> connectionList)
+        {
+            cableHandler.updateConnections(connectionList);
+        }
+
         private void connectionBtn_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.Cross;

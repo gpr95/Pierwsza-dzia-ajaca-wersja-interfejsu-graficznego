@@ -27,5 +27,10 @@ namespace ManagementApp
         {
             return "In: " + iport + " Szcz: " + in_cont + " Out: " + oport + " Szcz: " + out_cont;
         }
+
+        public FIB reverse()
+        {
+            return new FIB(this.oport, this.out_cont, this.iport, this.in_cont);
+        }
     }
 }

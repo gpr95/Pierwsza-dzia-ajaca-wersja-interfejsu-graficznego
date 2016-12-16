@@ -15,12 +15,14 @@ namespace ManagementApp
         private Priority priority;
         private String name;
         private int startingSlot;
+        private int endingSlot;
         private int portFrom;
         private int portTo;
         private Dictionary<NodeConnection, int> connectionDictionary = new Dictionary<NodeConnection, int>();
         private List<Node> componentNodes;
         private List<Point> points = new List<Point>();
         private Dictionary<Node, FIB> componentFIBs = new Dictionary<Node, FIB>();
+        //private Dictionary<Node, FIB> componentFIBsTo = new Dictionary<Node, FIB>();
 
         enum Priority
         {
@@ -73,6 +75,11 @@ namespace ManagementApp
                             findConnection(path.ElementAt(0), path.ElementAt(1), con).VirtualPortTo;
                         StartingSlot = findFirstFreeSlot(findConnection(from, path.ElementAt(n + 1), con), vc4);
                         slot = StartingSlot;
+                        if (slot == -1)
+                        {
+                            clearTrail(this);
+                            break;
+                        }
                         findConnection(from, path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
                         findConnection(from, path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
                         connectionDictionary.Add(findConnection(from, path.ElementAt(n + 1), con), slot);
@@ -102,13 +109,16 @@ namespace ManagementApp
                         clearTrail(this);
                         break;
                     }
+                    endingSlot = slotTemp;
                     //StartingSlot = startinS;
-                    FIB newFib = new FIB(portIn, slot, portOut, slotTemp);
+                    FIB newFibFrom = new FIB(portIn, slot, portOut, slotTemp);
+                    FIB newFibTo = new FIB(portOut, slotTemp, portIn, slot);
                     slot = slotTemp;
                     findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).OccupiedSlots.Add(slot);
                     findConnection(path.ElementAt(n), path.ElementAt(n + 1), con).AutoOccupiedSlots.Add(slot);
                     connectionDictionary.Add(findConnection(path.ElementAt(n), path.ElementAt(n + 1), con), slot);
-                    ComponentFIBs.Add(path.ElementAt(n), newFib);
+                    ComponentFIBs.Add(path.ElementAt(n), newFibFrom);
+                    //ComponentFIBs.Add(path.ElementAt(n), newFibTo);
                 }
             }
             else
@@ -197,7 +207,9 @@ namespace ManagementApp
                 if (!connection.OccupiedSlots.Any())
                     return 11;
                 else if (connection.OccupiedSlots.Max() >= 13)
-                        return -1;
+                    return -1;
+                else if (connection.OccupiedSlots.Min() == 1)
+                    return -1;
                 else
                     return connection.OccupiedSlots.Max() + 1;
             }
@@ -232,7 +244,11 @@ namespace ManagementApp
 
         public String toString()
         {
-            String o = "Trail: " + this.from.Name + "-" + this.to.Name;
+            String o = null;
+            if (this.Name != null)
+                o = "Trail: " + this.Name;
+            else
+                o = "Trail was not created.";
             foreach (KeyValuePair<Node, FIB> ff in componentFIBs)
             {
                 o = o + System.Environment.NewLine + ff.Key.Name + ":: " + ff.Value.toString();
@@ -368,6 +384,19 @@ namespace ManagementApp
             set
             {
                 name = value;
+            }
+        }
+
+        public int EndingSlot
+        {
+            get
+            {
+                return endingSlot;
+            }
+
+            set
+            {
+                endingSlot = value;
             }
         }
     }

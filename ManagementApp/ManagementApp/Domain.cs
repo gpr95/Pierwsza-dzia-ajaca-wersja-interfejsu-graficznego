@@ -39,6 +39,9 @@ namespace ManagementApp
             this.pointFrom = from;
             this.pointTo = to;
             Size = new Size(pointTo.X - pointFrom.X, pointTo.Y - pointFrom.Y);
+
+            //TO DO ???
+
             //containedPoints = new List<Point>();
             //int xFrom = from.X >= to.X ? from.X:to.X;
             //int xTo = from.X >= to.X ? to.X : from.X;

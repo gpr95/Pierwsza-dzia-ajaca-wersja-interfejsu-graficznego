@@ -97,7 +97,10 @@ namespace ManagementApp
 
         private void createBtn_Click(object sender, EventArgs e)
         {
-            management.addTrail(management.createTrail(a, b, checkBox1.Checked));
+            Trail t = management.createTrail(a, b, checkBox1.Checked);
+            if (t.From == null || t.To == null || t.StartingSlot == -1)
+                return;
+            management.addTrail(t);
             this.Dispose();
         }
     }

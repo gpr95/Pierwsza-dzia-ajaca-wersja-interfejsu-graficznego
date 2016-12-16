@@ -223,7 +223,7 @@ namespace ManagementApp
             int.TryParse(n.Name.Split('.')[1], out nodeNumber);
             row["id"] = nodeNumber;
             row["Type"] = n is NetNode ? "Network" : "Client";
-            row["Name"] = n is NetNode ? "NN" + nodeNumber : "CN" + nodeNumber;
+            row["Name"] = n is NetNode ? "NN." + nodeNumber : "CN." + nodeNumber;
             table.Rows.Add(row);
         }
 
@@ -343,6 +343,7 @@ namespace ManagementApp
             table.Rows.Remove(table.Rows.Find(nodeToDelete.Name));
             mainWindow.errorMessage("Node " + nodeToDelete.Name + " deleted.");
             nodeList.Remove(nodeToDelete);
+            nodeToDelete.ProcessHandle.Dispose();
         }
 
         private int getNumberOfConnectionsBetweenNodes(Node from, Node to)
@@ -458,6 +459,23 @@ namespace ManagementApp
                 found.Add(nodeName);
             }
             return found;
+        }
+
+        internal void restartNode(string v)
+        {
+            Node n = nodeList.Where(s => s.Name.Equals(v)).FirstOrDefault();
+            if(n.ProcessHandle.HasExited)
+            {
+                nodeList.Remove(n);
+                if (n is ClientNode)
+                    nodeList.Add(new ClientNode((ClientNode)n));
+                else if (n is NetNode)
+                    nodeList.Add(new NetNode((NetNode) n));
+
+                //List<string> conL = findElemAtPosition(n.Position.X, n.Position.Y);
+                mainWindow.updateConnections(connectionList);
+                sendOutInformation();
+            }
         }
 
         public List<List<Node>> findPathsLN(Node client, bool onlyClients)
@@ -592,6 +610,9 @@ namespace ManagementApp
                     Dictionary<string, int> temp = new Dictionary<string, int>();
                     temp.Add(trail.To.Name, trail.StartingSlot);
                     listDestinations.Add(temp, (trail.From.Name));
+                    temp = new Dictionary<string, int>();
+                    temp.Add(trail.From.Name, trail.EndingSlot);
+                    listDestinations.Add(temp, (trail.To.Name));
                 }
             }
 
@@ -599,6 +620,7 @@ namespace ManagementApp
             {
                 if (trail.From == null)
                     continue;
+                //Fix needed
                 BinaryWriter writer = new BinaryWriter(trail.From.TcpClient.GetStream());
                 ManagmentProtocol protocol = new ManagmentProtocol();
                 protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
@@ -621,6 +643,27 @@ namespace ManagementApp
                 String send_object = JSON.Serialize(JSON.FromValue(protocol));
                 writer.Write(send_object);
 
+                writer = trail.To.SocketWriter;
+                protocol = new ManagmentProtocol();
+                protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
+                protocol.possibleDestinations = new Dictionary<string, int>();
+
+                foreach (var dest in listDestinations)
+                {
+                    if (dest.Value == trail.To.Name)
+                    {
+                        foreach (var temp in dest.Key)
+                        {
+                            protocol.possibleDestinations.Add(temp.Key, temp.Value);
+                        }
+                    }
+                }
+
+                protocol.Port = trail.PortFrom;
+                mainWindow.errorMessage(trail.From.Name + "<->" + protocol.Port);
+                send_object = JSON.Serialize(JSON.FromValue(protocol));
+                writer.Write(send_object);
+
                 foreach (KeyValuePair<Node, FIB> fib in trail.ComponentFIBs)
                 {
                     //continue;
@@ -630,6 +673,9 @@ namespace ManagementApp
                     Console.WriteLine("routingentry");
                     protocol.RoutingEntry = fib.Value;
 
+                    send_object = JSON.Serialize(JSON.FromValue(protocol));
+                    writer.Write(send_object);
+                    protocol.RoutingEntry = fib.Value.reverse();
                     send_object = JSON.Serialize(JSON.FromValue(protocol));
                     writer.Write(send_object);
                 }
@@ -739,7 +785,7 @@ namespace ManagementApp
             List<Trail> tList = new List<Trail>();
             foreach(Trail t in trailList)
             {
-                if (t.From.Equals(n))
+                if (t.From.Equals(n) || t.To.Equals(n))
                     tList.Add(t);
             }
             return tList;
