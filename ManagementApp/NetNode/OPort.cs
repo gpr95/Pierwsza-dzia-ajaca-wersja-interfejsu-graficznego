@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using ClientNode;
+using ClientWindow;
 
 namespace NetNode
 {
@@ -33,16 +33,19 @@ namespace NetNode
         {
             if (pos != 0)
             {
-                this.currentFrame.vc3List.Add(pos,container);
+                this.currentFrame.vc4.vc3List.Add(pos, container);
             }
         }
         public void addToOutQueue()
         {
-            if (this.currentFrame.vc3List.Count > 0)
+            if (this.currentFrame.vc4 != null)
             {
-                this.output.Enqueue(this.currentFrame);
-                this.clear();
-                Console.WriteLine("Stm1 added to output queue");
+                if (this.currentFrame.vc4.vc3List.Count > 0)
+                {
+                    this.output.Enqueue(this.currentFrame);
+                    this.clear();
+                    Console.WriteLine("Stm1 added to output queue");
+                }
             }
         }
         public void clear()

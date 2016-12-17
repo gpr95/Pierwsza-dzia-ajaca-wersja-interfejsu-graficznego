@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ClientNode;
+using ClientWindow;
 using ManagementApp;
 
 namespace NetNode
@@ -13,7 +13,7 @@ namespace NetNode
     {
         public static List<FIB> fib = new List<FIB>();
 
-        public int commuteContainer(VirtualContainer4 container, int iport)
+        public int commutateContainer(VirtualContainer4 container, int iport)
         {
             int out_pos = 1;
             if (container != null)
@@ -24,14 +24,14 @@ namespace NetNode
                     if (row.iport == iport && row.in_cont == 1)
                     {
                         out_pos = row.oport;
-                        Console.WriteLine("Commuting container from:" + row.iport + " to " + row.oport);
+                        Console.WriteLine("Commutating vc4 container from:" + row.iport + " to " + row.oport);
                         return out_pos;
                     }
                 }
             }
             return out_pos;
         }
-        public int[] commuteContainer(VirtualContainer3 container, int iport, int pos)
+        public int[] commutateContainer(VirtualContainer3 container, int iport, int pos)
         {
             int[] out_pos = { -1, -1 };
             if (container != null)
@@ -43,7 +43,7 @@ namespace NetNode
                     {
                         out_pos[0] = row.oport;
                         out_pos[1] = row.out_cont;
-                        Console.WriteLine("Commuting container from:" + row.iport + " " + row.in_cont + "to " + row.oport + " " + row.out_cont);
+                        Console.WriteLine("Commutating vc3 container from:" + row.iport + " " + row.in_cont + "to " + row.oport + " " + row.out_cont);
                         return out_pos;
                     }
                 }
@@ -56,7 +56,7 @@ namespace NetNode
             if (fib.Count == 0)
             {
                 fib.Add(row);
-                Console.WriteLine("New fib row added");
+                Console.WriteLine("New conn entry added");
             }
             else
             {
@@ -72,7 +72,7 @@ namespace NetNode
                 if (counter == fib.Count)
                 {
                     fib.Add(row);
-                    Console.WriteLine("New fib row added");
+                    Console.WriteLine("New conn entry added");
                 }
             }
         }
@@ -81,7 +81,8 @@ namespace NetNode
         {
             foreach (var temp in fib)
             {
-                Console.WriteLine(temp.iport + " " + temp.in_cont + " " + temp.oport + " " + temp.out_cont);
+                Console.WriteLine(temp.toString());
+                //Console.WriteLine(temp.iport + " " + temp.in_cont + " " + temp.oport + " " + temp.out_cont);
             }
         }
     }

@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ClientNode;
+using ClientWindow;
 using ManagementApp;
 
 namespace NetNode
@@ -109,11 +109,11 @@ namespace NetNode
             while (!quit)
             {
                 Console.WriteLine("\n MENU: ");
-                Console.WriteLine("\n 1) Manually insert FIB");
+                Console.WriteLine("\n 1) Manually insert entry in connection table");
                 Console.WriteLine("\n 2) Simulate failure");
                 Console.WriteLine("\n 3) Unfreeze netnode");
-                Console.WriteLine("\n 4) Show FIB table");
-				Console.WriteLine("\n");
+                Console.WriteLine("\n 4) Show connection table");
+                Console.WriteLine("\n");
 
                 int choice;
                 bool res = int.TryParse(Console.ReadLine(), out choice);
@@ -161,22 +161,22 @@ namespace NetNode
                         {
                             int out_pos = -1;
                             VirtualContainer4 vc4 = frame.vc4;
-                            out_pos = switchField.commuteContainer(vc4, iport.port);
+                            out_pos = switchField.commutateContainer(vc4, iport.port);
                             if (out_pos != -1)
                             {
                                 Console.WriteLine("ok");
                                 this.ports.oports[out_pos].addToOutQueue(vc4);
                             }
                         }
-                        else if (frame.vc3List.Count > 0)
+                        else if (frame.vc4.vc3List.Count > 0)
                         {
-                            foreach (var vc in frame.vc3List)
+                            foreach (var vc in frame.vc4.vc3List)
                             {
                                 VirtualContainer3 vc3 = vc.Value;
                                 if (vc3 != null)
                                 {
-                                    int[] out_pos = {-1,-1};
-                                    out_pos = switchField.commuteContainer(vc3, iport.port, vc.Key);
+                                    int[] out_pos = { -1, -1 };
+                                    out_pos = switchField.commutateContainer(vc3, iport.port, vc.Key);
                                     if (out_pos[0] != -1)
                                     {
                                         Console.WriteLine("ok");
@@ -203,7 +203,7 @@ namespace NetNode
                     if (oport.output.Count > 0)
                     {
                         STM1 frame = oport.output.Dequeue();
-                        if (frame.vc4 != null || frame.vc3List.Count > 0)
+                        if (frame.vc4 != null || frame.vc4.vc3List.Count > 0)
                         {
                             try
                             {
