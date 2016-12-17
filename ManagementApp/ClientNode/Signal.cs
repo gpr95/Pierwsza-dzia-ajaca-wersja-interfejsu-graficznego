@@ -16,7 +16,7 @@ namespace ClientWindow
         {
             this.time = time;
             this.port = port;
-            this.stm1 = stm1;
+            this.stm1 = new STM1(stm1.vc4.POH, stm1.vc4.C4, stm1.vc4.vc3List);
         }
 
     }

@@ -41,7 +41,7 @@ namespace ClientWindow
             managementThreadad.Start(managementPort);
             InitializeComponent();
             this.Text=virtualIP;
-            Log2("NONE", "START LOG");
+            Log2("INFO", "START LOG");
         }
 
         private void Listen()
@@ -175,8 +175,8 @@ namespace ClientWindow
                 }
                 else
                 {
-                    VirtualContainer4 vc4 = new VirtualContainer4(adaptation(), message);
-                    STM1 frame = new STM1(vc4);
+                   // VirtualContainer4 vc4 = new VirtualContainer4(adaptation(), message);
+                    STM1 frame = new STM1(adaptation(), message);
                     Signal signal = new Signal(getTime(), virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writer.Write(data);
@@ -234,8 +234,8 @@ namespace ClientWindow
                 }
                 else
                 {
-                    VirtualContainer4 vc4 = new VirtualContainer4(adaptation(), message);
-                    frame = new STM1(vc4);
+                    
+                    frame = new STM1(adaptation(), message);
                     //SYGNAL
                     signal = new Signal(getTime(), virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -369,8 +369,8 @@ namespace ClientWindow
         private void sendComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             currentSlot = possibleDestinations[sendComboBox.SelectedItem.ToString()];
-            logTextBox.AppendText("Current slot: " + currentSlot);
-            logTextBox.AppendText(Environment.NewLine);
+            //logTextBox.AppendText("Current slot: " + currentSlot);
+           // logTextBox.AppendText(Environment.NewLine);
 
             if (currentSlot == 1)
             {
