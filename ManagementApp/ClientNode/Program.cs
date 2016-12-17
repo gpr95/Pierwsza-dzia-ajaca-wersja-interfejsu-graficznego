@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ClientNode
+namespace ClientWindow
 {
     class Program
     {
 
-        private static ClientNode client = null;
+       
         static void Main(string[] args)
         {
             // MANAGER

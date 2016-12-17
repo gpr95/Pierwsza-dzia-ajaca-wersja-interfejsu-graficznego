@@ -1,4 +1,4 @@
-﻿namespace ClientNode
+﻿namespace ClientWindow
 {
     partial class ClientWindow
     {

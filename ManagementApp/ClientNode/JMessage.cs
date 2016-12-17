@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 
-namespace ClientNode
+namespace ClientWindow
 {
     public class JMessage
     {
