@@ -15,13 +15,13 @@ namespace NetNode
 
         public int commutateContainer(VirtualContainer4 container, int iport)
         {
-            int out_pos = 1;
+            int out_pos = -1;
             if (container != null)
             {
                 //mamy do czynienia z vc4
                 foreach (var row in fib)
                 {
-                    if (row.iport == iport && row.in_cont == 1)
+                    if (row.iport == iport) // && row.in_cont == 1)
                     {
                         out_pos = row.oport;
                         Console.WriteLine("Commutating vc4 container from:" + row.iport + " to " + row.oport);
@@ -84,6 +84,11 @@ namespace NetNode
                 Console.WriteLine(temp.toString());
                 //Console.WriteLine(temp.iport + " " + temp.in_cont + " " + temp.oport + " " + temp.out_cont);
             }
+        }
+
+        public static void clearFibTable()
+        {
+            fib.Clear();
         }
     }
 }
