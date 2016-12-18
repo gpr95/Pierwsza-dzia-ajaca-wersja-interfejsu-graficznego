@@ -67,6 +67,8 @@ namespace CableCloud
                 catch(IOException ex)
                 {
                     consoleWriter("ERROR: Connection LOST: " + name,ERROR_COLOR);
+                    deleteCable(fromPort, virtualFromPort);
+                    consoleWriter("CONNECTION REMOVED FROM TABLE " + name, INFO_COLOR);
                     return;
                 }
                 if (received_data == null || received_data.Length == 0)
@@ -129,6 +131,19 @@ namespace CableCloud
             table.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
             consoleWriter("Made connection: from-" + fromPort + "(" + virtualFromPort + ")" + " to-" +
                               toPort + "(" + virtualToPort + ")", ADMIN_COLOR);
+        }
+
+        private void deleteCable(int fromPort, int virtualFromPort)
+        {
+            for (int i = table.Rows.Count - 1; i >= 0; i--)
+            {
+                DataRow dr = table.Rows[i];
+                if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort))
+                {
+                    table.Rows.Remove(dr);
+                    portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
+                }
+            }
         }
         private void consoleWriter(String msg, ConsoleColor cc)
         {
