@@ -56,7 +56,6 @@ namespace CableCloud
 
             /** Add new cable to table */
             addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
-        //    portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
             portToThreadMap.Add(fromPort + ":" + virtualFromPort, this);
             while (true)
             {
@@ -125,6 +124,7 @@ namespace CableCloud
             catch(IOException ex)
             {
                 consoleWriter(ERROR_MSG + "Trying to send data failed", ERROR_COLOR);
+                deleteCable(fromPort, virtualFromPort);
             }
         }
         private void addNewCable(int fromPort, int virtualFromPort, int toPort, int virtualToPort)
@@ -151,13 +151,6 @@ namespace CableCloud
                     table.Rows.Remove(drFrom);
                     portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
                 }
-
-//                DataRow drTo = table.Rows[i];
-//                if (drTo["toPort"].Equals(toPort) && drTo["virtualToPort"].Equals(virtualToPort))
-//                {
-//                    table.Rows.Remove(drTo);
-//                    portToThreadMap.Remove(toPort + ":" + virtualFromPort);
-//                }
             }
         }
         private void consoleWriter(String msg, ConsoleColor cc)
