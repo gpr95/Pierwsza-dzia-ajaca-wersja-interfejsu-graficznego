@@ -31,7 +31,7 @@ namespace ClientWindow
             virtualIP = args[0];
             int cloudPort = Convert.ToInt32(args[1]);
             managementPort = Convert.ToInt32(args[2]);
-            string fileName = virtualIP.Replace(".", "_") + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
+            string fileName = virtualIP.Replace(".", "_") + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
             path = System.IO.Directory.GetCurrentDirectory() + @"\logs\" + fileName + ".txt";
           
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
@@ -75,7 +75,7 @@ namespace ClientWindow
            
                         receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + received_frame.vc4.C4);
                         receivedTextBox.AppendText(Environment.NewLine);
-                        Log1("IN", virtualIP, received_signal.time.ToString(),1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
+                        Log1("IN", virtualIP,1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
                     }
 
                     else
@@ -85,7 +85,7 @@ namespace ClientWindow
                             
                             receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + v.Value.C3);
                             receivedTextBox.AppendText(Environment.NewLine);
-                            Log1("IN", virtualIP, received_signal.time.ToString(),v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                            Log1("IN", virtualIP,v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                         }
                     }
                 }
@@ -165,22 +165,22 @@ namespace ClientWindow
                     vc3List.Add(currentSlot, vc3);
                     STM1 frame = new STM1(vc3List);
                     //SYGNAL
-                    Signal signal = new Signal(getTime(), virtualPort, frame);
+                    Signal signal = new Signal(virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writer.Write(data);
                     foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                     {
-                        Log1("OUT", virtualIP, signal.time.ToString(),v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                        Log1("OUT", virtualIP,v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                     }
                 }
                 else
                 {
                    // VirtualContainer4 vc4 = new VirtualContainer4(adaptation(), message);
                     STM1 frame = new STM1(adaptation(), message);
-                    Signal signal = new Signal(getTime(), virtualPort, frame);
+                    Signal signal = new Signal(virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writer.Write(data);
-                    Log1("OUT", virtualIP, signal.time.ToString(),1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                    Log1("OUT", virtualIP,1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                 }
                 sendingTextBox.Clear();
             }
@@ -200,13 +200,7 @@ namespace ClientWindow
             return POH;
         }
 
-        //losowy czas sygnalu z przedzialu od 10 do 125 "mikro" sekund
-        private int getTime()
-        {
-            Random r = new Random();
-            int time = r.Next(10, 125);
-            return time;
-        }
+       
 
         private void sendPeriodically(int period, string message)
         {
@@ -227,7 +221,7 @@ namespace ClientWindow
                     vc3List.Add(currentSlot, vc3);
                      frame = new STM1(vc3List);
                     //SYGNAL
-                    signal = new Signal(getTime(), virtualPort, frame);
+                    signal = new Signal(virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
                     isVc3 = true;
 
@@ -237,7 +231,7 @@ namespace ClientWindow
                     
                     frame = new STM1(adaptation(), message);
                     //SYGNAL
-                    signal = new Signal(getTime(), virtualPort, frame);
+                    signal = new Signal( virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
 
                 }
@@ -252,10 +246,10 @@ namespace ClientWindow
                         if (isVc3)
                             foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                             {
-                                Log1("OUT", virtualIP, signal.time.ToString(),v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                                Log1("OUT", virtualIP,v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                             }
                         else
-                            Log1("OUT", virtualIP, signal.time.ToString(),1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                            Log1("OUT", virtualIP,1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                         await Task.Delay(TimeSpan.FromMilliseconds(period));
                     }
                     catch (Exception e)
@@ -273,15 +267,14 @@ namespace ClientWindow
             myThread.Start();
         }
 
-        public  void Log1(string type, string clientNodeName, string signalDuration,int currentSlot, string containerType, string POH, string message)
+        public  void Log1(string type, string clientNodeName, int currentSlot, string containerType, string POH, string message)
         {
 
             StreamWriter writer = File.AppendText(path);
-            writer.WriteLine("\r\n{0} {1} : {2} {3} {4} {5} {6} {7} {8}", DateTime.Now.ToLongTimeString(),
+            writer.WriteLine("\r\n{0} {1} : {2} {3} {4} {5} {6} {7} ", DateTime.Now.ToLongTimeString(),
                 DateTime.Now.ToLongDateString(),
                 type,
                 clientNodeName,
-                signalDuration,
                 currentSlot,
                 containerType,
                 POH,
@@ -294,17 +287,17 @@ namespace ClientWindow
             if (this.InvokeRequired)
             {
                 log1RowCallback d = new log1RowCallback(Log1);
-                this.Invoke(d, new object[] { type,  clientNodeName,  signalDuration,  currentSlot,  containerType,  POH, message });
+                this.Invoke(d, new object[] { type,  clientNodeName,  currentSlot,  containerType,  POH, message });
             }
             else
             {
                 logTextBox.Paste("\r\n" + DateTime.Now.ToLongTimeString() + " : " + "[" + type + "]"
-               + " " + signalDuration + " " + currentSlot.ToString() + " " + containerType + " " + POH + " " + message);
+               +  " " + currentSlot.ToString() + " " + containerType + " " + POH + " " + message);
                 logTextBox.AppendText(Environment.NewLine);
             }
         }
 
-        delegate void log1RowCallback(string type, string clientNodeName, string signalDuration, int currentSlot, string containerType, string POH, string message);
+        delegate void log1RowCallback(string type, string clientNodeName, int currentSlot, string containerType, string POH, string message);
 
         public  void Log2(string type, string message)
         {
