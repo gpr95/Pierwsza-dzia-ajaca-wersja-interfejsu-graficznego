@@ -381,5 +381,10 @@ namespace ClientWindow
                 currentSpeed = 3;
             }
         }
+
+        private void ClientWindow_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
+        {
+            Environment.Exit(0);
+        }
     }
 }

@@ -226,8 +226,11 @@
             this.sendingGroupBox.ResumeLayout(false);
             this.sendingGroupBox.PerformLayout();
             this.ResumeLayout(false);
+            this.FormClosing += ClientWindow_FormClosing;
 
         }
+
+       
 
         #endregion
         private System.Windows.Forms.Panel logPanel;
