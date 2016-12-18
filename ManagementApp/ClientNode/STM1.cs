@@ -30,6 +30,11 @@ namespace ClientWindow
             
         }
 
+        public STM1(VirtualContainer4 vc4)
+        {
+            this.vc4 = vc4;
+        }
+
         public STM1(int POH, string C4, Dictionary<int, VirtualContainer3> vc3List)
         {
             this.vc4 = new VirtualContainer4(POH, C4);

@@ -72,7 +72,7 @@ namespace NetNode
                         int virtPort = received_signal.port;
                         consoleWriter("received signal time: " + received_signal.time + " on port: " + virtPort);
                         toVirtualPort(virtPort, frame);
-
+                        Console.WriteLine(received_data);
                     }
                 }
             }
@@ -110,9 +110,8 @@ namespace NetNode
             {
                 Console.WriteLine("\n MENU: ");
                 Console.WriteLine("\n 1) Manually insert entry in connection table");
-                Console.WriteLine("\n 2) Simulate failure");
-                Console.WriteLine("\n 3) Unfreeze netnode");
-                Console.WriteLine("\n 4) Show connection table");
+                Console.WriteLine("\n 2) Show connection table");
+                Console.WriteLine("\n 3) Clear connection table");
                 Console.WriteLine("\n");
 
                 int choice;
@@ -125,13 +124,10 @@ namespace NetNode
                             insertFib();
                             break;
                         case 2:
-                            freeze();
+                            SwitchingField.printFibTable();
                             break;
                         case 3:
-                            unfreeze();
-                            break;
-                        case 4:
-                            SwitchingField.printFibTable();
+                            SwitchingField.clearFibTable();
                             break;
                         default:
                             Console.WriteLine("\n Wrong option");
@@ -150,6 +146,8 @@ namespace NetNode
         {
             while (flag)
             {
+                int opt = commOption();
+
                 foreach (IPort iport in this.ports.iports)
                 {
                     //check if there is frame in queue and try to process it 
@@ -157,8 +155,10 @@ namespace NetNode
                     {
                         STM1 frame = iport.input.Dequeue();
 
-                        if (frame.vc4 != null)
+                        //if (frame.vc4 != null)
+                        if(opt != 1)
                         {
+                            Console.WriteLine("vc4");
                             int out_pos = -1;
                             VirtualContainer4 vc4 = frame.vc4;
                             out_pos = switchField.commutateContainer(vc4, iport.port);
@@ -168,8 +168,11 @@ namespace NetNode
                                 this.ports.oports[out_pos].addToOutQueue(vc4);
                             }
                         }
-                        else if (frame.vc4.vc3List.Count > 0)
+                        //else if (frame.vc4.vc3List.Count > 0)
+                        else
                         {
+                            Console.WriteLine("vc3->vc4");
+                            Console.WriteLine("unpacking container");
                             foreach (var vc in frame.vc4.vc3List)
                             {
                                 VirtualContainer3 vc3 = vc.Value;
@@ -185,10 +188,10 @@ namespace NetNode
                                 }
                             }
                         }
-                        else
-                        {
-                            Console.WriteLine("smth wrong with stm1");
-                        }
+                        //else
+                        //{
+                            //Console.WriteLine("smth wrong with stm1");
+                        //}
                     }
                 }
                 foreach (OPort oport in this.ports.oports)
@@ -210,6 +213,7 @@ namespace NetNode
                                 Signal signal = new Signal(getTime(), oport.port, frame);
                                 consoleWriter("sending signal port: " + signal.port);
                                 string data = JMessage.Serialize(JMessage.FromValue(signal));
+                                Console.WriteLine(data);
                                 writer.Write(data);
                             }
                             catch (Exception e)
@@ -221,8 +225,30 @@ namespace NetNode
                         }
                     }
                 }
-                Thread.Sleep(125);
+                Thread.Sleep(1250);
             }
+        }
+
+        private int commOption()
+        {
+            int counter = 1;
+            if (SwitchingField.fib.Count > 0)
+            {
+                int temp = SwitchingField.fib[0].iport;
+                int temp2 = SwitchingField.fib[0].oport;
+                for(int i=1; i<SwitchingField.fib.Count; i++)
+                {
+                    if(SwitchingField.fib[i].oport == temp2)
+                    {
+                        if(SwitchingField.fib[i].iport != temp)
+                            counter++;
+                    }
+                }
+            }
+            if (counter == 2 || counter == 3)
+                return 1;
+            else
+                return 0;
         }
 
         private void insertFib()
