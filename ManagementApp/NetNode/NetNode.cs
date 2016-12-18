@@ -70,7 +70,7 @@ namespace NetNode
                         Signal received_signal = received_object.Value.ToObject<Signal>();
                         STM1 frame = received_signal.stm1;
                         int virtPort = received_signal.port;
-                        consoleWriter("received signal time: " + received_signal.time + " on port: " + virtPort);
+                        consoleWriter("received signal on port: " + virtPort);
                         toVirtualPort(virtPort, frame);
                         Console.WriteLine(received_data);
                     }
@@ -210,7 +210,7 @@ namespace NetNode
                         {
                             try
                             {
-                                Signal signal = new Signal(getTime(), oport.port, frame);
+                                Signal signal = new Signal(oport.port, frame);
                                 consoleWriter("sending signal port: " + signal.port);
                                 string data = JMessage.Serialize(JMessage.FromValue(signal));
                                 Console.WriteLine(data);
@@ -269,13 +269,6 @@ namespace NetNode
         private void consoleWriter(String msg)
         {
             Console.WriteLine("#" + DateTime.Now.ToLongTimeString() + DateTime.Now.ToLongDateString() + "#:" + msg);
-        }
-
-        private int getTime()
-        {
-            Random r = new Random();
-            int time = r.Next(10, 125);
-            return time;
         }
 
         static void Main(string[] args)
