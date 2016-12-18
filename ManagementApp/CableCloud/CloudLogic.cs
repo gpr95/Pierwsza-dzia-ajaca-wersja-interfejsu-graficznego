@@ -123,7 +123,7 @@ namespace CableCloud
                    toPort, virtualToPort);
 
             }
-            if (!portToThreadMap.ContainsKey(fromPort + ":" + virtualFromPort))
+            if (!portToThreadMap.ContainsKey(toPort + ":" + virtualToPort))
             {
                 TcpClient connectionTo = null;
                 try
