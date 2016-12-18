@@ -56,7 +56,7 @@ namespace CableCloud
 
             /** Add new cable to table */
             addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
-            portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
+        //    portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
             portToThreadMap.Add(fromPort + ":" + virtualFromPort, this);
             while (true)
             {

@@ -103,40 +103,44 @@ namespace CableCloud
         public void connectToNodes(int fromPort, int virtualFromPort,
                                     int toPort, int virtualToPort) 
         {
+            if (!portToThreadMap.ContainsKey(fromPort + ":" + virtualFromPort))
+            {
+                TcpClient connectionFrom = null;
+                try
+                {
+                    connectionFrom = new TcpClient("localhost", fromPort);
+                }
+                catch (SocketException ex)
+                {
+                    consoleWriter("Connection can't be made on port " + toPort, ERROR_COLOR);
+                    return;
+                }
+                String connection1Name = +fromPort +
+                              "(virtual:" + virtualFromPort + ")-->" + toPort +
+                               "(virtual:" + virtualToPort + ")";
+                NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom,
+                    ref portToThreadMap, tableWithPorts, connection1Name, fromPort, virtualFromPort,
+                   toPort, virtualToPort);
 
-            TcpClient connectionFrom = null;
-            try
-            {
-                connectionFrom = new TcpClient("localhost", fromPort);
             }
-            catch (SocketException ex)
+            if (!portToThreadMap.ContainsKey(fromPort + ":" + virtualFromPort))
             {
-                consoleWriter("Connection can't be made on port " + toPort, ERROR_COLOR);
-                return;
+                TcpClient connectionTo = null;
+                try
+                {
+                    connectionTo = new TcpClient("localhost", toPort);
+                }
+                catch (SocketException ex)
+                {
+                    consoleWriter("Connection can't be made on port " + toPort, ERROR_COLOR);
+                    return;
+                }
+                String connection2Name = toPort +
+                              "(virtual:" + virtualToPort + ")-->" + fromPort +
+                               "(virtual:" + virtualFromPort + ")";
+                NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
+                    ref portToThreadMap, tableWithPorts, connection2Name, toPort, virtualToPort, fromPort, virtualFromPort);
             }
-            String connection1Name = +fromPort +
-                          "(virtual:" + virtualFromPort + ")-->" + toPort +
-                           "(virtual:" + virtualToPort + ")";
-            NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom, 
-                ref portToThreadMap, tableWithPorts, connection1Name, fromPort, virtualFromPort,
-               toPort, virtualToPort);
-
-
-            TcpClient connectionTo = null;
-            try
-            {
-                connectionTo = new TcpClient("localhost", toPort);
-            }
-            catch (SocketException ex)
-            {
-                consoleWriter("Connection can't be made on port " + toPort,ERROR_COLOR);
-                return;
-            }
-            String connection2Name = toPort +
-                          "(virtual:" + virtualToPort + ")-->" + fromPort +
-                           "(virtual:" + virtualFromPort + ")";
-            NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
-                ref portToThreadMap, tableWithPorts, connection2Name, toPort, virtualToPort, fromPort, virtualFromPort);
         }
 
 
