@@ -56,6 +56,7 @@ namespace CableCloud
 
             /** Add new cable to table */
             addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
+            portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
             portToThreadMap.Add(fromPort + ":" + virtualFromPort, this);
             while (true)
             {
@@ -128,21 +129,35 @@ namespace CableCloud
         }
         private void addNewCable(int fromPort, int virtualFromPort, int toPort, int virtualToPort)
         {
-            table.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
-            consoleWriter("Made connection: from-" + fromPort + "(" + virtualFromPort + ")" + " to-" +
-                              toPort + "(" + virtualToPort + ")", ADMIN_COLOR);
+            try
+            {
+                table.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
+                consoleWriter("Made connection: from-" + fromPort + "(" + virtualFromPort + ")" + " to-" +
+                                  toPort + "(" + virtualToPort + ")", ADMIN_COLOR);
+            }
+            catch(ArgumentException ex)
+            {
+                consoleWriter("Connection already existed in table.", INFO_COLOR);
+            }
         }
 
         private void deleteCable(int fromPort, int virtualFromPort)
         {
             for (int i = table.Rows.Count - 1; i >= 0; i--)
             {
-                DataRow dr = table.Rows[i];
-                if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort))
+                DataRow drFrom = table.Rows[i];
+                if (drFrom["fromPort"].Equals(fromPort) && drFrom["virtualFromPort"].Equals(virtualFromPort))
                 {
-                    table.Rows.Remove(dr);
+                    table.Rows.Remove(drFrom);
                     portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
                 }
+
+//                DataRow drTo = table.Rows[i];
+//                if (drTo["toPort"].Equals(toPort) && drTo["virtualToPort"].Equals(virtualToPort))
+//                {
+//                    table.Rows.Remove(drTo);
+//                    portToThreadMap.Remove(toPort + ":" + virtualFromPort);
+//                }
             }
         }
         private void consoleWriter(String msg, ConsoleColor cc)

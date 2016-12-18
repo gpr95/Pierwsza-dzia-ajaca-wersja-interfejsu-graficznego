@@ -103,6 +103,7 @@ namespace CableCloud
         public void connectToNodes(int fromPort, int virtualFromPort,
                                     int toPort, int virtualToPort) 
         {
+
             TcpClient connectionFrom = null;
             try
             {
@@ -141,11 +142,15 @@ namespace CableCloud
 
         private void deleteCable(int fromPort, int virtualFromPort)
         {
+            int toPort = 0;
+            int virtualToPort = 0;
             for (int i = tableWithPorts.Rows.Count - 1; i >= 0; i--)
             {
                 DataRow dr = tableWithPorts.Rows[i];
                 if (dr["fromPort"].Equals(fromPort) && dr["virtualFromPort"].Equals(virtualFromPort))
                 {
+                    toPort = (int)dr["toPort"];
+                    virtualToPort = (int)dr["virtualToPort"];
                     tableWithPorts.Rows.Remove(dr);
                     portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
                 }
