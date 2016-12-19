@@ -307,11 +307,11 @@ namespace ManagementApp
                     management.isSpaceAvailable(nodeFrom, x, y, containerPictureBox.Size.Height, containerPictureBox.Size.Width);
                     foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
-                            management.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo);
+                            management.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo, true);
                         else if (elem.End.Equals(oldPosition))
-                            management.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom);
+                            management.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom, true);
 
-                    consoleWriter("Node phisical move from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
+                    consoleWriter("Placement of node changed from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
                         x + "," + y);
                     nodeFrom = null;
                     connectionTemp.Clear();
@@ -529,9 +529,9 @@ namespace ManagementApp
 
         public void errorMessage(String ms)
         {
-            consoleTextBox.AppendText("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString());
+            consoleTextBox.AppendText("#### " + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString());
             consoleTextBox.AppendText(Environment.NewLine);
-            consoleTextBox.AppendText("#:" + ms);
+            consoleTextBox.AppendText("####: " + ms);
             consoleTextBox.AppendText(Environment.NewLine);
         }
 
@@ -654,7 +654,7 @@ namespace ManagementApp
             {
                 panel.DrawLine(orangePen, t.Points.ElementAt(i - 1), t.Points.ElementAt(i));
             }
-            containerPictureBox.Refresh();
+            //containerPictureBox.Refresh();
         }
 
         private void putToGrid(ref int x, ref int y)
@@ -788,7 +788,7 @@ namespace ManagementApp
 
         private void consoleWriter(String msg)
         {
-            consoleTextBox.AppendText("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString());
+            consoleTextBox.AppendText("# " + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString());
             consoleTextBox.AppendText(Environment.NewLine);
             consoleTextBox.AppendText("\n#:" + msg);
             consoleTextBox.AppendText(Environment.NewLine);

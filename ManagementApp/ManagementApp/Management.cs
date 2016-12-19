@@ -248,7 +248,7 @@ namespace ManagementApp
             
         }
 
-        public void addConnection(Node from, int portFrom, Node to, int portTo)
+        public void addConnection(Node from, int portFrom, Node to, int portTo, bool move = false)
         {
             if (from is ClientNode)
                 if (connectionList.Where(i => i.From.Equals(from) || i.To.Equals(from)).Any())
@@ -283,13 +283,16 @@ namespace ManagementApp
                 }
                 else
                 {
-                    //List<NodeConnection> portList = connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).ToList();
-                    if (connectionList.Where(i => i.From.Equals(to)).ToList().Where(i => i.VirtualPortFrom.Equals(portTo)).Any())
+                    if(move)
+                    {
+                        connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
+                        mainWindow.bind();
+                    }
+                    else if (connectionList.Where(i => i.From.Equals(to)).ToList().Where(i => i.VirtualPortFrom.Equals(portTo)).Any())
                         mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.1");
-                        //to fix
-                    //else if (connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
+                    else if (connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
                         //connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any();
-                        //mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.2");
+                        mainWindow.errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.2");
                     else if (connectionList.Where(i => i.From.Equals(from)).ToList().Where(i => i.VirtualPortFrom.Equals(portFrom)).Any())
                         mainWindow.errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.3");
                     else if (connectionList.Where(i => i.To.Equals(from)).ToList().Where(i => i.VirtualPortTo.Equals(portFrom)).Any())
@@ -299,7 +302,7 @@ namespace ManagementApp
                         connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
                         mainWindow.bind();
                     }
-                }
+            }
         }
 
         private int numberOfNodeConnections(Node n)
