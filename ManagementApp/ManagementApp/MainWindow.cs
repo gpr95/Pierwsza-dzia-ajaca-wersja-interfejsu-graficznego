@@ -311,9 +311,8 @@ namespace ManagementApp
                         else if (elem.End.Equals(oldPosition))
                             management.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom);
 
-                    consoleTextBox.AppendText("Node moved from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
+                    consoleWriter("Node phisical move from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
                         x + "," + y);
-                    consoleTextBox.AppendText(Environment.NewLine);
                     nodeFrom = null;
                     connectionTemp.Clear();
                     break;
@@ -519,19 +518,20 @@ namespace ManagementApp
         public void addNode(Node node)
         {
             if (node is ClientNode)
-                consoleTextBox.AppendText("Client Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.Name);
+                consoleWriter("Client Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.LocalPort);
 
             if (node is NetNode)
-                consoleTextBox.AppendText("Network Node added at: " + node.Position.X + "," + node.Position.Y);
+                consoleWriter("Network Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.LocalPort);
 
-            consoleTextBox.AppendText(Environment.NewLine);
 
             refreshTable();
         }
 
         public void errorMessage(String ms)
         {
-            consoleTextBox.AppendText(ms);
+            consoleTextBox.AppendText("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString());
+            consoleTextBox.AppendText(Environment.NewLine);
+            consoleTextBox.AppendText("#:" + ms);
             consoleTextBox.AppendText(Environment.NewLine);
         }
 
@@ -557,8 +557,7 @@ namespace ManagementApp
         public void bind()
         {
             cableHandler.updateOneConnection();
-            consoleTextBox.AppendText("Connection  added");
-            consoleTextBox.AppendText(Environment.NewLine);
+            consoleWriter("Connection added from " + connectionList.Last().From.Name + " to " + connectionList.Last().To.Name);
         }
 
         public void bind(NodeConnection newNodeConn)
@@ -583,13 +582,11 @@ namespace ManagementApp
             if (add)
             {
                 domainList.Add(toAdd);
-                consoleTextBox.AppendText("Domain added");
-                consoleTextBox.AppendText(Environment.NewLine);
+                consoleWriter("Domain added");
             }
             else
             {
-                consoleTextBox.AppendText("Domains can't cross each others or domain too small for rendering.");
-                consoleTextBox.AppendText(Environment.NewLine);
+                errorMessage("Domains can't cross each others or domain too small for rendering.");
             }
         }
 
@@ -657,7 +654,7 @@ namespace ManagementApp
             {
                 panel.DrawLine(orangePen, t.Points.ElementAt(i - 1), t.Points.ElementAt(i));
             }
-            //containerPictureBox.Refresh();
+            containerPictureBox.Refresh();
         }
 
         private void putToGrid(ref int x, ref int y)
@@ -719,14 +716,12 @@ namespace ManagementApp
             int portT;
             if (!int.TryParse(portFrom,out portF))
             {
-                consoleTextBox.AppendText("Please enter correct ports.");
-                consoleTextBox.AppendText(Environment.NewLine);
+                errorMessage("Please enter correct ports.");
                 return;
             }
             if (!int.TryParse(portTo, out portT))
             {
-                consoleTextBox.AppendText("Please enter correct ports in To.");
-                consoleTextBox.AppendText(Environment.NewLine);
+                errorMessage("Please enter correct ports in To.");
                 return;
             }
             management.addConnection(aNode, portF, bNode, portT);
@@ -774,7 +769,7 @@ namespace ManagementApp
             putToGrid(ref x, ref y);
             Node n = getNodeFrom(x, y);
             //SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
-            errorMessage("Paint Trails");
+            errorMessage("Painting Trails");
             tempTrailList = new List<Trail>(management.getTrailForNode(n));
             foreach(var a in tempTrailList)
                 errorMessage(a.toString());
@@ -791,6 +786,12 @@ namespace ManagementApp
             management.clearAllTrails();
         }
 
-
+        private void consoleWriter(String msg)
+        {
+            consoleTextBox.AppendText("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString());
+            consoleTextBox.AppendText(Environment.NewLine);
+            consoleTextBox.AppendText("\n#:" + msg);
+            consoleTextBox.AppendText(Environment.NewLine);
+        }
     }
 }

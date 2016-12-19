@@ -639,7 +639,7 @@ namespace ManagementApp
 
                 //protocol.possibleDestinations.Add(trail.To.Name, trail.StartingSlot);
                 protocol.Port = trail.PortFrom;
-                mainWindow.errorMessage(trail.From.Name + "<->" + protocol.Port);
+                mainWindow.errorMessage("Sended trail info to : " +trail.From.Name + "," + protocol.Port);
                 String send_object = JSON.Serialize(JSON.FromValue(protocol));
                 writer.Write(send_object);
 
@@ -660,7 +660,7 @@ namespace ManagementApp
                 }
 
                 protocol.Port = trail.PortFrom;
-                mainWindow.errorMessage(trail.From.Name + "<->" + protocol.Port);
+                mainWindow.errorMessage("Sended trail info to : " + trail.From.Name + "," + protocol.Port);
                 send_object = JSON.Serialize(JSON.FromValue(protocol));
                 writer.Write(send_object);
 

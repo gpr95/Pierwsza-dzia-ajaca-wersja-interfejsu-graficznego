@@ -155,7 +155,8 @@ namespace CableCloud
         }
         private void consoleWriter(String msg, ConsoleColor cc)
         {
-            Console.ForegroundColor = cc;
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.BackgroundColor = ConsoleColor.White;
             Console.WriteLine();
             Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
         }
