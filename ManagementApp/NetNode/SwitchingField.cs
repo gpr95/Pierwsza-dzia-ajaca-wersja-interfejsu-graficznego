@@ -62,7 +62,7 @@ namespace NetNode
             {
                 foreach (var fibrow in fib)
                 {
-                    if (fibrow.iport == row.iport && fibrow.in_cont == row.in_cont && fibrow.oport == row.oport && fibrow.out_cont == row.out_cont)
+                    if (fibrow.iport == row.iport && fibrow.in_cont == row.in_cont)// && fibrow.oport == row.oport && fibrow.out_cont == row.out_cont)
                     {
                         Console.WriteLine("Already stored");
                         break;
