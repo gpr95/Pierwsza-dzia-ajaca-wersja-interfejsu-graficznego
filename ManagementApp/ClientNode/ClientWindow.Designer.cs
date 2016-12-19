@@ -66,6 +66,7 @@
             this.logTextBox.Location = new System.Drawing.Point(20, 124);
             this.logTextBox.Multiline = true;
             this.logTextBox.Name = "logTextBox";
+            this.logTextBox.ReadOnly = true;
             this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.logTextBox.Size = new System.Drawing.Size(301, 84);
             this.logTextBox.TabIndex = 3;
@@ -89,6 +90,7 @@
             this.receivedTextBox.Location = new System.Drawing.Point(20, 30);
             this.receivedTextBox.Multiline = true;
             this.receivedTextBox.Name = "receivedTextBox";
+            this.receivedTextBox.ReadOnly = true;
             this.receivedTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.receivedTextBox.Size = new System.Drawing.Size(301, 61);
             this.receivedTextBox.TabIndex = 1;
@@ -219,6 +221,7 @@
             this.ClientSize = new System.Drawing.Size(934, 242);
             this.Controls.Add(this.sendingGroupBox);
             this.Controls.Add(this.logPanel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "ClientWindow";
             this.Text = "ClientWindow";
             this.logPanel.ResumeLayout(false);
@@ -226,7 +229,6 @@
             this.sendingGroupBox.ResumeLayout(false);
             this.sendingGroupBox.PerformLayout();
             this.ResumeLayout(false);
-            this.FormClosing += ClientWindow_FormClosing;
 
         }
 

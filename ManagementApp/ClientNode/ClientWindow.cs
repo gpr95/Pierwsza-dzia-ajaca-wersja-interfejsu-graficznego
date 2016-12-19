@@ -122,13 +122,18 @@ namespace ClientWindow
                         }
                         else if (management_packet.State == ManagementApp.ManagmentProtocol.POSSIBLEDESITATIONS)
                         {
+                            
                             this.possibleDestinations = management_packet.possibleDestinations;
                             this.virtualPort = management_packet.Port;
                             //logTextBox.AppendText("Virtual Port: " + virtualPort);
                             List<string> destinations = new List<string>(this.possibleDestinations.Keys);
+                            
                             sendComboBox.Items.Clear();
+                            sendComboBox.Refresh();
                             for (int i = 0; i < destinations.Count; i++)
                             {
+                                //DEBUG
+                                //Log2("MAGAGEMENT INFO", destinations[i] + " : " + possibleDestinations[destinations[i]]);
                                 sendComboBox.Items.Add(destinations[i]);
                             }
                         }
@@ -175,7 +180,6 @@ namespace ClientWindow
                 }
                 else
                 {
-                   // VirtualContainer4 vc4 = new VirtualContainer4(adaptation(), message);
                     STM1 frame = new STM1(adaptation(), message);
                     Signal signal = new Signal(virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -362,8 +366,7 @@ namespace ClientWindow
         private void sendComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             currentSlot = possibleDestinations[sendComboBox.SelectedItem.ToString()];
-            //logTextBox.AppendText("Current slot: " + currentSlot);
-           // logTextBox.AppendText(Environment.NewLine);
+
 
             if (currentSlot == 1)
             {

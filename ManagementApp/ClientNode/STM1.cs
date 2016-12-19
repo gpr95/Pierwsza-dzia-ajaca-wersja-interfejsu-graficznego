@@ -13,8 +13,6 @@ namespace ClientWindow
         //RSOH
         //MSOH
         public VirtualContainer4 vc4;
-       // public VirtualContainer3[] vc3List = new VirtualContainer3[3];//sa trzy kontenery vc3 a nie dwa
-       // public Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
 
         public STM1()
         {
