@@ -619,6 +619,16 @@ namespace ManagementApp
                 }
             }
 
+            foreach (Node n in nodeList)
+            {
+                ManagmentProtocol protocol = new ManagmentProtocol();
+                protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
+                protocol.possibleDestinations = new Dictionary<string, int>();
+                String send_object = JSON.Serialize(JSON.FromValue(protocol));
+                BinaryWriter writer = n.SocketWriter;
+                writer.Write(send_object);
+            }
+
             foreach (Trail trail in trailList)
             {
                 if (trail.From == null)
@@ -781,6 +791,7 @@ namespace ManagementApp
                 table.Rows.Remove(table.Rows.Find(t.Name));
             }
             trailList = new List<Trail>();
+            sendOutInformation();
         }
 
         public List<Trail> getTrailForNode(Node n)

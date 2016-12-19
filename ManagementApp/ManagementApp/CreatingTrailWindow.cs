@@ -74,6 +74,8 @@ namespace ManagementApp
                 if (a == default(Node) || b == default(Node))
                     return;
                 Trail t = management.createTrail(a, b, checkBox1.Checked);
+                if (t == null)
+                    return;
                 foreach(var con in t.ConnectionDictionary)
                 {
                     var row = table.NewRow();
