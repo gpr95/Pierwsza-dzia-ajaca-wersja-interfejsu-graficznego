@@ -232,23 +232,22 @@ namespace NetNode
         private int commOption()
         {
             int counter = 1;
-            if (SwitchingField.fib.Count > 0)
+            for (int j = 0; j < SwitchingField.fib.Count; j++)
             {
-                int temp = SwitchingField.fib[0].iport;
-                int temp2 = SwitchingField.fib[0].oport;
-                for(int i=1; i<SwitchingField.fib.Count; i++)
+                int temp = SwitchingField.fib[j].iport;
+                int temp2 = SwitchingField.fib[j].oport;
+                for (int i = 1; i < SwitchingField.fib.Count; i++)
                 {
-                    if(SwitchingField.fib[i].oport == temp2)
+                    if (SwitchingField.fib[i].oport == temp2)
                     {
-                        if(SwitchingField.fib[i].iport != temp)
+                        if (SwitchingField.fib[i].iport != temp && SwitchingField.fib[i].in_cont != 1)
                             counter++;
                     }
                 }
+                if (counter == 2 || counter == 3)
+                    return 1;
             }
-            if (counter == 2 || counter == 3)
-                return 1;
-            else
-                return 0;
+            return 0;
         }
 
         private void insertFib()
