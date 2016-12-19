@@ -26,7 +26,8 @@ namespace CableCloud
         /** HANDLERS MAP - localPORT-Thread with connection to this port */
         private Dictionary<String, NodeConnectionThread> portToThreadMap;
 
-
+        /** Avilable port list */
+        List<int> portList;
         public CloudLogic()
         {
             tableWithPorts = new DataTable("Connections");
@@ -35,7 +36,9 @@ namespace CableCloud
             tableWithPorts.Columns.Add("virtualFromPort", typeof(int)).AllowDBNull = false;
             tableWithPorts.Columns.Add("toPort", typeof(int)).AllowDBNull = false;
             tableWithPorts.Columns.Add("virtualToPort", typeof(int)).AllowDBNull = false;
-
+            portList = new List<int>();
+            for (int i = 9000; i < 9300; i++)
+                portList.Add(i);
             /** LOGS CONSOLE  */
             consoleWriter("Cloud start", ADMIN_COLOR);
         }
@@ -106,9 +109,14 @@ namespace CableCloud
             if (!portToThreadMap.ContainsKey(fromPort + ":" + virtualFromPort))
             {
                 TcpClient connectionFrom = null;
+                int minPort = portList.Min();
                 try
                 {
-                    connectionFrom = new TcpClient("localhost", fromPort);
+                    IPAddress ipAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
+                    IPEndPoint ipLocalEndPoint = new IPEndPoint(ipAddress, minPort);
+                    connectionFrom = new TcpClient(ipLocalEndPoint);
+                    connectionFrom.Connect("localhost", fromPort);
+                    portList.Remove(minPort);
                 }
                 catch (SocketException ex)
                 {
@@ -120,15 +128,20 @@ namespace CableCloud
                                "(virtual:" + virtualToPort + ")";
                 NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom,
                     ref portToThreadMap, tableWithPorts, connection1Name, fromPort, virtualFromPort,
-                   toPort, virtualToPort);
+                   toPort, virtualToPort, minPort, ref portList);
 
             }
             if (!portToThreadMap.ContainsKey(toPort + ":" + virtualToPort))
             {
                 TcpClient connectionTo = null;
+                int minPort = portList.Min();
                 try
                 {
-                    connectionTo = new TcpClient("localhost", toPort);
+                    IPAddress ipAddress = Dns.GetHostEntry(Dns.GetHostName()).AddressList[0];
+                    IPEndPoint ipLocalEndPoint = new IPEndPoint(ipAddress, minPort);
+                    connectionTo = new TcpClient(ipLocalEndPoint);
+                    connectionTo.Connect("localhost", toPort);
+                    portList.Remove(minPort);
                 }
                 catch (SocketException ex)
                 {
@@ -139,7 +152,7 @@ namespace CableCloud
                               "(virtual:" + virtualToPort + ")-->" + fromPort +
                                "(virtual:" + virtualFromPort + ")";
                 NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
-                    ref portToThreadMap, tableWithPorts, connection2Name, toPort, virtualToPort, fromPort, virtualFromPort);
+                    ref portToThreadMap, tableWithPorts, connection2Name, toPort, virtualToPort, fromPort, virtualFromPort, minPort, ref portList);
             }
         }
 
@@ -156,6 +169,8 @@ namespace CableCloud
                     toPort = (int)dr["toPort"];
                     virtualToPort = (int)dr["virtualToPort"];
                     tableWithPorts.Rows.Remove(dr);
+                    portList.Add(portToThreadMap[fromPort + ":" + virtualFromPort].tcpClientPort);
+                    portToThreadMap[fromPort + ":" + virtualFromPort].executeConnection();
                     portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
                 }
             }

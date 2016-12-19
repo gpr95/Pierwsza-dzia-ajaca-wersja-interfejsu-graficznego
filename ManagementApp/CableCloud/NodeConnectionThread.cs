@@ -29,11 +29,12 @@ namespace CableCloud
         private int virtualFromPort;
         private int toPort;
         private int virtualToPort;
-
+        public int tcpClientPort;
+        private List<int> portList;
         private String name; 
 
         public NodeConnectionThread(ref TcpClient connection,
-            ref Dictionary<String, NodeConnectionThread> portToThreadMap, DataTable table, String name, int fromPort, int virtualFromPort, int toPort, int virtualToPort)
+            ref Dictionary<String, NodeConnectionThread> portToThreadMap, DataTable table, String name, int fromPort, int virtualFromPort, int toPort, int virtualToPort,int tcpClientPort, ref List<int> portList)
         {
             this.connection = connection;
             this.portToThreadMap = portToThreadMap;
@@ -43,6 +44,8 @@ namespace CableCloud
             this.virtualFromPort = virtualFromPort;
             this.toPort = toPort;
             this.virtualToPort = virtualToPort;
+            this.tcpClientPort = tcpClientPort;
+            this.portList = portList;
 
             thread = new Thread(nodeConnectionThread);
             thread.Start();
@@ -149,6 +152,8 @@ namespace CableCloud
                 if (drFrom["fromPort"].Equals(fromPort) && drFrom["virtualFromPort"].Equals(virtualFromPort))
                 {
                     table.Rows.Remove(drFrom);
+                    portList.Add(portToThreadMap[fromPort + ":" + virtualFromPort].tcpClientPort);
+                    portToThreadMap[fromPort + ":" + virtualFromPort].executeConnection();
                     portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
                 }
             }
@@ -159,6 +164,12 @@ namespace CableCloud
             Console.BackgroundColor = ConsoleColor.White;
             Console.WriteLine();
             Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+        }
+
+        public void executeConnection()
+        {
+            connection.GetStream().Close();
+            connection.Close();
         }
 
     }
