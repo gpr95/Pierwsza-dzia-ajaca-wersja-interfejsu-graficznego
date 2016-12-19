@@ -64,7 +64,9 @@ namespace NetNode
                 {
                     if (fibrow.iport == row.iport && fibrow.in_cont == row.in_cont)// && fibrow.oport == row.oport && fibrow.out_cont == row.out_cont)
                     {
-                        Console.WriteLine("Already stored");
+                        Console.WriteLine("Updating already stored");
+                        fib.Remove(fibrow);
+                        fib.Add(row);
                         break;
                     }
                     counter++;
