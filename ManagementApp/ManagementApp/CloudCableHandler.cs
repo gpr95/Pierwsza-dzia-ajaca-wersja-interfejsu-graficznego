@@ -41,7 +41,7 @@ namespace ManagementApp
 
         public void updateConnections(List<NodeConnection> connections)
         {
-            this.allConnections.AddRange(connections);
+            //this.allConnections.AddRange(connections);
             for (int i = 0; i < connections.Count; i++)
             {
                 System.Threading.Thread.Sleep(5000);

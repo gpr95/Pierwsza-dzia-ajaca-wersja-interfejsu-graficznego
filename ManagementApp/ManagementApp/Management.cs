@@ -469,11 +469,11 @@ namespace ManagementApp
             Node n = nodeList.Where(s => s.Name.Equals(v)).FirstOrDefault();
             if(n.ProcessHandle.HasExited)
             {
-                nodeList.Remove(n);
+                //nodeList.Remove(n);
                 if (n is ClientNode)
-                    nodeList.Add(new ClientNode((ClientNode)n));
+                    n = new ClientNode((ClientNode)n);
                 else if (n is NetNode)
-                    nodeList.Add(new NetNode((NetNode) n));
+                    n = new NetNode((NetNode) n);
 
                 //List<string> conL = findElemAtPosition(n.Position.X, n.Position.Y);
                 mainWindow.updateConnections(connectionList);
@@ -511,7 +511,7 @@ namespace ManagementApp
 
                     foreach (Node nodeProcessing in neighbors)
                     {
-                        if (listOfWhiteNodes.Where(i => i.Equals(nodeProcessing)).Any())
+                        if (listOfWhiteNodes.Where(i => i.Name.Equals(nodeProcessing.Name)).Any())
                         {
                             List<Node> newPath = new List<Node>(path);
                             listOfGrayNodes.Add(nodeProcessing);
@@ -624,7 +624,7 @@ namespace ManagementApp
                 if (trail.From == null)
                     continue;
                 //Fix needed
-                BinaryWriter writer = new BinaryWriter(trail.From.TcpClient.GetStream());
+                BinaryWriter writer = trail.From.SocketWriter;//new BinaryWriter(trail.From.TcpClient.GetStream());
                 ManagmentProtocol protocol = new ManagmentProtocol();
                 protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
                 protocol.possibleDestinations = new Dictionary<string, int>();
@@ -670,7 +670,7 @@ namespace ManagementApp
                 foreach (KeyValuePair<Node, FIB> fib in trail.ComponentFIBs)
                 {
                     //continue;
-                    writer = fib.Key.SocketWriter;//new BinaryWriter(fib.Key.TcpClient.GetStream());
+                    writer = fib.Key.SocketWriter; //new BinaryWriter(fib.Key.TcpClient.GetStream());//
                     protocol = new ManagmentProtocol();
                     protocol.State = ManagmentProtocol.ROUTINGENTRY;
                     Console.WriteLine("routingentry");
