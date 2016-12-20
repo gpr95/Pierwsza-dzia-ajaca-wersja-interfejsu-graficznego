@@ -239,7 +239,7 @@ namespace ManagementApp
                 kvp.Key.OccupiedSlots.Remove(kvp.Value);
                 kvp.Key.AutoOccupiedSlots.Remove(kvp.Value);
             }
-            trail.from = null;
+            //trail.from = null;
         }
 
         public String toString()

@@ -469,14 +469,33 @@ namespace ManagementApp
             Node n = nodeList.Where(s => s.Name.Equals(v)).FirstOrDefault();
             if(n.ProcessHandle.HasExited)
             {
-                //nodeList.Remove(n);
+                nodeList.Remove(n);
                 if (n is ClientNode)
                     n = new ClientNode((ClientNode)n);
                 else if (n is NetNode)
                     n = new NetNode((NetNode) n);
-
+                nodeList.Add(n);
                 //List<string> conL = findElemAtPosition(n.Position.X, n.Position.Y);
+                foreach (NodeConnection c in connectionList)
+                {
+                    if (c.From.Name.Equals(n.Name))
+                        c.From = n;
+                    if (c.To.Name.Equals(n.Name))
+                        c.To = n;
+                }
                 mainWindow.updateConnections(connectionList);
+                List<Trail> copyOfTrails = new List<Trail>(trailList);
+                foreach(Trail t in trailList)
+                {
+                    t.clearTrail(t);
+                }
+                trailList.Clear();
+                for(int i = 0; i < copyOfTrails.Count(); i++)
+                {
+                    Node nodeA = copyOfTrails.ElementAt(i).From;
+                    Node nodeB = copyOfTrails.ElementAt(i).To;
+                    trailList.Add(createTrail(nodeA, nodeB, copyOfTrails.ElementAt(i).StartingSlot == 1));
+                }
                 sendOutInformation();
             }
         }
@@ -544,10 +563,10 @@ namespace ManagementApp
         private List<Node> findNeighborNodes(Node n)
         {
             List<Node> neighborNodes = new List<Node>();
-            List<NodeConnection> possibeNodesConn = connectionList.Where(i => i.From.Equals(n) || i.To.Equals(n)).ToList();
+            List<NodeConnection> possibeNodesConn = connectionList.Where(i => i.From.Name.Equals(n.Name) || i.To.Name.Equals(n.Name)).ToList();
             foreach (NodeConnection con in possibeNodesConn)
             {
-                neighborNodes.Add(con.From.Equals(n) ? con.To : con.From);
+                neighborNodes.Add(con.From.Equals(n) ? nodeList.Where(c => c.Name.Equals(con.To.Name)).FirstOrDefault() : nodeList.Where(c => c.Name.Equals(con.From.Name)).FirstOrDefault());
             }
             return neighborNodes;
         }
@@ -574,7 +593,7 @@ namespace ManagementApp
 
         public Trail createTrail(Node from, Node to, bool vc4 = false)
         {
-            if (from == null || to == null)
+            if (from == null || to == null || from == default(Node) || to == default(Node))
                 return null;
             List<List<Node>> paths = findPathsLN(from, true);
             List<Node> path;
@@ -619,7 +638,7 @@ namespace ManagementApp
                 }
             }
 
-            foreach (Node n in nodeList)
+            foreach (Node n in nodeList.Where(n => n is ClientNode).ToList())
             {
                 ManagmentProtocol protocol = new ManagmentProtocol();
                 protocol.State = ManagmentProtocol.POSSIBLEDESITATIONS;
@@ -676,7 +695,7 @@ namespace ManagementApp
                 mainWindow.errorMessage("Sended trail info to : " + trail.From.Name + "," + protocol.Port);
                 send_object = JSON.Serialize(JSON.FromValue(protocol));
                 writer.Write(send_object);
-
+                Thread.Sleep(1000);
                 foreach (KeyValuePair<Node, FIB> fib in trail.ComponentFIBs)
                 {
                     //continue;

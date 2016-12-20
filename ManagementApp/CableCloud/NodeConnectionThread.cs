@@ -147,7 +147,14 @@ namespace CableCloud
                 DataRow drFrom = table.Rows[i];
                 if (drFrom["fromPort"].Equals(fromPort) && drFrom["virtualFromPort"].Equals(virtualFromPort))
                 {
-                    table.Rows.Remove(drFrom);
+                    try
+                    {
+                        table.Rows.Remove(drFrom);
+                    }
+                    catch(RowNotInTableException ex)
+                    {
+                        consoleWriter("Element already deleted from table.", ERROR_COLOR);
+                    }
                     portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
                 }
             }
