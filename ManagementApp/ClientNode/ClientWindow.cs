@@ -23,7 +23,7 @@ namespace ClientWindow
         private int currentSlot;
         private static string path;
         private Dictionary<String, int> possibleDestinations = new Dictionary<string, int>();
-        private int virtualPort;
+        private int virtualPort=1;
         private int managementPort;
 
         public ClientWindow(string[] args)
@@ -160,6 +160,7 @@ namespace ClientWindow
 
         private void send(string message)
         {
+           // logTextBox.AppendText("Virtual Port: " + virtualPort);
             try
             {
                 if (currentSpeed == 3)
