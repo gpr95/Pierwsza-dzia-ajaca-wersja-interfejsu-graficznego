@@ -66,7 +66,7 @@ namespace ManagementApp
 
                     if (n is NetNode)
                         nodeList.Add(new NetNode((NetNode)n));
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
                
                 List<NodeConnection> tmpNodeConnList = new List<NodeConnection>();
@@ -82,7 +82,7 @@ namespace ManagementApp
                     }
                     mainWindow.bind(nc);
                     tmpNodeConnList.Add(new NodeConnection(nc));
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
 
                 List<Domain> tmpDomainList = new List<Domain>();
