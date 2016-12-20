@@ -31,6 +31,7 @@ namespace NetNode
         {
             flag = true;
             this.virtualIp = args[0];
+            Console.Title = args[0];
             this.ports = new Ports();
             this.agent = new ManagementAgent(Convert.ToInt32(args[2]), this.virtualIp);
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
