@@ -47,6 +47,8 @@
             this.timeLbl = new System.Windows.Forms.Label();
             this.sendBtn = new System.Windows.Forms.Button();
             this.timeTextBox = new System.Windows.Forms.TextBox();
+            this.portLbl = new System.Windows.Forms.Label();
+            this.portTextBox = new System.Windows.Forms.TextBox();
             this.logPanel.SuspendLayout();
             this.sendingGroupBox.SuspendLayout();
             this.sendParamsGroupBox1.SuspendLayout();
@@ -136,6 +138,8 @@
             // 
             // sendParamsGroupBox1
             // 
+            this.sendParamsGroupBox1.Controls.Add(this.portTextBox);
+            this.sendParamsGroupBox1.Controls.Add(this.portLbl);
             this.sendParamsGroupBox1.Controls.Add(this.addButton);
             this.sendParamsGroupBox1.Controls.Add(this.slotTextBox);
             this.sendParamsGroupBox1.Controls.Add(this.nodeTextBox);
@@ -153,9 +157,9 @@
             // 
             this.addButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
             this.addButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.addButton.Location = new System.Drawing.Point(238, 17);
+            this.addButton.Location = new System.Drawing.Point(265, 17);
             this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(91, 23);
+            this.addButton.Size = new System.Drawing.Size(73, 23);
             this.addButton.TabIndex = 4;
             this.addButton.Text = "Add";
             this.addButton.UseVisualStyleBackColor = false;
@@ -166,9 +170,9 @@
             this.slotTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
             this.slotTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.slotTextBox.ForeColor = System.Drawing.SystemColors.Window;
-            this.slotTextBox.Location = new System.Drawing.Point(156, 17);
+            this.slotTextBox.Location = new System.Drawing.Point(129, 18);
             this.slotTextBox.Name = "slotTextBox";
-            this.slotTextBox.Size = new System.Drawing.Size(56, 20);
+            this.slotTextBox.Size = new System.Drawing.Size(28, 20);
             this.slotTextBox.TabIndex = 3;
             // 
             // nodeTextBox
@@ -178,13 +182,13 @@
             this.nodeTextBox.ForeColor = System.Drawing.SystemColors.Window;
             this.nodeTextBox.Location = new System.Drawing.Point(49, 17);
             this.nodeTextBox.Name = "nodeTextBox";
-            this.nodeTextBox.Size = new System.Drawing.Size(54, 20);
+            this.nodeTextBox.Size = new System.Drawing.Size(40, 20);
             this.nodeTextBox.TabIndex = 2;
             // 
             // slotLbl
             // 
             this.slotLbl.AutoSize = true;
-            this.slotLbl.Location = new System.Drawing.Point(122, 19);
+            this.slotLbl.Location = new System.Drawing.Point(95, 22);
             this.slotLbl.Name = "slotLbl";
             this.slotLbl.Size = new System.Drawing.Size(28, 13);
             this.slotLbl.TabIndex = 1;
@@ -286,6 +290,25 @@
             this.timeTextBox.TabIndex = 4;
             this.timeTextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // portLbl
+            // 
+            this.portLbl.AutoSize = true;
+            this.portLbl.Location = new System.Drawing.Point(164, 20);
+            this.portLbl.Name = "portLbl";
+            this.portLbl.Size = new System.Drawing.Size(29, 13);
+            this.portLbl.TabIndex = 5;
+            this.portLbl.Text = "Port:";
+            // 
+            // portTextBox
+            // 
+            this.portTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.portTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.portTextBox.ForeColor = System.Drawing.SystemColors.Window;
+            this.portTextBox.Location = new System.Drawing.Point(199, 17);
+            this.portTextBox.Name = "portTextBox";
+            this.portTextBox.Size = new System.Drawing.Size(45, 20);
+            this.portTextBox.TabIndex = 6;
+            // 
             // ClientWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -329,5 +352,7 @@
         private System.Windows.Forms.TextBox nodeTextBox;
         private System.Windows.Forms.Label slotLbl;
         private System.Windows.Forms.Label nodeLbl;
+        private System.Windows.Forms.TextBox portTextBox;
+        private System.Windows.Forms.Label portLbl;
     }
 }

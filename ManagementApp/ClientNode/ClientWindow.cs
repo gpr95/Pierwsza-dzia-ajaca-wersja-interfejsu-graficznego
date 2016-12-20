@@ -23,7 +23,7 @@ namespace ClientWindow
         private int currentSlot;
         private static string path;
         private Dictionary<String, int> possibleDestinations = new Dictionary<string, int>();
-        private int virtualPort=1;
+        private int virtualPort = 1;
         private int managementPort;
 
         public ClientWindow(string[] args)
@@ -160,7 +160,7 @@ namespace ClientWindow
 
         private void send(string message)
         {
-           
+            
             try
             {
                 if (currentSpeed == 3)
@@ -251,7 +251,7 @@ namespace ClientWindow
                         if (isVc3)
                             foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                             {
-                                Log1("OUT",virtualIP, virtualPort.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                                Log1("OUT", virtualIP, virtualPort.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                             }
                         else
                             Log1("OUT", virtualIP, virtualPort.ToString(), 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
@@ -388,16 +388,20 @@ namespace ClientWindow
         private void addButton_Click(object sender, EventArgs e)
         {
             string destinationNode = nodeTextBox.Text;
+
             int slot;
             bool res = int.TryParse(slotTextBox.Text, out slot);
             if (res)
             {
+                
                 if (this.possibleDestinations.ContainsKey(destinationNode))
                 {
                     possibleDestinations[destinationNode] = slot;
-                }else
+                }
+                else
                 {
-                    possibleDestinations.Add(destinationNode, slot);
+                    if (destinationNode != "")
+                        possibleDestinations.Add(destinationNode, slot);
                 }
                 List<string> destinations = new List<string>(this.possibleDestinations.Keys);
                 sendComboBox.Items.Clear();
@@ -414,12 +418,24 @@ namespace ClientWindow
             }
             else
             {
-                logTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : "+"Wrong slot format");
+                logTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + "Wrong slot format");
                 logTextBox.AppendText(Environment.NewLine);
                 slotTextBox.Clear();
             }
 
-            
+            int virtualPort;
+            bool res2 = int.TryParse(portTextBox.Text, out virtualPort);
+            if (res2)
+            {
+                this.virtualPort = virtualPort;
+            }
+            else
+            {
+                logTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + "Wrong port format");
+                logTextBox.AppendText(Environment.NewLine);
+                
+            }
+            portTextBox.Clear();
         }
     }
 }
