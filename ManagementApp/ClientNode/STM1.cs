@@ -22,9 +22,9 @@ namespace ClientWindow
         {
             this.vc4 = new VirtualContainer4(POH, C4);
         }
-        public STM1(Dictionary<int, VirtualContainer3> vc3List)
+        public STM1(int POH,Dictionary<int, VirtualContainer3> vc3List)
         {
-            this.vc4 = new VirtualContainer4(vc3List);
+            this.vc4 = new VirtualContainer4(POH,vc3List);
             
         }
 
@@ -78,8 +78,9 @@ namespace ClientWindow
             this.C4 = C4;
         }
 
-        public VirtualContainer4(Dictionary<int, VirtualContainer3> vc3List)
+        public VirtualContainer4(int POH,Dictionary<int, VirtualContainer3> vc3List)
         {
+            this.POH = POH;
             this.vc3List = vc3List;
         }
     }

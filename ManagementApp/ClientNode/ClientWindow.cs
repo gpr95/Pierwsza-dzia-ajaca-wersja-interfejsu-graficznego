@@ -169,7 +169,7 @@ namespace ClientWindow
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
                     Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
                     vc3List.Add(currentSlot, vc3);
-                    STM1 frame = new STM1(vc3List);
+                    STM1 frame = new STM1(adaptation2(),vc3List);
                     //SYGNAL
                     Signal signal = new Signal(virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -201,7 +201,13 @@ namespace ClientWindow
         private int adaptation()
         {
             Random r = new Random();
-            int POH = r.Next(30000, 50000);
+            int POH = r.Next(10000, 40000);
+            return POH;
+        }
+        private int adaptation2()
+        {
+            Random r = new Random();
+            int POH = r.Next(50000, 80000);
             return POH;
         }
 
@@ -224,7 +230,7 @@ namespace ClientWindow
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
                     Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
                     vc3List.Add(currentSlot, vc3);
-                    frame = new STM1(vc3List);
+                    frame = new STM1(adaptation2(), vc3List);
                     //SYGNAL
                     signal = new Signal(virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
