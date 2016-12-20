@@ -34,6 +34,12 @@
             this.receivedTextBox = new System.Windows.Forms.TextBox();
             this.receivedLbl = new System.Windows.Forms.Label();
             this.sendingGroupBox = new System.Windows.Forms.GroupBox();
+            this.sendParamsGroupBox1 = new System.Windows.Forms.GroupBox();
+            this.addButton = new System.Windows.Forms.Button();
+            this.slotTextBox = new System.Windows.Forms.TextBox();
+            this.nodeTextBox = new System.Windows.Forms.TextBox();
+            this.slotLbl = new System.Windows.Forms.Label();
+            this.nodeLbl = new System.Windows.Forms.Label();
             this.stopSendingBtn = new System.Windows.Forms.Button();
             this.sendingTextBox = new System.Windows.Forms.TextBox();
             this.sendComboBox = new System.Windows.Forms.ComboBox();
@@ -43,6 +49,7 @@
             this.timeTextBox = new System.Windows.Forms.TextBox();
             this.logPanel.SuspendLayout();
             this.sendingGroupBox.SuspendLayout();
+            this.sendParamsGroupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // logPanel
@@ -109,6 +116,7 @@
             // sendingGroupBox
             // 
             this.sendingGroupBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.sendingGroupBox.Controls.Add(this.sendParamsGroupBox1);
             this.sendingGroupBox.Controls.Add(this.stopSendingBtn);
             this.sendingGroupBox.Controls.Add(this.sendingTextBox);
             this.sendingGroupBox.Controls.Add(this.sendComboBox);
@@ -125,6 +133,71 @@
             this.sendingGroupBox.TabIndex = 7;
             this.sendingGroupBox.TabStop = false;
             this.sendingGroupBox.Text = "SENDING";
+            // 
+            // sendParamsGroupBox1
+            // 
+            this.sendParamsGroupBox1.Controls.Add(this.addButton);
+            this.sendParamsGroupBox1.Controls.Add(this.slotTextBox);
+            this.sendParamsGroupBox1.Controls.Add(this.nodeTextBox);
+            this.sendParamsGroupBox1.Controls.Add(this.slotLbl);
+            this.sendParamsGroupBox1.Controls.Add(this.nodeLbl);
+            this.sendParamsGroupBox1.ForeColor = System.Drawing.Color.DarkOrange;
+            this.sendParamsGroupBox1.Location = new System.Drawing.Point(173, 124);
+            this.sendParamsGroupBox1.Name = "sendParamsGroupBox1";
+            this.sendParamsGroupBox1.Size = new System.Drawing.Size(359, 54);
+            this.sendParamsGroupBox1.TabIndex = 7;
+            this.sendParamsGroupBox1.TabStop = false;
+            this.sendParamsGroupBox1.Text = "SENDING PARAMETERS";
+            // 
+            // addButton
+            // 
+            this.addButton.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.addButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.addButton.Location = new System.Drawing.Point(238, 17);
+            this.addButton.Name = "addButton";
+            this.addButton.Size = new System.Drawing.Size(91, 23);
+            this.addButton.TabIndex = 4;
+            this.addButton.Text = "Add";
+            this.addButton.UseVisualStyleBackColor = false;
+            this.addButton.Click += new System.EventHandler(this.addButton_Click);
+            // 
+            // slotTextBox
+            // 
+            this.slotTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.slotTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.slotTextBox.ForeColor = System.Drawing.SystemColors.Window;
+            this.slotTextBox.Location = new System.Drawing.Point(156, 17);
+            this.slotTextBox.Name = "slotTextBox";
+            this.slotTextBox.Size = new System.Drawing.Size(56, 20);
+            this.slotTextBox.TabIndex = 3;
+            // 
+            // nodeTextBox
+            // 
+            this.nodeTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(51)))));
+            this.nodeTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.nodeTextBox.ForeColor = System.Drawing.SystemColors.Window;
+            this.nodeTextBox.Location = new System.Drawing.Point(49, 17);
+            this.nodeTextBox.Name = "nodeTextBox";
+            this.nodeTextBox.Size = new System.Drawing.Size(54, 20);
+            this.nodeTextBox.TabIndex = 2;
+            // 
+            // slotLbl
+            // 
+            this.slotLbl.AutoSize = true;
+            this.slotLbl.Location = new System.Drawing.Point(122, 19);
+            this.slotLbl.Name = "slotLbl";
+            this.slotLbl.Size = new System.Drawing.Size(28, 13);
+            this.slotLbl.TabIndex = 1;
+            this.slotLbl.Text = "Slot:";
+            // 
+            // nodeLbl
+            // 
+            this.nodeLbl.AutoSize = true;
+            this.nodeLbl.Location = new System.Drawing.Point(7, 20);
+            this.nodeLbl.Name = "nodeLbl";
+            this.nodeLbl.Size = new System.Drawing.Size(36, 13);
+            this.nodeLbl.TabIndex = 0;
+            this.nodeLbl.Text = "Node:";
             // 
             // stopSendingBtn
             // 
@@ -228,6 +301,8 @@
             this.logPanel.PerformLayout();
             this.sendingGroupBox.ResumeLayout(false);
             this.sendingGroupBox.PerformLayout();
+            this.sendParamsGroupBox1.ResumeLayout(false);
+            this.sendParamsGroupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -248,5 +323,11 @@
         private System.Windows.Forms.Button sendBtn;
         private System.Windows.Forms.TextBox timeTextBox;
         private System.Windows.Forms.Button stopSendingBtn;
+        private System.Windows.Forms.GroupBox sendParamsGroupBox1;
+        private System.Windows.Forms.Button addButton;
+        private System.Windows.Forms.TextBox slotTextBox;
+        private System.Windows.Forms.TextBox nodeTextBox;
+        private System.Windows.Forms.Label slotLbl;
+        private System.Windows.Forms.Label nodeLbl;
     }
 }

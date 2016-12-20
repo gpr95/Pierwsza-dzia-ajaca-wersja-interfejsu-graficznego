@@ -33,14 +33,14 @@ namespace ClientWindow
             managementPort = Convert.ToInt32(args[2]);
             string fileName = virtualIP.Replace(".", "_") + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
             path = System.IO.Directory.GetCurrentDirectory() + @"\logs\" + fileName + ".txt";
-          
+
             listener = new TcpListener(IPAddress.Parse("127.0.0.1"), cloudPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
             Thread managementThreadad = new Thread(new ParameterizedThreadStart(initManagmentConnection));
             managementThreadad.Start(managementPort);
             InitializeComponent();
-            this.Text=virtualIP;
+            this.Text = virtualIP;
             Log2("INFO", "START LOG");
         }
 
@@ -57,7 +57,7 @@ namespace ClientWindow
         }
 
 
-        private  void ListenThread(Object client)
+        private void ListenThread(Object client)
         {
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
@@ -72,20 +72,20 @@ namespace ClientWindow
                     STM1 received_frame = received_signal.stm1;
                     if (received_frame.vc4.C4 != null)
                     {
-           
+
                         receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + received_frame.vc4.C4);
                         receivedTextBox.AppendText(Environment.NewLine);
-                        Log1("IN", virtualIP,1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
+                        Log1("IN", virtualIP, 1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
                     }
 
                     else
                     {
                         foreach (KeyValuePair<int, VirtualContainer3> v in received_frame.vc4.vc3List)
                         {
-                            
+
                             receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + v.Value.C3);
                             receivedTextBox.AppendText(Environment.NewLine);
-                            Log1("IN", virtualIP,v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                            Log1("IN", virtualIP, v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                         }
                     }
                 }
@@ -122,12 +122,12 @@ namespace ClientWindow
                         }
                         else if (management_packet.State == ManagementApp.ManagmentProtocol.POSSIBLEDESITATIONS)
                         {
-                            
+
                             this.possibleDestinations = management_packet.possibleDestinations;
                             this.virtualPort = management_packet.Port;
                             //logTextBox.AppendText("Virtual Port: " + virtualPort);
                             List<string> destinations = new List<string>(this.possibleDestinations.Keys);
-                            
+
                             sendComboBox.Items.Clear();
                             sendComboBox.Refresh();
                             for (int i = 0; i < destinations.Count; i++)
@@ -148,12 +148,12 @@ namespace ClientWindow
             }
             catch (Exception e)
             {
-                
+
                 //debug
                 // Console.WriteLine(e.Message);
                 Log2("ERR", "Could not connect on management interface");
                 Thread.Sleep(4000);
-                Environment.Exit(1);
+                Environment.Exit(0);
 
             }
         }
@@ -175,7 +175,7 @@ namespace ClientWindow
                     writer.Write(data);
                     foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                     {
-                        Log1("OUT", virtualIP,v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                        Log1("OUT", virtualIP, v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                     }
                 }
                 else
@@ -184,13 +184,13 @@ namespace ClientWindow
                     Signal signal = new Signal(virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writer.Write(data);
-                    Log1("OUT", virtualIP,1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                    Log1("OUT", virtualIP, 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                 }
                 sendingTextBox.Clear();
             }
             catch (Exception e)
             {
-             
+
                 Log2("ERR", "Error sending signal");
             }
 
@@ -204,7 +204,7 @@ namespace ClientWindow
             return POH;
         }
 
-       
+
 
         private void sendPeriodically(int period, string message)
         {
@@ -223,7 +223,7 @@ namespace ClientWindow
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
                     Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
                     vc3List.Add(currentSlot, vc3);
-                     frame = new STM1(vc3List);
+                    frame = new STM1(vc3List);
                     //SYGNAL
                     signal = new Signal(virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -232,10 +232,10 @@ namespace ClientWindow
                 }
                 else
                 {
-                    
+
                     frame = new STM1(adaptation(), message);
                     //SYGNAL
-                    signal = new Signal( virtualPort, frame);
+                    signal = new Signal(virtualPort, frame);
                     data = JMessage.Serialize(JMessage.FromValue(signal));
 
                 }
@@ -250,16 +250,16 @@ namespace ClientWindow
                         if (isVc3)
                             foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                             {
-                                Log1("OUT", virtualIP,v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                                Log1("OUT", virtualIP, v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                             }
                         else
-                            Log1("OUT", virtualIP,1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                            Log1("OUT", virtualIP, 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                         await Task.Delay(TimeSpan.FromMilliseconds(period));
                     }
                     catch (Exception e)
                     {
 
-                       
+
                         Log2("ERR", "Error sending signal: ");
                         break;
                     }
@@ -271,7 +271,7 @@ namespace ClientWindow
             myThread.Start();
         }
 
-        public  void Log1(string type, string clientNodeName, int currentSlot, string containerType, string POH, string message)
+        public void Log1(string type, string clientNodeName, int currentSlot, string containerType, string POH, string message)
         {
 
             StreamWriter writer = File.AppendText(path);
@@ -286,24 +286,24 @@ namespace ClientWindow
             writer.Flush();
             writer.Close();
 
-           
+
 
             if (this.InvokeRequired)
             {
                 log1RowCallback d = new log1RowCallback(Log1);
-                this.Invoke(d, new object[] { type,  clientNodeName,  currentSlot,  containerType,  POH, message });
+                this.Invoke(d, new object[] { type, clientNodeName, currentSlot, containerType, POH, message });
             }
             else
             {
                 logTextBox.Paste("\r\n" + DateTime.Now.ToLongTimeString() + " : " + "[" + type + "]"
-               +  " " + currentSlot.ToString() + " " + containerType + " " + POH + " " + message);
+               + " " + currentSlot.ToString() + " " + containerType + " " + POH + " " + message);
                 logTextBox.AppendText(Environment.NewLine);
             }
         }
 
         delegate void log1RowCallback(string type, string clientNodeName, int currentSlot, string containerType, string POH, string message);
 
-        public  void Log2(string type, string message)
+        public void Log2(string type, string message)
         {
 
             StreamWriter writer = File.AppendText(path);
@@ -313,13 +313,13 @@ namespace ClientWindow
                 message);
             writer.Flush();
             writer.Close();
-           
-            
+
+
 
             if (this.InvokeRequired)
             {
                 log2RowCallback d = new log2RowCallback(Log2);
-                this.Invoke(d, new object[] { type,message });
+                this.Invoke(d, new object[] { type, message });
             }
             else
             {
@@ -342,7 +342,7 @@ namespace ClientWindow
             bool res = int.TryParse(timeTextBox.Text, out time);
             if (res)
             {
-               
+
                 cyclic_sending = true;
                 sendPeriodically(time, sendingTextBox.Text);
                 sendingTextBox.Clear();
@@ -350,7 +350,7 @@ namespace ClientWindow
             }
             else
             {
-                logTextBox.AppendText("Wrong period format");
+                logTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + "Wrong period format");
                 logTextBox.AppendText(Environment.NewLine);
                 timeTextBox.Clear();
             }
@@ -381,6 +381,43 @@ namespace ClientWindow
         private void ClientWindow_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
         {
             Environment.Exit(0);
+        }
+
+        private void addButton_Click(object sender, EventArgs e)
+        {
+            string destinationNode = nodeTextBox.Text;
+            int slot;
+            bool res = int.TryParse(slotTextBox.Text, out slot);
+            if (res)
+            {
+                if (this.possibleDestinations.ContainsKey(destinationNode))
+                {
+                    possibleDestinations[destinationNode] = slot;
+                }else
+                {
+                    possibleDestinations.Add(destinationNode, slot);
+                }
+                List<string> destinations = new List<string>(this.possibleDestinations.Keys);
+                sendComboBox.Items.Clear();
+                sendComboBox.Refresh();
+                for (int i = 0; i < destinations.Count; i++)
+                {
+                    //DEBUG
+                    //Log2("MAGAGEMENT INFO", destinations[i] + " : " + possibleDestinations[destinations[i]]);
+                    sendComboBox.Items.Add(destinations[i]);
+                }
+
+                nodeTextBox.Clear();
+                slotTextBox.Clear();
+            }
+            else
+            {
+                logTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : "+"Wrong slot format");
+                logTextBox.AppendText(Environment.NewLine);
+                slotTextBox.Clear();
+            }
+
+            
         }
     }
 }
