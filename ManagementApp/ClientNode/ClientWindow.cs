@@ -13,7 +13,7 @@ namespace ClientWindow
 {
     public partial class ClientWindow : Form
     {
-        private static string virtualIP;
+        private string virtualIP;
         private TcpListener listener;
         private TcpClient managmentClient;
         private static BinaryWriter writer;
@@ -75,7 +75,7 @@ namespace ClientWindow
 
                         receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + received_frame.vc4.C4);
                         receivedTextBox.AppendText(Environment.NewLine);
-                        Log1("IN", virtualIP, 1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
+                        Log1("IN", virtualIP, received_signal.port.ToString(), 1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
                     }
 
                     else
@@ -85,7 +85,7 @@ namespace ClientWindow
 
                             receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + v.Value.C3);
                             receivedTextBox.AppendText(Environment.NewLine);
-                            Log1("IN", virtualIP, v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                            Log1("IN", virtualIP, received_signal.port.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                         }
                     }
                 }
@@ -160,7 +160,7 @@ namespace ClientWindow
 
         private void send(string message)
         {
-           // logTextBox.AppendText("Virtual Port: " + virtualPort);
+           
             try
             {
                 if (currentSpeed == 3)
@@ -176,7 +176,7 @@ namespace ClientWindow
                     writer.Write(data);
                     foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                     {
-                        Log1("OUT", virtualIP, v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                        Log1("OUT", virtualIP, virtualPort.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                     }
                 }
                 else
@@ -185,7 +185,7 @@ namespace ClientWindow
                     Signal signal = new Signal(virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writer.Write(data);
-                    Log1("OUT", virtualIP, 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                    Log1("OUT", virtualIP, virtualPort.ToString(), 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                 }
                 sendingTextBox.Clear();
             }
@@ -251,10 +251,10 @@ namespace ClientWindow
                         if (isVc3)
                             foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                             {
-                                Log1("OUT", virtualIP, v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                                Log1("OUT",virtualIP, virtualPort.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                             }
                         else
-                            Log1("OUT", virtualIP, 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+                            Log1("OUT", virtualIP, virtualPort.ToString(), 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
                         await Task.Delay(TimeSpan.FromMilliseconds(period));
                     }
                     catch (Exception e)
@@ -272,14 +272,15 @@ namespace ClientWindow
             myThread.Start();
         }
 
-        public void Log1(string type, string clientNodeName, int currentSlot, string containerType, string POH, string message)
+        public void Log1(string type, string clientNodeName, string currentPort, int currentSlot, string containerType, string POH, string message)
         {
 
             StreamWriter writer = File.AppendText(path);
-            writer.WriteLine("\r\n{0} {1} : {2} {3} {4} {5} {6} {7} ", DateTime.Now.ToLongTimeString(),
+            writer.WriteLine("\r\n{0} {1} : {2} {3} {4} {5} {6} {7} {8} ", DateTime.Now.ToLongTimeString(),
                 DateTime.Now.ToLongDateString(),
                 type,
                 clientNodeName,
+                currentPort,
                 currentSlot,
                 containerType,
                 POH,
@@ -292,17 +293,17 @@ namespace ClientWindow
             if (this.InvokeRequired)
             {
                 log1RowCallback d = new log1RowCallback(Log1);
-                this.Invoke(d, new object[] { type, clientNodeName, currentSlot, containerType, POH, message });
+                this.Invoke(d, new object[] { type, clientNodeName, currentPort, currentSlot, containerType, POH, message });
             }
             else
             {
                 logTextBox.Paste("\r\n" + DateTime.Now.ToLongTimeString() + " : " + "[" + type + "]"
-               + " " + currentSlot.ToString() + " " + containerType + " " + POH + " " + message);
+               + " " + currentPort + " " + currentSlot.ToString() + " " + containerType + " " + POH + " " + message);
                 logTextBox.AppendText(Environment.NewLine);
             }
         }
 
-        delegate void log1RowCallback(string type, string clientNodeName, int currentSlot, string containerType, string POH, string message);
+        delegate void log1RowCallback(string type, string clientNodeName, string currentPort, int currentSlot, string containerType, string POH, string message);
 
         public void Log2(string type, string message)
         {
