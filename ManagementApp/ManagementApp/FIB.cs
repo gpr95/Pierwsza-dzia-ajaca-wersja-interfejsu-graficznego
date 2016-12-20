@@ -25,7 +25,7 @@ namespace ManagementApp
 
         public String toString()
         {
-            return "In: " + iport + " Szcz: " + in_cont + " Out: " + oport + " Szcz: " + out_cont;
+            return "In: " + iport + " Slot: " + in_cont + " Out: " + oport + " Slot: " + out_cont;
         }
 
         public FIB reverse()
