@@ -13,7 +13,7 @@ namespace ManagementApp
         // CONSTS
         private const int GAP = 10;
         private readonly int CLOUDPORT = 7776;
-        private readonly int MANAGPORT = 7778;
+        private readonly int MANAGPORT = 7777;
         private readonly int NETNODECONNECTIONS = 21;
 
         // CONNECTIONS
