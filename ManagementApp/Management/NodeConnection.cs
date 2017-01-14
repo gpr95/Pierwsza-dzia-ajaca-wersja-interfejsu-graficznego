@@ -45,9 +45,7 @@ namespace Management
             this.Name = name;
         }
 
-        public NodeConnection(NodeConnection nc) : this(nc.From, nc.virtualPortFrom, nc.To, nc.VirtualPortTo, nc.Name)
-        {
-        }
+        public NodeConnection(NodeConnection nc) : this(nc.From, nc.virtualPortFrom, nc.To, nc.VirtualPortTo, nc.Name) { }
 
         public string Name
         {
