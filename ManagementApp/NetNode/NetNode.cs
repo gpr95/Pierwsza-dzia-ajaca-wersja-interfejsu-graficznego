@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ClientWindow;
-using Management;
+using ManagementApp;
 
 namespace NetNode
 {
@@ -16,6 +16,7 @@ namespace NetNode
     {
         private string virtualIp;
         private static SwitchingField switchField = new SwitchingField();
+        private LRM lrm;
         public Ports ports;
         public ManagementAgent agent;
 
@@ -33,6 +34,7 @@ namespace NetNode
             this.virtualIp = args[0];
             Console.Title = args[0];
             this.ports = new Ports();
+            this.lrm = new LRM(args[0]);
             this.agent = new ManagementAgent(Convert.ToInt32(args[2]), this.virtualIp);
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
             this.physicalPort = Convert.ToInt32(args[1]);
@@ -60,6 +62,8 @@ namespace NetNode
             TcpClient clienttmp = (TcpClient)client;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
             writer = new BinaryWriter(clienttmp.GetStream());
+            LRM.writer = new BinaryWriter(clienttmp.GetStream());
+
             try
             {
                 while (true)
@@ -69,11 +73,21 @@ namespace NetNode
                     if (received_object.Type == typeof(Signal))
                     {
                         Signal received_signal = received_object.Value.ToObject<Signal>();
-                        STM1 frame = received_signal.stm1;
-                        int virtPort = received_signal.port;
-                        consoleWriter("received signal on port: " + virtPort);
-                        toVirtualPort(virtPort, frame);
-                        Console.WriteLine(received_data);
+                        if(received_signal.stm1 != null)
+                        {
+                            STM1 frame = received_signal.stm1;
+                            int virtPort = received_signal.port;
+                            consoleWriter("received signal on port: " + virtPort);
+                            toVirtualPort(virtPort, frame);
+                            //Console.WriteLine(received_data);
+                        }
+                        else if(received_signal.lrmProtocol != null)
+                        {
+                            string lrmProtocol = received_signal.lrmProtocol;
+                            int port = received_signal.port;
+                            this.lrm.receivedMessage(lrmProtocol, port);
+                            //Console.WriteLine(received_data);
+                        }
                     }
                 }
             }
