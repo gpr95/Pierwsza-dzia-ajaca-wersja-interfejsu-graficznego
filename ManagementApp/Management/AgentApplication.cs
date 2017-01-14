@@ -13,33 +13,42 @@ namespace Management
     class AgentApplication
     {
         private int port;
-        private string virtualIp;
+        private Thread thread;
+        private TcpClient client;
+        private ManagementPlane management;
 
-        public AgentApplication(int port, string ip)
+        public AgentApplication(int port, ManagementPlane management)
         {
+            this.management = management;
             this.port = port;
-            this.virtualIp = ip;
-            Thread thread = new Thread(new ThreadStart(Listen));
+            thread = new Thread(new ThreadStart(Listen));
             thread.Start();
         }
 
         private void Listen()
         {
-            TcpClient clienttmp = new TcpClient("127.0.0.1", this.port);
-            BinaryReader reader = new BinaryReader(clienttmp.GetStream());
-            BinaryWriter writer = new BinaryWriter(clienttmp.GetStream());
             try
             {
+                client = new TcpClient("127.0.0.1", this.port);
+                BinaryReader reader = new BinaryReader(client.GetStream());
+                BinaryWriter writer = new BinaryWriter(client.GetStream());
+                management.log("Connection successfully established with Window application.", ConsoleColor.Green);
                 while (true)
                 {
                     string received_data = reader.ReadString();
                     JSON received_object = JSON.Deserialize(received_data);
                 }
             }
-            catch (Exception e)
+            catch (SocketException e)
             {
-                Console.WriteLine("\nError sending signal: " + e.Message);
-                Thread.Sleep(100);
+                management.log("\nError: " + e.Message, ConsoleColor.Red);
+                //Thread.Sleep(2000);
+                //Environment.Exit(1);
+            }
+            catch (IOException e)
+            {
+                management.log("\nError: " + e.Message, ConsoleColor.Red);
+                Thread.Sleep(1000);
                 Environment.Exit(1);
             }
         }
