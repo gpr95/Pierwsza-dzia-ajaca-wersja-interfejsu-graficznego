@@ -90,23 +90,30 @@ namespace Management
                 nodeDictionary.Add(enumerate++, node);
             }
             String s;
-            Node n;
-            while (true)
-            {
-                s = Console.ReadLine();
-                if (s.Equals("q"))
-                    break;
-                int choice;
-                bool res = int.TryParse(s, out choice);
-                nodeDictionary.TryGetValue(choice, out n);
-                if (n != null)
-                    break;
-            }
-            
+            Node n = null;
+            log("#DEBUG3.1", ConsoleColor.Magenta);
+            if (nodeDictionary.Count != 0)
+                while (true)
+                {
+                    s = Console.ReadLine();
+                    if (s.Equals("q"))
+                        break;
+                    int choice;
+                    bool res = int.TryParse(s, out choice);
+                    nodeDictionary.TryGetValue(choice, out n);
+                    if (n != null)
+                        break;
+                }
+            if (n == null)
+                return;
+            if(operation != OPERATION.CLEAR)
+                management.getInterfaces(n);
+            log("#DEBUG3.2", ConsoleColor.Magenta);
             switch (operation)
             {
                 case OPERATION.ENTRY:
-                    while(true)
+                    
+                    while (true)
                     {
                         log("Please enter forwarding entry: /n", ConsoleColor.White);
                         log("(Foramt: port 1/contener 1/port 2/contener2) /n", ConsoleColor.Blue);
@@ -116,7 +123,6 @@ namespace Management
                         else
                             log("Wrong format, try again.", ConsoleColor.DarkRed);
                     }
-                    
                     break;
                 case OPERATION.TABLE:
 

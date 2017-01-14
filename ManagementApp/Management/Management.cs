@@ -65,11 +65,10 @@ namespace Management
 
         public void getInterfaces(Node n)
         {
+            log("#DEBUG4", ConsoleColor.Magenta);
             protocol.State = ManagmentProtocol.INTERFACEINFORMATION;
             string data = JSON.Serialize(JSON.FromValue(protocol));
             n.SocketWriter.Write(data);
-
-
         }
 
         public void log(String msg, ConsoleColor cc)
