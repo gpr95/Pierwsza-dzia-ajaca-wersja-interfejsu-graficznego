@@ -24,7 +24,7 @@ namespace ManagementApp
             threadManagement = new Thread(new ThreadStart(listenForManagement));
             threadManagement.Start();
             String parameters = "" + port;
-            //System.Diagnostics.Process.Start("Management.exe", parameters);
+            System.Diagnostics.Process.Start("Management.exe", parameters);
         }
 
         private void listenForManagement()
