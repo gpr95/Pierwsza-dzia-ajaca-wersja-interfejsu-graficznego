@@ -23,7 +23,7 @@ namespace ManagementApp
             this.filePathDomains = path + "_DOMAINS.bin";
             this.filePathTrails = path + "_TRAILS";
         }
-        public void WriteToBinaryFile(List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList, List<Trail> trailList)
+        public void WriteToBinaryFile(List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
         {
             using (Stream stream = File.Open(path, FileMode.Create)) { }
             using (Stream stream = File.Open(filePathNodes, FileMode.Create))
@@ -84,15 +84,15 @@ namespace ManagementApp
             }
         }
 
-        public List<Trail> ReadFromBinaryFileTrails()
-        {
-            if (!File.Exists(filePathTrails))
-                return new List<Trail>();
-            using (Stream stream = File.Open(filePathTrails, FileMode.Open))
-            {
-                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                return (List<Trail>)binaryFormatter.Deserialize(stream);
-            }
-        }
+        //public List<Trail> ReadFromBinaryFileTrails()
+        //{
+        //    if (!File.Exists(filePathTrails))
+        //        return new List<Trail>();
+        //    using (Stream stream = File.Open(filePathTrails, FileMode.Open))
+        //    {
+        //        var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+        //        return (List<Trail>)binaryFormatter.Deserialize(stream);
+        //    }
+        //}
     }
 }

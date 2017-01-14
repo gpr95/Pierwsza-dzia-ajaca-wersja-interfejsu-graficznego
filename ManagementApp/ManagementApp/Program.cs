@@ -13,7 +13,8 @@ namespace ManagementApp
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            new ManagementPlane();
+            //MainWindow mainWindow = new MainWindow();
+            Application.Run(new MainWindow());
         }
     }
 }

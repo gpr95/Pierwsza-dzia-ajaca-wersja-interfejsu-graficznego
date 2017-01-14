@@ -5,13 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManagementApp
+namespace Management
 {
     [Serializable()]
     public class NodeConnection
     {
-        private Point start;
-        private Point end;
         private String name;
 
         private String from;
@@ -25,7 +23,6 @@ namespace ManagementApp
         private int virtualPortTo;
         private int localPortFrom;
         private int localPortTo;
-        private ConnectionProperties prop;
 
         public NodeConnection(Node from, int virtualPortFrom, Node to, int virtualPortTo, String name)
         {
@@ -34,12 +31,9 @@ namespace ManagementApp
             this.From = from.Name;
             this.To = to.Name;
             this.Name = name;
-            this.Prop = new ConnectionProperties(from.LocalPort, virtualPortFrom, to.LocalPort, virtualPortTo);
 
             localPortFrom = from.LocalPort;
             localPortTo = to.LocalPort;
-            Start = from.Position;
-            End = to.Position;
         }
 
         public NodeConnection(String from, int virtualPortFrom, String to, int virtualPortTo, String name)
@@ -53,32 +47,6 @@ namespace ManagementApp
 
         public NodeConnection(NodeConnection nc) : this(nc.From, nc.virtualPortFrom, nc.To, nc.VirtualPortTo, nc.Name)
         {
-        }
-
-        public Point Start
-        {
-            get
-            {
-                return start;
-            }
-
-            set
-            {
-                start = value;
-            }
-        }
-
-        public Point End
-        {
-            get
-            {
-                return end;
-            }
-
-            set
-            {
-                end = value;
-            }
         }
 
         public string Name
@@ -142,19 +110,6 @@ namespace ManagementApp
         {
             get { return localPortTo; }
             set { localPortTo = value; }
-        }
-
-        internal ConnectionProperties Prop
-        {
-            get
-            {
-                return prop;
-            }
-
-            set
-            {
-                prop = value;
-            }
         }
 
         public List<int> OccupiedSlots

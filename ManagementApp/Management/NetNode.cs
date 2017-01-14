@@ -2,26 +2,25 @@
 using System.Diagnostics;
 using System.Drawing;
 
-namespace ManagementApp
+namespace Management
 {
 
     [Serializable()]
     public class NetNode : Node
     {
-        public NetNode(int x , int y,String name, int localPort)
+        public NetNode(String name, int localPort)
         {
             this.Name = name;
             this.LocalPort = localPort;
-            this.Position = new Point(x, y);
 
             String parameters = name + " " + this.LocalPort + " " + this.ManagmentPort;
             ProcessStartInfo startInfo = new ProcessStartInfo("NetNode.exe");
             startInfo.WindowStyle = ProcessWindowStyle.Minimized;
             startInfo.Arguments = parameters;
 
-            this.processHandle = Process.Start(startInfo);
+            this.ProcessHandle = Process.Start(startInfo);
         }
 
-        public NetNode(NetNode nnode) : this(nnode.Position.X, nnode.Position.Y, nnode.Name, nnode.LocalPort) { }
+        public NetNode(NetNode nnode) : this(nnode.Name, nnode.LocalPort) { }
     }
 }

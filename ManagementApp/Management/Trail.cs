@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManagementApp
+namespace Management
 {
     [Serializable()]
     class Trail
@@ -20,7 +20,7 @@ namespace ManagementApp
         private int portTo;
         private Dictionary<NodeConnection, int> connectionDictionary = new Dictionary<NodeConnection, int>();
         private List<Node> componentNodes;
-        private List<Point> points = new List<Point>();
+        //private List<Point> points = new List<Point>();
         private Dictionary<Node, FIB> componentFIBs = new Dictionary<Node, FIB>();
         //private Dictionary<Node, FIB> componentFIBsTo = new Dictionary<Node, FIB>();
 
@@ -66,7 +66,7 @@ namespace ManagementApp
                 int slot = 0;
                 for (int n = 0; n < path.Count(); n++)
                 {
-                    points.Add(path.ElementAt(n).Position);
+                    //points.Add(path.ElementAt(n).Position);
                     if (n == 0)
                     {
                         //Start of path
@@ -129,7 +129,7 @@ namespace ManagementApp
                 int slot = 0;
                 for (int n = 0; n < path.Count(); n++)
                 {
-                    points.Add(path.ElementAt(n).Position);
+                    //points.Add(path.ElementAt(n).Position);
                     if (n == 0)
                     {
                         //Start of path
@@ -176,10 +176,10 @@ namespace ManagementApp
                     connectionTemp2.AutoOccupiedSlots.Add(slot);
                     connectionDictionary.Add(connectionTemp2, slot);
                     ComponentFIBs.Add(path.ElementAt(n), newFib);
-                    
+
                 }
             }
-            
+
         }
 
         private NodeConnection findConnection(Node start, Node end, List<NodeConnection> con)
@@ -198,9 +198,9 @@ namespace ManagementApp
                     return 1;
                 else
                     if (connection.OccupiedSlots.Min() != 1)
-                        return 1;
-                    else
-                        return -1;
+                    return 1;
+                else
+                    return -1;
             }
             else
             {
@@ -296,18 +296,18 @@ namespace ManagementApp
             }
         }
 
-        public List<Point> Points
-        {
-            get
-            {
-                return points;
-            }
+        //public List<Point> Points
+        //{
+        //    get
+        //    {
+        //        return points;
+        //    }
 
-            set
-            {
-                points = value;
-            }
-        }
+        //    set
+        //    {
+        //        points = value;
+        //    }
+        //}
 
         public int PortFrom
         {

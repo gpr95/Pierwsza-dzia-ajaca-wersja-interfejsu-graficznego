@@ -69,15 +69,19 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ManagementApp\ManagementApp.csproj">
-      <Project>{5a2b0de4-65be-4605-a9cc-96342f13f000}</Project>
-      <Name>ManagementApp</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="ClientWindow.resx">
       <DependentUpon>ClientWindow.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ManagementApp\Application.csproj">
+      <Project>{5a2b0de4-65be-4605-a9cc-96342f13f000}</Project>
+      <Name>Application</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Management\Management.csproj">
+      <Project>{bce5238d-1404-4544-b40b-8ae246d6bb36}</Project>
+      <Name>Management</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

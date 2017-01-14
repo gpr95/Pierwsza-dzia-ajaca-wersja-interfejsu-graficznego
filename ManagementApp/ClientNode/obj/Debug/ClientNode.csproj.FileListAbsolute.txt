@@ -24,3 +24,17 @@ C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\Man
 C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\obj\Debug\ClientNode.exe
 C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\obj\Debug\ClientNode.pdb
 C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\ClientNode\bin\Debug\ManagementApp.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\ClientNode.exe.config
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\ClientNode.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\ClientNode.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\Management.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\ManagementApp.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\ManagementApp.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\Management.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\bin\Debug\Newtonsoft.Json.xml
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\obj\Debug\ClientNode.csprojResolveAssemblyReference.cache
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\obj\Debug\ClientWindow.ClientWindow.resources
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\obj\Debug\ClientNode.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\obj\Debug\ClientNode.pdb

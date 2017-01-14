@@ -38,7 +38,7 @@ namespace ClientWindow
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
             Thread managementThreadad = new Thread(new ParameterizedThreadStart(initManagmentConnection));
-            managementThreadad.Start(managementPort);
+            //managementThreadad.Start(managementPort);
             InitializeComponent();
             this.Text = virtualIP;
             Log2("INFO", "START LOG");
@@ -110,17 +110,17 @@ namespace ClientWindow
                 {
                     string received_data = reader.ReadString();
                     JMessage received_object = JMessage.Deserialize(received_data);
-                    if (received_object.Type == typeof(ManagementApp.ManagmentProtocol))
+                    if (received_object.Type == typeof(Management.ManagmentProtocol))
                     {
-                        ManagementApp.ManagmentProtocol management_packet = received_object.Value.ToObject<ManagementApp.ManagmentProtocol>();
-                        if (management_packet.State == ManagementApp.ManagmentProtocol.WHOIS)
+                        Management.ManagmentProtocol management_packet = received_object.Value.ToObject<Management.ManagmentProtocol>();
+                        if (management_packet.State == Management.ManagmentProtocol.WHOIS)
                         {
-                            ManagementApp.ManagmentProtocol packet_to_management = new ManagementApp.ManagmentProtocol();
+                            Management.ManagmentProtocol packet_to_management = new Management.ManagmentProtocol();
                             packet_to_management.Name = virtualIP;
                             String send_object = JMessage.Serialize(JMessage.FromValue(packet_to_management));
                             writer.Write(send_object);
                         }
-                        else if (management_packet.State == ManagementApp.ManagmentProtocol.POSSIBLEDESITATIONS)
+                        else if (management_packet.State == Management.ManagmentProtocol.POSSIBLEDESITATIONS)
                         {
 
                             this.possibleDestinations = management_packet.possibleDestinations;

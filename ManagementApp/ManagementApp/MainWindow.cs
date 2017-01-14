@@ -3,29 +3,32 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ManagementApp
 {
     public partial class MainWindow : Form
     {
-        [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
-        private static extern bool SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int uFlags);
-        //private static extern bool ShowWindow(IntPtr hWnd, int  nCmdShow);
         // CONSTS
         private const int GAP = 10;
         private readonly int CLOUDPORT = 7776;
+        private readonly int MANAGPORT = 7778;
+        private readonly int NETNODECONNECTIONS = 21;
+
+        // CONNECTIONS
+        private CloudCableHandler cableHandler;
+        private ManagementHandler managHandler;
+
         // LOGICAL VARS
         private OperationType oType;
-        private ManagementPlane management;
+        private int clientNodesNumber = 0;
+        private int networkNodesNumber = 0;
         private DataTable table;
-        private List<Node> nodeList;
-        private List<NodeConnection> connectionList;
+        private List<Node> nodeList = new List<Node>();
+        private List<NodeConnection> connectionList = new List<NodeConnection>();
+        private List<Domain> domainList = new List<Domain>();
         private List<NodeConnection> connectionTemp = new List<NodeConnection>();
-        private List<Domain> domainList;
-        private CloudCableHandler cableHandler;
-        private List<Trail> tempTrailList = new List<Trail>();
 
         // PAINTING VARS
         private bool isDrawing = false;
@@ -36,19 +39,6 @@ namespace ManagementApp
         private Bitmap containerPoints;
         private Point domainFrom;
         private Graphics myGraphics;
-
-        internal ManagementPlane Management
-        {
-            get
-            {
-                return management;
-            }
-
-            set
-            {
-                management = value;
-            }
-        }
 
         enum OperationType
         {
@@ -61,18 +51,19 @@ namespace ManagementApp
             NOTHING
         }
 
-        public MainWindow(DataTable table, List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList)
+        public MainWindow() //DataTable table, List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList
         {
-            //TODO: start chmury kablowej
+            //Start of listeners
             cableHandler = new CloudCableHandler(connectionList, CLOUDPORT);
+            managHandler = new ManagementHandler(MANAGPORT);
+
+            //Initialize of components
+            //TODO: MankeTable
+            table = makeTable();
+
             InitializeComponent();
             hidePortSetup();
             RenderTable();
-            this.table = table;
-            this.nodeList = nodeList;
-            this.connectionList = connectionList;
-            this.domainList = domainList;
-
         }
 
         private void MainWindow_Load(object sender, EventArgs e)
@@ -91,6 +82,54 @@ namespace ManagementApp
             myGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
         }
 
+        private DataTable makeTable()
+        {
+            //Fix needed
+            table = new DataTable("threadManagment");
+            var column = new DataColumn();
+            column.DataType = System.Type.GetType("System.Int32");
+            column.ColumnName = "id";
+            column.AutoIncrement = false;
+            column.Caption = "ParentItem";
+            column.ReadOnly = true;
+            column.Unique = false;
+            table.Columns.Add(column);
+
+
+            column = new DataColumn();
+            column.DataType = System.Type.GetType("System.String");
+            column.ColumnName = "Type";
+            column.ReadOnly = true;
+            column.Unique = false;
+            table.Columns.Add(column);
+
+            column = new DataColumn();
+            column.DataType = System.Type.GetType("System.String");
+            column.ColumnName = "Name";
+            column.ReadOnly = true;
+            column.Unique = true;
+            table.Columns.Add(column);
+
+            DataColumn[] PrimaryKeyColumns = new DataColumn[1];
+            PrimaryKeyColumns[0] = table.Columns["Name"];
+            table.PrimaryKey = PrimaryKeyColumns;
+            var dtSet = new DataSet();
+            dtSet.Tables.Add(table);
+
+            return table;
+        }
+
+        private void addNodeToTable(Node n)
+        {
+            var row = table.NewRow();
+            int nodeNumber;
+            int.TryParse(n.Name.Split('.')[1], out nodeNumber);
+            row["id"] = nodeNumber;
+            row["Type"] = n.Type.Equals(Node.NodeType.NETWORK) ? "Network" : "Client";
+            row["Name"] = n.Type.Equals(Node.NodeType.NETWORK) ? "NN." + nodeNumber : "CN." + nodeNumber;
+            table.Rows.Add(row);
+        }
+
         private void hidePortSetup()
         {
             label1.Visible = false;
@@ -102,7 +141,6 @@ namespace ManagementApp
 
         private void showPortSetup(Node from, Node to)
         {
-            
             aNode = from;
             bNode = to;
             containerPictureBox.Update();
@@ -140,18 +178,17 @@ namespace ManagementApp
             {
                 drawConnection(elem, panel);
             }
-            foreach (Trail t in tempTrailList)
-            {
-                drawTrail(t, panel);
-            }
+            //No more trails
+            //foreach (Trail t in tempTrailList)
+            //{
+            //    drawTrail(t, panel);
+            //}
             foreach (var node in nodeList)
             {
                 drawNode(node, panel);
             }
             containerPictureBox.BackgroundImage = containerPoints;
         }
-
-
 
         private void containerPictureBox_MouseClick(object sender, MouseEventArgs e)
         {
@@ -161,10 +198,10 @@ namespace ManagementApp
             switch (oType)
             {
                 case OperationType.ADD_CLIENT_NODE:
-                    management.addClientNode(x, y);
+                    addClientNode(x, y);
                     break;
                 case OperationType.ADD_NETWORK_NODE:
-                    management.addNetworkNode(x, y);
+                    addNetworkNode(x, y);
                     break;
                 case OperationType.DELETE:
                     deleteListBox.Visible = false;
@@ -175,7 +212,7 @@ namespace ManagementApp
                     Node n = getNodeFrom(x, y);
                     if (n == null)
                         break;
-                    List<String> atPosition = management.findElemAtPosition(x, y);
+                    List<String> atPosition = findElemAtPosition(x, y);
 
                     foreach (String toDelete in atPosition)
                         deleteListBox.Items.Add(toDelete);
@@ -192,7 +229,7 @@ namespace ManagementApp
                     }
                     else if (atPosition.Count == 1)
                     {
-                        management.deleteNode(n);
+                        deleteNode(n);
                     }
                     break;
 
@@ -244,7 +281,7 @@ namespace ManagementApp
                     if (checkBox1.Checked)
                     {
                         //if(portF > 4)
-                        management.addConnection(nodeFrom, management.getPort(nodeFrom), virtualNodeTo, management.getPort(virtualNodeTo));
+                        addConnection(nodeFrom, getPort(nodeFrom), virtualNodeTo, getPort(virtualNodeTo));
                         hidePortSetup();
                         containerPictureBox.Refresh();
                     }
@@ -304,12 +341,12 @@ namespace ManagementApp
                     }
 
                     Point oldPosition = new Point(nodeFrom.Position.X, nodeFrom.Position.Y);
-                    management.isSpaceAvailable(nodeFrom, x, y, containerPictureBox.Size.Height, containerPictureBox.Size.Width);
+                    isSpaceAvailable(nodeFrom, x, y, containerPictureBox.Size.Height, containerPictureBox.Size.Width);
                     foreach (var elem in connectionTemp)
                         if (elem.Start.Equals(oldPosition))
-                            management.addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo, true);
+                            addConnection(getNodeFrom(elem.End.X, elem.End.Y), elem.VirtualPortFrom, nodeFrom, elem.VirtualPortTo, true);
                         else if (elem.End.Equals(oldPosition))
-                            management.addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom, true);
+                            addConnection(getNodeFrom(elem.Start.X, elem.Start.Y), elem.VirtualPortTo, nodeFrom, elem.VirtualPortFrom, true);
 
                     consoleWriter("Placement of node changed from: " + oldPosition.X + "," + oldPosition.Y + " to:" +
                         x + "," + y);
@@ -389,9 +426,9 @@ namespace ManagementApp
                 containerPictureBox.Refresh();
 
                 Rectangle rect = new Rectangle(e.X - 5, e.Y - 5, 11, 11);
-                if (nodeFrom is NetNode)
+                if (nodeFrom.Type.Equals(Node.NodeType.NETWORK))
                     myGraphics.FillEllipse(Brushes.DodgerBlue, rect);
-                else if (nodeFrom is ClientNode)
+                else if (nodeFrom.Type.Equals(Node.NodeType.CLIENT))
                     myGraphics.FillEllipse(Brushes.YellowGreen, rect);
                 myGraphics.DrawEllipse(Pens.Black, rect);
                 myGraphics.DrawString(nodeFrom.Name, new Font("Arial", 5), Brushes.Gainsboro, new Point(e.X + 3,
@@ -439,23 +476,23 @@ namespace ManagementApp
                     foreach (NodeConnection con in connectionsToDelete)
                     {
                         cableHandler.deleteConnection(con);
-                        management.removeConnection(con);
+                        removeConnection(con);
                     }
                         
 
-                    management.deleteNode(nodeList.ElementAt(idxOfElement));
+                    deleteNode(nodeList.ElementAt(idxOfElement));
                 }
                 else
                 {
                     cableHandler.deleteConnection(connectionList.ElementAt(idxOfElement));
-                    management.removeConnection(connectionList.ElementAt(idxOfElement));
+                    removeConnection(connectionList.ElementAt(idxOfElement));
                 }
                     
 
             }
             if(deleteListBox.Text.Contains("Restart"))
             {
-                management.restartNode(deleteListBox.Text.Split(' ')[1]);
+                restartNode(deleteListBox.Text.Split(' ')[1]);
             }
 
             deleteListBox.Visible = false;
@@ -515,18 +552,6 @@ namespace ManagementApp
             oType = OperationType.MOVE_NODE;
         }
 
-        public void addNode(Node node)
-        {
-            if (node is ClientNode)
-                consoleWriter("Client Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.LocalPort);
-
-            if (node is NetNode)
-                consoleWriter("Network Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.LocalPort);
-
-
-            refreshTable();
-        }
-
         public void errorMessage(String ms)
         {
             consoleTextBox.AppendText("#### " + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString());
@@ -534,30 +559,11 @@ namespace ManagementApp
             consoleTextBox.AppendText("####: " + ms);
             consoleTextBox.AppendText(Environment.NewLine);
         }
-
-        private Node getNodeFrom(int x, int y)
-        {
-            Node n = nodeList.Where(i => i.Position.Equals(new Point(x, y))).FirstOrDefault();
-            return n;
-        }
-
-        private List<NodeConnection> findConnectionsByPosition(int x, int y)
-        {
-            List<NodeConnection> result = new List<NodeConnection>();
-            NodeConnection ifExist = connectionList.FirstOrDefault(
-                i => (i.Start.Equals(new Point(x,y))) || (i.End.Equals(new Point(x,y))));
-            if (ifExist != null)
-                result = connectionList.AsParallel().Where(
-                    i => (i.Start.Equals(new Point(x, y))) || (i.End.Equals(new Point(x, y)))
-                    ).ToList();
-
-            return result;
-        }
         
         public void bind()
         {
             cableHandler.updateOneConnection();
-            consoleWriter("Connection added from " + connectionList.Last().From.Name + " to " + connectionList.Last().To.Name);
+            consoleWriter("Connection added from " + connectionList.Last().From + " to " + connectionList.Last().To);
         }
 
         public void bind(NodeConnection newNodeConn)
@@ -611,9 +617,9 @@ namespace ManagementApp
         {
             panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             Rectangle rect = new Rectangle(node.Position.X - GAP / 2, node.Position.Y - GAP / 2, GAP + 1, GAP + 1);
-            if (node is NetNode)
+            if (node.Type.Equals(Node.NodeType.NETWORK))
                 panel.FillEllipse(Brushes.DodgerBlue, rect);
-            else if (node is ClientNode)
+            else if (node.Type.Equals(Node.NodeType.CLIENT))
                 panel.FillEllipse(Brushes.YellowGreen, rect);
             panel.DrawEllipse(Pens.Black, rect);
             panel.DrawString(node.Name + ":" + node.LocalPort, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + (GAP / 2),
@@ -644,17 +650,6 @@ namespace ManagementApp
             panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             Rectangle rect = new Rectangle(domain.PointFrom, domain.Size);
             panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
-        }
-
-        private void drawTrail(Trail t, Graphics panel)
-        {
-            panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            Pen orangePen = new Pen(Color.Orange, 3);
-            for (int i = 1; i < t.Points.Count(); i++)
-            {
-                panel.DrawLine(orangePen, t.Points.ElementAt(i - 1), t.Points.ElementAt(i));
-            }
-            //containerPictureBox.Refresh();
         }
 
         private void putToGrid(ref int x, ref int y)
@@ -703,7 +698,10 @@ namespace ManagementApp
             //            consoleTextBox.AppendText(Environment.NewLine);
             //        }
             //    }
-            management.sendOutInformation();
+
+            //TODO UpdateManagemet
+
+            //management.sendOutInformation();
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -724,14 +722,14 @@ namespace ManagementApp
                 errorMessage("Please enter correct ports in To.");
                 return;
             }
-            management.addConnection(aNode, portF, bNode, portT);
+            addConnection(aNode, portF, bNode, portT);
             hidePortSetup();
             containerPictureBox.Refresh();
         }
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            management.stopRunning();
+            managHandler.stopRunning();
             cableHandler.stopRunning();
         }
 
@@ -745,13 +743,13 @@ namespace ManagementApp
                 String path = saveFileDialog.InitialDirectory;
                 String fileName = saveFileDialog.FileName;
                 FileSaver configuration = new FileSaver(path + fileName);
-                configuration.WriteToBinaryFile(nodeList, connectionList, domainList,management.TrailList);
+                configuration.WriteToBinaryFile(nodeList, connectionList, domainList);
             }
         }
 
         private void readConfBtn_Click(object sender, EventArgs e)
         {
-            management.load();
+            load();
             containerPictureBox.Refresh();
         }
 
@@ -762,29 +760,29 @@ namespace ManagementApp
             this.domainList.AddRange(domainList);
         }
 
-        private void containerPictureBox_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            int x = e.X;
-            int y = e.Y;
-            putToGrid(ref x, ref y);
-            Node n = getNodeFrom(x, y);
-            //SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
-            errorMessage("Painting Trails");
-            tempTrailList = new List<Trail>(management.getTrailForNode(n));
-            foreach(var a in tempTrailList)
-                errorMessage(a.toString());
-            //containerPictureBox.Refresh();
-        }
+        //private void containerPictureBox_MouseDoubleClick(object sender, MouseEventArgs e)
+        //{
+        //    int x = e.X;
+        //    int y = e.Y;
+        //    putToGrid(ref x, ref y);
+        //    Node n = getNodeFrom(x, y);
+        //    //SetWindowPos(n.ProcessHandle.MainWindowHandle, 0, 0, 0, 100, 80, 0x2000);
+        //    errorMessage("Painting Trails");
+        //    tempTrailList = new List<Trail>(management.getTrailForNode(n));
+        //    foreach(var a in tempTrailList)
+        //        errorMessage(a.toString());
+        //    //containerPictureBox.Refresh();
+        //}
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            management.showTrailWindow();
-        }
+        //private void button3_Click(object sender, EventArgs e)
+        //{
+        //    management.showTrailWindow();
+        //}
 
-        private void button4_Click(object sender, EventArgs e)
-        {
-            management.clearAllTrails();
-        }
+        //private void button4_Click(object sender, EventArgs e)
+        //{
+        //    management.clearAllTrails();
+        //}
 
         private void consoleWriter(String msg)
         {
@@ -793,5 +791,280 @@ namespace ManagementApp
             consoleTextBox.AppendText("\n#:" + msg);
             consoleTextBox.AppendText(Environment.NewLine);
         }
+
+        private void addClientNode(int x, int y)
+        {
+            foreach (Node node in nodeList)
+                if (node.Position.Equals(new Point(x, y)))
+                {
+                    errorMessage("There is already node in that position.");
+                    return;
+                }
+            Node client = new Node(x, y, Node.NodeType.CLIENT, "CN." + clientNodesNumber, 8000 + clientNodesNumber);
+            ++clientNodesNumber;
+            nodeList.Add(client);
+            addNodeToTable(client);
+            addNode(client);
+        }
+
+        public void addNetworkNode(int x, int y)
+        {
+            foreach (Node node in nodeList)
+                if (node.Position.Equals(new Point(x, y)))
+                {
+                    errorMessage("There is already node in that position.");
+                    return;
+                }
+            Node network = new Node(x, y, Node.NodeType.NETWORK, "NN." + networkNodesNumber, 8500 + networkNodesNumber);
+            ++networkNodesNumber;
+            nodeList.Add(network);
+            addNodeToTable(network);
+            addNode(network);
+        }
+
+        public void addNode(Node node)
+        {
+            if (node.Type.Equals(Node.NodeType.CLIENT))
+                consoleWriter("Client Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.LocalPort);
+
+            if (node.Type.Equals(Node.NodeType.NETWORK))
+                consoleWriter("Network Node added at: " + node.Position.X + "," + node.Position.Y + " with adress: " + node.LocalPort);
+
+            refreshTable();
+        }
+
+        public List<String> findElemAtPosition(int x, int y)
+        {
+            List<String> atPosition = findConnectionsByPosition(x, y).Select(i => i.Name).ToList();
+            Node n = getNodeFrom(x, y);
+            if (n == null)
+                return null; ;
+
+            atPosition.Add(n.Name);
+            return atPosition;
+        }
+
+        private Node getNodeFrom(int x, int y)
+        {
+            Node n = nodeList.Where(i => i.Position.Equals(new Point(x, y))).FirstOrDefault();
+            return n;
+        }
+
+        private List<NodeConnection> findConnectionsByPosition(int x, int y)
+        {
+            List<NodeConnection> result = new List<NodeConnection>();
+            NodeConnection ifExist = connectionList.FirstOrDefault(
+                i => (i.Start.Equals(new Point(x,y))) || (i.End.Equals(new Point(x,y))));
+            if (ifExist != null)
+                result = connectionList.AsParallel().Where(
+                    i => (i.Start.Equals(new Point(x, y))) || (i.End.Equals(new Point(x, y)))
+                    ).ToList();
+
+            return result;
+        }
+
+        public void deleteNode(Node nodeToDelete)
+        {
+            table.Rows.Remove(table.Rows.Find(nodeToDelete.Name));
+            errorMessage("Node " + nodeToDelete.Name + " deleted.");
+            nodeList.Remove(nodeToDelete);
+            nodeToDelete.ProcessHandle.Dispose();
+            //TODO Update management
+        }
+
+        public int getPort(Node node)
+        {
+            int port1, port2;
+            if (connectionList.Where(i => i.From.Equals(node)).Select(c => c.VirtualPortFrom).Any())
+                port1 = connectionList.Where(i => i.From.Equals(node)).Select(c => c.VirtualPortFrom).Max();
+            else
+                port1 = 0;
+            if (connectionList.Where(i => i.To.Equals(node)).Select(c => c.VirtualPortTo).Any())
+                port2 = connectionList.Where(i => i.To.Equals(node)).Select(c => c.VirtualPortTo).Max();
+            else
+                port2 = 0;
+            return port1 > port2 ? ++port1 : ++port2;
+        }
+
+        public void addConnection(Node from, int portFrom, Node to, int portTo, bool move = false)
+        {
+            if (from.Type.Equals(Node.NodeType.CLIENT))
+                if (connectionList.Where(i => i.From.Equals(from) || i.To.Equals(from)).Any())
+                {
+                    errorMessage("Client node can have only one connection!");
+                    return;
+                }
+
+            if (to.Type.Equals(Node.NodeType.CLIENT))
+                if (connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).Any())
+                {
+                    errorMessage("Client node can have only one connection!");
+                    return;
+                }
+            if (from.Type.Equals(Node.NodeType.NETWORK))
+                if (numberOfNodeConnections(from) == NETNODECONNECTIONS)
+                {
+                    errorMessage("Network node have " + NETNODECONNECTIONS + " ports");
+                    return;
+                }
+
+            if (to.Type.Equals(Node.NodeType.NETWORK))
+                if (numberOfNodeConnections(to) == NETNODECONNECTIONS)
+                {
+                    errorMessage("Network node have " + NETNODECONNECTIONS + " ports");
+                    return;
+                }
+            if (to != null)
+                if (isConnectionExist(from, to))
+                {
+                    errorMessage("That connection alredy exist!");
+                }
+                else
+                {
+                    if (move)
+                    {
+                        connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
+                        bind();
+                    }
+                    else if (connectionList.Where(i => i.From.Equals(to)).ToList().Where(i => i.VirtualPortFrom.Equals(portTo)).Any())
+                        errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.1");
+                    else if (connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
+                        //connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any();
+                        errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.2");
+                    else if (connectionList.Where(i => i.From.Equals(from)).ToList().Where(i => i.VirtualPortFrom.Equals(portFrom)).Any())
+                        errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.3");
+                    else if (connectionList.Where(i => i.To.Equals(from)).ToList().Where(i => i.VirtualPortTo.Equals(portFrom)).Any())
+                        errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.4");
+                    else
+                    {
+                        connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
+                        bind();
+                    }
+                }
+        }
+
+        private bool isConnectionExist(Node f, Node t)
+        {
+            return connectionList.Where(i => (i.From.Equals(f) && i.To.Equals(t)) || (i.From.Equals(t) && i.To.Equals(f))).Any();
+        }
+
+        private int numberOfNodeConnections(Node n)
+        {
+            return connectionList.Where(i => i.From.Equals(n) || i.To.Equals(n)).Count();
+        }
+
+        public void isSpaceAvailable(Node node, int x, int y, int maxW, int maxH)
+        {
+            foreach (Node n in nodeList)
+            {
+                if (n.Position.Equals(new Point(x, y)))
+                {
+                    if (x + GAP < maxW - 1)
+                        isSpaceAvailable(node, x + GAP, y, maxW, maxH);
+                    else
+                        isSpaceAvailable(node, x - GAP, y, maxW, maxH);
+                    return;
+                }
+            }
+            updateNode(node, x, y);
+        }
+
+        public void updateNode(Node node, int x, int y)
+        {
+            node.Position = new Point(x, y);
+        }
+
+        public void removeConnection(NodeConnection conn)
+        {
+            connectionList.RemoveAt(connectionList.IndexOf(conn));
+        }
+
+        internal void restartNode(string v)
+        {
+            Node n = nodeList.Where(s => s.Name.Equals(v)).FirstOrDefault();
+            if (n.ProcessHandle.HasExited)
+            {
+                nodeList.Remove(n);
+                if (n is Node)
+                    n = new Node((Node)n);
+                nodeList.Add(n);
+                //List<string> conL = findElemAtPosition(n.Position.X, n.Position.Y);
+                foreach (NodeConnection c in connectionList)
+                {
+                    if (c.From.Equals(n.Name))
+                        c.From = n.Name;
+                    if (c.To.Equals(n.Name))
+                        c.To = n.Name;
+                }
+                updateConnections(connectionList);
+
+                //TODO Update management
+            }
+        }
+
+        public void load()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Save topology";
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                String path = openFileDialog.InitialDirectory;
+                String fileName = openFileDialog.FileName;
+                FileSaver configuration = new FileSaver(path + fileName);
+
+
+                foreach (Node n in configuration.ReadFromBinaryFileNodes())
+                {
+                    if (n.Type.Equals(Node.NodeType.CLIENT))
+                        nodeList.Add(new Node((Node)n));
+
+                    if (n.Type.Equals(Node.NodeType.NETWORK))
+                        nodeList.Add(new Node((Node)n));
+                    Thread.Sleep(100);
+                }
+
+                List<NodeConnection> tmpNodeConnList = new List<NodeConnection>();
+                foreach (NodeConnection nc in configuration.ReadFromBinaryFileNodeConnections())
+                {
+
+                    foreach (Node realNode in nodeList)
+                    {
+                        if (realNode.LocalPort == nc.LocalPortFrom)
+                            nc.From = realNode.Name;
+                        if (realNode.LocalPort == nc.LocalPortTo)
+                            nc.To = realNode.Name;
+                    }
+                    bind(nc);
+                    tmpNodeConnList.Add(new NodeConnection(nc));
+                    Thread.Sleep(100);
+                }
+
+                List<Domain> tmpDomainList = new List<Domain>();
+                configuration.ReadFromBinaryFileDomains().ForEach(
+                  d => {
+                      tmpDomainList.Add(new Domain(d)); Thread.Sleep(500);
+                  });
+
+                connectionList = new List<NodeConnection>();
+                domainList = new List<Domain>();
+
+                connectionList.AddRange(tmpNodeConnList);
+                domainList.AddRange(tmpDomainList);
+
+                updateLists(nodeList, domainList);
+            }
+        }
+
+        //private int getNumberOfConnectionsBetweenNodes(Node from, Node to)
+        //{
+        //    return connectionList.Where(i => (
+        //                i.Start.Equals(from.Position) &&
+        //                i.Start.Equals(to.Position)) || (
+        //                i.Start.Equals(to.Position) &&
+        //                i.Start.Equals(from.Position))
+        //                ).Count();
+        //}
+
+
     }
 }

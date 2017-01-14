@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ManagementApp
+namespace Management
 {
     //forwarding information table: destination mask oport
     public class FIB

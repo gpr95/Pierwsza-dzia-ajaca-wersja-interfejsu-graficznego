@@ -15,20 +15,55 @@ namespace ManagementApp
     [Serializable()]
     public class Node
     {
-        protected int state { get; set; }
-        protected int localPort;
         protected int ManagmentPort = 7777;
-        protected String name;
-        protected Point position;
-        [NonSerialized]
-        protected Thread threadHandle;
-        [NonSerialized]
-        protected TcpClient tcpClient;
-        [NonSerialized]
-        protected BinaryWriter socketWriter;
-        [NonSerialized]
-        protected Process processHandle;
+        private int state { get; set; }
+        private int localPort;
+        private String name;
+        private Point position;
+        private NodeType nodeType;
+        private Process processHandle;
 
+        public Node(int x, int y, NodeType n, String name, int localPort)
+        {
+            nodeType = n;
+            if (n.Equals(NodeType.CLIENT))
+            {
+                this.Name = name;
+                this.LocalPort = localPort;
+                this.Position = new Point(x, y);
+
+                String parameters = name + " " + this.LocalPort + " " + this.ManagmentPort;
+                ProcessStartInfo startInfo = new ProcessStartInfo("ClientNode.exe");
+                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                startInfo.Arguments = parameters;
+
+                this.ProcessHandle = Process.Start(startInfo);
+            }
+            else if (n.Equals(NodeType.NETWORK))
+            {
+                this.Name = name;
+                this.LocalPort = localPort;
+                this.Position = new Point(x, y);
+
+                String parameters = name + " " + this.LocalPort + " " + this.ManagmentPort;
+                ProcessStartInfo startInfo = new ProcessStartInfo("NetNode.exe");
+                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                startInfo.Arguments = parameters;
+
+                this.ProcessHandle = Process.Start(startInfo);
+            }
+        }
+
+        public Node(Node n) : this(n.Position.X, n.Position.Y, n.Type, n.Name, n.LocalPort)
+        {
+            
+        }
+
+        public enum NodeType
+        {
+            CLIENT,
+            NETWORK
+        }
 
         public Point Position
         {
@@ -69,29 +104,16 @@ namespace ManagementApp
             }
         }
 
-        public Thread ThreadHandle
+        public NodeType Type
         {
             get
             {
-                return threadHandle;
+                return nodeType;
             }
 
             set
             {
-                threadHandle = value;
-            }
-        }
-
-        public TcpClient TcpClient
-        {
-            get
-            {
-                return tcpClient;
-            }
-
-            set
-            {
-                tcpClient = value;
+                nodeType = value;
             }
         }
 
@@ -105,19 +127,6 @@ namespace ManagementApp
             set
             {
                 processHandle = value;
-            }
-        }
-
-        public BinaryWriter SocketWriter
-        {
-            get
-            {
-                return socketWriter;
-            }
-
-            set
-            {
-                socketWriter = value;
             }
         }
     }

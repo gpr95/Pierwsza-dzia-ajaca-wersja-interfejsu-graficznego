@@ -20,3 +20,17 @@ C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\Man
 C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\NetNode\obj\Debug\NetNode.csprojResolveAssemblyReference.cache
 C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\NetNode\obj\Debug\NetNode.exe
 C:\Users\Grzegorz\Desktop\TSST\TSST PROJEKT WORKINGSPACE\RoutersEmulatorTSST\ManagementApp\NetNode\obj\Debug\NetNode.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\obj\Debug\NetNode.csprojResolveAssemblyReference.cache
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\obj\Debug\NetNode.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\obj\Debug\NetNode.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\NetNode.exe.config
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\NetNode.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\NetNode.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\ClientNode.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\Management.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\ManagementApp.exe
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\Newtonsoft.Json.dll
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\ClientNode.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\ManagementApp.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\Management.pdb
+C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\NetNode\bin\Debug\Newtonsoft.Json.xml

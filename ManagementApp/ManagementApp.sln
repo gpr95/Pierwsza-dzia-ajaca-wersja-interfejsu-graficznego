@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagementApp", "ManagementApp\ManagementApp.csproj", "{5A2B0DE4-65BE-4605-A9CC-96342F13F000}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "ManagementApp\Application.csproj", "{5A2B0DE4-65BE-4605-A9CC-96342F13F000}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientNode", "ClientNode\ClientNode.csproj", "{C348FC9F-8EDB-415F-8984-2FB7DA94B364}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetNode", "NetNode\NetNode.csproj", "{AF48A392-65DF-4B9B-8877-E85402C2F585}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CableCloud", "CableCloud\CableCloud.csproj", "{FF22A7CB-2314-4A27-A75E-37FBE5969175}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Management", "Management\Management.csproj", "{BCE5238D-1404-4544-B40B-8AE246D6BB36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{FF22A7CB-2314-4A27-A75E-37FBE5969175}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF22A7CB-2314-4A27-A75E-37FBE5969175}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF22A7CB-2314-4A27-A75E-37FBE5969175}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCE5238D-1404-4544-B40B-8AE246D6BB36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCE5238D-1404-4544-B40B-8AE246D6BB36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCE5238D-1404-4544-B40B-8AE246D6BB36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCE5238D-1404-4544-B40B-8AE246D6BB36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
