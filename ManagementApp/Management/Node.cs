@@ -21,7 +21,6 @@ namespace Management
         protected Thread threadHandle;
         protected TcpClient tcpClient;
         protected BinaryWriter socketWriter;
-        protected Process processHandle;
 
         public int State
         {
@@ -98,19 +97,6 @@ namespace Management
             set
             {
                 socketWriter = value;
-            }
-        }
-
-        public Process ProcessHandle
-        {
-            get
-            {
-                return processHandle;
-            }
-
-            set
-            {
-                processHandle = value;
             }
         }
     }
