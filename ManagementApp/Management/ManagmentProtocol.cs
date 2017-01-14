@@ -10,6 +10,7 @@ namespace Management
         private static readonly int pOSSIBLEDESITATIONS = 2;
         private static readonly int rOUTINGENTRY = 3;
         private static readonly int cONFIRMATION = 4;
+        private static readonly int iNTERFACEINFORMATION = 4;
 
         private int state;
         private int port;
@@ -17,7 +18,8 @@ namespace Management
         private List<FIB> routingTable;
         private FIB routingEntry;
         private String name;
-        public Dictionary<String, int> possibleDestinations;
+        private Dictionary<String, int> possibleDestinations;
+        private Dictionary<int, String> interfaces;
 
         public static int WHOIS
         {
@@ -134,6 +136,40 @@ namespace Management
             get
             {
                 return rOUTINGENTRY;
+            }
+        }
+
+        public static int INTERFACEINFORMATION
+        {
+            get
+            {
+                return iNTERFACEINFORMATION;
+            }
+        }
+
+        public Dictionary<int, string> Interfaces
+        {
+            get
+            {
+                return interfaces;
+            }
+
+            set
+            {
+                interfaces = value;
+            }
+        }
+
+        public Dictionary<string, int> PossibleDestinations
+        {
+            get
+            {
+                return possibleDestinations;
+            }
+
+            set
+            {
+                possibleDestinations = value;
             }
         }
     }
