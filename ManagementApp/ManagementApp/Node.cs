@@ -15,7 +15,7 @@ namespace ManagementApp
     [Serializable()]
     public class Node
     {
-        protected int ManagmentPort = 7777;
+        protected int ManagmentPort = 7778;
         private int state { get; set; }
         private int localPort;
         private String name;
