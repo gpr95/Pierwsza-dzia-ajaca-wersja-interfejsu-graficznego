@@ -15,6 +15,7 @@ namespace Management
         public int in_cont;
         public int oport;
         public int out_cont;
+
         public FIB(int iport, int in_cont, int oport, int out_cont)
         {
             this.iport = iport;
