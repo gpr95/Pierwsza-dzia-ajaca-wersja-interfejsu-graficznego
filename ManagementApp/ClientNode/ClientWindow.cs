@@ -39,7 +39,7 @@ namespace ClientWindow
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
             Thread managementThreadad = new Thread(new ParameterizedThreadStart(initManagmentConnection));
-            //managementThreadad.Start(managementPort);
+            managementThreadad.Start(managementPort);
             InitializeComponent();
             this.Text = virtualIP;
             Log2("INFO", "START LOG");
@@ -342,6 +342,9 @@ namespace ClientWindow
 
         private void sendBtn_Click(object sender, EventArgs e)
         {
+            //CONTROL
+            controlAgent.connect();
+            controlAgent.sendRequest("TEST");
             send(sendingTextBox.Text);
 
         }
@@ -377,9 +380,7 @@ namespace ClientWindow
         {
             currentSlot = possibleDestinations[sendComboBox.SelectedItem.ToString()];
 
-            //CONTROL
-            controlAgent.connect();
-            controlAgent.sendRequest(sendComboBox.SelectedItem.ToString());
+            
 
 
             if (currentSlot == 1)
