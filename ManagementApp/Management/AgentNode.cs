@@ -18,13 +18,13 @@ namespace Management
         private int managementPort;
         private Thread thread;
         private TcpListener listener;
-        private List<Node> nodeList;
+        //private List<Node> nodeList;
 
         public AgentNode(int port, List<Node> nodeList, ManagementPlane management)
         {
             this.management = management;
             this.managementPort = port;
-            this.nodeList = nodeList;
+            //this.nodeList = nodeList;
 
             listener = new TcpListener(IPAddress.Any, managementPort);
             thread = new Thread(new ParameterizedThreadStart(Listen));
@@ -89,11 +89,13 @@ namespace Management
             }
             catch (SocketException e)
             {
-                UserInterface.log("\nError: " + e.Message, ConsoleColor.Red);
+                UserInterface.log("Error: " + e.Message, ConsoleColor.Red);
+                tp.management.removeNode(nodeName);
             }
             catch (IOException e)
             {
-                UserInterface.log("\nError: " + e.Message, ConsoleColor.Red);
+                UserInterface.log("Error: " + e.Message, ConsoleColor.Red);
+                tp.management.removeNode(nodeName);
             }
         }
     }
