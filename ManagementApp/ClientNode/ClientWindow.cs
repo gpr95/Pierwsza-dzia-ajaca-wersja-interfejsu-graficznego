@@ -25,6 +25,7 @@ namespace ClientWindow
         private Dictionary<String, int> possibleDestinations = new Dictionary<string, int>();
         private int virtualPort = 1;
         private int managementPort;
+        private CPCC controlAgent;
 
         public ClientWindow(string[] args)
         {
@@ -42,6 +43,7 @@ namespace ClientWindow
             InitializeComponent();
             this.Text = virtualIP;
             Log2("INFO", "START LOG");
+            controlAgent = new CPCC(this);
         }
 
         private void Listen()
@@ -123,7 +125,7 @@ namespace ClientWindow
                         else if (management_packet.State == Management.ManagmentProtocol.POSSIBLEDESITATIONS)
                         {
 
-                            this.possibleDestinations = management_packet.possibleDestinations;
+                            this.possibleDestinations = management_packet.PossibleDestinations;
                             this.virtualPort = management_packet.Port;
                             //logTextBox.AppendText("Virtual Port: " + virtualPort);
                             List<string> destinations = new List<string>(this.possibleDestinations.Keys);
