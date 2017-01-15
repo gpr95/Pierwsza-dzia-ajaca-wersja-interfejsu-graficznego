@@ -97,7 +97,7 @@ namespace Management
                 {
                     s = Console.ReadLine();
                     if (s.Equals("q"))
-                        break;
+                        return;
                     int choice;
                     bool res = int.TryParse(s, out choice);
                     nodeDictionary.TryGetValue(choice, out n);
@@ -112,26 +112,50 @@ namespace Management
             switch (operation)
             {
                 case OPERATION.ENTRY:
-                    
                     while (true)
                     {
-                        log("Please enter forwarding entry: /n", ConsoleColor.White);
-                        log("(Foramt: port 1/contener 1/port 2/contener2) /n", ConsoleColor.Blue);
+                        log("Please enter forwarding entry: ", ConsoleColor.White);
+                        log("(Foramt: port 1/container 1/port 2/container 2) ", ConsoleColor.Blue);
                         s = Console.ReadLine();
-                        if (s.Split('/').Length == 3)
+                        if (s.Split('/').Length == 4)
+                        {
+                            management.sendEntry(n, s);
+                            break;
+                        }
+                        else if (s.Equals("q"))
                             break;
                         else
                             log("Wrong format, try again.", ConsoleColor.DarkRed);
                     }
                     break;
                 case OPERATION.TABLE:
-
+                        log("Please enter forwarding table: ", ConsoleColor.White);
+                        log("(Foramt: port 1/container 1/port 2/container 2) ", ConsoleColor.Blue);
+                        List<String> tableList = new List<string>();
+                        while (true)
+                        {
+                            s = Console.ReadLine();
+                            if (s.Split('/').Length == 4)
+                            {
+                                tableList.Add(s);
+                            }
+                            else if (s.Equals("end"))
+                                break;
+                            else if (s.Equals("q"))
+                                return;
+                            else
+                                log("Wrong format, please try again.", ConsoleColor.Red);
+                        }
+                        management.sendTable(n, tableList);
                     break;
                 case OPERATION.SHOW:
-
+                    management.sendShowTable(n);
                     break;
                 case OPERATION.CLEAR:
-
+                    log("Are you sure?", ConsoleColor.Red);
+                    s = Console.ReadLine();
+                    if (s.Equals("y"))
+                        management.sendClear(n);
                     break;
                 default:
                     operation = OPERATION.NONE;
