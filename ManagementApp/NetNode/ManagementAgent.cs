@@ -80,6 +80,7 @@ namespace NetNode
                         Console.WriteLine("Signal from management: iterfaceinformation");
                         //send dictionary from LRM to management
                         ManagmentProtocol protocol = new ManagmentProtocol();
+                        protocol.State = ManagmentProtocol.INTERFACEINFORMATION;
                         protocol.Interfaces = LRM.getConn();
                         String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
                         writer.Write(send_object);
