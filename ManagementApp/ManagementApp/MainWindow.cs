@@ -875,12 +875,12 @@ namespace ManagementApp
         public int getPort(Node node)
         {
             int port1, port2;
-            if (connectionList.Where(i => i.From.Equals(node)).Select(c => c.VirtualPortFrom).Any())
-                port1 = connectionList.Where(i => i.From.Equals(node)).Select(c => c.VirtualPortFrom).Max();
+            if (connectionList.Where(i => i.From.Equals(node.Name)).Select(c => c.VirtualPortFrom).Any())
+                port1 = connectionList.Where(i => i.From.Equals(node.Name)).Select(c => c.VirtualPortFrom).Max();
             else
                 port1 = 0;
-            if (connectionList.Where(i => i.To.Equals(node)).Select(c => c.VirtualPortTo).Any())
-                port2 = connectionList.Where(i => i.To.Equals(node)).Select(c => c.VirtualPortTo).Max();
+            if (connectionList.Where(i => i.To.Equals(node.Name)).Select(c => c.VirtualPortTo).Any())
+                port2 = connectionList.Where(i => i.To.Equals(node.Name)).Select(c => c.VirtualPortTo).Max();
             else
                 port2 = 0;
             return port1 > port2 ? ++port1 : ++port2;
