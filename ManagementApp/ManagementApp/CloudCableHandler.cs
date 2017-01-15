@@ -28,6 +28,8 @@ namespace ManagementApp
             threadCloudCableHandler.Start();
             String parameters = "" + cloudPort;
             System.Diagnostics.Process.Start("CableCloud.exe", parameters);
+            //FOR TESTING
+            System.Diagnostics.Process.Start("ControlNCC.exe");
         }
 
         private void listenForCloud()

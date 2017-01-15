@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Diagnostics;
 
 namespace ManagementApp
 {
@@ -18,6 +19,7 @@ namespace ManagementApp
         private Point pointFrom;
         private Size size;
         private String name { get; set; }
+        private Process processHandle;
 
         public Domain(int width, int height, Point pointTo, Point pointFrom, Size size, String name)
         {
@@ -27,6 +29,11 @@ namespace ManagementApp
             this.pointFrom = pointFrom;
             this.size = size;
             this.name = name;
+            ProcessStartInfo startInfo = new ProcessStartInfo("ControlNCC.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            //startInfo.Arguments = parameters;
+
+            this.ProcessHandle = Process.Start(startInfo);
         }
 
         public Domain(Domain d) : this(d.Width, d.Height, d.PointTo, d.PointFrom, d.Size, d.name)
@@ -138,6 +145,19 @@ namespace ManagementApp
             set
             {
                 size = value;
+            }
+        }
+
+        public Process ProcessHandle
+        {
+            get
+            {
+                return processHandle;
+            }
+
+            set
+            {
+                processHandle = value;
             }
         }
     }

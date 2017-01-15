@@ -6,7 +6,18 @@ using System.Threading.Tasks;
 
 namespace ClientNode
 {
-    class ControlPacket
+    public class ControlPacket
     {
+        public string virtualInterface;
+        public int FLAG = 0;
+        public string resourceIdentifier;
+
+        public ControlPacket(string virtualInterface, int FLAG, string resourceIdentifier)
+        {
+            this.virtualInterface = virtualInterface;
+            this.FLAG = FLAG;
+            this.resourceIdentifier = resourceIdentifier;
+        }
+
     }
 }

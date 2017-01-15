@@ -377,6 +377,10 @@ namespace ClientWindow
         {
             currentSlot = possibleDestinations[sendComboBox.SelectedItem.ToString()];
 
+            //CONTROL
+            controlAgent.connect();
+            controlAgent.sendRequest(sendComboBox.SelectedItem.ToString());
+
 
             if (currentSlot == 1)
             {

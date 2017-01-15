@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "ManagementApp\Application.csproj", "{5A2B0DE4-65BE-4605-A9CC-96342F13F000}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CableCloud", "CableCloud\CableCloud.csproj", "{FF22A7CB-2314-4A27-A75E-37FBE5969175}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Management", "Management\Management.csproj", "{BCE5238D-1404-4544-B40B-8AE246D6BB36}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControlNCC", "ControlNCC\ControlNCC.csproj", "{FAB73EEB-169C-4F6F-854B-20766E7DE9BD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{BCE5238D-1404-4544-B40B-8AE246D6BB36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCE5238D-1404-4544-B40B-8AE246D6BB36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCE5238D-1404-4544-B40B-8AE246D6BB36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAB73EEB-169C-4F6F-854B-20766E7DE9BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAB73EEB-169C-4F6F-854B-20766E7DE9BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAB73EEB-169C-4F6F-854B-20766E7DE9BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAB73EEB-169C-4F6F-854B-20766E7DE9BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
