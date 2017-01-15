@@ -18,7 +18,8 @@ namespace NetNode
         private static SwitchingField switchField = new SwitchingField();
         private LRM lrm;
         public Ports ports;
-        public ManagementAgent agent;
+        public ManagementAgent managementAgent;
+        public ControlAgent controlAgent;
 
         public static Boolean flag;
         public int physicalPort;
@@ -35,7 +36,8 @@ namespace NetNode
             Console.Title = args[0];
             this.ports = new Ports();
             this.lrm = new LRM(args[0]);
-            this.agent = new ManagementAgent(Convert.ToInt32(args[2]), this.virtualIp);
+            this.managementAgent = new ManagementAgent(Convert.ToInt32(args[2]), this.virtualIp);
+            //this.controlAgent = new ControlAgent(Convert.ToInt32("13389"), this.virtualIp); //temporarly 13389
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
             this.physicalPort = Convert.ToInt32(args[1]);
             this.threadListen = new Thread(new ThreadStart(Listen));
@@ -118,7 +120,7 @@ namespace NetNode
 
         private void ConsoleInterface()
         {
-            Console.WriteLine("NetNode " + this.virtualIp + " " + this.agent.port + " " + this.physicalPort);
+            Console.WriteLine("NetNode " + this.virtualIp + " " + this.managementAgent.port + " " + this.physicalPort);
 
             Boolean quit = false;
             while (!quit)
@@ -127,6 +129,7 @@ namespace NetNode
                 Console.WriteLine("\n 1) Manually insert entry in connection table");
                 Console.WriteLine("\n 2) Show connection table");
                 Console.WriteLine("\n 3) Clear connection table");
+                Console.WriteLine("\n 4) Show node connections");
                 Console.WriteLine("\n");
 
                 int choice;
@@ -143,6 +146,9 @@ namespace NetNode
                             break;
                         case 3:
                             SwitchingField.clearFibTable();
+                            break;
+                        case 4:
+                            LRM.printConn();
                             break;
                         default:
                             Console.WriteLine("\n Wrong option");
