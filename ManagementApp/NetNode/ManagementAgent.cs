@@ -85,6 +85,16 @@ namespace NetNode
                         String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
                         writer.Write(send_object);
                     }
+                    else if (received_Protocol.State == ManagmentProtocol.GETTABLE)
+                    {
+                        Console.WriteLine("Signal from management: getTable");
+                        //send dictionary from LRM to management
+                        ManagmentProtocol protocol = new ManagmentProtocol();
+                        protocol.State = ManagmentProtocol.GETTABLE;
+                        protocol.RoutingTable = SwitchingField.fib;
+                        String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+                        writer.Write(send_object);
+                    }
                     else
                     {
                         Console.WriteLine("Signal from management: undefined protocol");

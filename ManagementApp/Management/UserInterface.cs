@@ -115,7 +115,7 @@ namespace Management
                     while (true)
                     {
                         log("Please enter forwarding entry: ", ConsoleColor.White);
-                        log("(Foramt: port 1/container 1/port 2/container 2) ", ConsoleColor.Blue);
+                        log("Foramt: port 1/container 1/port 2/container 2 ", ConsoleColor.Cyan);
                         s = Console.ReadLine();
                         if (s.Split('/').Length == 4)
                         {
@@ -125,12 +125,12 @@ namespace Management
                         else if (s.Equals("q"))
                             break;
                         else
-                            log("Wrong format, try again.", ConsoleColor.DarkRed);
+                            log("Wrong format, try again.", ConsoleColor.Red);
                     }
                     break;
                 case OPERATION.TABLE:
                         log("Please enter forwarding table: ", ConsoleColor.White);
-                        log("(Foramt: port 1/container 1/port 2/container 2) ", ConsoleColor.Blue);
+                        log("Foramt: port 1/container 1/port 2/container 2\nTo finish configuration enter 'end'", ConsoleColor.Cyan);
                         List<String> tableList = new List<string>();
                         while (true)
                         {
@@ -163,10 +163,18 @@ namespace Management
             }
         }
 
+        internal static void showTable(List<FIB> routingTable)
+        {
+            foreach (var temp in routingTable)
+            {
+                Console.WriteLine(temp.toString());
+            }
+        }
+
         internal static void showInterfaces(Dictionary<int, string> dictionary)
         {
             foreach (var row in dictionary)
-                log("Interface: " + row.Key + " connected to: " + row.Value, ConsoleColor.Blue);
+                log("Interface: " + row.Key + " connected to: " + row.Value, ConsoleColor.Cyan);
         }
 
         public static void log(String msg, ConsoleColor cc)

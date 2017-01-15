@@ -159,6 +159,7 @@ namespace Management
         {
             try
             {
+                Thread.Sleep(100);
                 protocol.State = ManagmentProtocol.GETTABLE;
                 string data = JSON.Serialize(JSON.FromValue(protocol));
                 n.SocketWriter.Write(data);

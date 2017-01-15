@@ -85,6 +85,8 @@ namespace Management
                     received_Protocol = received_object.Value.ToObject<ManagmentProtocol>();
                     if(received_Protocol.State == ManagmentProtocol.INTERFACEINFORMATION)
                         UserInterface.showInterfaces(received_Protocol.Interfaces);
+                    if (received_Protocol.State == ManagmentProtocol.GETTABLE)
+                        UserInterface.showTable(received_Protocol.RoutingTable);
                 }
             }
             catch (SocketException e)
