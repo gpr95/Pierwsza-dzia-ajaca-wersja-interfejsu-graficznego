@@ -10,7 +10,9 @@ namespace Management
         private static readonly int pOSSIBLEDESITATIONS = 2;
         private static readonly int rOUTINGENTRY = 3;
         private static readonly int cONFIRMATION = 4;
-        private static readonly int iNTERFACEINFORMATION = 4;
+        private static readonly int iNTERFACEINFORMATION = 5;
+        private static readonly int cLEARTABLE = 6;
+        private static readonly int gETTABLE = 7;
 
         private int state;
         private int port;
@@ -170,6 +172,22 @@ namespace Management
             set
             {
                 possibleDestinations = value;
+            }
+        }
+
+        public static int CLEARTABLE
+        {
+            get
+            {
+                return cLEARTABLE;
+            }
+        }
+
+        public static int GETTABLE
+        {
+            get
+            {
+                return gETTABLE;
             }
         }
     }
