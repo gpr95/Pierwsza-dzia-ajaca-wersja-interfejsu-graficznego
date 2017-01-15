@@ -19,12 +19,12 @@ namespace NetNode
         public static BinaryWriter writer;
         private Timer timerForsending;
         private string virtualIp;
-        private Dictionary<int, string> connections;
+        public static Dictionary<int, string> connections = new Dictionary<int,string>();
 
         public LRM(string virtualIp)
         {
             this.virtualIp = virtualIp;
-            this.connections = new Dictionary<int, string>();
+            //this.connections = new Dictionary<int, string>();
 
             //Timer
             timerForsending = new Timer();
@@ -60,16 +60,21 @@ namespace NetNode
 
         private void saveConnection(int port, string virtualIp)
         {
-            if(!this.connections.ContainsKey(port))
+            if(!connections.ContainsKey(port))
             {
                 Console.WriteLine("I am connected with " + virtualIp + " on port " + port);
-                this.connections.Add(port, virtualIp);
+                connections.Add(port, virtualIp);
                 //TODO send to RC
             }
             else
             {
                 //Console.WriteLine("connections already stored");
             }
+        }
+
+        public static Dictionary<int,string> getConn()
+        {
+            return connections;
         }
     }
 }

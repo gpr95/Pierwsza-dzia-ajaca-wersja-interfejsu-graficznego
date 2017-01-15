@@ -75,6 +75,15 @@ namespace NetNode
                             SwitchingField.addToSwitch(received_Protocol.RoutingEntry);
                         }
                     }
+                    else if (received_Protocol.State == ManagmentProtocol.INTERFACEINFORMATION)
+                    {
+                        Console.WriteLine("Signal from management: iterfaceinformation");
+                        //send dictionary from LRM to management
+                        ManagmentProtocol protocol = new ManagmentProtocol();
+                        protocol.Interfaces = LRM.getConn();
+                        String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+                        writer.Write(send_object);
+                    }
                     else
                     {
                         Console.WriteLine("Signal from management: undefined protocol");

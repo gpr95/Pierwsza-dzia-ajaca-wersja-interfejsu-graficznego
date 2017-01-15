@@ -46,7 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlAgent.cs" />
     <Compile Include="IPort.cs" />
+    <Compile Include="LRM.cs" />
     <Compile Include="ManagementAgent.cs" />
     <Compile Include="OPort.cs" />
     <Compile Include="Ports.cs" />
