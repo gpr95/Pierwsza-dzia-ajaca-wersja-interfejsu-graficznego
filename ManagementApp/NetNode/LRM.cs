@@ -22,11 +22,12 @@ namespace NetNode
         private string virtualIp;
         public static Dictionary<int, string> connections = new Dictionary<int,string>();
         private static Dictionary<int, bool> confirmations = new Dictionary<int, bool>();
+        private static Dictionary<int, Dictionary<int, bool>> resources = new Dictionary<int, Dictionary<int,bool>>();
 
         public LRM(string virtualIp)
         {
             this.virtualIp = virtualIp;
-            //this.connections = new Dictionary<int, string>();
+            initResources(resources);
 
             //Timer
             timerForSending = new Timer();
@@ -39,6 +40,18 @@ namespace NetNode
             timerForConf.Elapsed += new ElapsedEventHandler(confirmAlive);
             timerForConf.Interval = 10000; //10 seconds
             timerForConf.Enabled = true;
+        }
+
+        private void initResources(Dictionary<int, Dictionary<int, bool>> resources)
+        {
+            Dictionary<int,bool> temp = new Dictionary<int,bool>();
+            temp.Add(11,false);
+            temp.Add(12,false);
+            temp.Add(13,false);
+            for(int i=0;i<21;i++)
+            {
+                resources.Add(i, temp);
+            }
         }
 
         public void receivedMessage(string lrmProtocol, int port)
@@ -110,8 +123,36 @@ namespace NetNode
                     //znaczy ze nie ma polaczenia
                     Console.WriteLine("polaczenie musialo zostac zerwane bo nie slysze sasiada na porcie " + i.Key);
                     connections.Remove(i.Key);
+                    //inform RC that row is deleted
+                    ControlAgent.sendDeleted(this.virtualIp, i.Key, i.Value);
+                    clearResources(resources[i.Key]);
                 }
             }
+        }
+
+        public static int allocateResource(int port)
+        {
+            int no_vc3 = 0;
+            foreach(var res in resources[port])
+            {
+                if(res.Value == false)
+                {
+                    //empty so allocating
+                    Console.WriteLine("Allocating on port: "+port+"vc3: "+res.Key);
+                    resources[port][res.Key] = true;
+                    no_vc3 = res.Key;
+                    break;
+                }
+            }
+            return no_vc3;
+        }
+
+        private void clearResources(Dictionary<int, bool> dictionary)
+        {
+            dictionary[11] = false;
+            dictionary[12] = false;
+            dictionary[13] = false;
+            Console.WriteLine("resources cleared");
         }
 
         public static Dictionary<int,string> getConn()

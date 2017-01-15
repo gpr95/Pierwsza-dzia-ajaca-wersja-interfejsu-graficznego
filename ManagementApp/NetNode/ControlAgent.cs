@@ -75,13 +75,24 @@ namespace NetNode
         public static void sendTopology(string from, int port, string to)
         {
             //TODO send to RC e.g. NN0 connected on port 2 with NN1
+            Console.WriteLine("sending topology to RC: " + from+" "+port+" "+to);
 
             //ControlProtocol protocol = new ControlProtocol();
             //protocol.topology = this.virtualIp;
             //String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             //writer.Write(send_object);
-            //Console.WriteLine("sending topology to RC: " + protocol.Name);
         }
 
+
+        public static void sendDeleted(string from, int port, string to)
+        {
+            //TODO send to RC that row e.g. NN0 connected on port 2 with NN1 is deleted
+            Console.WriteLine("sending to RC info about deletion: " + from + " " + port + " " + to);
+        }
+
+        public static void sendConfirmation(int port, int no_vc3)
+        {
+            //TODO send to CC confirmation of resource reservation and vc3 number
+        }
     }
 }
