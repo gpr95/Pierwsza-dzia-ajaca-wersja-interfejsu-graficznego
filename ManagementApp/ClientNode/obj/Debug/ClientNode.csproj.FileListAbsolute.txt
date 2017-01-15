@@ -38,3 +38,9 @@ C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\Clie
 C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
 C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\obj\Debug\ClientNode.exe
 C:\Users\Marek\Source\Repos\RoutersEmulatorTSST\ManagementApp\ManagementApp\ClientNode\obj\Debug\ClientNode.pdb
+D:\TSSTRepo\ManagementApp\ClientNode\obj\Debug\ClientWindow.ClientWindow.resources
+D:\TSSTRepo\ManagementApp\ClientNode\obj\Debug\ClientNode.csproj.GenerateResource.Cache
+D:\TSSTRepo\ManagementApp\ClientNode\bin\Debug\Management.exe
+D:\TSSTRepo\ManagementApp\ClientNode\bin\Debug\ManagementApp.exe
+D:\TSSTRepo\ManagementApp\ClientNode\bin\Debug\ManagementApp.pdb
+D:\TSSTRepo\ManagementApp\ClientNode\bin\Debug\Management.pdb
