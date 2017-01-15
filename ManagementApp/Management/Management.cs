@@ -44,7 +44,7 @@ namespace Management
 
         public void allocateNode(String nodeName, TcpClient nodePort, Thread nodeThreadHandle, BinaryWriter writer)
         {
-            log("Node " + nodeName + " connected", ConsoleColor.Blue);
+            log("Node " + nodeName + " connected", ConsoleColor.Green);
             Node nodeBeingAllocated;
             if (nodeName.Contains("CN"))
                 nodeBeingAllocated = new ClientNode(nodeName, 0);
@@ -66,9 +66,15 @@ namespace Management
         public void getInterfaces(Node n)
         {
             log("#DEBUG4", ConsoleColor.Magenta);
-            protocol.State = ManagmentProtocol.INTERFACEINFORMATION;
-            string data = JSON.Serialize(JSON.FromValue(protocol));
-            n.SocketWriter.Write(data);
+            try
+            {
+                protocol.State = ManagmentProtocol.INTERFACEINFORMATION;
+                string data = JSON.Serialize(JSON.FromValue(protocol));
+                n.SocketWriter.Write(data);
+            } catch (IOException e)
+            {
+                log("Error: " + e.Message, ConsoleColor.Red);
+            }
         }
 
         public void log(String msg, ConsoleColor cc)
@@ -80,6 +86,101 @@ namespace Management
         {
             //run = false;
             //listener.Stop();
+        }
+
+        internal void removeNode(String clienttmp)
+        {
+            Node node = nodeList.Where(n => n.Name.Equals(clienttmp)).FirstOrDefault();
+            if (node == default(Node))
+                log("#DEBUG 5", ConsoleColor.Magenta);
+            nodeList.Remove(node);
+        }
+
+        internal void sendEntry(Node n, string s)
+        {
+            String[] entry = s.Split('/');
+            int[] val = new int[entry.Length];
+            if(val.Length != 4)
+            {
+                log("Wrong entry.", ConsoleColor.Red);
+                return;
+            }
+            for (int i = 0; i < entry.Length; i++)
+            {
+                int.TryParse(entry[i], out val[i]);
+            }
+            FIB f = new FIB(val[0], val[1], val[2], val[3]);
+            try
+            {
+                protocol.State = ManagmentProtocol.ROUTINGENTRY;
+                protocol.RoutingEntry = f;
+                string data = JSON.Serialize(JSON.FromValue(protocol));
+                n.SocketWriter.Write(data);
+            }
+            catch (IOException e)
+            {
+                log("Error: " + e.Message, ConsoleColor.Red);
+            }
+        }
+
+        internal void sendTable(Node n, List<string> tableList)
+        {
+            List<FIB> listOfFibs = new List<FIB>();
+            foreach(String s in tableList)
+            {
+                String[] entry = s.Split('/');
+                int[] val = new int[entry.Length];
+                if (val.Length != 4)
+                {
+                    log("Wrong entry.", ConsoleColor.Red);
+                    return;
+                }
+                for (int i = 0; i < entry.Length; i++)
+                {
+                    int.TryParse(entry[i], out val[i]);
+                }
+                listOfFibs.Add(new FIB(val[0], val[1], val[2], val[3]));
+            }
+
+            try
+            {
+                protocol.State = ManagmentProtocol.ROUTINGTABLES;
+                protocol.RoutingTable = listOfFibs;
+                string data = JSON.Serialize(JSON.FromValue(protocol));
+                n.SocketWriter.Write(data);
+            }
+            catch (IOException e)
+            {
+                log("Error: " + e.Message, ConsoleColor.Red);
+            }
+        }
+
+        internal void sendShowTable(Node n)
+        {
+            try
+            {
+                protocol.State = ManagmentProtocol.GETTABLE;
+                string data = JSON.Serialize(JSON.FromValue(protocol));
+                n.SocketWriter.Write(data);
+            }
+            catch (IOException e)
+            {
+                log("Error: " + e.Message, ConsoleColor.Red);
+            }
+        }
+
+        internal void sendClear(Node n)
+        {
+            try
+            {
+                protocol.State = ManagmentProtocol.CLEARTABLE;
+                string data = JSON.Serialize(JSON.FromValue(protocol));
+                n.SocketWriter.Write(data);
+            }
+            catch (IOException e)
+            {
+                log("Error: " + e.Message, ConsoleColor.Red);
+            }
         }
     }
 }
