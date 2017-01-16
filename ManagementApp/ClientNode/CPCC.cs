@@ -44,17 +44,29 @@ namespace ClientWindow
 
             while (true)
             {
-                string received_data = reader.ReadString();
+                try
+                {
+                    string received_data = reader.ReadString();
                 JMessage received_object = JMessage.Deserialize(received_data);
                 if (received_object.Type == typeof(ControlPacket))
                 {
                     ControlPacket packet = received_object.Value.ToObject<ControlPacket>();
-                    Console.WriteLine(packet.virtualInterface);
+                    if(packet.virtualInterface == ControlProtocol.CALL_ACCEPT)
+                        {
+                            clientWindowHandler.Log2("CONTROL", "uuu mam slot i port moge slac");
+                            
+                        }
 
                 }
                 else
                 {
-                    Console.WriteLine("Wrong control packet format");
+                        clientWindowHandler.Log2("CONTROL", "Wrong control packet format");
+                }
+                }
+                catch (IOException e)
+                {
+                    clientWindowHandler.Log2("CONTROL", "Connection closed");
+                    break;
                 }
             }
         }
@@ -64,6 +76,7 @@ namespace ClientWindow
             ControlPacket packet = new ControlPacket(ControlProtocol.CALL_REQUEST, 0, clientName);
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
+            clientWindowHandler.Log2("CONTROL", "send request on " + ControlProtocol.CALL_REQUEST + " interface");
 
         }
 

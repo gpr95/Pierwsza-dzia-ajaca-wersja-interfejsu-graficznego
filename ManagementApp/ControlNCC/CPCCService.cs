@@ -38,18 +38,49 @@ namespace ControlNCC
             writer = new BinaryWriter(clienttmp.GetStream());
             while (true)
             {
-                string received_data = reader.ReadString();
-                JMessage received_object = JMessage.Deserialize(received_data);
-                if (received_object.Type == typeof(ControlPacket))
-                {
-                    ControlPacket packet = received_object.Value.ToObject<ControlPacket>();
-                    Console.WriteLine(packet.virtualInterface);
+                try {
+                    string received_data = reader.ReadString();
+                    JMessage received_object = JMessage.Deserialize(received_data);
+                    if (received_object.Type == typeof(ControlPacket))
+                    {
+                        ControlPacket packet = received_object.Value.ToObject<ControlPacket>();
+                        if(packet.virtualInterface == ControlProtocol.CALL_REQUEST)
+                        {
+                            Console.WriteLine("Receive call request for "+packet.resourceIdentifier+" on " + ControlProtocol.CALL_REQUEST_ACCEPT + " interface");
+                            Console.WriteLine("Send directory request");//sprawdzenie czy w naszej domenie 
+                            Console.WriteLine("Receive local name");
+                            Console.WriteLine("Send policy out");
+                            Console.WriteLine("Call accept");
+                            Console.WriteLine("Send call indication or network call coordination out ?");
+                            Console.WriteLine("Call accept");
+                            Console.WriteLine("Send connection request (to CC) ");
+                            Console.WriteLine("receive virtual port + slot ? (from CC) ");
+                            //bla bla bla
+                            //send(ControlProtocol.CALL_ACCEPT, 1, packet.resourceIdentifier, 1, 3);
+                            Console.WriteLine("Send cos tambajsdh");
 
-                }else
+
+                        }
+
+                    } else
+                    {
+                        Console.WriteLine("Wrong control packet format");
+                    }
+
+                }catch(IOException e)
                 {
-                    Console.WriteLine("Wrong control packet format");
+                    Console.WriteLine("Connection closed");
+                    break;
                 }
-            }
+             }
+        }
+
+        public void send(string virtualInterface, int FLAG, string resourceIdentifier, int virtualPort, int slot)
+        {
+            ControlPacket packet = new ControlPacket(ControlProtocol.CALL_REQUEST, 0, resourceIdentifier, virtualPort, slot);
+            string data = JMessage.Serialize(JMessage.FromValue(packet));
+            writer.Write(data);
+            
         }
 
     }

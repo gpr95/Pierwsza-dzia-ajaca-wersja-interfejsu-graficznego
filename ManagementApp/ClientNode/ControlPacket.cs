@@ -11,6 +11,8 @@ namespace ClientNode
         public string virtualInterface;
         public int FLAG = 0;
         public string resourceIdentifier;
+        public int virtualPort;
+        public int slot;
 
         public ControlPacket(string virtualInterface, int FLAG, string resourceIdentifier)
         {
@@ -18,6 +20,8 @@ namespace ClientNode
             this.FLAG = FLAG;
             this.resourceIdentifier = resourceIdentifier;
         }
+
+       
 
     }
 }
