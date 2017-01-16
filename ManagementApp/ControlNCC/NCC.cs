@@ -26,7 +26,7 @@ namespace ControlNCC
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
 
-            Console.WriteLine("Start NCC, IP: " + ip + " Port: " + controlPort);
+            Console.WriteLine("[INIT]Start NCC, IP: " + ip + " Port: " + controlPort);
         }
 
         private void Listen()
