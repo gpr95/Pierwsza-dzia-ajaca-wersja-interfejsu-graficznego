@@ -889,14 +889,14 @@ namespace ManagementApp
         public void addConnection(Node from, int portFrom, Node to, int portTo, bool move = false)
         {
             if (from.Type.Equals(Node.NodeType.CLIENT))
-                if (connectionList.Where(i => i.From.Equals(from) || i.To.Equals(from)).Any())
+                if (connectionList.Where(i => i.From.Equals(from.Name) || i.To.Equals(from.Name)).Any())
                 {
                     errorMessage("Client node can have only one connection!");
                     return;
                 }
 
             if (to.Type.Equals(Node.NodeType.CLIENT))
-                if (connectionList.Where(i => i.From.Equals(to) || i.To.Equals(to)).Any())
+                if (connectionList.Where(i => i.From.Equals(to.Name) || i.To.Equals(to.Name)).Any())
                 {
                     errorMessage("Client node can have only one connection!");
                     return;
@@ -926,14 +926,14 @@ namespace ManagementApp
                         connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
                         bind();
                     }
-                    else if (connectionList.Where(i => i.From.Equals(to)).ToList().Where(i => i.VirtualPortFrom.Equals(portTo)).Any())
+                    else if (connectionList.Where(i => i.From.Equals(to.Name)).ToList().Where(i => i.VirtualPortFrom.Equals(portTo)).Any())
                         errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.1");
-                    else if (connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
+                    else if (connectionList.Where(i => i.To.Equals(to.Name)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
                         //connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any();
                         errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.2");
-                    else if (connectionList.Where(i => i.From.Equals(from)).ToList().Where(i => i.VirtualPortFrom.Equals(portFrom)).Any())
+                    else if (connectionList.Where(i => i.From.Equals(from.Name)).ToList().Where(i => i.VirtualPortFrom.Equals(portFrom)).Any())
                         errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.3");
-                    else if (connectionList.Where(i => i.To.Equals(from)).ToList().Where(i => i.VirtualPortTo.Equals(portFrom)).Any())
+                    else if (connectionList.Where(i => i.To.Equals(from.Name)).ToList().Where(i => i.VirtualPortTo.Equals(portFrom)).Any())
                         errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.4");
                     else
                     {
@@ -945,12 +945,12 @@ namespace ManagementApp
 
         private bool isConnectionExist(Node f, Node t)
         {
-            return connectionList.Where(i => (i.From.Equals(f) && i.To.Equals(t)) || (i.From.Equals(t) && i.To.Equals(f))).Any();
+            return connectionList.Where(i => (i.From.Equals(f.Name) && i.To.Equals(t.Name)) || (i.From.Equals(t.Name) && i.To.Equals(f.Name))).Any();
         }
 
         private int numberOfNodeConnections(Node n)
         {
-            return connectionList.Where(i => i.From.Equals(n) || i.To.Equals(n)).Count();
+            return connectionList.Where(i => i.From.Equals(n.Name) || i.To.Equals(n.Name)).Count();
         }
 
         public void isSpaceAvailable(Node node, int x, int y, int maxW, int maxH)
