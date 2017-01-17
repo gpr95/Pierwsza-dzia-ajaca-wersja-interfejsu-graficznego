@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ControlNCC
 {
-    class CC
+    class CallController
     {
     }
 }

@@ -15,9 +15,9 @@ namespace ControlNCC
     {
         private TcpClient client;
         private BinaryWriter writer;
-        private NCC handlerNCC;
+        private NetworkCallControl handlerNCC;
 
-        public CPCCService(TcpClient clientHandler, NCC handlerNCC)
+        public CPCCService(TcpClient clientHandler, NetworkCallControl handlerNCC)
         {
             this.client = clientHandler;
             this.handlerNCC = handlerNCC;

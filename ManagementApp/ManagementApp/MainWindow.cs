@@ -11,7 +11,7 @@ namespace ManagementApp
     public partial class MainWindow : Form
     {
         // CONSTS
-        private const int GAP = 10;
+        private const int GAP = 14;
         private readonly int CLOUDPORT = 7776;
         private readonly int MANAGPORT = 7777;
         private readonly int NETNODECONNECTIONS = 21;

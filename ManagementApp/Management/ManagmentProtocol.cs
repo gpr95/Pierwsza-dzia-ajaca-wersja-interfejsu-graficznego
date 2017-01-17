@@ -5,14 +5,14 @@ namespace Management
 {
     public class ManagmentProtocol
     {
-        private static readonly int wHOIS = 0;
-        private static readonly int rOUTINGTABLES = 1;
-        private static readonly int pOSSIBLEDESITATIONS = 2;
-        private static readonly int rOUTINGENTRY = 3;
-        private static readonly int cONFIRMATION = 4;
-        private static readonly int iNTERFACEINFORMATION = 5;
-        private static readonly int cLEARTABLE = 6;
-        private static readonly int gETTABLE = 7;
+        public static readonly int WHOIS = 0;
+        public static readonly int ROUTINGTABLES = 1;
+        public static readonly int POSSIBLEDESITATIONS = 2;
+        public static readonly int ROUTINGENTRY = 3;
+        public static readonly int CONFIRMATION = 4;
+        public static readonly int INTERFACEINFORMATION = 5;
+        public static readonly int CLEARTABLE = 6;
+        public static readonly int GETTABLE = 7;
 
         private int state;
         private int port;
@@ -22,38 +22,6 @@ namespace Management
         private String name;
         private Dictionary<String, int> possibleDestinations;
         private Dictionary<int, String> interfaces;
-
-        public static int WHOIS
-        {
-            get
-            {
-                return wHOIS;
-            }
-        }
-
-        public static int ROUTINGTABLES
-        {
-            get
-            {
-                return rOUTINGTABLES;
-            }
-        }
-
-        public static int POSSIBLEDESITATIONS
-        {
-            get
-            {
-                return pOSSIBLEDESITATIONS;
-            }
-        }
-
-        public static int CONFIRMATION
-        {
-            get
-            {
-                return cONFIRMATION;
-            }
-        }
 
         public int State
         {
@@ -133,22 +101,6 @@ namespace Management
             }
         }
 
-        public static int ROUTINGENTRY
-        {
-            get
-            {
-                return rOUTINGENTRY;
-            }
-        }
-
-        public static int INTERFACEINFORMATION
-        {
-            get
-            {
-                return iNTERFACEINFORMATION;
-            }
-        }
-
         public Dictionary<int, string> Interfaces
         {
             get
@@ -172,22 +124,6 @@ namespace Management
             set
             {
                 possibleDestinations = value;
-            }
-        }
-
-        public static int CLEARTABLE
-        {
-            get
-            {
-                return cLEARTABLE;
-            }
-        }
-
-        public static int GETTABLE
-        {
-            get
-            {
-                return gETTABLE;
             }
         }
     }

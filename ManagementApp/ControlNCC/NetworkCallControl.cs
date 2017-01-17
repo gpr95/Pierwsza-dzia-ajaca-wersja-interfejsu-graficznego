@@ -11,13 +11,13 @@ using System.Xml.XPath;
 
 namespace ControlNCC
 {
-    class NCC
+    class NetworkCallControl
     {
         private int controlPort;
         private TcpListener listener;
         private Dictionary<int, CPCCService> services;
 
-        public NCC()
+        public NetworkCallControl()
         {
             services = new Dictionary<int, CPCCService>();
             string ip = "127.0.0.1";

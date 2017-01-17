@@ -12,7 +12,6 @@ namespace ManagementApp
     [Serializable()]
     public class Domain
     {
-        private const int GAP = 10;
         private int width;
         private int height;
         private Point pointTo;
