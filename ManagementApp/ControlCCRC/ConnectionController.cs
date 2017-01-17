@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ControlNCC
+namespace ControlCCRC
 {
-    class RoutingController
+    class ConnectionController
     {
     }
 }
