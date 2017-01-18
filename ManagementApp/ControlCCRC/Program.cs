@@ -10,6 +10,7 @@ namespace ControlCCRC
     {
         static void Main(string[] args)
         {
+            RoutingController rc = new RoutingController(args);
         }
     }
 }
