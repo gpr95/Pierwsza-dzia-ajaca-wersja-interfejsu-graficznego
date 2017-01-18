@@ -13,7 +13,7 @@ namespace Management
         private static Dictionary<int, Node> nodeDictionary;
 
         private enum OPERATION
-        {ENTRY, TABLE, SHOW, CLEAR, NONE }
+        {ENTRY, TABLE, SHOW, INTERFACES, CLEAR, NONE }
 
         internal static ManagementPlane Management
         {
@@ -38,7 +38,8 @@ namespace Management
                 Console.WriteLine("\n\t 1) Insert forwarding entry to Node");
                 Console.WriteLine("\n\t 2) Insert forwarding table to Node");
                 Console.WriteLine("\n\t 3) Show connection table of Node");
-                Console.WriteLine("\n\t 4) Clear connection table of Node");
+                Console.WriteLine("\n\t 4) Show interfaces of Node");
+                Console.WriteLine("\n\t 5) Clear connection table of Node");
                 Console.WriteLine("\n");
 
                 int choice;
@@ -61,6 +62,10 @@ namespace Management
                             management.getNodes();
                             break;
                         case 4:
+                            operation = OPERATION.INTERFACES;
+                            management.getNodes();
+                            break;
+                        case 5:
                             operation = OPERATION.CLEAR;
                             management.getNodes();
                             break;
@@ -80,7 +85,7 @@ namespace Management
 
         public static void nodeList(List<Node> nodeList)
         {
-            log("#DEBUG3", ConsoleColor.Magenta);
+            //log("#DEBUG3", ConsoleColor.Magenta);
             nodeDictionary = new Dictionary<int, Node>();
             int enumerate = 1;
             Console.ForegroundColor = ConsoleColor.White;
@@ -91,7 +96,7 @@ namespace Management
             }
             String s;
             Node n = null;
-            log("#DEBUG3.1", ConsoleColor.Magenta);
+            //log("#DEBUG3.1", ConsoleColor.Magenta);
             if (nodeDictionary.Count != 0)
                 while (true)
                 {
@@ -108,7 +113,7 @@ namespace Management
                 return;
             if(operation != OPERATION.CLEAR)
                 management.getInterfaces(n);
-            log("#DEBUG3.2", ConsoleColor.Magenta);
+            //log("#DEBUG3.2", ConsoleColor.Magenta);
             switch (operation)
             {
                 case OPERATION.ENTRY:
@@ -150,6 +155,8 @@ namespace Management
                     break;
                 case OPERATION.SHOW:
                     management.sendShowTable(n);
+                    break;
+                case OPERATION.INTERFACES:
                     break;
                 case OPERATION.CLEAR:
                     log("Are you sure?", ConsoleColor.Red);
