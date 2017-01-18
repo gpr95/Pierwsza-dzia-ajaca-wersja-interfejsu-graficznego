@@ -13,8 +13,15 @@ namespace ControlCCRC
 {
     class RoutingController
     {
-        private TcpListener listener;
+        private Boolean iAmDomain;
+
+        private TcpListener LRMlistener;
+        private TcpListener RClistener;
+        private TcpClient RCClient;
+
         private Thread threadLRMListen;
+        private Thread threadRCListen;
+        private Thread threadRCConnection;
         private Dictionary<String, LRMThread> threadsMap;
 
 
@@ -24,31 +31,104 @@ namespace ControlCCRC
         private Dictionary<String, Dictionary<String, int>> topologyVC32;
         private Dictionary<String, Dictionary<String, int>> topologyVC33;
 
+        /**
+         * DOMAIN [listen LRM , listen RC]
+         * SUBNETWORK [listen LRM , listen RC , connect up RC] 
+         */
         public RoutingController(string[] args)
         {
+            iAmDomain = (args.Length == 2);
+            
+            if(iAmDomain)
+            {
+               consoleWriter("[INIT] DOMAIN");
+            }
+            else
+            {
+                consoleWriter("[INIT] SUBNETWORK");
+                
+                try
+                {
+                    RCClient = new TcpClient("localhost", Convert.ToInt32(args[2]));
+                }
+                catch (SocketException ex)
+                {
+                    consoleWriter("[ERROR] Cannot connect with upper RC.");
+                }
+                this.threadLRMListen = new Thread(new ThreadStart(rcConnecting));
+                threadLRMListen.Start();
+            }
+
             topologyVC31 = new Dictionary<String, Dictionary<String, int>>();
             topologyVC32 = new Dictionary<String, Dictionary<String, int>>();
             topologyVC33 = new Dictionary<String, Dictionary<String, int>>();
-            this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[0]));
+
+            this.LRMlistener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[0]));
             this.threadLRMListen = new Thread(new ThreadStart(lrmListening));
             threadLRMListen.Start();
+
+            this.RClistener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
+            this.threadRCListen = new Thread(new ThreadStart(rcListening));
+            threadRCListen.Start();
 
             consoleStart();
         }
 
-        private void lrmListening()
+        private void rcConnecting()
         {
-            this.listener.Start();
+            BinaryReader reader = new BinaryReader(RCClient.GetStream());
 
             Boolean noError = true;
             while (noError)
             {
                 try
                 {
-                    TcpClient client = listener.AcceptTcpClient();
-                    LRMThread thread = new LRMThread(client, ref threadsMap, ref topologyVC31, ref topologyVC32, ref topologyVC33);
+                    string received_data = reader.ReadString();
+                    JMessage received_object = JMessage.Deserialize(received_data);
+                    if (received_object.Type != typeof(RCSignalingMessage))
+                        noError = false;
+                    RCSignalingMessage msg = received_object.Value.ToObject<RCSignalingMessage>();
+                    //@TODO something with Msg
+                }
+                catch (IOException ex)
+                {
+                    noError = false;
+                }
+            }
+        }
+        private void lrmListening()
+        {
+            this.RClistener.Start();
+
+            Boolean noError = true;
+            while (noError)
+            {
+                try
+                {
+                    TcpClient client = RClistener.AcceptTcpClient();
+                   // @TODO
                 }
                 catch(SocketException sEx)
+                {
+                    consoleWriter("[ERROR] Socket failed. Listener.");
+                    noError = false;
+                }
+            }
+        }
+
+        private void rcListening()
+        {
+            this.LRMlistener.Start();
+
+            Boolean noError = true;
+            while (noError)
+            {
+                try
+                {
+                    TcpClient client = LRMlistener.AcceptTcpClient();
+                    LRMThread thread = new LRMThread(client, ref threadsMap, ref topologyVC31, ref topologyVC32, ref topologyVC33);
+                }
+                catch (SocketException sEx)
                 {
                     consoleWriter("[ERROR] Socket failed. Listener.");
                     noError = false;
