@@ -51,6 +51,7 @@
     <Compile Include="ControlSignalingMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RCSignalingMessage.cs" />
     <Compile Include="RoutingController.cs" />
   </ItemGroup>
   <ItemGroup>
