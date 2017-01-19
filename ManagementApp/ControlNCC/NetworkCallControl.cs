@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -15,18 +16,26 @@ namespace ControlNCC
     {
         private int controlPort;
         private TcpListener listener;
-        private Dictionary<int, CPCCService> services;
+        private Dictionary<int, ControlConnectionService> services;
+        private string domainNumber;
+        private static List<string> directory = new List<string>();
 
-        public NetworkCallControl()
+        public NetworkCallControl(string domainNumber)
         {
-            services = new Dictionary<int, CPCCService>();
+            services = new Dictionary<int, ControlConnectionService>();
             string ip = "127.0.0.1";
+            this.domainNumber = domainNumber;
             readConfig();
             listener = new TcpListener(IPAddress.Parse(ip), controlPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
 
             Console.WriteLine("[INIT]Start NCC, IP: " + ip + " Port: " + controlPort);
+            Console.WriteLine("Nodes in my network: ");
+            foreach(string node in directory)
+            {
+                Console.WriteLine(node);
+            }
         }
 
         private void Listen()
@@ -36,11 +45,11 @@ namespace ControlNCC
             while (true)
             {
                 TcpClient client = listener.AcceptTcpClient();
-                CPCCService service = new CPCCService(client, this);
+                ControlConnectionService service = new ControlConnectionService(client, this);
             }
         }
 
-        public void addService(int ID, CPCCService handler)
+        public void addService(int ID, ControlConnectionService handler)
         {
             services.Add(ID, handler);
         }
@@ -49,9 +58,27 @@ namespace ControlNCC
 
         private void readConfig()
         {
-            XDocument doc = XDocument.Load("config.xml");
-            string value = doc.XPathSelectElement("//config[1]/controlPort").Value;
-            bool res = int.TryParse(value, out controlPort);
+            XmlDocument doc = new XmlDocument();
+            doc.Load("config.xml");
+            XmlNode portNode = doc.DocumentElement.SelectSingleNode("/domain"+domainNumber+"/controlPort");
+            string controlPort = portNode.InnerText;
+            bool res = int.TryParse(controlPort, out this.controlPort);
+            XmlNodeList clients = doc.DocumentElement.SelectNodes("/domain" + domainNumber + "/client");
+            foreach(XmlNode node in clients)
+            {
+                directory.Add(node.InnerText);
+
+            }
+        }
+
+        public Boolean checkIfInDirectory(string address)
+        {
+            if (directory.Contains(address))
+            {
+                return true;
+            }
+            else
+                return false;
         }
     }
 }

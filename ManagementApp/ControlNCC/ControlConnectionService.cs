@@ -11,17 +11,23 @@ using System.Threading.Tasks;
 
 namespace ControlNCC
 {
-    class CPCCService
+    class ControlConnectionService
     {
         private TcpClient client;
         private BinaryWriter writer;
         private NetworkCallControl handlerNCC;
+        private TcpClient connection;
+        private Thread thread;
+        private string ip;
+        private int connectionControlPort;   //do dodania
+        BinaryWriter writerToCC;
 
-        public CPCCService(TcpClient clientHandler, NetworkCallControl handlerNCC)
+        public ControlConnectionService(TcpClient clientHandler, NetworkCallControl handlerNCC)
         {
             this.client = clientHandler;
             this.handlerNCC = handlerNCC;
             init(client);
+            ip = "127.0.0.1";
             
         }
 
@@ -44,20 +50,32 @@ namespace ControlNCC
                     if (received_object.Type == typeof(ControlPacket))
                     {
                         ControlPacket packet = received_object.Value.ToObject<ControlPacket>();
-                        if(packet.virtualInterface == ControlProtocol.CALL_REQUEST)
+                        if(packet.virtualInterface == ControlInterface.CALL_REQUEST)
                         {
-                            Console.WriteLine("[CPCC]Receive call request for "+packet.resourceIdentifier+" on " + ControlProtocol.CALL_REQUEST_ACCEPT + " interface");
+                            Console.WriteLine("[CPCC]Receive call request for "+packet.resourceIdentifier+" on " + ControlInterface.CALL_REQUEST_ACCEPT + " interface");
                             Console.WriteLine("[DIRECTORY]Send directory request");//sprawdzenie czy w naszej domenie 
-                            Console.WriteLine("[DIRECTORY]Receive local name");
-                            Console.WriteLine("[POLICY]Send policy out");
-                            Console.WriteLine("[POLICY]Call accept");
-                            Console.WriteLine("Send call indication or network call coordination out ?");
-                            Console.WriteLine("Call accept");
-                            Console.WriteLine("[CC]Send connection request (to CC) ");
-                            Console.WriteLine("[CC]receive virtual port + slot ? (from CC) ");
-                            //bla bla bla
-                            //send(ControlProtocol.CALL_ACCEPT, 1, packet.resourceIdentifier, 1, 3);
-                            Console.WriteLine("Send cos tambajsdh");
+                            if (handlerNCC.checkIfInDirectory(packet.resourceIdentifier))
+                            {
+                                Console.WriteLine("[DIRECTORY]Receive local name");
+                                Console.WriteLine("[POLICY]Send policy out");
+                                Console.WriteLine("[POLICY]Call accept");
+                                Console.WriteLine("[CPCC]Send call indication");
+                                Console.WriteLine("[CPCC]Call confirmed");
+                                //wysylanie do innego cpcc
+                                Console.WriteLine("[CC]Send connection request");
+                                //connection = new TcpClient(ip, connectionControlPort);
+                               // thread = new Thread(new ParameterizedThreadStart(connectionControlThread));
+                               // thread.Start(packet.resourceIdentifier);
+                            }
+                            else
+                            {
+                                Console.WriteLine("[DIRECTORY]This client is not in my network");
+                                Console.WriteLine("[NCC]Send call request to next NCC");
+                            }
+                            
+                           
+                            
+                            Console.WriteLine("[CPCC] Call confirmed or not");
 
 
                         }
@@ -77,11 +95,47 @@ namespace ControlNCC
 
         public void send(string virtualInterface, int FLAG, string resourceIdentifier, int virtualPort, int slot)
         {
-            ControlPacket packet = new ControlPacket(ControlProtocol.CALL_REQUEST, 0, resourceIdentifier);
+            ControlPacket packet = new ControlPacket(ControlInterface.CALL_REQUEST, 0, resourceIdentifier);
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
             
         }
 
+        private void connectionControlThread(object resourceIdentifier)
+        {
+            string address = (string)resourceIdentifier;
+            writer = new BinaryWriter(connection.GetStream());
+            BinaryReader reader = new BinaryReader(connection.GetStream());
+            ControlPacket packet = new ControlPacket(ControlInterface.CONNECTION_REQUEST_OUT, 0, address);
+            string data = JMessage.Serialize(JMessage.FromValue(packet));
+            while (true)
+                try
+                {
+                    string received_data = reader.ReadString();
+                    JMessage received_object = JMessage.Deserialize(received_data);
+                    if (received_object.Type == typeof(ControlPacket))
+                    {
+                        ControlPacket packet_received = received_object.Value.ToObject<ControlPacket>();
+                        if (packet_received.virtualInterface == ControlInterface.CONNECTION_REQUEST_OUT)
+                        {
+                            Console.WriteLine("[CC]Connection confirmed or not");
+                            // albo ok i szczeliny albo nie i lipton
+                        }
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("[ERR]Wrong control packet format");
+                    }
+                }
+                catch (IOException e)
+                {
+                    Console.WriteLine("[ERR]Connection closed");
+                    break;
+                }
+        }
+
     }
-}
+
+    }
+

@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
@@ -22,10 +23,12 @@ namespace ClientWindow
         BinaryReader reader;
         BinaryWriter writer;
         private Thread thread;
+        private string domainNumber;
     
-        public CPCC(ClientWindow clientWindowHandler)
+        public CPCC(ClientWindow clientWindowHandler, string domainNumber)
         {
             this.clientWindowHandler = clientWindowHandler;
+            this.domainNumber = domainNumber;
             this.readConfig();
             ip = "127.0.0.1";
         }
@@ -33,11 +36,11 @@ namespace ClientWindow
         public void connect()
         {
             connection = new TcpClient(ip, controlPort);
-            thread = new Thread(connectionThread);
+            thread = new Thread(callThread);
             thread.Start();
         }
 
-        private void connectionThread()
+        private void callThread()
         {
             writer = new BinaryWriter(connection.GetStream());
             reader = new BinaryReader(connection.GetStream());
@@ -51,7 +54,7 @@ namespace ClientWindow
                 if (received_object.Type == typeof(ControlPacket))
                 {
                     ControlPacket packet = received_object.Value.ToObject<ControlPacket>();
-                    if(packet.virtualInterface == ControlProtocol.CALL_ACCEPT)
+                    if(packet.virtualInterface == ControlInterface.CALL_ACCEPT)
                         {
                             clientWindowHandler.Log2("CONTROL", "uuu mam slot i port moge slac");
                             
@@ -73,18 +76,20 @@ namespace ClientWindow
 
         public void sendRequest(string clientName)
         {
-            ControlPacket packet = new ControlPacket(ControlProtocol.CALL_REQUEST, 0, clientName);
+            ControlPacket packet = new ControlPacket(ControlInterface.CALL_REQUEST, 0, clientName);
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
-            clientWindowHandler.Log2("CONTROL", "send request on " + ControlProtocol.CALL_REQUEST + " interface");
+            clientWindowHandler.Log2("CONTROL", "send request on " + ControlInterface.CALL_REQUEST + " interface");
 
         }
 
         private void readConfig()
         {
-            XDocument doc = XDocument.Load("config.xml");
-            string value = doc.XPathSelectElement("//config[1]/controlPort").Value;
-            bool res = int.TryParse(value, out controlPort);
+            XmlDocument doc = new XmlDocument();
+            doc.Load("config.xml");
+            XmlNode portNode = doc.DocumentElement.SelectSingleNode("/domain"+ domainNumber +"/controlPort");
+            string port = portNode.InnerText;
+            bool res = int.TryParse(port, out this.controlPort);
         }
     }
 }

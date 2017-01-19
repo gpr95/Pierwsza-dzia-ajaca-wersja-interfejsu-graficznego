@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClientNode
 {
-    public class ControlProtocol
+    public class ControlInterface
     {
         //CPCC
         public static string CALL_REQUEST = "call request"; //call request accept NCC log
@@ -20,6 +20,7 @@ namespace ClientNode
         public static string NETWORK_CALL_COORDINATION_IN = "network call coordination in";
         public static string NETWORK_CALL_COORDINATION_OUT = "network call coordination out";
         public static string CALL_INDICATION = "call indication"; //wywołanie klienta docelowego, dla formalnosci NCC->CPCC
-        public static string CALL_MODIFICATION_INDICATION = "call modification indication"; //zmiana parametrow polaczenia NCC->CPP
+        public static string CALL_MODIFICATION_INDICATION = "call modification indication"; //zmiana parametrow polaczenia NCC->CPCC
+        public static string CONNECTION_REQUEST_OUT = "connection request out";
     }
 }

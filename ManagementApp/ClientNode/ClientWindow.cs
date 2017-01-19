@@ -27,11 +27,14 @@ namespace ClientWindow
         private int managementPort;
         private CPCC controlAgent;
 
+
         public ClientWindow(string[] args)
         {
             virtualIP = args[0];
             int cloudPort = Convert.ToInt32(args[1]);
             managementPort = Convert.ToInt32(args[2]);
+            
+
             string fileName = virtualIP.Replace(".", "_") + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
             path = System.IO.Directory.GetCurrentDirectory() + @"\logs\" + fileName + ".txt";
 
@@ -43,7 +46,7 @@ namespace ClientWindow
             InitializeComponent();
             this.Text = virtualIP;
             Log2("INFO", "START LOG");
-            controlAgent = new CPCC(this);
+            controlAgent = new CPCC(this, args[3]);
         }
 
         private void Listen()

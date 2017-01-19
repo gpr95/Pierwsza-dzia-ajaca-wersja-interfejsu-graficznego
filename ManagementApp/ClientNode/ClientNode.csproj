@@ -59,7 +59,7 @@
       <DependentUpon>ClientWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="ControlPacket.cs" />
-    <Compile Include="ControlProtocol.cs" />
+    <Compile Include="ControlInterface.cs" />
     <Compile Include="CPCC.cs" />
     <Compile Include="Signal.cs" />
     <Compile Include="STM1.cs" />

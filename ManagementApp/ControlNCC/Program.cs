@@ -10,7 +10,8 @@ namespace ControlNCC
     {
         static void Main(string[] args)
         {
-            NetworkCallControl ncc = new NetworkCallControl();
+            string domainNumber = "1";
+            NetworkCallControl ncc = new NetworkCallControl(domainNumber);
         }
     }
 }

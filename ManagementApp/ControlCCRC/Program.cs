@@ -36,7 +36,7 @@ namespace ControlCCRC
                 ccArgs = new string[] { args[2], args[3], args[3] }; // SUBNETWORK [listen CC, connect up CC, JUST_FLAG]
 
             RoutingController rc = new RoutingController(rcArgs);
-            ConnectionController cc = new ConnectionController(ccArgs);
+           // ConnectionController cc = new ConnectionController(ccArgs);
         }
     }
 }

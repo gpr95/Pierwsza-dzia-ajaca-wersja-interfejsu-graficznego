@@ -14,7 +14,8 @@ namespace ClientWindow
         static void Main(string[] args)
         {
             // MANAGER [name, cloud port, management port]
-            string[] parameters = new string[] { args[0], args[1], args[2] };
+            string domainNumber = "1";
+            string[] parameters = new string[] { args[0], args[1], args[2], domainNumber };
             //DEBUG
             //string[] parameters = new string[] { "CN0", "10002", "10001"};
             //client = new ClientNode(parameters);
