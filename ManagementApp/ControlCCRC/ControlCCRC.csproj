@@ -33,9 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\ClientNode\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -59,8 +58,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClientNode\ClientNode.csproj">
-      <Project>{C348FC9F-8EDB-415F-8984-2FB7DA94B364}</Project>
+      <Project>{c348fc9f-8edb-415f-8984-2fb7da94b364}</Project>
       <Name>ClientNode</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ManagementApp\Application.csproj">
+      <Project>{5a2b0de4-65be-4605-a9cc-96342f13f000}</Project>
+      <Name>Application</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
