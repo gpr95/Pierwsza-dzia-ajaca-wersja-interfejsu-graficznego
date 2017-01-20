@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -9,7 +10,8 @@ using System.Threading.Tasks;
 
 using ClientWindow;
 using ManagementApp;
-using System.Net;
+using Management;
+using ControlCCRC;
 
 namespace NetNode
 {
@@ -23,8 +25,8 @@ namespace NetNode
         public int port;
         private string virtualIp;
 
-        BinaryReader reader;
-        BinaryWriter writer;
+        private static BinaryReader reader;
+        private static BinaryWriter writer;
 
         public ControlAgent(int port, string ip)
         {
@@ -46,22 +48,40 @@ namespace NetNode
                 {
                     string received_data = reader.ReadString();
                     JSON received_object = JSON.Deserialize(received_data);
-                    //ControlProtocol received_Protocol = received_object.Value.ToObject<ControlProtocol>();
+                    ControlProtocol received_Protocol = received_object.Value.ToObject<ControlProtocol>();
 
-                    //if (received_Protocol.State == ControlProtocol.WHOIS)
-                    //{
-                        //Console.WriteLine("Control Signal: receivedWhoIs");
-                        //send name to management
-                       //ControlProtocol protocol = new ControlProtocol();
-                        //protocol.Name = this.virtualIp;
-                        //String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
-                        //writer.Write(send_object);
-                        //Console.WriteLine("sending name to management: " + protocol.Name);
-                    //}
-                    //else
-                    //{
-                       // Console.WriteLine("Control Signal: undefined protocol");
-                    //}
+                    if (received_Protocol.State == ControlProtocol.ALLOCATERES)
+                    {
+                        Console.WriteLine("Control Signal: allocateRes");
+                        //allocate resource and send confirmation of error
+                        string rec = received_Protocol.allocateNo;
+                        
+                        //TODO allocate and return value
+                        int port = 1;
+                        int amount = 1;
+                        int res = LRM.allocateResource(port,amount);
+                        if(res != 0)
+                        {
+                            //send ok
+                            sendConfirmation(port, amount, true);
+                        }
+                        else
+                        {
+                            //send err
+                            sendConfirmation(port, amount, true);
+                        }
+                    }
+                    else if (received_Protocol.State == ControlProtocol.INSERTFIB)
+                    {
+                        //insert FIB
+                        Console.WriteLine("Control Signal: insertFib");
+                        FIB rec = received_Protocol.fib;
+                        SwitchingField.addToSwitch(rec);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Control Signal: undefined protocol");
+                    }
                 }
             }
             catch (Exception e)
@@ -75,24 +95,44 @@ namespace NetNode
         public static void sendTopology(string from, int port, string to)
         {
             //TODO send to RC e.g. NN0 connected on port 2 with NN1
-            Console.WriteLine("sending topology to RC: " + from+" "+port+" "+to);
+            string toSend = from + "/" + port.ToString() + "/" + to;
+            Console.WriteLine("sending topology to RC: " + toSend);
 
-            //ControlProtocol protocol = new ControlProtocol();
-            //protocol.topology = this.virtualIp;
-            //String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
-            //writer.Write(send_object);
+            ControlProtocol protocol = new ControlProtocol();
+            protocol.State = ControlProtocol.SENDTOPOLOGY;
+            protocol.topology = toSend;
+            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+            writer.Write(send_object);
         }
 
 
         public static void sendDeleted(string from, int port, string to)
         {
             //TODO send to RC that row e.g. NN0 connected on port 2 with NN1 is deleted
-            Console.WriteLine("sending to RC info about deletion: " + from + " " + port + " " + to);
+            string toSend = from + "/" + port.ToString() + "/" + to;
+            Console.WriteLine("sending to RC info about deletion: " + toSend);
+
+            ControlProtocol protocol = new ControlProtocol();
+            protocol.State = ControlProtocol.SENDDELETED;
+            protocol.topologyDeleted = toSend;
+            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+            writer.Write(send_object);
         }
 
-        public static void sendConfirmation(int port, int no_vc3)
+        public static void sendConfirmation(int port, int no_vc3, bool flag)
         {
             //TODO send to CC confirmation of resource reservation and vc3 number
+            string status = "ERR";
+            if (flag == true)
+                status = "OK";
+            string toSend = status+"/"+port.ToString() + "/" + no_vc3.ToString();
+            Console.WriteLine("sending to CC allocated id" + toSend);
+
+            ControlProtocol protocol = new ControlProtocol();
+            protocol.State = ControlProtocol.SENDCONFIRMATION;
+            protocol.allocationConf = toSend;
+            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+            writer.Write(send_object);
         }
     }
 }

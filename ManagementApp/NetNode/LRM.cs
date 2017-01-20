@@ -130,7 +130,7 @@ namespace NetNode
             }
         }
 
-        public static int allocateResource(int port)
+        public static int allocateResource(int port, int amount)
         {
             int no_vc3 = 0;
             foreach(var res in resources[port])

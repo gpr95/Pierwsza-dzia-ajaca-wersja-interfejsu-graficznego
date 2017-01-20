@@ -37,7 +37,7 @@ namespace NetNode
             this.ports = new Ports();
             this.lrm = new LRM(args[0]);
             this.managementAgent = new ManagementAgent(Convert.ToInt32(args[2]), this.virtualIp);
-            //this.controlAgent = new ControlAgent(Convert.ToInt32("13389"), this.virtualIp); //temporarly 13389
+            //this.controlAgent = new ControlAgent(Convert.ToInt32(args[3]), this.virtualIp); //temporarly socket to management
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
             this.physicalPort = Convert.ToInt32(args[1]);
             this.threadListen = new Thread(new ThreadStart(Listen));
