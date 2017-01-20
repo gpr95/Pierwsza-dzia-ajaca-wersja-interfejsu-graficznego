@@ -130,6 +130,7 @@ namespace NetNode
                 Console.WriteLine("\n 2) Show connection table");
                 Console.WriteLine("\n 3) Clear connection table");
                 Console.WriteLine("\n 4) Show node connections");
+                Console.WriteLine("\n 5) Show node resource status");
                 Console.WriteLine("\n");
 
                 int choice;
@@ -149,6 +150,9 @@ namespace NetNode
                             break;
                         case 4:
                             LRM.printConn();
+                            break;
+                        case 5:
+                            LRM.printResources();
                             break;
                         default:
                             Console.WriteLine("\n Wrong option");

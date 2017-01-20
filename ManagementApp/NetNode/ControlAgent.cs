@@ -55,10 +55,10 @@ namespace NetNode
                         Console.WriteLine("Control Signal: allocateRes");
                         //allocate resource and send confirmation of error
                         string rec = received_Protocol.allocateNo;
-                        
-                        //TODO allocate and return value
-                        int port = 1;
-                        int amount = 1;
+                        string[] temp = rec.Split('/');
+                        int port,amount;
+                        int.TryParse(temp[0], out port);
+                        int.TryParse(temp[1], out amount);
                         int res = LRM.allocateResource(port,amount);
                         if(res != 0)
                         {
@@ -68,7 +68,7 @@ namespace NetNode
                         else
                         {
                             //send err
-                            sendConfirmation(port, amount, true);
+                            sendConfirmation(port, amount, false);
                         }
                     }
                     else if (received_Protocol.State == ControlProtocol.INSERTFIB)

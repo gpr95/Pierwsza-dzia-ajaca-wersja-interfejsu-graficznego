@@ -22,7 +22,8 @@ namespace NetNode
         private string virtualIp;
         public static Dictionary<int, string> connections = new Dictionary<int,string>();
         private static Dictionary<int, bool> confirmations = new Dictionary<int, bool>();
-        private static Dictionary<int, Dictionary<int, bool>> resources = new Dictionary<int, Dictionary<int,bool>>();
+        //private static Dictionary<int, Dictionary<int, bool>> resources = new Dictionary<int, Dictionary<int,bool>>();
+        public static List<Resource> resources = new List<Resource>();
 
         public LRM(string virtualIp)
         {
@@ -42,15 +43,14 @@ namespace NetNode
             timerForConf.Enabled = true;
         }
 
-        private void initResources(Dictionary<int, Dictionary<int, bool>> resources)
+        private void initResources(List<Resource> resources)
         {
-            Dictionary<int,bool> temp = new Dictionary<int,bool>();
-            temp.Add(11,false);
-            temp.Add(12,false);
-            temp.Add(13,false);
             for(int i=0;i<21;i++)
             {
-                resources.Add(i, temp);
+                for(int j=11;j<=13;j++)
+                {
+                    resources.Add(new Resource(i,j,false));
+                }
             }
         }
 
@@ -125,7 +125,7 @@ namespace NetNode
                     connections.Remove(i.Key);
                     //inform RC that row is deleted
                     ControlAgent.sendDeleted(this.virtualIp, i.Key, i.Value);
-                    clearResources(resources[i.Key]);
+                    clearResources(i.Key);
                 }
             }
         }
@@ -133,25 +133,52 @@ namespace NetNode
         public static int allocateResource(int port, int amount)
         {
             int no_vc3 = 0;
-            foreach(var res in resources[port])
+            int count = 0;
+            if(checkResources(port, amount))
             {
-                if(res.Value == false)
+                foreach (var res in resources)
                 {
-                    //empty so allocating
-                    Console.WriteLine("Allocating on port: "+port+"vc3: "+res.Key);
-                    resources[port][res.Key] = true;
-                    no_vc3 = res.Key;
-                    break;
+                    if (res.port == port && res.status == false && count < amount)
+                    {
+                        Console.WriteLine("Allocating on port: " + res.port + " vc3: " + res.no_vc3);
+                        resources.Where(d => d.port == res.port && d.no_vc3 == res.no_vc3).First().status = true;
+                        no_vc3 = res.no_vc3;
+                        count++;
+                    }
                 }
+                return no_vc3;
             }
-            return no_vc3;
+            else
+            {
+                return 0;
+            }
         }
 
-        private void clearResources(Dictionary<int, bool> dictionary)
+        private static bool checkResources(int port, int amount)
         {
-            dictionary[11] = false;
-            dictionary[12] = false;
-            dictionary[13] = false;
+            int counter=0;
+            foreach (var res in resources)
+            {
+                if (res.port == port && res.status == false)
+                {
+                    counter++;
+                }
+            }
+            if (counter >= amount)
+                return true;
+            else
+                return false;
+        }
+
+        private void clearResources(int port)
+        {
+            foreach (var res in resources)
+            {
+                if(res.port == port)
+                {
+                    res.status = false;
+                }
+            }
             Console.WriteLine("resources cleared");
         }
 
@@ -165,6 +192,14 @@ namespace NetNode
             foreach (var temp in connections)
             {
                 Console.WriteLine("port: "+temp.Key + " node: " + temp.Value);
+            }
+        }
+
+        public static void printResources()
+        {
+            foreach (var res in resources)
+            {
+                Console.WriteLine(res.toString());
             }
         }
     }

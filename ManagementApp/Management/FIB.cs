@@ -10,7 +10,6 @@ namespace Management
     //forwarding information table: destination mask oport
     public class FIB
     {
-        //Nie ma to jak enkapsulacja
         public int iport;
         public int in_cont;
         public int oport;

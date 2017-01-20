@@ -54,6 +54,7 @@
     <Compile Include="Ports.cs" />
     <Compile Include="NetNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resource.cs" />
     <Compile Include="SwitchingField.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +68,10 @@
     <ProjectReference Include="..\ClientNode\ClientNode.csproj">
       <Project>{c348fc9f-8edb-415f-8984-2fb7da94b364}</Project>
       <Name>ClientNode</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ControlCCRC\ControlCCRC.csproj">
+      <Project>{b6f77b46-7e8c-4bdd-9807-6d9a28232425}</Project>
+      <Name>ControlCCRC</Name>
     </ProjectReference>
     <ProjectReference Include="..\ManagementApp\Application.csproj">
       <Project>{5a2b0de4-65be-4605-a9cc-96342f13f000}</Project>
