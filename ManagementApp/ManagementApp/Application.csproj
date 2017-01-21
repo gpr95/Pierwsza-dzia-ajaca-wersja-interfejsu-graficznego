@@ -51,8 +51,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Adress.cs" />
+    <Compile Include="ApplicationProtocol.cs" />
     <Compile Include="CloudCableHandler.cs" />
     <Compile Include="ConnectionProperties.cs" />
+    <Compile Include="Subnetwork.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="FileSaver.cs" />
     <Compile Include="JSON.cs" />

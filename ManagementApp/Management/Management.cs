@@ -38,7 +38,8 @@ namespace Management
             this.agentNode = new AgentNode(MANAGMENTPORT, nodeList, this);
 
             Thread.Sleep(100);
-
+            if(APPLICATIONPORT != 7777)
+                UserInterface.showDomain(APPLICATIONPORT);
             UserInterface.showMenu();
         }
 

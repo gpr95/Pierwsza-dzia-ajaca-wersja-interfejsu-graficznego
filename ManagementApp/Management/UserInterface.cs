@@ -11,6 +11,7 @@ namespace Management
         private static ManagementPlane management;
         private static OPERATION operation;
         private static Dictionary<int, Node> nodeDictionary;
+        private static Boolean quit = false;
 
         private enum OPERATION
         {ENTRY, TABLE, SHOW, INTERFACES, CLEAR, NONE }
@@ -28,10 +29,22 @@ namespace Management
             }
         }
 
+        public static bool Quit
+        {
+            get
+            {
+                return quit;
+            }
+
+            set
+            {
+                quit = value;
+            }
+        }
+
         public static void showMenu()
         {
-            Boolean quit = false;
-            while (!quit)
+            while (!Quit)
             {
                 //Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("\n MENU: ");
@@ -81,6 +94,14 @@ namespace Management
                     showMenu();
                 }
             }
+        }
+
+        internal static void showDomain(int aPPLICATIONPORT)
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            int temp = aPPLICATIONPORT - 7777;
+            Console.WriteLine("\nManagement for domain: " + temp);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static void nodeList(List<Node> nodeList)

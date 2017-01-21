@@ -42,20 +42,21 @@ namespace ManagementApp
             this.domainBtn = new System.Windows.Forms.Button();
             this.deleteBtn = new System.Windows.Forms.Button();
             this.deleteListBox = new System.Windows.Forms.ListBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.cursorBtn = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.testBtn = new System.Windows.Forms.Button();
+            this.resendInfoBtn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.button2 = new System.Windows.Forms.Button();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.textBoxConUp = new System.Windows.Forms.TextBox();
+            this.textBoxConDown = new System.Windows.Forms.TextBox();
+            this.commitConBtn = new System.Windows.Forms.Button();
+            this.autoAggregation = new System.Windows.Forms.CheckBox();
             this.saveConfBtn = new System.Windows.Forms.Button();
             this.readConfBtn = new System.Windows.Forms.Button();
+            this.subNetworkBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -72,7 +73,6 @@ namespace ManagementApp
             this.containerPictureBox.TabStop = false;
             this.containerPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.containerPictureBox_Paint);
             this.containerPictureBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseClick);
-            //this.containerPictureBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseDoubleClick);
             this.containerPictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseDown);
             this.containerPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseMove);
             this.containerPictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.containerPictureBox_MouseUp);
@@ -111,7 +111,7 @@ namespace ManagementApp
             this.connectionBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
             this.connectionBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.connectionBtn.ForeColor = System.Drawing.Color.Gainsboro;
-            this.connectionBtn.Location = new System.Drawing.Point(614, 96);
+            this.connectionBtn.Location = new System.Drawing.Point(614, 124);
             this.connectionBtn.Name = "connectionBtn";
             this.connectionBtn.Size = new System.Drawing.Size(140, 22);
             this.connectionBtn.TabIndex = 3;
@@ -172,19 +172,19 @@ namespace ManagementApp
             this.deleteListBox.Visible = false;
             this.deleteListBox.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.deleteListBox_MouseDoubleClick);
             // 
-            // button1
+            // cursorBtn
             // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.button1.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button1.Location = new System.Drawing.Point(614, 509);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(140, 23);
-            this.button1.TabIndex = 8;
-            this.button1.Text = "Kursor";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.cursorBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.cursorBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.cursorBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cursorBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.cursorBtn.Location = new System.Drawing.Point(614, 509);
+            this.cursorBtn.Name = "cursorBtn";
+            this.cursorBtn.Size = new System.Drawing.Size(140, 23);
+            this.cursorBtn.TabIndex = 8;
+            this.cursorBtn.Text = "Kursor";
+            this.cursorBtn.UseVisualStyleBackColor = false;
+            this.cursorBtn.Click += new System.EventHandler(this.button1_Click);
             // 
             // tabControl1
             // 
@@ -265,25 +265,25 @@ namespace ManagementApp
             this.dataGridView1.Size = new System.Drawing.Size(278, 494);
             this.dataGridView1.TabIndex = 0;
             // 
-            // testBtn
+            // resendInfoBtn
             // 
-            this.testBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.testBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
-            this.testBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.testBtn.ForeColor = System.Drawing.Color.Gainsboro;
-            this.testBtn.Location = new System.Drawing.Point(614, 453);
-            this.testBtn.Name = "testBtn";
-            this.testBtn.Size = new System.Drawing.Size(140, 22);
-            this.testBtn.TabIndex = 10;
-            this.testBtn.Text = "Resend Info";
-            this.testBtn.UseVisualStyleBackColor = false;
-            this.testBtn.Click += new System.EventHandler(this.testBtn_Click);
+            this.resendInfoBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.resendInfoBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.resendInfoBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.resendInfoBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.resendInfoBtn.Location = new System.Drawing.Point(614, 453);
+            this.resendInfoBtn.Name = "resendInfoBtn";
+            this.resendInfoBtn.Size = new System.Drawing.Size(140, 22);
+            this.resendInfoBtn.TabIndex = 10;
+            this.resendInfoBtn.Text = "Resend Info";
+            this.resendInfoBtn.UseVisualStyleBackColor = false;
+            this.resendInfoBtn.Click += new System.EventHandler(this.testBtn_Click);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label1.Location = new System.Drawing.Point(614, 179);
+            this.label1.Location = new System.Drawing.Point(614, 207);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(51, 13);
             this.label1.TabIndex = 11;
@@ -293,56 +293,56 @@ namespace ManagementApp
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.Gainsboro;
-            this.label2.Location = new System.Drawing.Point(614, 209);
+            this.label2.Location = new System.Drawing.Point(614, 237);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(51, 13);
             this.label2.TabIndex = 12;
             this.label2.Text = "CC0 port:";
             // 
-            // textBox1
+            // textBoxConUp
             // 
-            this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox1.ForeColor = System.Drawing.Color.Gainsboro;
-            this.textBox1.Location = new System.Drawing.Point(687, 177);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(67, 20);
-            this.textBox1.TabIndex = 13;
+            this.textBoxConUp.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.textBoxConUp.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxConUp.ForeColor = System.Drawing.Color.Gainsboro;
+            this.textBoxConUp.Location = new System.Drawing.Point(687, 205);
+            this.textBoxConUp.Name = "textBoxConUp";
+            this.textBoxConUp.Size = new System.Drawing.Size(67, 20);
+            this.textBoxConUp.TabIndex = 13;
             // 
-            // textBox2
+            // textBoxConDown
             // 
-            this.textBox2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.textBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox2.ForeColor = System.Drawing.Color.Gainsboro;
-            this.textBox2.Location = new System.Drawing.Point(687, 207);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(67, 20);
-            this.textBox2.TabIndex = 14;
+            this.textBoxConDown.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.textBoxConDown.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBoxConDown.ForeColor = System.Drawing.Color.Gainsboro;
+            this.textBoxConDown.Location = new System.Drawing.Point(687, 235);
+            this.textBoxConDown.Name = "textBoxConDown";
+            this.textBoxConDown.Size = new System.Drawing.Size(67, 20);
+            this.textBoxConDown.TabIndex = 14;
             // 
-            // button2
+            // commitConBtn
             // 
-            this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.button2.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.ForeColor = System.Drawing.Color.Gainsboro;
-            this.button2.Location = new System.Drawing.Point(614, 233);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(140, 22);
-            this.button2.TabIndex = 15;
-            this.button2.Text = "Commit";
-            this.button2.UseVisualStyleBackColor = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.commitConBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.commitConBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.commitConBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.commitConBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.commitConBtn.Location = new System.Drawing.Point(614, 261);
+            this.commitConBtn.Name = "commitConBtn";
+            this.commitConBtn.Size = new System.Drawing.Size(140, 22);
+            this.commitConBtn.TabIndex = 15;
+            this.commitConBtn.Text = "Commit";
+            this.commitConBtn.UseVisualStyleBackColor = false;
+            this.commitConBtn.Click += new System.EventHandler(this.button2_Click);
             // 
-            // checkBox1
+            // autoAggregation
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.ForeColor = System.Drawing.Color.Gainsboro;
-            this.checkBox1.Location = new System.Drawing.Point(614, 154);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(128, 17);
-            this.checkBox1.TabIndex = 16;
-            this.checkBox1.Text = "Auto port aggregation";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.autoAggregation.AutoSize = true;
+            this.autoAggregation.ForeColor = System.Drawing.Color.Gainsboro;
+            this.autoAggregation.Location = new System.Drawing.Point(614, 182);
+            this.autoAggregation.Name = "autoAggregation";
+            this.autoAggregation.Size = new System.Drawing.Size(128, 17);
+            this.autoAggregation.TabIndex = 16;
+            this.autoAggregation.Text = "Auto port aggregation";
+            this.autoAggregation.UseVisualStyleBackColor = true;
             // 
             // saveConfBtn
             // 
@@ -350,7 +350,7 @@ namespace ManagementApp
             this.saveConfBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
             this.saveConfBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.saveConfBtn.ForeColor = System.Drawing.Color.Gainsboro;
-            this.saveConfBtn.Location = new System.Drawing.Point(614, 124);
+            this.saveConfBtn.Location = new System.Drawing.Point(614, 152);
             this.saveConfBtn.Name = "saveConfBtn";
             this.saveConfBtn.Size = new System.Drawing.Size(67, 22);
             this.saveConfBtn.TabIndex = 17;
@@ -364,7 +364,7 @@ namespace ManagementApp
             this.readConfBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
             this.readConfBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.readConfBtn.ForeColor = System.Drawing.Color.Gainsboro;
-            this.readConfBtn.Location = new System.Drawing.Point(687, 124);
+            this.readConfBtn.Location = new System.Drawing.Point(687, 152);
             this.readConfBtn.Name = "readConfBtn";
             this.readConfBtn.Size = new System.Drawing.Size(67, 22);
             this.readConfBtn.TabIndex = 18;
@@ -372,23 +372,38 @@ namespace ManagementApp
             this.readConfBtn.UseVisualStyleBackColor = false;
             this.readConfBtn.Click += new System.EventHandler(this.readConfBtn_Click);
             // 
+            // subNetworkBtn
+            // 
+            this.subNetworkBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.subNetworkBtn.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            this.subNetworkBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.subNetworkBtn.ForeColor = System.Drawing.Color.Gainsboro;
+            this.subNetworkBtn.Location = new System.Drawing.Point(614, 96);
+            this.subNetworkBtn.Name = "subNetworkBtn";
+            this.subNetworkBtn.Size = new System.Drawing.Size(140, 22);
+            this.subNetworkBtn.TabIndex = 19;
+            this.subNetworkBtn.Text = "Podsieć";
+            this.subNetworkBtn.UseVisualStyleBackColor = false;
+            this.subNetworkBtn.Click += new System.EventHandler(this.subNetworkBtn_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(45)))), ((int)(((byte)(45)))), ((int)(((byte)(48)))));
             this.ClientSize = new System.Drawing.Size(1058, 544);
+            this.Controls.Add(this.subNetworkBtn);
             this.Controls.Add(this.readConfBtn);
             this.Controls.Add(this.saveConfBtn);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.autoAggregation);
+            this.Controls.Add(this.commitConBtn);
+            this.Controls.Add(this.textBoxConDown);
+            this.Controls.Add(this.textBoxConUp);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.testBtn);
+            this.Controls.Add(this.resendInfoBtn);
             this.Controls.Add(this.tabControl1);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.cursorBtn);
             this.Controls.Add(this.deleteListBox);
             this.Controls.Add(this.deleteBtn);
             this.Controls.Add(this.domainBtn);
@@ -421,20 +436,21 @@ namespace ManagementApp
         private System.Windows.Forms.Button domainBtn;
         private System.Windows.Forms.Button deleteBtn;
         private System.Windows.Forms.ListBox deleteListBox;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button cursorBtn;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.Button testBtn;
+        private System.Windows.Forms.Button resendInfoBtn;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.TextBox textBoxConUp;
+        private System.Windows.Forms.TextBox textBoxConDown;
+        private System.Windows.Forms.Button commitConBtn;
+        private System.Windows.Forms.CheckBox autoAggregation;
         private System.Windows.Forms.Button saveConfBtn;
         private System.Windows.Forms.Button readConfBtn;
+        private System.Windows.Forms.Button subNetworkBtn;
     }
 }
 

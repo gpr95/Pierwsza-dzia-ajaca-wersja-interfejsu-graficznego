@@ -21,13 +21,17 @@ namespace ManagementApp
         private ManagementHandler managHandler;
 
         // LOGICAL VARS
+        private int nodeConnectionPort = 7788;
         private OperationType oType;
         private int clientNodesNumber = 0;
         private int networkNodesNumber = 0;
+        private int domainNumber = 0;
+        private List<int> subNetworkNumber = new List<int>();
         private DataTable table;
         private List<Node> nodeList = new List<Node>();
-        private List<NodeConnection> connectionList = new List<NodeConnection>();
         private List<Domain> domainList = new List<Domain>();
+        private List<Subnetwork> subnetworkList = new List<Subnetwork>();
+        private List<NodeConnection> connectionList = new List<NodeConnection>();
         private List<NodeConnection> connectionTemp = new List<NodeConnection>();
 
         // PAINTING VARS
@@ -39,6 +43,7 @@ namespace ManagementApp
         private Bitmap containerPoints;
         private Point domainFrom;
         private Graphics myGraphics;
+        private Point subFrom;
 
         enum OperationType
         {
@@ -46,6 +51,7 @@ namespace ManagementApp
             ADD_NETWORK_NODE,
             ADD_CONNECTION,
             ADD_DOMAIN,
+            ADD_SUBNETWORK,
             DELETE,
             MOVE_NODE,
             NOTHING
@@ -55,10 +61,9 @@ namespace ManagementApp
         {
             //Start of listeners
             cableHandler = new CloudCableHandler(connectionList, CLOUDPORT);
-            managHandler = new ManagementHandler(MANAGPORT);
+            managHandler = new ManagementHandler(MANAGPORT, nodeConnectionPort++);
 
             //Initialize of components
-            //TODO: MankeTable
             table = makeTable();
 
             InitializeComponent();
@@ -134,9 +139,9 @@ namespace ManagementApp
         {
             label1.Visible = false;
             label2.Visible = false;
-            textBox1.Visible = false;
-            textBox2.Visible = false;
-            button2.Visible = false;
+            textBoxConUp.Visible = false;
+            textBoxConDown.Visible = false;
+            commitConBtn.Visible = false;
         }
 
         private void showPortSetup(Node from, Node to)
@@ -153,9 +158,9 @@ namespace ManagementApp
             
             label1.Visible = true;
             label2.Visible = true;
-            textBox1.Visible = true;
-            textBox2.Visible = true;
-            button2.Visible = true;
+            textBoxConUp.Visible = true;
+            textBoxConDown.Visible = true;
+            commitConBtn.Visible = true;
         }
 
         private void RenderTable()
@@ -170,9 +175,13 @@ namespace ManagementApp
         {
             Graphics panel = e.Graphics;
 
+            foreach (var elem in subnetworkList)
+            {
+                drawSubnetwork(elem, panel);
+            }
             foreach (var elem in domainList)
             {
-                drawElement(elem, panel);
+                drawDomain(elem, panel);
             }
             foreach (var elem in connectionList)
             {
@@ -252,6 +261,10 @@ namespace ManagementApp
                     domainFrom = new Point(x, y);
                     isDrawing = true;
                     break;
+                case OperationType.ADD_SUBNETWORK:
+                    subFrom = new Point(x, y);
+                    isDrawing = true;
+                    break;
                 case OperationType.MOVE_NODE:
                     nodeFrom = getNodeFrom(x, y);
                     if (nodeFrom != null)
@@ -278,44 +291,27 @@ namespace ManagementApp
                     if (nodeFrom == null)
                         break;
                     Node nodeTo = getNodeFrom(x, y);
-                    if (checkBox1.Checked)
+                    if (autoAggregation.Checked)
                     {
-                        //if(portF > 4)
                         addConnection(nodeFrom, getPort(nodeFrom), virtualNodeTo, getPort(virtualNodeTo));
                         hidePortSetup();
                         containerPictureBox.Refresh();
                     }
                     else
                         showPortSetup(nodeFrom, virtualNodeTo);
-
-                    
                     nodeFrom = null;
                     break;
 
                 case OperationType.ADD_DOMAIN:
                     Point domainTo = new Point(x,y);
-                    if (domainFrom.X > x && domainFrom.Y < y)
-                    {
-                        Point tmpFrom = new Point(domainTo.X, domainFrom.Y);
-                        Point tmpTo = new Point(domainFrom.X, domainTo.Y);
-                        domainFrom = tmpFrom;
-                        domainTo = tmpTo;
-                    }
-                    else if (domainFrom.X > x && domainFrom.Y > y)
-                    {
-                        domainTo = domainFrom;
-                        domainFrom = new Point(x, y);
-                    }
-                    else if (domainFrom.X < x && domainFrom.Y > y)
-                    {
-                        Point tmpFrom = new Point(domainFrom.X, domainTo.Y);
-                        Point tmpTo = new Point(domainTo.X, domainFrom.Y);
-                        domainFrom = tmpFrom;
-                        domainTo = tmpTo;
-                    }
+                    Domain domainToAdd = new Domain(domainFrom, domainTo, ++domainNumber);
+                    addDomainToElements(domainToAdd);
+                    break;
 
-                    Domain toAdd = new Domain(domainFrom, domainTo);
-                    addDomainToElements(toAdd);
+                case OperationType.ADD_SUBNETWORK:
+                    Point subTo = new Point(x,y);
+                    Subnetwork subnetworkToAdd = new Subnetwork(subFrom, subTo);
+                    addSubnetworkToList(subnetworkToAdd);
                     break;
 
                 case OperationType.MOVE_NODE:
@@ -356,6 +352,11 @@ namespace ManagementApp
 
             }
             containerPictureBox.Refresh();
+        }
+
+        private void addSubnetworkToList(Subnetwork subnetworkToAdd)
+        {
+            //throw new NotImplementedException();
         }
 
         private void containerPictureBox_MouseMove(object sender, MouseEventArgs e)
@@ -417,6 +418,33 @@ namespace ManagementApp
                 {
                     myGraphics.DrawRectangle(new Pen(Color.PaleVioletRed, 3), domainFrom.X,
                         domainFrom.Y, e.X - domainFrom.X, e.Y - domainFrom.Y);
+                }
+
+                System.Threading.Thread.Sleep(10);
+            }
+            else if (isDrawing && oType == OperationType.ADD_SUBNETWORK)
+            {
+                containerPictureBox.Refresh();
+
+                if (e.X - subFrom.X < 0 && e.Y - subFrom.Y < 0)
+                {
+                    myGraphics.DrawRectangle(new Pen(Color.Yellow, 3), e.X,
+                        e.Y, subFrom.X - e.X, subFrom.Y - e.Y);
+                }
+                else if (e.X - subFrom.X < 0)
+                {
+                    myGraphics.DrawRectangle(new Pen(Color.Yellow, 3), e.X,
+                        subFrom.Y, subFrom.X - e.X, e.Y - subFrom.Y);
+                }
+                else if (e.Y - subFrom.Y < 0)
+                {
+                    myGraphics.DrawRectangle(new Pen(Color.Yellow, 3), subFrom.X,
+                        e.Y, e.X - subFrom.X, subFrom.Y - e.Y);
+                }
+                else
+                {
+                    myGraphics.DrawRectangle(new Pen(Color.Yellow, 3), subFrom.X,
+                        subFrom.Y, e.X - subFrom.X, e.Y - subFrom.Y);
                 }
 
                 System.Threading.Thread.Sleep(10);
@@ -587,6 +615,10 @@ namespace ManagementApp
                 add = false;
             if (add)
             {
+                checkDomainContent(toAdd);
+                if(domainNumber == 1)
+                    managHandler.killManagement();
+                toAdd.setupManagement(MANAGPORT + toAdd.Name, nodeConnectionPort++);
                 domainList.Add(toAdd);
                 consoleWriter("Domain added");
             }
@@ -594,6 +626,17 @@ namespace ManagementApp
             {
                 errorMessage("Domains can't cross each others or domain too small for rendering.");
             }
+        }
+
+        private void checkDomainContent(Domain domain)
+        {
+            Rectangle domainRect = new Rectangle(domain.getPointStart(), domain.Size);
+            foreach(Node n in nodeList)
+            {
+                if(domainRect.Contains(n.Position))
+                    errorMessage(n.Name + " is in domain.");
+            }
+            
         }
 
         private void selectAffectedElements(Node node)
@@ -645,11 +688,18 @@ namespace ManagementApp
                (conn.Start.Y + conn.End.Y) / 2 + (GAP / 2)));
         }
 
-        private void drawElement(Domain domain, Graphics panel)
+        private void drawDomain(Domain domain, Graphics panel)
         {
             panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            Rectangle rect = new Rectangle(domain.PointFrom, domain.Size);
+            Rectangle rect = new Rectangle(domain.getPointStart(), domain.Size);
             panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
+        }
+
+        private void drawSubnetwork(Subnetwork sub, Graphics panel)
+        {
+            panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            Rectangle rect = new Rectangle(sub.getPointStart(), sub.Size);
+            panel.DrawRectangle(new Pen(Color.Yellow, 3), rect);
         }
 
         private void putToGrid(ref int x, ref int y)
@@ -706,8 +756,8 @@ namespace ManagementApp
 
         private void button2_Click(object sender, EventArgs e)
         {
-            String portFrom = textBox1.Text;
-            String portTo = textBox2.Text;
+            String portFrom = textBoxConUp.Text;
+            String portTo = textBoxConDown.Text;
             if (portFrom.Equals("") || portTo.Equals(""))
                 return;
             int portF;
@@ -809,6 +859,7 @@ namespace ManagementApp
 
         public void addNetworkNode(int x, int y)
         {
+
             foreach (Node node in nodeList)
                 if (node.Position.Equals(new Point(x, y)))
                 {
@@ -1053,6 +1104,12 @@ namespace ManagementApp
 
                 updateLists(nodeList, domainList);
             }
+        }
+
+        private void subNetworkBtn_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            oType = OperationType.ADD_SUBNETWORK;
         }
 
         //private int getNumberOfConnectionsBetweenNodes(Node from, Node to)

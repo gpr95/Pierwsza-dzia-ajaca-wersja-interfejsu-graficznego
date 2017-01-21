@@ -37,6 +37,12 @@ namespace Management
                 {
                     string received_data = reader.ReadString();
                     JSON received_object = JSON.Deserialize(received_data);
+                    ApplicationProtocol received_Protocol = received_object.Value.ToObject<ApplicationProtocol>();
+
+                    if (received_Protocol.State == ApplicationProtocol.A)
+                        Console.WriteLine("Option A");
+                    else if (received_Protocol.State == ApplicationProtocol.KILL)
+                        Environment.Exit(1);
                 }
             }
             catch (SocketException e)
