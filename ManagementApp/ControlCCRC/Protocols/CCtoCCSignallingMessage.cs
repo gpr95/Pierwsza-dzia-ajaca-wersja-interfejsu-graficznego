@@ -9,7 +9,7 @@ namespace ControlCCRC.Protocols
 {
     public class CCtoCCSignallingMessage
     {
-        // nothing
+        // sending node name
         public const int CC_LOW_INIT = 0;
         // lower confirmed path set
         public const int CC_LOW_CONFIRM = 1;
@@ -22,6 +22,8 @@ namespace ControlCCRC.Protocols
         private int state;
         // from last CC
         private bool lastCC;
+        // node name in init message
+        private String nodeName;
         // sended FIB table
         private List<FIB> fib_table;
 
@@ -61,6 +63,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 fib_table = value;
+            }
+        }
+
+        public string NodeName
+        {
+            get
+            {
+                return nodeName;
+            }
+
+            set
+            {
+                nodeName = value;
             }
         }
     }

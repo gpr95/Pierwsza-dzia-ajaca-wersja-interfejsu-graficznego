@@ -1,5 +1,6 @@
 ﻿using ClientWindow;
 using ControlCCRC.Protocols;
+using Management;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,6 +25,8 @@ namespace ControlCCRC
 
         private RoutingController rcHandler;
 
+        private Dictionary<String, CCThread> lastCCNodes;
+
         private Boolean iAmDomain;
         /**
          * DOMAIN [listen CC, connect NCC]
@@ -32,6 +35,8 @@ namespace ControlCCRC
         public ConnectionController(string[] args)
         {
             iAmDomain = (args.Length == 2);
+            lastCCNodes = new Dictionary<string, CCThread>();
+
             if(iAmDomain)
             {
                 consoleWriter("[INIT] DOMAIN");
@@ -91,28 +96,15 @@ namespace ControlCCRC
                     switch(msg.State)
                     {
                         case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:
-                            rcHandler.findPath(msg.NodeFrom, msg.NodeTo, msg.Rate);
-                            switch(msg.Rate)
-                            {
-                                case 1:
-                                    if(rcHandler.LatestBuildedPathLayer1 != null)
+                            Dictionary<String,List<FIB>> fibs = rcHandler.findPath(msg.NodeFrom, msg.NodeTo, msg.Rate);
+                            if(fibs != null)
+                                for(int i = 0; i<fibs.Count; i++)
+                                {
+                                    foreach(FIB fib in fibs[fibs.Keys.ElementAt(i)])
                                     {
-
+                                        lastCCNodes[fibs.Keys.ElementAt(i)].writeFIB(fib);
                                     }
-                                    else if (rcHandler.LatestBuildedPathLayer2 != null)
-                                    {
-
-                                    }
-                                    else if (rcHandler.LatestBuildedPathLayer3 != null)
-                                    {
-
-                                    }
-                                    else
-                                    {
-
-                                    }
-                                    break;
-                            }
+                                }
                             break;
                     }
                 }
@@ -156,7 +148,7 @@ namespace ControlCCRC
                 try
                 {
                     TcpClient client = CCListener.AcceptTcpClient();
-                    CCThread thread = new CCThread(client);
+                    CCThread thread = new CCThread(client, ref lastCCNodes);
                 }
                 catch (SocketException ex)
                 {
@@ -184,8 +176,11 @@ namespace ControlCCRC
     {
         private Thread thread;
         private BinaryWriter writer;
-        public CCThread(TcpClient con)
+        private Dictionary<String, CCThread> lastCCNodes;
+        private String nodeName;
+        public CCThread(TcpClient con, ref Dictionary<String, CCThread> lastCCNodes)
         {
+            this.lastCCNodes = lastCCNodes;
             thread = new Thread(new ParameterizedThreadStart(ccListen));
             thread.Start(con);
         }
@@ -214,6 +209,14 @@ namespace ControlCCRC
                 if(lastCC)
                 {
                     //@TODO communication with NetNode CC
+                    switch(msg.State)
+                    {
+                        case CCtoCCSignallingMessage.CC_LOW_INIT:
+                            nodeName = msg.NodeName;
+                            lastCCNodes.Add(nodeName, this);
+                            break;
+
+                    }
                 }
                 else
                 {
@@ -232,5 +235,19 @@ namespace ControlCCRC
             Console.Write(Environment.NewLine);
         }
 
+        internal void writeFIB(FIB fib)
+        {
+            try
+            {
+                CCtoCCSignallingMessage msg = new CCtoCCSignallingMessage();
+                msg.State = CCtoCCSignallingMessage.CC_UP_FIB_CHANGE;
+                string data = JMessage.Serialize(JMessage.FromValue(msg));
+                writer.Write(data);
+            }
+            catch (Exception e)
+            {
+                consoleWriter("[ERROR] Sending FIB failed");
+            }
+        }
     }
 }

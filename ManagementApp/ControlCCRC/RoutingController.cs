@@ -1,5 +1,6 @@
 ﻿using ClientWindow;
 using ControlCCRC.Protocols;
+using Management;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -32,18 +33,20 @@ namespace ControlCCRC
         private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2;
         private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3;
 
-        private List<String> latestBuildedPathLayer1;
-        private List<String> latestBuildedPathLayer2;
-        private List<String> latestBuildedPathLayer3;
+        private Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts;
+
+        private Dictionary<String,FIB> latestBuildedPathLayer1;
+        private Dictionary<String, FIB> latestBuildedPathLayer2;
+        private Dictionary<String, FIB> latestBuildedPathLayer3;
 
         private ConnectionController ccHandler;
 
      
 
         /**
-* DOMAIN [listen LRM_AND_RC]
-* SUBNETWORK [listen LRM_AND_RC , connect up RC] 
-*/
+        * DOMAIN [listen LRM_AND_RC]
+        * SUBNETWORK [listen LRM_AND_RC , connect up RC] 
+        */
         public RoutingController(string[] args)
         {
             iAmDomain = (args.Length == 1);
@@ -120,7 +123,8 @@ namespace ControlCCRC
                     TcpClient client = LRMAndRCListener.AcceptTcpClient();
                     LRMRCThread thread = new LRMRCThread(client, ref threadsMap,
                         ref topologyUnallocatedLayer1, ref topologyUnallocatedLayer2, ref topologyUnallocatedLayer3,
-                        ref topologyAllocatedLayer1, ref topologyAllocatedLayer2, ref topologyAllocatedLayer3);
+                        ref topologyAllocatedLayer1, ref topologyAllocatedLayer2, ref topologyAllocatedLayer3,
+                        ref wholeTopologyNodesAndConnectedNodesWithPorts);
                 }
                 catch (SocketException sEx)
                 {
@@ -130,34 +134,65 @@ namespace ControlCCRC
             }
         }
 
-        public void findPath(String startNode, String endNode, int howMuchVC3)
+        public Dictionary<String,List<FIB>> findPath(String startNode, String endNode, int howMuchVC3)
         {
             
             consoleWriter("[CC] Sended info to make path between: " + startNode + " and " + endNode + " with:" 
                 + howMuchVC3 + "x VC-3");
-            latestBuildedPathLayer1 = null;
-            latestBuildedPathLayer2 = null;
-            latestBuildedPathLayer3 = null;
+
+            Dictionary<String, List<FIB>> result = new Dictionary<string, List<FIB>>();
+            String firstInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
+                .Where(node => node.Value.ContainsKey(startNode)).First().Key;
+
+            String lastInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
+                .Where(node => node.Value.ContainsKey(endNode)).First().Key;
+
+
             switch (howMuchVC3)
             {
                 case 1:
                     int whichTopology = 1;
-                    List<String> pathRate1 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer1);
-                    if (pathRate1 == null || !pathRate1.First().Equals(startNode) || !pathRate1.Last().Equals(endNode))
+                    List<String> pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1);
+                    if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     { 
-                        pathRate1 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer2);
+                        pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2);
                         whichTopology = 2;
                     }
-                    if (pathRate1 == null || !pathRate1.First().Equals(startNode) || !pathRate1.Last().Equals(endNode))
+                    if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     {
-                        pathRate1 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer3);
+                        pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3);
                         whichTopology = 3;
                     }
 
-                    if (pathRate1 != null || pathRate1.First().Equals(startNode) || pathRate1.Last().Equals(endNode))
+                    if (pathRate1 != null || pathRate1.First().Equals(firstInMyNetwork) || pathRate1.Last().Equals(lastInMyNetwork))
                     {
                         consoleWriter("[INFO] Shortest path : " + pathRate1);
-                        switch(whichTopology)
+                        foreach (String node in pathRate1)
+                            result.Add(node, new List<FIB>());
+                        result.First().Value.Add(new FIB(
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
+                                            whichTopology,
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][pathRate1[1]],
+                                            whichTopology
+                                            ));
+                        result.Last().Value.Add(new FIB(
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][pathRate1[pathRate1.Count-2]],
+                                            whichTopology,
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][endNode],
+                                            whichTopology
+                                            ));
+                        for(int i =0; i< pathRate1.Count; i++)
+                        {
+                            if (i != 0 && i != pathRate1.Count - 1)
+                                result[pathRate1[i]].Add(new FIB(
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
+                                    1,
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i + 1]],
+                                    1
+                                    ));
+                        }
+
+                        switch (whichTopology)
                         {
                             case 1:
                                 /** Builded path in 1st layer */
@@ -165,8 +200,7 @@ namespace ControlCCRC
                                 {
                                     topologyUnallocatedLayer1[pathRate1[i]].Remove(pathRate1[i + 1]);
                                     topologyAllocatedLayer1[pathRate1[i]].Add(pathRate1[i + 1],1);
-                                }
-                                latestBuildedPathLayer1 = pathRate1;
+                                }                               
                                 break;
                             case 2:
                                 /** Builded path in 2nd layer */
@@ -174,8 +208,14 @@ namespace ControlCCRC
                                 {
                                     topologyUnallocatedLayer2[pathRate1[i]].Remove(pathRate1[i + 1]);
                                     topologyAllocatedLayer2[pathRate1[i]].Add(pathRate1[i + 1], 1);
+                                    if (i != 0 && i != pathRate1.Count - 1)
+                                        result[pathRate1[i]].Add(new FIB(
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
+                                            1,
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i + 1]],
+                                            1
+                                            ));
                                 }
-                                latestBuildedPathLayer2 = pathRate1;
                                 break;
                             case 3:
                                 /** Builded path in 3th layer */
@@ -184,15 +224,15 @@ namespace ControlCCRC
                                     topologyUnallocatedLayer3[pathRate1[i]].Remove(pathRate1[i + 1]);
                                     topologyAllocatedLayer3[pathRate1[i]].Add(pathRate1[i + 1], 1);
                                 }
-                                latestBuildedPathLayer3 = pathRate1;
                                 break;
                         }
+                        return result;
                     }
                     else
                     {
                         consoleWriter("[INFO] NOT able to connect nodes. All paths allocated.");
+                        return null;
                     }
-                    break;
                 case 2:
                     // TODO obsluga
                     List<String> path1 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer1);
@@ -249,6 +289,8 @@ namespace ControlCCRC
                     consoleWriter("[ERROR] Wrong VC-3 number");
                     break;
             }
+
+            return null;
         }
 
        
@@ -326,44 +368,7 @@ namespace ControlCCRC
             Console.Write(Environment.NewLine);
         }
 
-        public List<string> LatestBuildedPathLayer1
-        {
-            get
-            {
-                return latestBuildedPathLayer1;
-            }
-
-            set
-            {
-                latestBuildedPathLayer1 = value;
-            }
-        }
-
-        public List<string> LatestBuildedPathLayer2
-        {
-            get
-            {
-                return latestBuildedPathLayer2;
-            }
-
-            set
-            {
-                latestBuildedPathLayer2 = value;
-            }
-        }
-
-        public List<string> LatestBuildedPathLayer3
-        {
-            get
-            {
-                return latestBuildedPathLayer3;
-            }
-
-            set
-            {
-                latestBuildedPathLayer3 = value;
-            }
-        }
+     
 
     }
 
@@ -372,7 +377,6 @@ namespace ControlCCRC
     {
         private String nodeName;
         private Thread thread;
-        private BinaryWriter writer;
 
         /** Hadnlers */
         private Dictionary<String, LRMRCThread> threadsMap;
@@ -384,6 +388,8 @@ namespace ControlCCRC
         private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2;
         private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3;
 
+        private Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts;
+
         public LRMRCThread(TcpClient connection, 
             ref Dictionary<String, LRMRCThread> threadsMap,
             ref Dictionary<String,Dictionary<String, int>> topologyUnallocatedLayer1,
@@ -391,7 +397,8 @@ namespace ControlCCRC
           ref Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3,
             ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer1,
           ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2,
-          ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3)
+          ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3,
+          ref Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts)
         {
             this.threadsMap = threadsMap;
             this.topologyUnallocatedLayer1 = topologyUnallocatedLayer1;
@@ -400,6 +407,8 @@ namespace ControlCCRC
             this.topologyAllocatedLayer1 = topologyAllocatedLayer1;
             this.topologyAllocatedLayer2 = topologyAllocatedLayer2;
             this.topologyAllocatedLayer3 = topologyAllocatedLayer3;
+            this.wholeTopologyNodesAndConnectedNodesWithPorts = wholeTopologyNodesAndConnectedNodesWithPorts;
+
             thread = new Thread(new ParameterizedThreadStart(lrmThread));
             thread.Start(connection);
         }
@@ -409,7 +418,8 @@ namespace ControlCCRC
         {
             TcpClient lrmClient = (TcpClient)lrm;
             BinaryReader reader = new BinaryReader(lrmClient.GetStream());
-            writer = new BinaryWriter(lrmClient.GetStream());
+            BinaryWriter writer = new BinaryWriter(lrmClient.GetStream());
+
             Boolean noError = true;
             Boolean lrmConnection = false;
             while (noError)
@@ -439,12 +449,15 @@ namespace ControlCCRC
                             topologyAllocatedLayer1.Add(nodeName, new Dictionary<string, int>());
                             topologyAllocatedLayer2.Add(nodeName, new Dictionary<string, int>());
                             topologyAllocatedLayer3.Add(nodeName, new Dictionary<string, int>());
+                            wholeTopologyNodesAndConnectedNodesWithPorts.Add(nodeName, new Dictionary<string, int>());
                             threadsMap.Add(nodeName, this);
                             break;
                         case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
                             topologyUnallocatedLayer1[nodeName].Add(lrmMsg.ConnectedNode, 1);
                             topologyUnallocatedLayer2[nodeName].Add(lrmMsg.ConnectedNode, 1);
                             topologyUnallocatedLayer3[nodeName].Add(lrmMsg.ConnectedNode, 1);
+                            wholeTopologyNodesAndConnectedNodesWithPorts[nodeName]
+                                .Add(lrmMsg.ConnectedNode, lrmMsg.ConnectedNodePort);
                             break;
                         case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
                             String whoDied = lrmMsg.ConnectedNode;
