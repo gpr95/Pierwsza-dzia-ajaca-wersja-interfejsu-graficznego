@@ -1,4 +1,5 @@
 ﻿using ClientWindow;
+using ControlCCRC.Protocols;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,61 +16,50 @@ namespace ControlCCRC
     {
         private Boolean iAmDomain;
 
-        private TcpListener LRMlistener;
-        private TcpListener RClistener;
+        private TcpListener LRMAndRCListener;
         private TcpClient RCClient;
 
-        private Thread threadLRMListen;
-        private Thread threadRCListen;
-        private Thread threadRCConnection;
-        private Dictionary<String, LRMThread> threadsMap;
+        private Thread threadListenLRMAndRC;
+        private Thread threadconnectRC;
 
-
-
-
+        private Dictionary<String, LRMRCThread> threadsMap;
         private Dictionary<String, Dictionary<String, int>> topologyVC31;
         private Dictionary<String, Dictionary<String, int>> topologyVC32;
         private Dictionary<String, Dictionary<String, int>> topologyVC33;
 
         /**
-         * DOMAIN [listen LRM , listen RC]
-         * SUBNETWORK [listen LRM , listen RC , connect up RC] 
+         * DOMAIN [listen LRM_AND_RC]
+         * SUBNETWORK [listen LRM_AND_RC , connect up RC] 
          */
         public RoutingController(string[] args)
         {
-            iAmDomain = (args.Length == 2);
+            iAmDomain = (args.Length == 1);
             
-            if(iAmDomain)
-            {
-               consoleWriter("[INIT] DOMAIN");
-            }
-            else
+            if(!iAmDomain)
             {
                 consoleWriter("[INIT] SUBNETWORK");
-                
                 try
                 {
-                    RCClient = new TcpClient("localhost", Convert.ToInt32(args[2]));
+                    RCClient = new TcpClient("localhost", Convert.ToInt32(args[1]));
                 }
                 catch (SocketException ex)
                 {
                     consoleWriter("[ERROR] Cannot connect with upper RC.");
                 }
-                this.threadLRMListen = new Thread(new ThreadStart(rcConnecting));
-                threadLRMListen.Start();
+                this.threadconnectRC = new Thread(new ThreadStart(rcConnecting));
+                threadconnectRC.Start();
             }
+            else
+                consoleWriter("[INIT] DOMAIN");
+
 
             topologyVC31 = new Dictionary<String, Dictionary<String, int>>();
             topologyVC32 = new Dictionary<String, Dictionary<String, int>>();
             topologyVC33 = new Dictionary<String, Dictionary<String, int>>();
 
-            this.LRMlistener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[0]));
-            this.threadLRMListen = new Thread(new ThreadStart(lrmListening));
-            threadLRMListen.Start();
-
-            this.RClistener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
-            this.threadRCListen = new Thread(new ThreadStart(rcListening));
-            threadRCListen.Start();
+            this.LRMAndRCListener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[0]));
+            this.threadListenLRMAndRC = new Thread(new ThreadStart(lrmAndRcListening));
+            threadListenLRMAndRC.Start();
 
             consoleStart();
         }
@@ -85,9 +75,9 @@ namespace ControlCCRC
                 {
                     string received_data = reader.ReadString();
                     JMessage received_object = JMessage.Deserialize(received_data);
-                    if (received_object.Type != typeof(RCSignalingMessage))
+                    if (received_object.Type != typeof(RCtoRCSignallingMessage))
                         noError = false;
-                    RCSignalingMessage msg = received_object.Value.ToObject<RCSignalingMessage>();
+                    RCtoRCSignallingMessage msg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
                     //@TODO something with Msg
                 }
                 catch (IOException ex)
@@ -96,37 +86,18 @@ namespace ControlCCRC
                 }
             }
         }
-        private void lrmListening()
+
+        private void lrmAndRcListening()
         {
-            this.RClistener.Start();
+            this.LRMAndRCListener.Start();
 
             Boolean noError = true;
             while (noError)
             {
                 try
                 {
-                    TcpClient client = RClistener.AcceptTcpClient();
-                   // @TODO
-                }
-                catch(SocketException sEx)
-                {
-                    consoleWriter("[ERROR] Socket failed. Listener.");
-                    noError = false;
-                }
-            }
-        }
-
-        private void rcListening()
-        {
-            this.LRMlistener.Start();
-
-            Boolean noError = true;
-            while (noError)
-            {
-                try
-                {
-                    TcpClient client = LRMlistener.AcceptTcpClient();
-                    LRMThread thread = new LRMThread(client, ref threadsMap, ref topologyVC31, ref topologyVC32, ref topologyVC33);
+                    TcpClient client = LRMAndRCListener.AcceptTcpClient();
+                    LRMRCThread thread = new LRMRCThread(client, ref threadsMap, ref topologyVC31, ref topologyVC32, ref topologyVC33);
                 }
                 catch (SocketException sEx)
                 {
@@ -313,19 +284,19 @@ namespace ControlCCRC
     }
 
 
-    class LRMThread
+    class LRMRCThread
     {
         private String nodeName;
         private Thread thread;
         private BinaryWriter writer;
 
         /** Hadnlers */
-        private Dictionary<String, LRMThread> threadsMap;
+        private Dictionary<String, LRMRCThread> threadsMap;
         private Dictionary<String, Dictionary<String, int>> topologyVC31;
         private Dictionary<String, Dictionary<String, int>> topologyVC32;
         private Dictionary<String, Dictionary<String, int>> topologyVC33;
 
-        public LRMThread(TcpClient connection, ref Dictionary<String,LRMThread> threadsMap,ref Dictionary<String, Dictionary<String, int>> topologyVC31,
+        public LRMRCThread(TcpClient connection, ref Dictionary<String, LRMRCThread> threadsMap,ref Dictionary<String, Dictionary<String, int>> topologyVC31,
           ref  Dictionary<String, Dictionary<String, int>> topologyVC32,ref Dictionary<String, Dictionary<String, int>> topologyVC33)
         {
             this.threadsMap = threadsMap;
@@ -343,13 +314,51 @@ namespace ControlCCRC
             BinaryReader reader = new BinaryReader(lrmClient.GetStream());
             writer = new BinaryWriter(lrmClient.GetStream());
             Boolean noError = true;
+            Boolean lrmConnection = false;
             while (noError)
             {
                 string received_data = reader.ReadString();
                 JMessage received_object = JMessage.Deserialize(received_data);
-                if (received_object.Type != typeof(ControlSignalingMessage))
-                    noError = false;
+                if (received_object.Type == typeof(RCtoLRMSignallingMessage))
+                    lrmConnection = true;
+                else if (received_object.Type == typeof(RCtoRCSignallingMessage))
+                    lrmConnection = false;
+                else
+                {
+                    consoleWriter("[ERROR] Received wrong data format.");
+                    return;
+                }
 
+                if(lrmConnection)
+                {
+                    RCtoLRMSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoLRMSignallingMessage>();
+                    switch(lrmMsg.State)
+                    {
+                        //@TODO!
+                        case RCtoLRMSignallingMessage.SENDTOPOLOGY:
+                            topologyVC31[nodeName].Add(lrmMsg.topology, 1);
+                            topologyVC32[nodeName].Add(lrmMsg.topology, 1);
+                            topologyVC33[nodeName].Add(lrmMsg.topology, 1);
+                            break;
+                        case RCtoLRMSignallingMessage.SENDDELETED:
+                            String whoDied = lrmMsg.topologyDeleted;
+                            topologyVC31.Remove(whoDied);
+                            topologyVC32.Remove(whoDied);
+                            topologyVC33.Remove(whoDied);
+                            foreach (var item in topologyVC31.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                                item.Value.Remove(whoDied);
+                            foreach (var item in topologyVC32.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                                item.Value.Remove(whoDied);
+                            foreach (var item in topologyVC33.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                                item.Value.Remove(whoDied);
+                            break;                           
+                    }
+                }
+                else
+                {
+                    RCtoRCSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
+                    //@TODO
+                }
                 ControlSignalingMessage msg = received_object.Value.ToObject<ControlSignalingMessage>();
                 switch (msg.HeaderField)
                 {
@@ -385,5 +394,14 @@ namespace ControlCCRC
             }
         }
 
+
+        private void consoleWriter(String msg)
+        {
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.BackgroundColor = ConsoleColor.White;
+
+            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+            Console.Write(Environment.NewLine);
+        }
     }
 }

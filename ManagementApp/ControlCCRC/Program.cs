@@ -8,35 +8,33 @@ namespace ControlCCRC
 {
     class Program
     {
-        static void Main(string[] args)
-        {
-            /**
+        /**
              * DOMAIN:
-                LISTENER_RC_for_LRM[0], 
-	            LISTENER_RC_forLOWER_RC[1], 
-	            LISTENER_CC_forLOWER_CC[2] ,
-	            NCC_PORT[3] 
+                LISTENER_RC_for_LRM_AND_RC[0],  
+	            LISTENER_CC_forLOWER_CC[1] ,
+	            NCC_PORT[2] 
             * SUBNETWORK:
-                LISTENER_RC_for_LRM[0], 
-	            LISTENER_RC_forLOWER_RC[1], 
-	            LISTENER_CC_forLOWER_CC[2] ,
-                UPPER_RC_PORT[3], 
-                UPPER_CC_PORT[4]] 
+                LISTENER_RC_for_LRM_AND_RC[0], 
+	            LISTENER_CC_forLOWER_CC[1] ,
+                UPPER_RC_PORT[2], 
+                UPPER_CC_PORT[3]] 
             */
+        static void Main(string[] args)
+        { 
             string[] rcArgs = null;
-            if(args.Length == 4)
-                rcArgs = new string[] { args[0], args[1] }; // DOMAIN [listen LRM , listen RC]
-            if (args.Length == 5)
-                rcArgs = new string[] { args[0], args[1], args[3] }; // SUBNETWORK [listen LRM , listen RC , connect up RC] 
+            if(args.Length == 3)
+                rcArgs = new string[] { args[0]}; // DOMAIN [listen LRM_AND_RC]
+            if (args.Length == 4)
+                rcArgs = new string[] { args[0], args[2] }; // SUBNETWORK [listen LRM_AND_RC , connect up RC] 
 
             string[] ccArgs = null;
+            if (args.Length == 3)
+                ccArgs = new string[] { args[1], args[2]}; // DOMAIN [listen CC, connect NCC]
             if (args.Length == 4)
-                ccArgs = new string[] { args[2], args[3]}; // DOMAIN [listen CC, connect NCC]
-            if (args.Length == 5)
-                ccArgs = new string[] { args[2], args[3], args[3] }; // SUBNETWORK [listen CC, connect up CC, JUST_FLAG]
+                ccArgs = new string[] { args[1], args[3], args[3] }; // SUBNETWORK [listen CC, connect up CC, JUST_FLAG]
 
             RoutingController rc = new RoutingController(rcArgs);
-           // ConnectionController cc = new ConnectionController(ccArgs);
+            ConnectionController cc = new ConnectionController(ccArgs);
         }
     }
 }

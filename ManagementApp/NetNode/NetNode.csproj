@@ -54,6 +54,7 @@
     <Compile Include="Ports.cs" />
     <Compile Include="NetNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocols\RCtoLRMSignallingMessage.cs" />
     <Compile Include="Resource.cs" />
     <Compile Include="SwitchingField.cs" />
   </ItemGroup>

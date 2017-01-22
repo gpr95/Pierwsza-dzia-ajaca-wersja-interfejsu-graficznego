@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using ClientWindow;
 using ManagementApp;
 using Management;
-using ControlCCRC;
+using ControlCCRC.Protocols;
 
 namespace NetNode
 {
@@ -48,9 +48,9 @@ namespace NetNode
                 {
                     string received_data = reader.ReadString();
                     JSON received_object = JSON.Deserialize(received_data);
-                    ControlProtocol received_Protocol = received_object.Value.ToObject<ControlProtocol>();
+                    RCtoLRMSignallingMessage received_Protocol = received_object.Value.ToObject<RCtoLRMSignallingMessage>();
 
-                    if (received_Protocol.State == ControlProtocol.ALLOCATERES)
+                    if (received_Protocol.State == RCtoLRMSignallingMessage.ALLOCATERES)
                     {
                         Console.WriteLine("Control Signal: allocateRes");
                         //allocate resource and send confirmation of error
@@ -71,7 +71,7 @@ namespace NetNode
                             sendConfirmation(port, amount, false);
                         }
                     }
-                    else if (received_Protocol.State == ControlProtocol.INSERTFIB)
+                    else if (received_Protocol.State == RCtoLRMSignallingMessage.INSERTFIB)
                     {
                         //insert FIB
                         Console.WriteLine("Control Signal: insertFib");
@@ -98,8 +98,8 @@ namespace NetNode
             string toSend = from + "/" + port.ToString() + "/" + to;
             Console.WriteLine("sending topology to RC: " + toSend);
 
-            ControlProtocol protocol = new ControlProtocol();
-            protocol.State = ControlProtocol.SENDTOPOLOGY;
+            RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
+            protocol.State = RCtoLRMSignallingMessage.SENDTOPOLOGY;
             protocol.topology = toSend;
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
@@ -112,8 +112,8 @@ namespace NetNode
             string toSend = from + "/" + port.ToString() + "/" + to;
             Console.WriteLine("sending to RC info about deletion: " + toSend);
 
-            ControlProtocol protocol = new ControlProtocol();
-            protocol.State = ControlProtocol.SENDDELETED;
+            RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
+            protocol.State = RCtoLRMSignallingMessage.SENDDELETED;
             protocol.topologyDeleted = toSend;
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
@@ -128,8 +128,8 @@ namespace NetNode
             string toSend = status+"/"+port.ToString() + "/" + no_vc3.ToString();
             Console.WriteLine("sending to CC allocated id" + toSend);
 
-            ControlProtocol protocol = new ControlProtocol();
-            protocol.State = ControlProtocol.SENDCONFIRMATION;
+            RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
+            protocol.State = RCtoLRMSignallingMessage.SENDCONFIRMATION;
             protocol.allocationConf = toSend;
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
