@@ -9,18 +9,59 @@ namespace ControlCCRC.Protocols
 {
     class RCtoLRMSignallingMessage
     {
-        public const int SENDTOPOLOGY = 0;
-        public const int SENDDELETED = 1;
-        public const int SENDCONFIRMATION = 2;
-        public const int ALLOCATERES = 3;
-        public const int INSERTFIB = 4;
+        // my node name
+        public const int LRM_INIT = 0;
+        // new connected node
+        public const int LRM_TOPOLOGY_ADD = 1;
+        // who died from connected nodes
+        public const int LRM_TOPOLOGY_DELETE = 2;
 
-        public int state;
-        public string topology;
-        public string topologyDeleted;
-        public string allocationConf;
-        public string allocateNo;
-        public FIB fib;
+        private int state;
+        private int connectedNodePort;
+        private String connectedNode;
+        private String nodeName;
+
+
+      
+
+        public int ConnectedNodePort
+        {
+            get
+            {
+                return connectedNodePort;
+            }
+
+            set
+            {
+                connectedNodePort = value;
+            }
+        }
+
+        public string ConnectedNode
+        {
+            get
+            {
+                return connectedNode;
+            }
+
+            set
+            {
+                connectedNode = value;
+            }
+        }
+
+        public string NodeName
+        {
+            get
+            {
+                return nodeName;
+            }
+
+            set
+            {
+                nodeName = value;
+            }
+        }
 
         public int State
         {

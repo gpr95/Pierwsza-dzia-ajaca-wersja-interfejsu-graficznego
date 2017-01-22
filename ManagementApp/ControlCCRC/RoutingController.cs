@@ -334,14 +334,21 @@ namespace ControlCCRC
                     RCtoLRMSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoLRMSignallingMessage>();
                     switch(lrmMsg.State)
                     {
-                        //@TODO!
-                        case RCtoLRMSignallingMessage.SENDTOPOLOGY:
-                            topologyVC31[nodeName].Add(lrmMsg.topology, 1);
-                            topologyVC32[nodeName].Add(lrmMsg.topology, 1);
-                            topologyVC33[nodeName].Add(lrmMsg.topology, 1);
+                        case RCtoLRMSignallingMessage.LRM_INIT:
+                            nodeName = lrmMsg.NodeName;
+                            topologyVC31.Add(nodeName, new Dictionary<string, int>());
+                            topologyVC32.Add(nodeName, new Dictionary<string, int>());
+                            topologyVC33.Add(nodeName, new Dictionary<string, int>());
+                            threadsMap.Add(nodeName, this);
                             break;
-                        case RCtoLRMSignallingMessage.SENDDELETED:
-                            String whoDied = lrmMsg.topologyDeleted;
+                        //@TODO!
+                        case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
+                            topologyVC31[nodeName].Add(lrmMsg.ConnectedNode, 1);
+                            topologyVC32[nodeName].Add(lrmMsg.ConnectedNode, 1);
+                            topologyVC33[nodeName].Add(lrmMsg.ConnectedNode, 1);
+                            break;
+                        case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
+                            String whoDied = lrmMsg.ConnectedNode;
                             topologyVC31.Remove(whoDied);
                             topologyVC32.Remove(whoDied);
                             topologyVC33.Remove(whoDied);
