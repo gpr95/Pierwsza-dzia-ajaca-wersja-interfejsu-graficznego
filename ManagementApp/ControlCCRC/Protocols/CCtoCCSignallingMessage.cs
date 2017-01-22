@@ -22,10 +22,8 @@ namespace ControlCCRC.Protocols
         private int state;
         // from last CC
         private bool lastCC;
-        // sended FIB
-        private FIB fib;
-        // vc-3 alocated [1,2,3]
-        private int allocatedVC3;
+        // sended FIB table
+        private List<FIB> fib_table;
 
         public bool LastCC
         {
@@ -53,29 +51,16 @@ namespace ControlCCRC.Protocols
             }
         }
 
-        public FIB Fib
+        public List<FIB> Fib_table
         {
             get
             {
-                return fib;
+                return fib_table;
             }
 
             set
             {
-                fib = value;
-            }
-        }
-
-        public int AllocatedVC3
-        {
-            get
-            {
-                return allocatedVC3;
-            }
-
-            set
-            {
-                allocatedVC3 = value;
+                fib_table = value;
             }
         }
     }
