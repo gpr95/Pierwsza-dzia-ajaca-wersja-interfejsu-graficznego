@@ -53,6 +53,7 @@ namespace NetNode
                 }
             }
             ControlAgent.sendTopologyInit(this.virtualIp);
+            ControlAgent.sendCCInit(this.virtualIp);
         }
 
         public void receivedMessage(string lrmProtocol, int port)
@@ -131,7 +132,7 @@ namespace NetNode
             }
         }
 
-        public static int allocateResource(int port, int amount)
+        public static int allocateResourceAmount(int port, int amount)
         {
             int no_vc3 = 0;
             int count = 0;
@@ -153,6 +154,18 @@ namespace NetNode
             {
                 return 0;
             }
+        }
+
+        public static bool allocateResource(int port, int no_vc3)
+        {
+                if (resources[port].no_vc3 == no_vc3 && resources[port].status == false )
+                {
+                    //empty so allocating
+                    Console.WriteLine("Allocating on port: " + port + "vc3: " + no_vc3);
+                    resources[port].status = true;
+                    return true;
+                }
+            return false;
         }
 
         private static bool checkResources(int port, int amount)

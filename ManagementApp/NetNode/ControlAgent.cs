@@ -50,36 +50,17 @@ namespace NetNode
                     JSON received_object = JSON.Deserialize(received_data);
                     CCtoCCSignallingMessage received_Protocol = received_object.Value.ToObject<CCtoCCSignallingMessage>();
 
-                    //if (received_Protocol.State == CCtoCCSignallingMessage.######)
-                  //  {
-                        //Console.WriteLine("Control Signal: allocateRes");
-                        //allocate resource and send confirmation of error
-                       // string rec = received_Protocol.allocateNo;
-                        //string[] temp = rec.Split('/');
-                        //int port,amount;
-                        //int.TryParse(temp[0], out port);
-                        //int.TryParse(temp[1], out amount);
-                       // int res = LRM.allocateResource(port,amount);
-                        //if(res != 0)
-                       // {
-                            //send ok
-                            //sendConfirmation(port, amount, true);
-                       // }
-                      //  else
-                      //  {
-                       //     //send err
-                        //    sendConfirmation(port, amount, false);
-                      //  }
-                   // }
                     if (received_Protocol.State == CCtoCCSignallingMessage.CC_UP_FIB_CHANGE)
                     {
                         //insert FIB
                         Console.WriteLine("Control Signal: insertFib");
                         List<FIB> rec = received_Protocol.Fib_table;
-                        int amount = rec.Count;
+
                         //TODO allocate resources
-                        foreach(var row in rec)
+                        foreach (var row in rec)
                         {
+                            LRM.allocateResource(row.iport, row.in_cont);
+                            LRM.allocateResource(row.oport, row.out_cont);
                             SwitchingField.addToSwitch(row);
                         }
                     }
@@ -95,6 +76,17 @@ namespace NetNode
                 Thread.Sleep(2000);
                 Environment.Exit(1);
             }
+        }
+
+        public static void sendCCInit(string ip)
+        {
+            Console.WriteLine("sending init to CC: " + ip);
+
+            CCtoCCSignallingMessage protocol = new CCtoCCSignallingMessage();
+            protocol.State = CCtoCCSignallingMessage.CC_LOW_INIT;
+            protocol.NodeName = ip;
+            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+            writer.Write(send_object);
         }
 
         public static void sendTopologyInit(string from)
