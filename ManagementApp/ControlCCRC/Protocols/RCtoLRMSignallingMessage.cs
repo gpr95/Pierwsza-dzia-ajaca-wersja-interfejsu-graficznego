@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ControlCCRC.Protocols
 {
-    class RCtoLRMSignallingMessage
+    public class RCtoLRMSignallingMessage
     {
         // my node name
         public const int LRM_INIT = 0;

@@ -48,35 +48,40 @@ namespace NetNode
                 {
                     string received_data = reader.ReadString();
                     JSON received_object = JSON.Deserialize(received_data);
-                    RCtoLRMSignallingMessage received_Protocol = received_object.Value.ToObject<RCtoLRMSignallingMessage>();
+                    CCtoCCSignallingMessage received_Protocol = received_object.Value.ToObject<CCtoCCSignallingMessage>();
 
-                    if (received_Protocol.State == RCtoLRMSignallingMessage.ALLOCATERES)
-                    {
-                        Console.WriteLine("Control Signal: allocateRes");
+                    //if (received_Protocol.State == CCtoCCSignallingMessage.######)
+                  //  {
+                        //Console.WriteLine("Control Signal: allocateRes");
                         //allocate resource and send confirmation of error
-                        string rec = received_Protocol.allocateNo;
-                        string[] temp = rec.Split('/');
-                        int port,amount;
-                        int.TryParse(temp[0], out port);
-                        int.TryParse(temp[1], out amount);
-                        int res = LRM.allocateResource(port,amount);
-                        if(res != 0)
-                        {
+                       // string rec = received_Protocol.allocateNo;
+                        //string[] temp = rec.Split('/');
+                        //int port,amount;
+                        //int.TryParse(temp[0], out port);
+                        //int.TryParse(temp[1], out amount);
+                       // int res = LRM.allocateResource(port,amount);
+                        //if(res != 0)
+                       // {
                             //send ok
-                            sendConfirmation(port, amount, true);
-                        }
-                        else
-                        {
-                            //send err
-                            sendConfirmation(port, amount, false);
-                        }
-                    }
-                    else if (received_Protocol.State == RCtoLRMSignallingMessage.INSERTFIB)
+                            //sendConfirmation(port, amount, true);
+                       // }
+                      //  else
+                      //  {
+                       //     //send err
+                        //    sendConfirmation(port, amount, false);
+                      //  }
+                   // }
+                    if (received_Protocol.State == CCtoCCSignallingMessage.CC_UP_FIB_CHANGE)
                     {
                         //insert FIB
                         Console.WriteLine("Control Signal: insertFib");
-                        FIB rec = received_Protocol.fib;
-                        SwitchingField.addToSwitch(rec);
+                        List<FIB> rec = received_Protocol.Fib_table;
+                        int amount = rec.Count;
+                        //TODO allocate resources
+                        foreach(var row in rec)
+                        {
+                            SwitchingField.addToSwitch(row);
+                        }
                     }
                     else
                     {
@@ -92,15 +97,26 @@ namespace NetNode
             }
         }
 
+        public static void sendTopologyInit(string from)
+        {
+            Console.WriteLine("sending inittopology to RC: " + from);
+
+            RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
+            protocol.State = RCtoLRMSignallingMessage.LRM_INIT;
+            protocol.NodeName = from;
+            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+            writer.Write(send_object);
+        }
+
         public static void sendTopology(string from, int port, string to)
         {
-            //TODO send to RC e.g. NN0 connected on port 2 with NN1
-            string toSend = from + "/" + port.ToString() + "/" + to;
+            string toSend = port.ToString() + " " + to;
             Console.WriteLine("sending topology to RC: " + toSend);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
-            protocol.State = RCtoLRMSignallingMessage.SENDTOPOLOGY;
-            protocol.topology = toSend;
+            protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD;
+            protocol.ConnectedNodePort = port;
+            protocol.ConnectedNode = to;
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
         }
@@ -108,29 +124,31 @@ namespace NetNode
 
         public static void sendDeleted(string from, int port, string to)
         {
-            //TODO send to RC that row e.g. NN0 connected on port 2 with NN1 is deleted
-            string toSend = from + "/" + port.ToString() + "/" + to;
+            string toSend = port.ToString() + " " + to;
             Console.WriteLine("sending to RC info about deletion: " + toSend);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
-            protocol.State = RCtoLRMSignallingMessage.SENDDELETED;
-            protocol.topologyDeleted = toSend;
+            protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE;
+            protocol.ConnectedNodePort = port;
+            protocol.ConnectedNode = to;
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
         }
 
         public static void sendConfirmation(int port, int no_vc3, bool flag)
         {
-            //TODO send to CC confirmation of resource reservation and vc3 number
-            string status = "ERR";
-            if (flag == true)
-                status = "OK";
-            string toSend = status+"/"+port.ToString() + "/" + no_vc3.ToString();
-            Console.WriteLine("sending to CC allocated id" + toSend);
+            CCtoCCSignallingMessage protocol = new CCtoCCSignallingMessage();
 
-            RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
-            protocol.State = RCtoLRMSignallingMessage.SENDCONFIRMATION;
-            protocol.allocationConf = toSend;
+            if (flag == true)
+            {
+                protocol.State = CCtoCCSignallingMessage.CC_LOW_CONFIRM;
+                Console.WriteLine("Send CONFIRM");
+            }
+            else
+            {
+                protocol.State = CCtoCCSignallingMessage.CC_LOW_REJECT;
+                Console.WriteLine("Send REJECT");
+            }
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
         }

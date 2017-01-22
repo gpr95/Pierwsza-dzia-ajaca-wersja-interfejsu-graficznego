@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ControlCCRC.Protocols
 {
-    class CCtoCCSignallingMessage
+    public class CCtoCCSignallingMessage
     {
         // nothing
         public const int CC_LOW_INIT = 0;
