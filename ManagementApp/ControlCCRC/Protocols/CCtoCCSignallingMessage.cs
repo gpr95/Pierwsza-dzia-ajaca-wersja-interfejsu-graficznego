@@ -24,6 +24,8 @@ namespace ControlCCRC.Protocols
         private bool lastCC;
         // sended FIB
         private FIB fib;
+        // vc-3 alocated [1,2,3]
+        private int allocatedVC3;
 
         public bool LastCC
         {
@@ -61,6 +63,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 fib = value;
+            }
+        }
+
+        public int AllocatedVC3
+        {
+            get
+            {
+                return allocatedVC3;
+            }
+
+            set
+            {
+                allocatedVC3 = value;
             }
         }
     }
