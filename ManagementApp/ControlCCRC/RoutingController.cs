@@ -23,14 +23,27 @@ namespace ControlCCRC
         private Thread threadconnectRC;
 
         private Dictionary<String, LRMRCThread> threadsMap;
-        private Dictionary<String, Dictionary<String, int>> topologyVC31;
-        private Dictionary<String, Dictionary<String, int>> topologyVC32;
-        private Dictionary<String, Dictionary<String, int>> topologyVC33;
+
+        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer1;
+        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer2;
+        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3;
+
+        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer1;
+        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2;
+        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3;
+
+        private List<String> latestBuildedPathLayer1;
+        private List<String> latestBuildedPathLayer2;
+        private List<String> latestBuildedPathLayer3;
+
+        private ConnectionController ccHandler;
+
+     
 
         /**
-         * DOMAIN [listen LRM_AND_RC]
-         * SUBNETWORK [listen LRM_AND_RC , connect up RC] 
-         */
+* DOMAIN [listen LRM_AND_RC]
+* SUBNETWORK [listen LRM_AND_RC , connect up RC] 
+*/
         public RoutingController(string[] args)
         {
             iAmDomain = (args.Length == 1);
@@ -53,15 +66,23 @@ namespace ControlCCRC
                 consoleWriter("[INIT] DOMAIN");
 
 
-            topologyVC31 = new Dictionary<String, Dictionary<String, int>>();
-            topologyVC32 = new Dictionary<String, Dictionary<String, int>>();
-            topologyVC33 = new Dictionary<String, Dictionary<String, int>>();
+            topologyUnallocatedLayer1 = new Dictionary<String, Dictionary<String, int>>();
+            topologyUnallocatedLayer2 = new Dictionary<String, Dictionary<String, int>>();
+            topologyUnallocatedLayer3 = new Dictionary<String, Dictionary<String, int>>();
+            topologyAllocatedLayer1 = new Dictionary<String, Dictionary<String, int>>();
+            topologyAllocatedLayer2 = new Dictionary<String, Dictionary<String, int>>();
+            topologyAllocatedLayer3 = new Dictionary<String, Dictionary<String, int>>();
 
             this.LRMAndRCListener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[0]));
             this.threadListenLRMAndRC = new Thread(new ThreadStart(lrmAndRcListening));
             threadListenLRMAndRC.Start();
 
             consoleStart();
+        }
+
+        public void setCCHandler(ConnectionController cc)
+        {
+            this.ccHandler = cc;
         }
 
         private void rcConnecting()
@@ -97,7 +118,9 @@ namespace ControlCCRC
                 try
                 {
                     TcpClient client = LRMAndRCListener.AcceptTcpClient();
-                    LRMRCThread thread = new LRMRCThread(client, ref threadsMap, ref topologyVC31, ref topologyVC32, ref topologyVC33);
+                    LRMRCThread thread = new LRMRCThread(client, ref threadsMap,
+                        ref topologyUnallocatedLayer1, ref topologyUnallocatedLayer2, ref topologyUnallocatedLayer3,
+                        ref topologyAllocatedLayer1, ref topologyAllocatedLayer2, ref topologyAllocatedLayer3);
                 }
                 catch (SocketException sEx)
                 {
@@ -109,60 +132,81 @@ namespace ControlCCRC
 
         public void findPath(String startNode, String endNode, int howMuchVC3)
         {
+            
             consoleWriter("[CC] Sended info to make path between: " + startNode + " and " + endNode + " with:" 
                 + howMuchVC3 + "x VC-3");
+            latestBuildedPathLayer1 = null;
+            latestBuildedPathLayer2 = null;
+            latestBuildedPathLayer3 = null;
             switch (howMuchVC3)
             {
                 case 1:
                     int whichTopology = 1;
-                    List<String> path = shortest_path(startNode, endNode, ref topologyVC31);
-                    if (path == null || !path.First().Equals(startNode) || !path.Last().Equals(endNode))
+                    List<String> pathRate1 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer1);
+                    if (pathRate1 == null || !pathRate1.First().Equals(startNode) || !pathRate1.Last().Equals(endNode))
                     { 
-                        path = shortest_path(startNode, endNode, ref topologyVC32);
+                        pathRate1 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer2);
                         whichTopology = 2;
                     }
-                    if (path == null || !path.First().Equals(startNode) || !path.Last().Equals(endNode))
+                    if (pathRate1 == null || !pathRate1.First().Equals(startNode) || !pathRate1.Last().Equals(endNode))
                     {
-                        path = shortest_path(startNode, endNode, ref topologyVC33);
+                        pathRate1 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer3);
                         whichTopology = 3;
                     }
 
-                    if (path != null || path.First().Equals(startNode) || path.Last().Equals(endNode))
+                    if (pathRate1 != null || pathRate1.First().Equals(startNode) || pathRate1.Last().Equals(endNode))
                     {
-                        consoleWriter("[INFO] Shortest path : " + path);
+                        consoleWriter("[INFO] Shortest path : " + pathRate1);
                         switch(whichTopology)
                         {
                             case 1:
                                 /** Builded path in 1st layer */
-                                for(int i=0;i<path.Count - 1;i++)
-                                    topologyVC31[path[i]].Remove(path[i + 1]);
+                                for (int i = 0; i < pathRate1.Count - 1; i++)
+                                {
+                                    topologyUnallocatedLayer1[pathRate1[i]].Remove(pathRate1[i + 1]);
+                                    topologyAllocatedLayer1[pathRate1[i]].Add(pathRate1[i + 1],1);
+                                }
+                                latestBuildedPathLayer1 = pathRate1;
                                 break;
                             case 2:
                                 /** Builded path in 2nd layer */
-                                for (int i = 0; i < path.Count - 1; i++)
-                                    topologyVC32[path[i]].Remove(path[i + 1]);
+                                for (int i = 0; i < pathRate1.Count - 1; i++)
+                                {
+                                    topologyUnallocatedLayer2[pathRate1[i]].Remove(pathRate1[i + 1]);
+                                    topologyAllocatedLayer2[pathRate1[i]].Add(pathRate1[i + 1], 1);
+                                }
+                                latestBuildedPathLayer2 = pathRate1;
                                 break;
                             case 3:
                                 /** Builded path in 3th layer */
-                                for (int i = 0; i < path.Count - 1; i++)
-                                    topologyVC33[path[i]].Remove(path[i + 1]);
+                                for (int i = 0; i < pathRate1.Count - 1; i++)
+                                {
+                                    topologyUnallocatedLayer3[pathRate1[i]].Remove(pathRate1[i + 1]);
+                                    topologyAllocatedLayer3[pathRate1[i]].Add(pathRate1[i + 1], 1);
+                                }
+                                latestBuildedPathLayer3 = pathRate1;
                                 break;
                         }
                     }
-                        break;
+                    else
+                    {
+                        consoleWriter("[INFO] NOT able to connect nodes. All paths allocated.");
+                    }
+                    break;
                 case 2:
-                    List<String> path1 = shortest_path(startNode, endNode, ref topologyVC31);
-                    List<String> path2 = shortest_path(startNode, endNode, ref topologyVC32);
-                    List<String> path3 = shortest_path(startNode, endNode, ref topologyVC33);
+                    // TODO obsluga
+                    List<String> path1 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer1);
+                    List<String> path2 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer2);
+                    List<String> path3 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer3);
                     if(path1 != null && path1.First().Equals(startNode) && path1.Last().Equals(endNode) &&
                        path2 != null && path2.First().Equals(startNode) && path2.Last().Equals(endNode))
                     {
                         /** Builded path in 1st layer */
                         /** Builded path in 2nd layer */
                         for (int i = 0; i < path1.Count - 1; i++)
-                            topologyVC31[path1[i]].Remove(path1[i + 1]);
+                            topologyUnallocatedLayer1[path1[i]].Remove(path1[i + 1]);
                         for (int i = 0; i < path2.Count - 1; i++)
-                            topologyVC32[path2[i]].Remove(path2[i + 1]);
+                            topologyUnallocatedLayer2[path2[i]].Remove(path2[i + 1]);
                     }
                     else if (path1 != null && path1.First().Equals(startNode) && path1.Last().Equals(endNode) &&
                              path3 != null && path3.First().Equals(startNode) && path3.Last().Equals(endNode))
@@ -170,9 +214,9 @@ namespace ControlCCRC
                         /** Builded path in 1st layer */
                         /** Builded path in 3nd layer */
                         for (int i = 0; i < path1.Count - 1; i++)
-                            topologyVC31[path1[i]].Remove(path1[i + 1]);
+                            topologyUnallocatedLayer1[path1[i]].Remove(path1[i + 1]);
                         for (int i = 0; i < path3.Count - 1; i++)
-                            topologyVC33[path3[i]].Remove(path3[i + 1]);
+                            topologyUnallocatedLayer3[path3[i]].Remove(path3[i + 1]);
                     }
                     else if (path2 != null && path2.First().Equals(startNode) && path2.Last().Equals(endNode) &&
                              path3 != null && path3.First().Equals(startNode) && path3.Last().Equals(endNode))
@@ -180,16 +224,17 @@ namespace ControlCCRC
                         /** Builded path in 2nd layer */
                         /** Builded path in 3nd layer */
                         for (int i = 0; i < path2.Count - 1; i++)
-                            topologyVC32[path2[i]].Remove(path2[i + 1]);
+                            topologyUnallocatedLayer2[path2[i]].Remove(path2[i + 1]);
                         for (int i = 0; i < path3.Count - 1; i++)
-                            topologyVC33[path3[i]].Remove(path3[i + 1]);
+                            topologyUnallocatedLayer3[path3[i]].Remove(path3[i + 1]);
                     }
 
                     break;
                 case 3:
-                    List<String> path31 = shortest_path(startNode, endNode, ref topologyVC31);
-                    List<String> path32 = shortest_path(startNode, endNode, ref topologyVC32);
-                    List<String> path33 = shortest_path(startNode, endNode, ref topologyVC33);
+                    // TODO obsluga
+                    List<String> path31 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer1);
+                    List<String> path32 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer2);
+                    List<String> path33 = shortest_path(startNode, endNode, ref topologyUnallocatedLayer3);
                     if (path31 != null && path31.First().Equals(startNode) && path31.Last().Equals(endNode) &&
                        path32 != null && path32.First().Equals(startNode) && path32.Last().Equals(endNode) &&
                        path33 != null && path33.First().Equals(startNode) && path33.Last().Equals(endNode))
@@ -281,6 +326,45 @@ namespace ControlCCRC
             Console.Write(Environment.NewLine);
         }
 
+        public List<string> LatestBuildedPathLayer1
+        {
+            get
+            {
+                return latestBuildedPathLayer1;
+            }
+
+            set
+            {
+                latestBuildedPathLayer1 = value;
+            }
+        }
+
+        public List<string> LatestBuildedPathLayer2
+        {
+            get
+            {
+                return latestBuildedPathLayer2;
+            }
+
+            set
+            {
+                latestBuildedPathLayer2 = value;
+            }
+        }
+
+        public List<string> LatestBuildedPathLayer3
+        {
+            get
+            {
+                return latestBuildedPathLayer3;
+            }
+
+            set
+            {
+                latestBuildedPathLayer3 = value;
+            }
+        }
+
     }
 
 
@@ -292,17 +376,30 @@ namespace ControlCCRC
 
         /** Hadnlers */
         private Dictionary<String, LRMRCThread> threadsMap;
-        private Dictionary<String, Dictionary<String, int>> topologyVC31;
-        private Dictionary<String, Dictionary<String, int>> topologyVC32;
-        private Dictionary<String, Dictionary<String, int>> topologyVC33;
+        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer1;
+        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer2;
+        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3;
 
-        public LRMRCThread(TcpClient connection, ref Dictionary<String, LRMRCThread> threadsMap,ref Dictionary<String, Dictionary<String, int>> topologyVC31,
-          ref  Dictionary<String, Dictionary<String, int>> topologyVC32,ref Dictionary<String, Dictionary<String, int>> topologyVC33)
+        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer1;
+        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2;
+        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3;
+
+        public LRMRCThread(TcpClient connection, 
+            ref Dictionary<String, LRMRCThread> threadsMap,
+            ref Dictionary<String,Dictionary<String, int>> topologyUnallocatedLayer1,
+          ref  Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer2,
+          ref Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3,
+            ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer1,
+          ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2,
+          ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3)
         {
             this.threadsMap = threadsMap;
-            this.topologyVC31 = topologyVC31;
-            this.topologyVC32 = topologyVC32;
-            this.topologyVC33 = topologyVC33;
+            this.topologyUnallocatedLayer1 = topologyUnallocatedLayer1;
+            this.topologyUnallocatedLayer2 = topologyUnallocatedLayer2;
+            this.topologyUnallocatedLayer3 = topologyUnallocatedLayer3;
+            this.topologyAllocatedLayer1 = topologyAllocatedLayer1;
+            this.topologyAllocatedLayer2 = topologyAllocatedLayer2;
+            this.topologyAllocatedLayer3 = topologyAllocatedLayer3;
             thread = new Thread(new ParameterizedThreadStart(lrmThread));
             thread.Start(connection);
         }
@@ -336,27 +433,38 @@ namespace ControlCCRC
                     {
                         case RCtoLRMSignallingMessage.LRM_INIT:
                             nodeName = lrmMsg.NodeName;
-                            topologyVC31.Add(nodeName, new Dictionary<string, int>());
-                            topologyVC32.Add(nodeName, new Dictionary<string, int>());
-                            topologyVC33.Add(nodeName, new Dictionary<string, int>());
+                            topologyUnallocatedLayer1.Add(nodeName, new Dictionary<string, int>());
+                            topologyUnallocatedLayer2.Add(nodeName, new Dictionary<string, int>());
+                            topologyUnallocatedLayer3.Add(nodeName, new Dictionary<string, int>());
+                            topologyAllocatedLayer1.Add(nodeName, new Dictionary<string, int>());
+                            topologyAllocatedLayer2.Add(nodeName, new Dictionary<string, int>());
+                            topologyAllocatedLayer3.Add(nodeName, new Dictionary<string, int>());
                             threadsMap.Add(nodeName, this);
                             break;
-                        //@TODO!
                         case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
-                            topologyVC31[nodeName].Add(lrmMsg.ConnectedNode, 1);
-                            topologyVC32[nodeName].Add(lrmMsg.ConnectedNode, 1);
-                            topologyVC33[nodeName].Add(lrmMsg.ConnectedNode, 1);
+                            topologyUnallocatedLayer1[nodeName].Add(lrmMsg.ConnectedNode, 1);
+                            topologyUnallocatedLayer2[nodeName].Add(lrmMsg.ConnectedNode, 1);
+                            topologyUnallocatedLayer3[nodeName].Add(lrmMsg.ConnectedNode, 1);
                             break;
                         case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
                             String whoDied = lrmMsg.ConnectedNode;
-                            topologyVC31.Remove(whoDied);
-                            topologyVC32.Remove(whoDied);
-                            topologyVC33.Remove(whoDied);
-                            foreach (var item in topologyVC31.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                            topologyUnallocatedLayer1.Remove(whoDied);
+                            topologyUnallocatedLayer2.Remove(whoDied);
+                            topologyUnallocatedLayer3.Remove(whoDied);
+                            topologyAllocatedLayer1.Remove(whoDied);
+                            topologyAllocatedLayer2.Remove(whoDied);
+                            topologyAllocatedLayer3.Remove(whoDied);
+                            foreach (var item in topologyUnallocatedLayer1.Where(node => node.Value.ContainsKey(whoDied)).ToList())
                                 item.Value.Remove(whoDied);
-                            foreach (var item in topologyVC32.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                            foreach (var item in topologyUnallocatedLayer2.Where(node => node.Value.ContainsKey(whoDied)).ToList())
                                 item.Value.Remove(whoDied);
-                            foreach (var item in topologyVC33.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                            foreach (var item in topologyUnallocatedLayer3.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                                item.Value.Remove(whoDied);
+                            foreach (var item in topologyAllocatedLayer1.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                                item.Value.Remove(whoDied);
+                            foreach (var item in topologyAllocatedLayer2.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                                item.Value.Remove(whoDied);
+                            foreach (var item in topologyAllocatedLayer3.Where(node => node.Value.ContainsKey(whoDied)).ToList())
                                 item.Value.Remove(whoDied);
                             break;                           
                     }
@@ -365,38 +473,6 @@ namespace ControlCCRC
                 {
                     RCtoRCSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
                     //@TODO
-                }
-                ControlSignalingMessage msg = received_object.Value.ToObject<ControlSignalingMessage>();
-                switch (msg.HeaderField)
-                {
-                    case ControlSignalingMessage.Header.INIT:
-                        nodeName = msg.ClientAddress;
-                        threadsMap.Add(nodeName, this);
-                        break;
-                    case ControlSignalingMessage.Header.TOPOLOGY:
-                        List<String> connectedNodes = msg.ConnectedNodes;
-                        Dictionary<String, int> connectionWithWights = new Dictionary<string, int>();
-                        foreach (String node in connectedNodes)
-                        {
-                            if (!connectionWithWights.Keys.Contains(node))
-                                connectionWithWights.Add(node, 1);
-                        }
-                        topologyVC31.Add(nodeName, connectionWithWights);
-                        topologyVC32.Add(nodeName, connectionWithWights);
-                        topologyVC33.Add(nodeName, connectionWithWights);
-                        break;
-                    case ControlSignalingMessage.Header.SOMEONE_DIED:
-                        String whoDied = msg.WhoDied;
-                        topologyVC31.Remove(whoDied);
-                        topologyVC32.Remove(whoDied);
-                        topologyVC33.Remove(whoDied);
-                        foreach (var item in topologyVC31.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                            item.Value.Remove(whoDied);
-                        foreach (var item in topologyVC32.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                            item.Value.Remove(whoDied);
-                        foreach (var item in topologyVC33.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                            item.Value.Remove(whoDied);
-                        break;
                 }
             }
         }

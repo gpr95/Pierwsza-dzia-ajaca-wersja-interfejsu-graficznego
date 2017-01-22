@@ -35,6 +35,9 @@ namespace ControlCCRC
 
             RoutingController rc = new RoutingController(rcArgs);
             ConnectionController cc = new ConnectionController(ccArgs);
+
+            rc.setCCHandler(cc);
+            cc.setRCHandler(rc);
         }
     }
 }

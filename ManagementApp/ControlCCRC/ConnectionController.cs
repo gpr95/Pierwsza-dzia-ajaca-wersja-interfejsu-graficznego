@@ -22,6 +22,8 @@ namespace ControlCCRC
         private Thread threadconnectCC;
         private Thread threadconnectNCC;
 
+        private RoutingController rcHandler;
+
         private Boolean iAmDomain;
         /**
          * DOMAIN [listen CC, connect NCC]
@@ -66,9 +68,15 @@ namespace ControlCCRC
             consoleStart();
         }
 
+        public void setRCHandler(RoutingController rc)
+        {
+            this.rcHandler = rc;
+        }
+
         private void nccConnect()
         {
             BinaryReader reader = new BinaryReader(NCCClient.GetStream());
+            BinaryWriter writer = new BinaryWriter(NCCClient.GetStream());
 
             Boolean noError = true;
             while (noError)
@@ -80,7 +88,33 @@ namespace ControlCCRC
                     if (received_object.Type != typeof(CCtoNCCSingallingMessage))
                         noError = false;
                     CCtoNCCSingallingMessage msg = received_object.Value.ToObject<CCtoNCCSingallingMessage>();
-                    //@TODO communication wtih NCC
+                    switch(msg.State)
+                    {
+                        case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:
+                            rcHandler.findPath(msg.NodeFrom, msg.NodeTo, msg.Rate);
+                            switch(msg.Rate)
+                            {
+                                case 1:
+                                    if(rcHandler.LatestBuildedPathLayer1 != null)
+                                    {
+
+                                    }
+                                    else if (rcHandler.LatestBuildedPathLayer2 != null)
+                                    {
+
+                                    }
+                                    else if (rcHandler.LatestBuildedPathLayer3 != null)
+                                    {
+
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                    break;
+                            }
+                            break;
+                    }
                 }
                 catch (IOException ex)
                 {
