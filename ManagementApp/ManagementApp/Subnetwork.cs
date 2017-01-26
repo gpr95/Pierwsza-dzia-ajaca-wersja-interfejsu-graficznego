@@ -16,6 +16,7 @@ namespace ManagementApp
         private Size size;
         private int name { get; set; }
         private Process processHandle;
+        private int controlPort;
 
         public Subnetwork(Point pointFrom, Point pointTo, int name)
         {
@@ -132,6 +133,19 @@ namespace ManagementApp
             set
             {
                 processHandle = value;
+            }
+        }
+
+        public int ControlPort
+        {
+            get
+            {
+                return controlPort;
+            }
+
+            set
+            {
+                controlPort = value;
             }
         }
     }
