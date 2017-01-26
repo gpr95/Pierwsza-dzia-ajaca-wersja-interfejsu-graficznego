@@ -95,7 +95,7 @@ namespace NetNode
             }
             catch (Exception e)
             {
-                Console.WriteLine("\nError sending signal: " + e.Message);
+                log("\nError sending signal: " + e.Message, ConsoleColor.Red);
                 Thread.Sleep(2000);
                 Environment.Exit(1);
             }
@@ -120,7 +120,7 @@ namespace NetNode
 
         private void ConsoleInterface()
         {
-            Console.WriteLine("NetNode " + this.virtualIp + " " + this.managementAgent.port + " " + this.physicalPort);
+            log("NetNode " + this.virtualIp + " " + this.managementAgent.port + " " + this.controlAgent.port + " " + this.physicalPort, ConsoleColor.Yellow);
 
             Boolean quit = false;
             while (!quit)
@@ -155,13 +155,13 @@ namespace NetNode
                             LRM.printResources();
                             break;
                         default:
-                            Console.WriteLine("\n Wrong option");
+                            log("\n Wrong option", ConsoleColor.Red);
                             break;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Wrong format");
+                    log("Wrong format", ConsoleColor.Red);
                     ConsoleInterface();
                 }
 
@@ -189,7 +189,7 @@ namespace NetNode
                             out_pos = switchField.commutateContainer(vc4, iport.port);
                             if (out_pos != -1)
                             {
-                                Console.WriteLine("ok");
+                                log("ok", ConsoleColor.Green);
                                 this.ports.oports[out_pos].addToOutQueue(vc4);
                             }
                         }
@@ -207,7 +207,7 @@ namespace NetNode
                                     out_pos = switchField.commutateContainer(vc3, iport.port, vc.Key);
                                     if (out_pos[0] != -1)
                                     {
-                                        Console.WriteLine("ok");
+                                        log("ok", ConsoleColor.Green);
                                         this.ports.oports[out_pos[0]].addToTempQueue(vc3, out_pos[1]);
                                     }
                                 }
@@ -243,7 +243,7 @@ namespace NetNode
                             }
                             catch (Exception e)
                             {
-                                Console.WriteLine("\nError sending signal: " + e.Message);
+                                log("\nError sending signal: " + e.Message, ConsoleColor.Red);
                                 Thread.Sleep(2000);
                                 Environment.Exit(1);
                             }
@@ -294,7 +294,14 @@ namespace NetNode
 
         private void consoleWriter(String msg)
         {
-            Console.WriteLine("#" + DateTime.Now.ToLongTimeString() + DateTime.Now.ToLongDateString() + "#:" + msg);
+            log("#" + DateTime.Now.ToLongTimeString() + DateTime.Now.ToLongDateString() + "#:" + msg, ConsoleColor.Magenta);
+        }
+
+        public static void log(String msg, ConsoleColor cc)
+        {
+            Console.ForegroundColor = cc;
+            Console.WriteLine(msg);
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         static void Main(string[] args)

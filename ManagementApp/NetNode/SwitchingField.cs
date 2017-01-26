@@ -24,7 +24,7 @@ namespace NetNode
                     if (row.iport == iport) // && row.in_cont == 1)
                     {
                         out_pos = row.oport;
-                        Console.WriteLine("Commutating vc4 container from:" + row.iport + " to " + row.oport);
+                        NetNode.log("Commutating vc4 container from:" + row.iport + " to " + row.oport, ConsoleColor.Green);
                         return out_pos;
                     }
                 }
@@ -43,7 +43,7 @@ namespace NetNode
                     {
                         out_pos[0] = row.oport;
                         out_pos[1] = row.out_cont;
-                        Console.WriteLine("Commutating vc3 container from:" + row.iport + " " + row.in_cont + "to " + row.oport + " " + row.out_cont);
+                        NetNode.log("Commutating vc3 container from:" + row.iport + " " + row.in_cont + "to " + row.oport + " " + row.out_cont, ConsoleColor.Green);
                         return out_pos;
                     }
                 }
@@ -56,7 +56,7 @@ namespace NetNode
             if (fib.Count == 0)
             {
                 fib.Add(row);
-                Console.WriteLine("New conn entry added");
+                Console.WriteLine("New fib entry added");
             }
             else
             {
@@ -87,7 +87,7 @@ namespace NetNode
 //            }
             for(int i=0;i<fib.Count;i+=2)
             {
-                Console.WriteLine(fib[i].toString());
+                NetNode.log(fib[i].toString(), ConsoleColor.Cyan);
             }
         }
 

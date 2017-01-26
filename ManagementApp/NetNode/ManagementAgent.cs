@@ -46,17 +46,17 @@ namespace NetNode
 
                     if (received_Protocol.State == ManagmentProtocol.WHOIS)
                     {
-                        Console.WriteLine("Signal from management: receivedWhoIs");
+                        NetNode.log("Signal from management: receivedWhoIs", ConsoleColor.Blue);
                         //send name to management
                         ManagmentProtocol protocol = new ManagmentProtocol();
                         protocol.Name = this.virtualIp;
                         String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
                         writer.Write(send_object);
-                        Console.WriteLine("sending name to management: " + protocol.Name);
+                        NetNode.log("sending name to management: " + protocol.Name, ConsoleColor.Blue);
                     }
                     else if (received_Protocol.State == ManagmentProtocol.ROUTINGTABLES)
                     {
-                        Console.WriteLine("Signal from management: receivedroutingtable");
+                        NetNode.log("Signal from management: receivedroutingtable", ConsoleColor.Blue);
                         //receiving fibs
                         if (received_Protocol.RoutingTable != null)
                         {
@@ -70,7 +70,7 @@ namespace NetNode
                     }
                     else if (received_Protocol.State == ManagmentProtocol.ROUTINGENTRY)
                     {
-                        Console.WriteLine("Signal from management: receivedroutingentry");
+                        NetNode.log("Signal from management: receivedroutingentry", ConsoleColor.Blue);
                         //receiving fibs
                         if (received_Protocol.RoutingEntry != null)
                         {
@@ -82,7 +82,7 @@ namespace NetNode
                     }
                     else if (received_Protocol.State == ManagmentProtocol.INTERFACEINFORMATION)
                     {
-                        Console.WriteLine("Signal from management: iterfaceinformation");
+                        NetNode.log("Signal from management: iterfaceinformation", ConsoleColor.Blue);
                         //send dictionary from LRM to management
                         ManagmentProtocol protocol = new ManagmentProtocol();
                         protocol.State = ManagmentProtocol.INTERFACEINFORMATION;
@@ -92,7 +92,7 @@ namespace NetNode
                     }
                     else if (received_Protocol.State == ManagmentProtocol.GETTABLE)
                     {
-                        Console.WriteLine("Signal from management: getTable");
+                        NetNode.log("Signal from management: getTable", ConsoleColor.Blue);
                         //send dictionary from LRM to management
                         ManagmentProtocol protocol = new ManagmentProtocol();
                         protocol.State = ManagmentProtocol.GETTABLE;
@@ -102,13 +102,13 @@ namespace NetNode
                     }
                     else
                     {
-                        Console.WriteLine("Signal from management: undefined protocol");
+                        NetNode.log("Signal from management: undefined protocol", ConsoleColor.Red);
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("\nError sending signal: " + e.Message);
+                NetNode.log("\nError sending signal: " + e.Message, ConsoleColor.Red);
                 Thread.Sleep(2000);
                 Environment.Exit(1);
             }

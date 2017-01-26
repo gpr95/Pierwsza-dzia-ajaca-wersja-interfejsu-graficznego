@@ -123,7 +123,7 @@ namespace NetNode
                 if(confirmations[i.Key] == true)
                 {
                     //znaczy ze nie ma polaczenia
-                    Console.WriteLine("polaczenie musialo zostac zerwane bo nie slysze sasiada na porcie " + i.Key);
+                    Console.WriteLine("connection lost no keepalive from neighbour on port " + i.Key);
                     connections.Remove(i.Key);
                     //inform RC that row is deleted
                     ControlAgent.sendDeleted(this.virtualIp, i.Key, i.Value);
@@ -205,7 +205,7 @@ namespace NetNode
         {
             foreach (var temp in connections)
             {
-                Console.WriteLine("port: "+temp.Key + " node: " + temp.Value);
+                NetNode.log("port: " + temp.Key + " node: " + temp.Value, ConsoleColor.Yellow);
             }
         }
 
@@ -213,7 +213,7 @@ namespace NetNode
         {
             foreach (var res in resources)
             {
-                Console.WriteLine(res.toString());
+                NetNode.log(res.toString(), ConsoleColor.DarkYellow);
             }
         }
     }

@@ -49,7 +49,7 @@ namespace NetNode
                     if (received_Protocol.State == CCtoCCSignallingMessage.CC_UP_FIB_CHANGE)
                     {
                         //insert FIB
-                        Console.WriteLine("Control Signal: insertFib");
+                        NetNode.log("Control Signal: insertFib", ConsoleColor.Yellow);
                         List<FIB> rec = received_Protocol.Fib_table;
 
                         //TODO allocate resources
@@ -64,13 +64,13 @@ namespace NetNode
                     }
                     else
                     {
-                        Console.WriteLine("Control Signal: undefined protocol");
+                        NetNode.log("Control Signal: undefined protocol", ConsoleColor.Red);
                     }
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine("\nError sending signal: " + e.Message);
+                NetNode.log("\nError sending signal: " + e.Message, ConsoleColor.Red);
                 Thread.Sleep(2000);
                 Environment.Exit(1);
             }
@@ -78,7 +78,7 @@ namespace NetNode
 
         public static void sendCCInit(string ip)
         {
-            Console.WriteLine("sending init to CC: " + ip);
+            NetNode.log("sending init to CC: " + ip, ConsoleColor.Yellow);
 
             CCtoCCSignallingMessage protocol = new CCtoCCSignallingMessage();
             protocol.State = CCtoCCSignallingMessage.CC_LOW_INIT;
@@ -89,7 +89,7 @@ namespace NetNode
 
         public static void sendTopologyInit(string from)
         {
-            Console.WriteLine("sending inittopology to RC: " + from);
+            NetNode.log("sending inittopology to RC: " + from, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_INIT;
@@ -101,7 +101,7 @@ namespace NetNode
         public static void sendTopology(string from, int port, string to)
         {
             string toSend = port.ToString() + " " + to;
-            Console.WriteLine("sending topology to RC: " + toSend);
+            NetNode.log("sending topology to RC: " + toSend, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD;
@@ -115,7 +115,7 @@ namespace NetNode
         public static void sendDeleted(string from, int port, string to)
         {
             string toSend = port.ToString() + " " + to;
-            Console.WriteLine("sending to RC info about deletion: " + toSend);
+            NetNode.log("sending to RC info about deletion: " + toSend, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE;
@@ -132,12 +132,12 @@ namespace NetNode
             if (flag == true)
             {
                 protocol.State = CCtoCCSignallingMessage.CC_LOW_CONFIRM;
-                Console.WriteLine("Send CONFIRM");
+                NetNode.log("Send CONFIRM", ConsoleColor.Green);
             }
             else
             {
                 protocol.State = CCtoCCSignallingMessage.CC_LOW_REJECT;
-                Console.WriteLine("Send REJECT");
+                NetNode.log("Send REJECT", ConsoleColor.Red);
             }
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
