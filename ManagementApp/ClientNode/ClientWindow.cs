@@ -74,23 +74,39 @@ namespace ClientWindow
                 if (received_object.Type == typeof(Signal))
                 {
                     Signal received_signal = received_object.Value.ToObject<Signal>();
-                    STM1 received_frame = received_signal.stm1;
-                    if (received_frame.vc4.C4 != null)
+                    if (received_signal.stm1 != null)
                     {
-
-                        receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + received_frame.vc4.C4);
-                        receivedTextBox.AppendText(Environment.NewLine);
-                        Log1("IN", virtualIP, received_signal.port.ToString(), 1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
-                    }
-
-                    else
-                    {
-                        foreach (KeyValuePair<int, VirtualContainer3> v in received_frame.vc4.vc3List)
+                        STM1 received_frame = received_signal.stm1;
+                        if (received_frame.vc4.C4 != null)
                         {
 
-                            receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + v.Value.C3);
+                            receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + received_frame.vc4.C4);
                             receivedTextBox.AppendText(Environment.NewLine);
-                            Log1("IN", virtualIP, received_signal.port.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                            Log1("IN", virtualIP, received_signal.port.ToString(), 1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
+                        }
+
+                        else
+                        {
+                            foreach (KeyValuePair<int, VirtualContainer3> v in received_frame.vc4.vc3List)
+                            {
+
+                                receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + v.Value.C3);
+                                receivedTextBox.AppendText(Environment.NewLine);
+                                Log1("IN", virtualIP, received_signal.port.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                            }
+                        }
+                    }
+                    else if (received_signal.lrmProtocol != null)
+                    {
+                        string lrmProtocol = received_signal.lrmProtocol;
+                        int port = received_signal.port;
+                        string[] temp = lrmProtocol.Split(' ');
+                        if (temp[0] == "whoyouare")
+                        {
+                            string message = "iam " + this.virtualIP;
+                            Signal signal = new Signal(port, message);
+                            string data = JMessage.Serialize(JMessage.FromValue(signal));
+                            writer.Write(data);
                         }
                     }
                 }
