@@ -63,6 +63,8 @@ namespace NetNode
                             foreach (var fib in received_Protocol.RoutingTable)
                             {
                                 SwitchingField.addToSwitch(fib);
+                                //adding fib for two-way communication
+                                SwitchingField.addToSwitch(new FIB(fib.oport, fib.out_cont, fib.iport, fib.in_cont));
                             }
                         }
                     }
@@ -73,6 +75,9 @@ namespace NetNode
                         if (received_Protocol.RoutingEntry != null)
                         {
                             SwitchingField.addToSwitch(received_Protocol.RoutingEntry);
+                            //adding fib for two-way communication
+                            SwitchingField.addToSwitch(new FIB(received_Protocol.RoutingEntry.oport, received_Protocol.RoutingEntry.out_cont,
+                                received_Protocol.RoutingEntry.iport, received_Protocol.RoutingEntry.in_cont));
                         }
                     }
                     else if (received_Protocol.State == ManagmentProtocol.INTERFACEINFORMATION)

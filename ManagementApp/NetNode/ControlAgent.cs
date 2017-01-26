@@ -17,10 +17,6 @@ namespace NetNode
 {
     class ControlAgent
     {
-        //TODO receiving from upper CC information to LRM to reserve resources
-        //TODO receive from upper CC information to store fib to fibtable
-        //TODO send confirmation to upper CC
-        //TODO send info from LRM to RC
         private TcpListener listener;
         public int port;
         private string virtualIp;
@@ -62,6 +58,8 @@ namespace NetNode
                             LRM.allocateResource(row.iport, row.in_cont);
                             LRM.allocateResource(row.oport, row.out_cont);
                             SwitchingField.addToSwitch(row);
+                            //adding fib for two-way communication
+                            SwitchingField.addToSwitch(new FIB(row.oport,row.out_cont,row.iport,row.in_cont));
                         }
                     }
                     else

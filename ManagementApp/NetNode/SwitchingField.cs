@@ -76,52 +76,18 @@ namespace NetNode
                     fib.Add(row);
                     Console.WriteLine("New conn entry added");
                 }
-            }
-            if (fib.Count() == 4)
-            {
-                FIB f1 = fib[0];
-                FIB f2 = fib[1];
-                if (f1.iport == fib[2].iport &&
-                    f1.oport == fib[2].oport)
-                {
-                    foreach (FIB fibElement in fib)
-                    {
-                        fibElement.in_cont = 1;
-                        fibElement.out_cont = 1;
-                    }
-                    fib.Clear();
-                    fib.Add(f1);
-                    fib.Add(f2);
-                }
-
-            }
-            if (fib.Count() == 6)
-            {
-                FIB f1 = fib[0];
-                FIB f2 = fib[1];
-                if(f1.iport == fib[2].iport && f1.iport == fib[4].iport &&
-                    f1.oport == fib[2].oport && f1.oport == fib[4].oport)
-                {
-                    foreach(FIB fibElement in fib)
-                    {
-                        fibElement.in_cont = 1;
-                        fibElement.out_cont = 1;
-                    }
-                    fib.Clear();
-                    fib.Add(f1);
-                    fib.Add(f2);
-                }
-
-            }
-           
+            }          
         }
 
         public static void printFibTable()
         {
-            foreach (var temp in fib)
+//            foreach (var temp in fib)
+//            {
+//                Console.WriteLine(temp.toString());
+//            }
+            for(int i=0;i<fib.Count;i+=2)
             {
-                Console.WriteLine(temp.toString());
-                //Console.WriteLine(temp.iport + " " + temp.in_cont + " " + temp.oport + " " + temp.out_cont);
+                Console.WriteLine(fib[i].toString());
             }
         }
 

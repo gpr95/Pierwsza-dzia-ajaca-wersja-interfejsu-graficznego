@@ -37,7 +37,7 @@ namespace NetNode
             this.ports = new Ports();
             this.lrm = new LRM(args[0]);
             this.managementAgent = new ManagementAgent(Convert.ToInt32(args[2]), this.virtualIp);
-            //this.controlAgent = new ControlAgent(Convert.ToInt32(args[3]), this.virtualIp); //temporarly socket to management
+            this.controlAgent = new ControlAgent(Convert.ToInt32(args[3]), this.virtualIp);
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
             this.physicalPort = Convert.ToInt32(args[1]);
             this.threadListen = new Thread(new ThreadStart(Listen));
@@ -288,6 +288,8 @@ namespace NetNode
             Int32.TryParse(Console.ReadLine(), out fib.out_cont);
 
             SwitchingField.addToSwitch(fib);
+            //adding fib for two-way communication
+            SwitchingField.addToSwitch(new FIB(fib.oport, fib.out_cont, fib.iport, fib.in_cont));
         }
 
         private void consoleWriter(String msg)
