@@ -156,6 +156,7 @@
             // 
             this.addressTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.addressTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.addressTextBox.ForeColor = System.Drawing.SystemColors.ButtonFace;
             this.addressTextBox.Location = new System.Drawing.Point(69, 128);
             this.addressTextBox.Name = "addressTextBox";
             this.addressTextBox.Size = new System.Drawing.Size(74, 20);
