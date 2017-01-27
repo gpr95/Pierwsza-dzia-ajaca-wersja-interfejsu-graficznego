@@ -66,12 +66,22 @@ namespace ManagementApp
             //}
         }
 
-        internal void setupControl()
+        internal void setupControl(Subnetwork up)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo("ControlCCRC.exe");
             startInfo.WindowStyle = ProcessWindowStyle.Minimized;
             this.ControlPort = PortAggregation.CcRcPort;
-            startInfo.Arguments = name + " " + this.ControlPort;
+            startInfo.Arguments = this.ControlPort + " " + name + " " + up.ControlPort + " t";
+            this.ProcessHandle = Process.Start(startInfo);
+
+        }
+
+        internal void setupControl(Domain up)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo("ControlCCRC.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            this.ControlPort = PortAggregation.CcRcPort;
+            startInfo.Arguments = this.ControlPort + " " + name + " " + up.ControlPort + " t";
             this.ProcessHandle = Process.Start(startInfo);
 
         }
