@@ -453,6 +453,7 @@ namespace ControlCCRC
       
         public void initLRMNode(String nodeName)
         {
+            consoleWriter("INIT FROM: " + nodeName);
             topologyUnallocatedLayer1.Add(nodeName, new Dictionary<string, int>());
             topologyUnallocatedLayer2.Add(nodeName, new Dictionary<string, int>());
             topologyUnallocatedLayer3.Add(nodeName, new Dictionary<string, int>());

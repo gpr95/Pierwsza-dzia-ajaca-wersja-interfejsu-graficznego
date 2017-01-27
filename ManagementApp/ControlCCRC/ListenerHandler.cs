@@ -53,14 +53,17 @@ namespace ControlCCRC
                     switch (lrmMsg.State)
                     {
                         case RCtoLRMSignallingMessage.LRM_INIT:
+                            consoleWriter("LRM_INIT");
                             identifier = lrmMsg.NodeName;
                             rc.initLRMNode(identifier);
                             socketHandler.Add(identifier, writer);
                             break;
                         case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
+                            consoleWriter("LRM_TOP_ADD");
                             rc.addTopologyElementFromLRM(identifier, lrmMsg.ConnectedNode, lrmMsg.ConnectedNodePort);
                             break;
                         case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
+                            consoleWriter("LRM_TOP_DEL");
                             rc.deleteTopologyElementFromLRM(lrmMsg.ConnectedNode);
                             break;
                     }
@@ -108,6 +111,16 @@ namespace ControlCCRC
 
             String send_object = JMessage.Serialize(JMessage.FromValue(msg));
             writer.Write(send_object);
+        }
+
+
+        private void consoleWriter(String msg)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
+            Console.BackgroundColor = ConsoleColor.White;
+
+            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:[RC]" + msg);
+            Console.Write(Environment.NewLine);
         }
     }
 }
