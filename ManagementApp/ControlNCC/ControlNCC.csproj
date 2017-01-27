@@ -60,6 +60,10 @@
       <Project>{c348fc9f-8edb-415f-8984-2fb7da94b364}</Project>
       <Name>ClientNode</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ControlCCRC\ControlCCRC.csproj">
+      <Project>{B6F77B46-7E8C-4BDD-9807-6D9A28232425}</Project>
+      <Name>ControlCCRC</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

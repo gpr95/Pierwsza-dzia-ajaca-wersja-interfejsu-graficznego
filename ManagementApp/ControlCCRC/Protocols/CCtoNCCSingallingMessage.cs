@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ControlCCRC.Protocols
 {
-    class CCtoNCCSingallingMessage
+    public class CCtoNCCSingallingMessage
     {
         public const int INIT_FROM_CC = 0;
         // NCC - set me connection between nodeFrom and nodeTo with rate{1,2,3}
@@ -79,6 +79,47 @@ namespace ControlCCRC.Protocols
             set
             {
                 rate = value;
+            }
+        }
+
+       
+
+        public int Vc12
+        {
+            get
+            {
+                return vc12;
+            }
+
+            set
+            {
+                vc12 = value;
+            }
+        }
+
+        public int Vc11
+        {
+            get
+            {
+                return vc11;
+            }
+
+            set
+            {
+                vc11 = value;
+            }
+        }
+
+        public int Vc13
+        {
+            get
+            {
+                return vc13;
+            }
+
+            set
+            {
+                vc13 = value;
             }
         }
     }

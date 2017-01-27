@@ -16,13 +16,14 @@ namespace ControlNCC
     {
         private int controlPort;
         private TcpListener listener;
-        private Dictionary<int, ControlConnectionService> services;
+        private Dictionary<String, ControlConnectionService> services;
         private string domainNumber;
         private static List<string> directory = new List<string>();
+        private ControlConnectionService CCService;
 
         public NetworkCallControl(string[] domainParams)
         {
-            services = new Dictionary<int, ControlConnectionService>();
+            services = new Dictionary<String, ControlConnectionService>();
             string ip = "127.0.0.1";
             this.domainNumber = domainParams[0];
             //readConfig();
@@ -50,9 +51,24 @@ namespace ControlNCC
             }
         }
 
-        public void addService(int ID, ControlConnectionService handler)
+        public void addService(string ID, ControlConnectionService handler)
         {
             services.Add(ID, handler);
+        }
+
+        public ControlConnectionService getService(string ID)
+        {
+            return services[ID];
+        }
+
+        public void setCCService(ControlConnectionService handler)
+        {
+            this.CCService = handler;
+        }
+
+        public ControlConnectionService getCCService()
+        {
+            return this.CCService;
         }
 
         //remove
