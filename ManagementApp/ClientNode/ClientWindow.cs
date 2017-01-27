@@ -13,7 +13,7 @@ namespace ClientWindow
 {
     public partial class ClientWindow : Form
     {
-        private string virtualIP;
+        public string virtualIP;
         private TcpListener listener;
         private TcpClient managmentClient;
         private static BinaryWriter writer;
@@ -27,6 +27,7 @@ namespace ClientWindow
         private int managementPort;
         private CPCC controlAgent;
         private int containersNumber;
+        public List<int> slots; 
 
 
         public ClientWindow(string[] args)
@@ -34,7 +35,7 @@ namespace ClientWindow
             virtualIP = args[0];
             int cloudPort = Convert.ToInt32(args[1]);
             managementPort = Convert.ToInt32(args[2]);
-            
+            slots = new List<int>();
 
             string fileName = virtualIP.Replace(".", "_") + "_" + DateTime.Now.ToLongTimeString().Replace(":", "_") + "_" + DateTime.Now.ToLongDateString().Replace(" ", "_");
             path = System.IO.Directory.GetCurrentDirectory() + @"\logs\" + fileName + ".txt";
@@ -43,7 +44,7 @@ namespace ClientWindow
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
             Thread managementThreadad = new Thread(new ParameterizedThreadStart(initManagmentConnection));
-           // managementThreadad.Start(managementPort);
+            managementThreadad.Start(managementPort);
             InitializeComponent();
             this.Text = virtualIP;
             Log2("INFO", "START LOG");
@@ -153,19 +154,19 @@ namespace ClientWindow
                         else if (management_packet.State == Management.ManagmentProtocol.POSSIBLEDESITATIONS)
                         {
 
-                            this.possibleDestinations = management_packet.PossibleDestinations;
-                            this.virtualPort = management_packet.Port;
-                            //logTextBox.AppendText("Virtual Port: " + virtualPort);
-                            List<string> destinations = new List<string>(this.possibleDestinations.Keys);
+                            //this.possibleDestinations = management_packet.PossibleDestinations;
+                            //this.virtualPort = management_packet.Port;
+                            ////logTextBox.AppendText("Virtual Port: " + virtualPort);
+                            //List<string> destinations = new List<string>(this.possibleDestinations.Keys);
 
-                            sendComboBox.Items.Clear();
-                            sendComboBox.Refresh();
-                            for (int i = 0; i < destinations.Count; i++)
-                            {
-                                //DEBUG
-                                //Log2("MAGAGEMENT INFO", destinations[i] + " : " + possibleDestinations[destinations[i]]);
-                                sendComboBox.Items.Add(destinations[i]);
-                            }
+                            //sendComboBox.Items.Clear();
+                            //sendComboBox.Refresh();
+                            //for (int i = 0; i < destinations.Count; i++)
+                            //{
+                            //    //DEBUG
+                            //    //Log2("MAGAGEMENT INFO", destinations[i] + " : " + possibleDestinations[destinations[i]]);
+                            //    sendComboBox.Items.Add(destinations[i]);
+                            //}
                         }
 
                     }
@@ -193,12 +194,13 @@ namespace ClientWindow
             
             try
             {
-                if (currentSpeed == 3)
-                {
 
-                    VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
-                    Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
-                    vc3List.Add(currentSlot, vc3);
+                Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
+                foreach (int slot in slots)
+                {
+                    VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), "Slot"+slot+" :"+message);
+                    vc3List.Add(slot, vc3);
+                }
                     STM1 frame = new STM1(adaptation2(),vc3List);
                     //SYGNAL
                     Signal signal = new Signal(virtualPort, frame);
@@ -208,15 +210,7 @@ namespace ClientWindow
                     {
                         Log1("OUT", virtualIP, virtualPort.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                     }
-                }
-                else
-                {
-                    STM1 frame = new STM1(adaptation(), message);
-                    Signal signal = new Signal(virtualPort, frame);
-                    string data = JMessage.Serialize(JMessage.FromValue(signal));
-                    writer.Write(data);
-                    Log1("OUT", virtualIP, virtualPort.ToString(), 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
-                }
+               
                 sendingTextBox.Clear();
             }
             catch (Exception e)
@@ -370,11 +364,7 @@ namespace ClientWindow
 
         private void sendBtn_Click(object sender, EventArgs e)
         {
-            //CONTROL
-            controlAgent.connect();
-            controlAgent.sendRequest("TEST");
             send(sendingTextBox.Text);
-
         }
 
         private void sendPeriodicallyBtn_Click(object sender, EventArgs e)
@@ -404,22 +394,7 @@ namespace ClientWindow
             cyclic_sending = false;
         }
 
-        private void sendComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            currentSlot = possibleDestinations[sendComboBox.SelectedItem.ToString()];
-
-            
-
-
-            if (currentSlot == 1)
-            {
-                currentSpeed = 4;
-            }
-            else
-            {
-                currentSpeed = 3;
-            }
-        }
+       
 
         private void ClientWindow_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
         {
@@ -430,7 +405,10 @@ namespace ClientWindow
 
         private void connectButton_Click(object sender, EventArgs e)
         {
-
+            controlAgent.connect();
+            int speed;
+            bool res = int.TryParse(speedComboBox.SelectedItem.ToString(), out speed);
+            controlAgent.sendRequest(addressTextBox.Text, speed);
         }
 
         private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -457,14 +435,7 @@ namespace ClientWindow
                         possibleDestinations.Add(destinationNode, slot);
                 }
                 List<string> destinations = new List<string>(this.possibleDestinations.Keys);
-                sendComboBox.Items.Clear();
-                sendComboBox.Refresh();
-                for (int i = 0; i < destinations.Count; i++)
-                {
-                    //DEBUG
-                    //Log2("MAGAGEMENT INFO", destinations[i] + " : " + possibleDestinations[destinations[i]]);
-                    sendComboBox.Items.Add(destinations[i]);
-                }
+                addressTextBox.Text = destinationNode;
 
                 nodeTextBox.Clear();
                 slotTextBox.Clear();
@@ -491,6 +462,6 @@ namespace ClientWindow
             portTextBox.Clear();
         }
 
-       
+        
     }
 }

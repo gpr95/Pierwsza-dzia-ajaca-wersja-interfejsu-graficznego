@@ -34,12 +34,13 @@
             this.receivedTextBox = new System.Windows.Forms.TextBox();
             this.receivedLbl = new System.Windows.Forms.Label();
             this.sendingGroupBox = new System.Windows.Forms.GroupBox();
+            this.addressLbl = new System.Windows.Forms.Label();
+            this.addressTextBox = new System.Windows.Forms.TextBox();
             this.connectButton = new System.Windows.Forms.Button();
             this.speedLbl = new System.Windows.Forms.Label();
             this.speedComboBox = new System.Windows.Forms.ComboBox();
             this.stopSendingBtn = new System.Windows.Forms.Button();
             this.sendingTextBox = new System.Windows.Forms.TextBox();
-            this.sendComboBox = new System.Windows.Forms.ComboBox();
             this.sendPeriodicallyBtn = new System.Windows.Forms.Button();
             this.timeLbl = new System.Windows.Forms.Label();
             this.sendBtn = new System.Windows.Forms.Button();
@@ -121,12 +122,13 @@
             // sendingGroupBox
             // 
             this.sendingGroupBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.sendingGroupBox.Controls.Add(this.addressLbl);
+            this.sendingGroupBox.Controls.Add(this.addressTextBox);
             this.sendingGroupBox.Controls.Add(this.connectButton);
             this.sendingGroupBox.Controls.Add(this.speedLbl);
             this.sendingGroupBox.Controls.Add(this.speedComboBox);
             this.sendingGroupBox.Controls.Add(this.stopSendingBtn);
             this.sendingGroupBox.Controls.Add(this.sendingTextBox);
-            this.sendingGroupBox.Controls.Add(this.sendComboBox);
             this.sendingGroupBox.Controls.Add(this.sendPeriodicallyBtn);
             this.sendingGroupBox.Controls.Add(this.timeLbl);
             this.sendingGroupBox.Controls.Add(this.sendBtn);
@@ -140,6 +142,24 @@
             this.sendingGroupBox.TabIndex = 7;
             this.sendingGroupBox.TabStop = false;
             this.sendingGroupBox.Text = "SENDING";
+            // 
+            // addressLbl
+            // 
+            this.addressLbl.AutoSize = true;
+            this.addressLbl.Location = new System.Drawing.Point(15, 130);
+            this.addressLbl.Name = "addressLbl";
+            this.addressLbl.Size = new System.Drawing.Size(48, 13);
+            this.addressLbl.TabIndex = 11;
+            this.addressLbl.Text = "Address:";
+            // 
+            // addressTextBox
+            // 
+            this.addressTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            this.addressTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.addressTextBox.Location = new System.Drawing.Point(69, 128);
+            this.addressTextBox.Name = "addressTextBox";
+            this.addressTextBox.Size = new System.Drawing.Size(74, 20);
+            this.addressTextBox.TabIndex = 10;
             // 
             // connectButton
             // 
@@ -199,18 +219,6 @@
             this.sendingTextBox.Name = "sendingTextBox";
             this.sendingTextBox.Size = new System.Drawing.Size(516, 83);
             this.sendingTextBox.TabIndex = 0;
-            // 
-            // sendComboBox
-            // 
-            this.sendComboBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            this.sendComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.sendComboBox.ForeColor = System.Drawing.Color.White;
-            this.sendComboBox.FormattingEnabled = true;
-            this.sendComboBox.Location = new System.Drawing.Point(18, 124);
-            this.sendComboBox.Name = "sendComboBox";
-            this.sendComboBox.Size = new System.Drawing.Size(125, 21);
-            this.sendComboBox.TabIndex = 3;
-            this.sendComboBox.SelectedIndexChanged += new System.EventHandler(this.sendComboBox_SelectedIndexChanged);
             // 
             // sendPeriodicallyBtn
             // 
@@ -351,7 +359,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(934, 333);
+            this.ClientSize = new System.Drawing.Size(934, 315);
             this.Controls.Add(this.sendParamsGroupBox1);
             this.Controls.Add(this.sendingGroupBox);
             this.Controls.Add(this.logPanel);
@@ -378,7 +386,6 @@
         private System.Windows.Forms.TextBox logTextBox;
         private System.Windows.Forms.GroupBox sendingGroupBox;
         private System.Windows.Forms.TextBox sendingTextBox;
-        private System.Windows.Forms.ComboBox sendComboBox;
         private System.Windows.Forms.Button sendPeriodicallyBtn;
         private System.Windows.Forms.Label timeLbl;
         private System.Windows.Forms.Button sendBtn;
@@ -395,5 +402,7 @@
         private System.Windows.Forms.TextBox nodeTextBox;
         private System.Windows.Forms.Label slotLbl;
         private System.Windows.Forms.Label nodeLbl;
+        private System.Windows.Forms.Label addressLbl;
+        private System.Windows.Forms.TextBox addressTextBox;
     }
 }
