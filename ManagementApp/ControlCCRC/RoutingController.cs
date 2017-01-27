@@ -163,7 +163,6 @@ namespace ControlCCRC
                                 for (int i = 0; i < pathRate1.Count - 1; i++)
                                 {
                                     topologyUnallocatedLayer1[pathRate1[i]].Remove(pathRate1[i + 1]);
-                                    topologyAllocatedLayer1[pathRate1[i]].Add(pathRate1[i + 1],1);
                                 }                               
                                 break;
                             case 2:
@@ -171,7 +170,6 @@ namespace ControlCCRC
                                 for (int i = 0; i < pathRate1.Count - 1; i++)
                                 {
                                     topologyUnallocatedLayer2[pathRate1[i]].Remove(pathRate1[i + 1]);
-                                    topologyAllocatedLayer2[pathRate1[i]].Add(pathRate1[i + 1], 1);
                                     if (i != 0 && i != pathRate1.Count - 1)
                                         result[pathRate1[i]].Add(new FIB(
                                             wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
@@ -186,7 +184,6 @@ namespace ControlCCRC
                                 for (int i = 0; i < pathRate1.Count - 1; i++)
                                 {
                                     topologyUnallocatedLayer3[pathRate1[i]].Remove(pathRate1[i + 1]);
-                                    topologyAllocatedLayer3[pathRate1[i]].Add(pathRate1[i + 1], 1);
                                 }
                                 break;
                         }

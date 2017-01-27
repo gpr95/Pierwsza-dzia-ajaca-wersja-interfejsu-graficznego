@@ -137,7 +137,7 @@ namespace ControlCCRC
                     socketHandler[fibs.Keys.ElementAt(i)].writeFIB(fibs.Values.ElementAt(i));
                 }
             else
-                consoleWriter("[ERROR] FIBS null - connection can't be made.")
+                consoleWriter("[ERROR] FIBS null - connection can't be made.");
         }
 
         private void consoleStart()
