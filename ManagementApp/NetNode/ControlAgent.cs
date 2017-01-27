@@ -28,9 +28,12 @@ namespace NetNode
         {
             this.port = port;
             this.virtualIp = ip;
-            //listener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
-            Thread thread = new Thread(new ThreadStart(Listen));
-            thread.Start();
+
+            if(port != 0)
+            {
+                Thread thread = new Thread(new ThreadStart(Listen));
+                thread.Start();
+            }
         }
 
         private void Listen()
