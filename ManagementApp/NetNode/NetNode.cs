@@ -35,11 +35,16 @@ namespace NetNode
             this.virtualIp = args[0];
             Console.Title = args[0];
             this.ports = new Ports();
-            this.lrm = new LRM(args[0]);
+            this.physicalPort = Convert.ToInt32(args[1]);
             this.managementAgent = new ManagementAgent(Convert.ToInt32(args[2]), this.virtualIp);
             this.controlAgent = new ControlAgent(Convert.ToInt32(args[3]), this.virtualIp);
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
-            this.physicalPort = Convert.ToInt32(args[1]);
+
+            if (args[3] != "0")
+            {
+                this.lrm = new LRM(args[0]);
+            }
+
             this.threadListen = new Thread(new ThreadStart(Listen));
             threadListen.Start();
             this.threadConsole = new Thread(new ThreadStart(ConsoleInterface));
