@@ -70,11 +70,11 @@ namespace ManagementApp
                 d.NumberOfNodes++;
                 if (up == default(Subnetwork))
                 {
-                    a = new Address(false, d.Name, 0, d.NumberOfNodes);
+                    a = new Address(true, d.Name, 0, d.NumberOfNodes);
                 }
                 else
                 {
-                    a = new Address(false, d.Name, up.Name - 100, d.NumberOfNodes);
+                    a = new Address(true, d.Name, up.Name - 100, d.NumberOfNodes);
                 }
                 client = new Node(point, Node.NodeType.CLIENT, a.getName(), 8000 + clientNodesNumber, d.ManagementPort, 0, d.NccPort);
             }

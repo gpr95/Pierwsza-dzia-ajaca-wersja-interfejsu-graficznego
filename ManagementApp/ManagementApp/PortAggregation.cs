@@ -7,7 +7,7 @@
         static private int managementNodePort = 7700;
         static private int clientPort = 8000;
         static private int netPort = 8500;
-        static private int nccPort = 11000;
+        static private int nccPort = 9000;
         static private int ccRcPort = 9100;
         static private int managementNccListener = 9200;
 
