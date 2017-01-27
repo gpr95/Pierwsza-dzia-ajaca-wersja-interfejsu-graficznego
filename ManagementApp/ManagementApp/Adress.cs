@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
-    class Address
+    public class Address
     {
-        private int type;
-        private int domain;
-        private int subnet;
-        private int space;
+        public int type;
+        public int domain;
+        public int subnet;
+        public int space;
 
         public Address(String addres)
         {

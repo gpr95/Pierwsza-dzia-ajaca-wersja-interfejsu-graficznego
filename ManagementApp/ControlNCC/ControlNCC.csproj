@@ -65,6 +65,10 @@
       <Project>{B6F77B46-7E8C-4BDD-9807-6D9A28232425}</Project>
       <Name>ControlCCRC</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ManagementApp\Application.csproj">
+      <Project>{5a2b0de4-65be-4605-a9cc-96342f13f000}</Project>
+      <Name>Application</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
