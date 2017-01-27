@@ -69,6 +69,7 @@ namespace ControlCCRC
             topologyUnallocatedLayer1 = new Dictionary<String, Dictionary<String, int>>();
             topologyUnallocatedLayer2 = new Dictionary<String, Dictionary<String, int>>();
             topologyUnallocatedLayer3 = new Dictionary<String, Dictionary<String, int>>();
+            wholeTopologyNodesAndConnectedNodesWithPorts = new Dictionary<string, Dictionary<string, int>>();
 
             consoleStart();
         }
