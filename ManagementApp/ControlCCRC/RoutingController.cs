@@ -645,19 +645,19 @@ namespace ControlCCRC
                     {
                         lowerRcRequestedInAction++;
                         ccHandler.sendRequestToSubnetworkCCToBuildPath(
-                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[requestNodeFrom + "#" + path[0]],requestNodeFrom,path[0]);
+                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[requestNodeFrom + "#" + path[0]],requestNodeFrom,path[0], rate);
                     }
                     for(int i = 0; i < path.Count; i++)
                     {
                         lowerRcRequestedInAction++;
                         ccHandler.sendRequestToSubnetworkCCToBuildPath(
-                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[path[i] + "#" + path[i+1]], path[i], path[i+1]);
+                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[path[i] + "#" + path[i+1]], path[i], path[i+1], rate);
                     }
                     if (mapNodeConnectedNodeAndAssociatedRCSubnetwork.ContainsKey(path.Last() + "#" + requestNodeTo))
                     {
                         lowerRcRequestedInAction++;
                         ccHandler.sendRequestToSubnetworkCCToBuildPath(
-                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[path.Last() + "#" + requestNodeTo], path.Last(), requestNodeTo);
+                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[path.Last() + "#" + requestNodeTo], path.Last(), requestNodeTo, rate);
                     }
                 }
                 else
