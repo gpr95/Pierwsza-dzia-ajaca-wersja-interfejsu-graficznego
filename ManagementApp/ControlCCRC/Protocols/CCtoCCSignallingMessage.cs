@@ -9,24 +9,20 @@ namespace ControlCCRC.Protocols
 {
     public class CCtoCCSignallingMessage
     {
-        // sending node name
-        public const int CC_LOW_INIT = 0;
         // lower confirmed path set
-        public const int CC_LOW_CONFIRM = 1;
+        public const int CC_LOW_CONFIRM = 0;
         // lower reject path set
-        public const int CC_LOW_REJECT = 2;
+        public const int CC_LOW_REJECT = 1;
         // upper cc changing fibs in lower cc
-        public const int CC_UP_FIB_CHANGE = 3;
+        public const int CC_UP_FIB_CHANGE = 2;
         // middle cc
-        public const int CC_MIDDLE_INIT = 4;
+        public const int CC_MIDDLE_INIT = 3;
         
 
 
         private int state;
         // from last CC
         private bool lastCC;
-        // node name in init message
-        private String nodeName;
         // sended FIB table
         private List<FIB> fib_table;
         // middle CC id
@@ -68,19 +64,6 @@ namespace ControlCCRC.Protocols
             set
             {
                 fib_table = value;
-            }
-        }
-
-        public string NodeName
-        {
-            get
-            {
-                return nodeName;
-            }
-
-            set
-            {
-                nodeName = value;
             }
         }
 

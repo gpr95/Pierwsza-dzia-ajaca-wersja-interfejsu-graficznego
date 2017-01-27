@@ -57,6 +57,7 @@ namespace ControlCCRC
                             identifier = lrmMsg.NodeName;
                             rc.initLRMNode(identifier);
                             socketHandler.Add(identifier, writer);
+                            consoleWriter("SOCKETHANDLER KONIEC");
                             break;
                         case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
                             consoleWriter("LRM_TOP_ADD");
@@ -85,14 +86,10 @@ namespace ControlCCRC
                 else if (received_object.Type == typeof(CCtoCCSignallingMessage))
                 {
                     CCtoCCSignallingMessage ccMsg = received_object.Value.ToObject<CCtoCCSignallingMessage>();
-                    socketHandler.Add(ccMsg.Identifier, writer);
+                    
                     switch (ccMsg.State)
                     {
-                        case CCtoCCSignallingMessage.CC_LOW_INIT:
-                           // identifier = ccMsg.NodeName;
-                           // rc.initLRMNode(identifier);
-                           // socketHandler.Add(identifier, writer);
-                            break;
+/////////////////////////
                        
                     }
                 }

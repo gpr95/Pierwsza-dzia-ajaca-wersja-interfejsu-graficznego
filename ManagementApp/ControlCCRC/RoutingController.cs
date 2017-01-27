@@ -458,6 +458,7 @@ namespace ControlCCRC
             topologyUnallocatedLayer2.Add(nodeName, new Dictionary<string, int>());
             topologyUnallocatedLayer3.Add(nodeName, new Dictionary<string, int>());
             wholeTopologyNodesAndConnectedNodesWithPorts.Add(nodeName, new Dictionary<string, int>());
+            consoleWriter("ZROBILEM");
         }
 
         public void addTopologyElementFromLRM(String nodeName, String connectedNode, int connectedNodePort)
