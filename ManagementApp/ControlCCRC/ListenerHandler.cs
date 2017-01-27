@@ -22,11 +22,11 @@ namespace ControlCCRC
         private TcpClient client;
         private RoutingController rc;
         private ConnectionController cc;
-        private Dictionary<String, ListenerHandler> socketHandler;
+        private Dictionary<String, BinaryWriter> socketHandler;
 
 
 
-        public ListenerHandler(TcpClient client, RoutingController rc, ConnectionController cc,ref Dictionary<String, ListenerHandler> socketHandler)
+        public ListenerHandler(TcpClient client, RoutingController rc, ConnectionController cc,ref Dictionary<String, BinaryWriter> socketHandler)
         {
             this.client = client;
             this.rc = rc;
@@ -55,7 +55,7 @@ namespace ControlCCRC
                         case RCtoLRMSignallingMessage.LRM_INIT:
                             identifier = lrmMsg.NodeName;
                             rc.initLRMNode(identifier);
-                            socketHandler.Add(identifier, this);
+                            socketHandler.Add(identifier, writer);
                             break;
                         case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
                             rc.addTopologyElementFromLRM(identifier, lrmMsg.ConnectedNode, lrmMsg.ConnectedNodePort);
@@ -67,11 +67,13 @@ namespace ControlCCRC
                 }
                 else if (received_object.Type == typeof(RCtoRCSignallingMessage))
                 {
-
+                    RCtoRCSignallingMessage rcMsg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
+                    socketHandler.Add(rcMsg.Identifier, writer);
                 }
                 else if (received_object.Type == typeof(CCtoCCSignallingMessage))
                 {
-
+                    CCtoCCSignallingMessage ccMsg = received_object.Value.ToObject<CCtoCCSignallingMessage>();
+                    socketHandler.Add(ccMsg.Identifier, writer);
                 }
             }
         }

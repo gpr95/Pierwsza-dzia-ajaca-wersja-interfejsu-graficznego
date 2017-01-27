@@ -17,6 +17,9 @@ namespace ControlCCRC.Protocols
         public const int CC_LOW_REJECT = 2;
         // upper cc changing fibs in lower cc
         public const int CC_UP_FIB_CHANGE = 3;
+        // middle cc
+        public const int CC_MIDDLE_INIT = 4;
+        
 
 
         private int state;
@@ -26,6 +29,8 @@ namespace ControlCCRC.Protocols
         private String nodeName;
         // sended FIB table
         private List<FIB> fib_table;
+        // middle CC id
+        private String identifier;
 
         public bool LastCC
         {
@@ -76,6 +81,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 nodeName = value;
+            }
+        }
+
+        public string Identifier
+        {
+            get
+            {
+                return identifier;
+            }
+
+            set
+            {
+                identifier = value;
             }
         }
     }

@@ -15,6 +15,8 @@ namespace ControlCCRC
 {
     class ConnectionController
     {
+        private String identifier;
+
         private TcpClient CCClient;
         private TcpClient NCCClient;
 
@@ -22,23 +24,25 @@ namespace ControlCCRC
         private Thread threadconnectNCC;
 
         private RoutingController rcHandler;
-        private Dictionary<String, ListenerHandler> socketHandler;
+        private Dictionary<String, BinaryWriter> socketHandler;
 
         private Boolean iAmDomain;
         /**
-         * DOMAIN [connect NCC]
-         * SUBNETWORK [connect up CC, flag] 
+         * DOMAIN [CC_ID, connect NCC]
+         * SUBNETWORK [CC_ID, connect up CC, flag] 
          */
         public ConnectionController(string[] args)
         {
             iAmDomain = (args.Length == 1);
+            identifier = args[0];
 
             if (iAmDomain)
             {
                 consoleWriter("[INIT] DOMAIN");
+                identifier = "DOMAIN_" + identifier;
                 try
                 {
-                    NCCClient = new TcpClient("localhost", Convert.ToInt32(args[0]));
+                    NCCClient = new TcpClient("localhost", Convert.ToInt32(args[1]));
                 }
                 catch (SocketException ex)
                 {
@@ -52,7 +56,7 @@ namespace ControlCCRC
                 consoleWriter("[INIT] SUBNETWORK");
                 try
                 {
-                    CCClient = new TcpClient("localhost", Convert.ToInt32(args[0]));
+                    CCClient = new TcpClient("localhost", Convert.ToInt32(args[1]));
                 }
                 catch (SocketException ex)
                 {
@@ -71,7 +75,7 @@ namespace ControlCCRC
             this.rcHandler = rc;
         }
 
-        public void setSocketHandler(Dictionary<String, ListenerHandler> socketHandler)
+        public void setSocketHandler(Dictionary<String, BinaryWriter> socketHandler)
         {
             this.socketHandler = socketHandler;
         }
@@ -87,6 +91,7 @@ namespace ControlCCRC
                 try
                 {
                     string received_data = reader.ReadString();
+                    socketHandler.Add("NCC", writer);
                     JMessage received_object = JMessage.Deserialize(received_data);
                     if (received_object.Type != typeof(CCtoNCCSingallingMessage))
                         noError = false;
@@ -109,6 +114,14 @@ namespace ControlCCRC
         private void ccConnect()
         {
             BinaryReader reader = new BinaryReader(CCClient.GetStream());
+            BinaryWriter writer = new BinaryWriter(CCClient.GetStream());
+
+
+            CCtoCCSignallingMessage initMsg = new CCtoCCSignallingMessage();
+            initMsg.Identifier = identifier;
+            String send_object = JMessage.Serialize(JMessage.FromValue(initMsg));
+            writer.Write(send_object);
+
 
             Boolean noError = true;
             while (noError)
@@ -134,7 +147,7 @@ namespace ControlCCRC
             if (fibs != null)
                 for (int i = 0; i < fibs.Count; i++)
                 {
-                    socketHandler[fibs.Keys.ElementAt(i)].writeFIB(fibs.Values.ElementAt(i));
+                   // socketHandler[fibs.Keys.ElementAt(i)].writeFIB(fibs.Values.ElementAt(i));
                 }
             else
                 consoleWriter("[ERROR] FIBS null - connection can't be made.");

@@ -26,9 +26,10 @@ namespace ControlCCRC
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3;
         private Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts;
 
+        private List<String> pathNeededToBeCount;
 
         private ConnectionController ccHandler;
-        private Dictionary<String, ListenerHandler> socketHandler;
+        private Dictionary<String, BinaryWriter> socketHandler;
 
 
 
@@ -39,8 +40,9 @@ namespace ControlCCRC
         public RoutingController(string[] args)
         {
             iAmDomain = (args.Length == 1);
-            
-            if(!iAmDomain)
+            identifier = args[0];
+
+            if (!iAmDomain)
             {
                 consoleWriter("[INIT] SUBNETWORK");
                 try
@@ -55,7 +57,10 @@ namespace ControlCCRC
                 threadconnectRC.Start();
             }
             else
+            {
                 consoleWriter("[INIT] DOMAIN");
+                identifier = "DOMAIN_" + identifier;
+            }
 
 
             topologyUnallocatedLayer1 = new Dictionary<String, Dictionary<String, int>>();
@@ -70,7 +75,7 @@ namespace ControlCCRC
             this.ccHandler = cc;
         }
 
-        public void setSocketHandler(Dictionary<String, ListenerHandler> socketHandler)
+        public void setSocketHandler(Dictionary<String, BinaryWriter> socketHandler)
         {
             this.socketHandler = socketHandler;
         }
@@ -78,6 +83,14 @@ namespace ControlCCRC
         private void rcConnecting()
         {
             BinaryReader reader = new BinaryReader(RCClient.GetStream());
+            BinaryWriter writer = new BinaryWriter(RCClient.GetStream());
+
+
+
+            RCtoRCSignallingMessage initMsg = new RCtoRCSignallingMessage();
+            initMsg.Identifier = identifier;
+            String send_object = JMessage.Serialize(JMessage.FromValue(initMsg));
+            writer.Write(send_object);
 
             Boolean noError = true;
             while (noError)
@@ -89,13 +102,96 @@ namespace ControlCCRC
                     if (received_object.Type != typeof(RCtoRCSignallingMessage))
                         noError = false;
                     RCtoRCSignallingMessage msg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
-                    //@TODO something with Msg
+                    switch(msg.State)
+                    {
+                        case RCtoRCSignallingMessage.COUNT_ALL_PATHS:
+                            pathNeededToBeCount = msg.AllUpperNodesToCountWeights;
+                            if(socketHandler.Keys.Where(id => id.StartsWith("RC")).Count() > 0)
+                                foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC")))
+                                {
+                                    RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
+                                    countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS;
+                                    countPathsMsg.AllUpperNodesToCountWeights = wholeTopologyNodesAndConnectedNodesWithPorts.Keys.ToList();
+                                    String dataToSend = JMessage.Serialize(JMessage.FromValue(countPathsMsg));
+                                    socketHandler[id].Write(dataToSend);
+                                }
+                            else
+                            {
+                                RCtoRCSignallingMessage countedPathValue = new RCtoRCSignallingMessage();
+
+                                Dictionary<String, String> pairs;
+                                for(int i=0; i< pathNeededToBeCount.Count(); i++)
+                                {
+                                    List<String> others = pathNeededToBeCount
+                                        .Where(node => !node.Equals(pathNeededToBeCount[i])).ToList();
+                                    foreach(String s in others)
+                                    {
+                                        if (findPath(pathNeededToBeCount[i], s, msg.RateToCountWeights) != null)
+                                            break;// result = findPath(pathNeededToBeCount[i], s, msg.RateToCountWeights).Count;
+
+                                    }
+                                   
+                                }
+                                
+                            }
+                            break;
+                    }
                 }
                 catch (IOException ex)
                 {
                     noError = false;
                 }
             }
+        }
+
+        public int findWeightBetweenTwoNodes(String startNode, String endNode, int howMuchVC3)
+        {
+            int result = 0;
+            consoleWriter("[RC] Sended info to count weights between: " + startNode + " and " + endNode + " with:"
+                + howMuchVC3 + "x VC-3");
+
+            if (wholeTopologyNodesAndConnectedNodesWithPorts
+               .Where(node => node.Value.ContainsKey(startNode)) == null)
+            {
+                return 0;
+            }
+            if (wholeTopologyNodesAndConnectedNodesWithPorts
+                .Where(node => node.Value.ContainsKey(endNode)) == null)
+            {
+                return 0;
+            }
+
+            String firstInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
+                .Where(node => node.Value.ContainsKey(startNode)).First().Key;
+
+            String lastInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
+                .Where(node => node.Value.ContainsKey(endNode)).First().Key;
+
+
+            switch (howMuchVC3)
+            {
+                case 1:
+                    if(shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1) != null)
+                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1).Count + 2;
+                    if(result == 0 && shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2) != null)
+                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2).Count + 2;
+                    if (result == 0 && shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3) != null)
+                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3).Count + 2;
+                    break;
+                case 2:
+                    int shortest1 = 0;
+                    int shortest2 = 0;
+                    int shortest3 = 0;
+
+                    if (shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1) != null &&
+                        shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2) != null)
+                        break;
+                    break;
+                case 3:
+                    break;
+            }
+
+            return result;
         }
 
         public Dictionary<String,List<FIB>> findPath(String startNode, String endNode, int howMuchVC3)
@@ -347,7 +443,15 @@ namespace ControlCCRC
 
         public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate)
         {
-
+            foreach(String id in socketHandler.Keys.Where(id => id.StartsWith("RC")))
+            {
+                RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
+                countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS;
+                countPathsMsg.AllUpperNodesToCountWeights = wholeTopologyNodesAndConnectedNodesWithPorts.Keys.ToList();
+                countPathsMsg.RateToCountWeights = rate;
+                String dataToSend = JMessage.Serialize(JMessage.FromValue(countPathsMsg));
+                socketHandler[id].Write(dataToSend);
+            }
         }
 
         private void consoleWriter(String msg)

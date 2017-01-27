@@ -18,7 +18,7 @@ namespace ControlCCRC
         /**
              * DOMAIN:
                 LISTENER_RCandCC_for_LRM_AND_RC_AND_CC[0],  
-                SUBNETWORK_ID[1],
+                DOMAIN_ID[1],
 	            NCC_PORT[2],
                 DOMAIN_FLAG[3]
             * SUBNETWORK:
@@ -28,8 +28,9 @@ namespace ControlCCRC
             */
         static void Main(string[] args)
         {
-            Dictionary<String, ListenerHandler> socketHandler = new Dictionary<string, ListenerHandler>();
-            int domainId = Int32.Parse(args[1]);
+            Dictionary<String, BinaryWriter> socketHandler = new Dictionary<string, BinaryWriter>();
+            int domainId;
+            int.TryParse(args[1],out domainId);
 
             string rcId = "RC" + domainId;
             string ccId = "CC" + domainId;
