@@ -83,6 +83,7 @@ namespace ManagementApp
             this.ControlPort = PortAggregation.CcRcPort;
             startInfo.Arguments = name + " " + this.ControlPort;
             this.ProcessHandle = Process.Start(startInfo);
+            
         }
 
         public Point getPointStart()

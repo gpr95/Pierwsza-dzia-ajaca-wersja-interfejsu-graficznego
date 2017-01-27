@@ -66,6 +66,16 @@ namespace ManagementApp
             //}
         }
 
+        internal void setupControl()
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo("ControlCCRC.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            this.ControlPort = PortAggregation.CcRcPort;
+            startInfo.Arguments = name + " " + this.ControlPort;
+            this.ProcessHandle = Process.Start(startInfo);
+
+        }
+
         public Point getPointStart()
         {
             return new Point(pointFrom.X > pointTo.X ? pointTo.X : pointFrom.X,

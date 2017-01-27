@@ -311,8 +311,8 @@ namespace ManagementApp
 
                 case OperationType.ADD_SUBNETWORK:
                     Point subTo = new Point(x,y);
-                    Subnetwork subnetworkToAdd = new Subnetwork(subFrom, subTo);
-                    addSubnetworkToList(subnetworkToAdd);
+                    //Subnetwork subnetworkToAdd = new Subnetwork(subFrom, subTo);
+                    controler.addSubnetworkToQueue(subFrom, subTo);
                     break;
 
                 case OperationType.MOVE_NODE:

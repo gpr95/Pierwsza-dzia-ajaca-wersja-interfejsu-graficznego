@@ -21,6 +21,7 @@ namespace ManagementApp
         private int clientNodesNumber = 0;
         private int networkNodesNumber = 0;
         private int domainNumber = 0;
+        private int subNumber = 0;
         private List<int> subNetworkNumber = new List<int>();
         private List<Node> nodeList = new List<Node>();
         private List<Domain> domainList = new List<Domain>();
@@ -197,6 +198,69 @@ namespace ManagementApp
         private Domain checkWhatDomain(Point p)
         {
             foreach (Domain d in domainList)
+            {
+                Rectangle domainRect = new Rectangle(d.getPointStart(), d.Size);
+                if (domainRect.Contains(p))
+                    return d;
+            }
+            return null;
+
+        }
+
+        internal Boolean addSubnetworkToQueue(Point subFrom, Point subTo)
+        {
+            bool add = true;
+            
+            Domain subnetworkStart = checkWhatDomain(subFrom);
+            Domain subnetworkStop = checkWhatDomain(subTo);
+            if (subnetworkStart == null || subnetworkStop == null)
+            {
+                return false;
+            }
+            if(subnetworkStart.Name != subnetworkStop.Name)
+                add = false;
+            
+            Subnetwork a = checkWhatSubnetwork(subFrom);
+            Subnetwork b = checkWhatSubnetwork(new Point(subFrom.X, subTo.Y));
+            Subnetwork c = checkWhatSubnetwork(subTo);
+            Subnetwork d = checkWhatSubnetwork(new Point(subTo.X, subFrom.Y));
+            if (a == b && b == c && c == d && d == a) { }
+            else 
+            { 
+                add = false;
+            }
+            
+            Subnetwork toAdd = new Subnetwork(subFrom, subTo, ++subNumber);
+            if (toAdd.Size.Width < MainWindow.GAP || toAdd.Size.Height < MainWindow.GAP)
+                add = false;
+            if (add)
+            {
+                checkSubnetworkContent(toAdd);
+                toAdd.setupControl();
+                subnetworkList.Add(toAdd);
+                mainWindow.consoleWriter("Subnetwork added " + subNumber);
+                return true;
+            }
+            else
+            {
+                mainWindow.errorMessage("Subnetwork can't cross each others or domain too small for rendering.");
+                return false;
+            }
+        }
+
+        private void checkSubnetworkContent(Subnetwork domain)
+        {
+            Rectangle domainRect = new Rectangle(domain.getPointStart(), domain.Size);
+            foreach (Node n in nodeList)
+            {
+                if (domainRect.Contains(n.Position))
+                    mainWindow.errorMessage(n.Name + " is in Subnetwork.");
+            }
+        }
+
+        private Subnetwork checkWhatSubnetwork(Point p)
+        {
+            foreach (Subnetwork d in subnetworkList)
             {
                 Rectangle domainRect = new Rectangle(d.getPointStart(), d.Size);
                 if (domainRect.Contains(p))
