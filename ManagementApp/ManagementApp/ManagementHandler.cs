@@ -42,7 +42,7 @@ namespace ManagementApp
 
         public void killManagement()
         {
-            if(clientManagement != null)
+            if (clientManagement != null)
             {
                 ApplicationProtocol toSend = new ApplicationProtocol();
                 toSend.State = ApplicationProtocol.KILL;

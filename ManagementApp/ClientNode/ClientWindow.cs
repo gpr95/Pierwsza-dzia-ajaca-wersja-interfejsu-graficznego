@@ -42,11 +42,19 @@ namespace ClientWindow
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
             Thread managementThreadad = new Thread(new ParameterizedThreadStart(initManagmentConnection));
-            managementThreadad.Start(managementPort);
+           // managementThreadad.Start(managementPort);
             InitializeComponent();
             this.Text = virtualIP;
             Log2("INFO", "START LOG");
             controlAgent = new CPCC(this, args[3]);
+            initSpeedComboBox();
+        }
+
+        private void initSpeedComboBox()
+        {
+            for(int i=1; i<4; i++)
+            speedComboBox.Items.Add(i);
+
         }
 
         private void Listen()
@@ -417,6 +425,18 @@ namespace ClientWindow
             Environment.Exit(0);
         }
 
+
+
+        private void connectButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            currentSpeed = Convert.ToInt32(speedComboBox.SelectedItem.ToString());
+        }
+
         private void addButton_Click(object sender, EventArgs e)
         {
             string destinationNode = nodeTextBox.Text;
@@ -425,7 +445,7 @@ namespace ClientWindow
             bool res = int.TryParse(slotTextBox.Text, out slot);
             if (res)
             {
-                
+
                 if (this.possibleDestinations.ContainsKey(destinationNode))
                 {
                     possibleDestinations[destinationNode] = slot;
@@ -465,9 +485,11 @@ namespace ClientWindow
             {
                 logTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + "Wrong port format");
                 logTextBox.AppendText(Environment.NewLine);
-                
+
             }
             portTextBox.Clear();
         }
+
+       
     }
 }

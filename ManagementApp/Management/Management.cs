@@ -18,7 +18,7 @@ namespace Management
 
         // CONSTS 
         private int APPLICATIONPORT = 7777;
-        private int MANAGMENTPORT = 7778;
+        private int NODEPORT = 7778;
 
         // LOGICAL VARIABLES
         private List<Node> nodeList = new List<Node>();
@@ -28,14 +28,14 @@ namespace Management
         public ManagementPlane(string[] args)
         {
             int.TryParse(args[0], out this.APPLICATIONPORT);
-            int.TryParse(args[1], out this.MANAGMENTPORT);
+            int.TryParse(args[1], out this.NODEPORT);
 
             UserInterface.Management = this;
 
             // Connection to Application
             this.agentApplication = new AgentApplication(APPLICATIONPORT, this);
             // Listener for Nodes
-            this.agentNode = new AgentNode(MANAGMENTPORT, nodeList, this);
+            this.agentNode = new AgentNode(NODEPORT, nodeList, this);
 
             Thread.Sleep(100);
             if(APPLICATIONPORT != 7777)

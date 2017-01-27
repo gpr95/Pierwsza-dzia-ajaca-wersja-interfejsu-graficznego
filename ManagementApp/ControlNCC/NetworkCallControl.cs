@@ -20,12 +20,13 @@ namespace ControlNCC
         private string domainNumber;
         private static List<string> directory = new List<string>();
 
-        public NetworkCallControl(string domainNumber)
+        public NetworkCallControl(string[] domainNumber)
         {
             services = new Dictionary<int, ControlConnectionService>();
             string ip = "127.0.0.1";
-            this.domainNumber = domainNumber;
+            this.domainNumber = domainNumber[0];
             readConfig();
+            int.TryParse(domainNumber[1], out this.controlPort);
             listener = new TcpListener(IPAddress.Parse(ip), controlPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();

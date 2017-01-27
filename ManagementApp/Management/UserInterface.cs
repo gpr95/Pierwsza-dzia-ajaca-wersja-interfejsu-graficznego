@@ -14,7 +14,7 @@ namespace Management
         private static Boolean quit = false;
 
         private enum OPERATION
-        {ENTRY, TABLE, SHOW, INTERFACES, CLEAR, NONE }
+        { ENTRY, TABLE, SHOW, INTERFACES, CLEAR, NONE }
 
         internal static ManagementPlane Management
         {

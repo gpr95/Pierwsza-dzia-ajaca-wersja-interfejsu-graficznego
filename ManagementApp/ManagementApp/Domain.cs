@@ -18,6 +18,9 @@ namespace ManagementApp
         private int name;
         private Process processHandle;
         private List<String> containedNodes = new List<string>();
+        private int managementPort;
+        private int controlPort;
+        private int numberOfNodes = 0;
 
         private ManagementHandler managementHandler;
 
@@ -27,11 +30,6 @@ namespace ManagementApp
             this.pointFrom = pointFrom;
             this.size = new Size(Math.Abs(pointFrom.X - pointTo.X), Math.Abs(pointFrom.Y - pointTo.Y));
             this.Name = name;
-            ProcessStartInfo startInfo = new ProcessStartInfo("ControlNCC.exe");
-            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
-            //startInfo.Arguments = parameters;
-
-            this.ProcessHandle = Process.Start(startInfo);
         }
 
         public Domain(Domain d) : this(d.PointTo, d.PointFrom, d.Name)
@@ -72,6 +70,19 @@ namespace ManagementApp
         internal void setupManagement(int mANAGPORT, int v)
         {
             managementHandler = new ManagementHandler(mANAGPORT, v);
+            this.ManagementPort = v;
+
+            ProcessStartInfo startInfo = new ProcessStartInfo("ControlNCC.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            this.NccPort = PortAggregation.NccPort;
+            startInfo.Arguments = name + " " + this.NccPort;
+            this.ProcessHandle = Process.Start(startInfo);
+
+            startInfo = new ProcessStartInfo("ControlCCRC.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            this.ControlPort = PortAggregation.CcRcPort;
+            startInfo.Arguments = name + " " + this.ControlPort;
+            this.ProcessHandle = Process.Start(startInfo);
         }
 
         public Point getPointStart()
@@ -153,5 +164,46 @@ namespace ManagementApp
                 name = value;
             }
         }
+
+        public int ManagementPort
+        {
+            get
+            {
+                return managementPort;
+            }
+
+            set
+            {
+                managementPort = value;
+            }
+        }
+
+        public int ControlPort
+        {
+            get
+            {
+                return controlPort;
+            }
+
+            set
+            {
+                controlPort = value;
+            }
+        }
+
+        public int NumberOfNodes
+        {
+            get
+            {
+                return numberOfNodes;
+            }
+
+            set
+            {
+                numberOfNodes = value;
+            }
+        }
+
+        public int NccPort { get; set; }
     }
 }

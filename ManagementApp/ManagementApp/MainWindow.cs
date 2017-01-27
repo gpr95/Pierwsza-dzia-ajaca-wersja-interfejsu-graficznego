@@ -10,28 +10,17 @@ namespace ManagementApp
 {
     public partial class MainWindow : Form
     {
+        private WindowController controler;
         // CONSTS
-        private const int GAP = 14;
-        private readonly int CLOUDPORT = 7776;
-        private readonly int MANAGPORT = 7777;
-        private readonly int NETNODECONNECTIONS = 21;
-
-        // CONNECTIONS
-        private CloudCableHandler cableHandler;
-        private ManagementHandler managHandler;
+        private const int gAP = 14;
 
         // LOGICAL VARS
-        private int nodeConnectionPort = 7788;
         private OperationType oType;
-        private int clientNodesNumber = 0;
-        private int networkNodesNumber = 0;
-        private int domainNumber = 0;
-        private List<int> subNetworkNumber = new List<int>();
         private DataTable table;
-        private List<Node> nodeList = new List<Node>();
-        private List<Domain> domainList = new List<Domain>();
-        private List<Subnetwork> subnetworkList = new List<Subnetwork>();
-        private List<NodeConnection> connectionList = new List<NodeConnection>();
+        private List<Node> nodeList;
+        private List<Domain> domainList;
+        private List<Subnetwork> subnetworkList;
+        private List<NodeConnection> connectionList;
         private List<NodeConnection> connectionTemp = new List<NodeConnection>();
 
         // PAINTING VARS
@@ -42,8 +31,17 @@ namespace ManagementApp
         private Node virtualNodeTo;
         private Bitmap containerPoints;
         private Point domainFrom;
+        private Point domainTo;
         private Graphics myGraphics;
         private Point subFrom;
+
+        public static int GAP
+        {
+            get
+            {
+                return gAP;
+            }
+        }
 
         enum OperationType
         {
@@ -59,16 +57,21 @@ namespace ManagementApp
 
         public MainWindow() //DataTable table, List<Node> nodeList, List<NodeConnection> connectionList, List<Domain> domainList
         {
-            //Start of listeners
-            cableHandler = new CloudCableHandler(connectionList, CLOUDPORT);
-            managHandler = new ManagementHandler(MANAGPORT, nodeConnectionPort++);
+            controler = new WindowController(this);
 
-            //Initialize of components
             table = makeTable();
 
             InitializeComponent();
             hidePortSetup();
             RenderTable();
+        }
+
+        public void setLists(List<Node> nodeList, List<Domain> domainList, List<Subnetwork> subnetworkList, List<NodeConnection> connectionList)
+        {
+            this.nodeList = nodeList;
+            this.domainList = domainList;
+            this.subnetworkList = subnetworkList;
+            this.connectionList = connectionList;
         }
 
         private void MainWindow_Load(object sender, EventArgs e)
@@ -100,7 +103,6 @@ namespace ManagementApp
             column.Unique = false;
             table.Columns.Add(column);
 
-
             column = new DataColumn();
             column.DataType = System.Type.GetType("System.String");
             column.ColumnName = "Type";
@@ -124,14 +126,14 @@ namespace ManagementApp
             return table;
         }
 
-        private void addNodeToTable(Node n)
+        public void addNodeToTable(Node n)
         {
             var row = table.NewRow();
             int nodeNumber;
             int.TryParse(n.Name.Split('.')[1], out nodeNumber);
             row["id"] = nodeNumber;
             row["Type"] = n.Type.Equals(Node.NodeType.NETWORK) ? "Network" : "Client";
-            row["Name"] = n.Type.Equals(Node.NodeType.NETWORK) ? "NN." + nodeNumber : "CN." + nodeNumber;
+            row["Name"] = n.Name;
             table.Rows.Add(row);
         }
 
@@ -304,8 +306,7 @@ namespace ManagementApp
 
                 case OperationType.ADD_DOMAIN:
                     Point domainTo = new Point(x,y);
-                    Domain domainToAdd = new Domain(domainFrom, domainTo, ++domainNumber);
-                    addDomainToElements(domainToAdd);
+                    controler.addDomainToQueue(domainFrom, domainTo);
                     break;
 
                 case OperationType.ADD_SUBNETWORK:
@@ -356,7 +357,7 @@ namespace ManagementApp
 
         private void addSubnetworkToList(Subnetwork subnetworkToAdd)
         {
-            //throw new NotImplementedException();
+            subnetworkList.Add(subnetworkToAdd);
         }
 
         private void containerPictureBox_MouseMove(object sender, MouseEventArgs e)
@@ -503,8 +504,8 @@ namespace ManagementApp
 
                     foreach (NodeConnection con in connectionsToDelete)
                     {
-                        cableHandler.deleteConnection(con);
-                        removeConnection(con);
+                        controler.deleteConnection(con);
+
                     }
                         
 
@@ -512,8 +513,7 @@ namespace ManagementApp
                 }
                 else
                 {
-                    cableHandler.deleteConnection(connectionList.ElementAt(idxOfElement));
-                    removeConnection(connectionList.ElementAt(idxOfElement));
+                    controler.removeConnection(idxOfElement);
                 }
                     
 
@@ -556,7 +556,7 @@ namespace ManagementApp
 
         internal void updateConnections(List<NodeConnection> connectionList)
         {
-            cableHandler.updateConnections(connectionList);
+            controler.updateCableCloud();
         }
 
         private void connectionBtn_Click(object sender, EventArgs e)
@@ -590,7 +590,7 @@ namespace ManagementApp
         
         public void bind()
         {
-            cableHandler.updateOneConnection();
+            controler.updateOneConnection();
             consoleWriter("Connection added from " + connectionList.Last().From + " to " + connectionList.Last().To);
         }
 
@@ -598,45 +598,6 @@ namespace ManagementApp
         {
             connectionList.Add(newNodeConn);
             bind();
-        }
-
-        private void addDomainToElements(Domain toAdd)
-        {
-            bool add = true;
-            foreach (Domain d in domainList)
-            {
-                if (toAdd.crossingOtherDomain(d))
-                {
-                    add = false;
-                    break;
-                }
-            }
-            if (toAdd.Size.Width < GAP || toAdd.Size.Height < GAP)
-                add = false;
-            if (add)
-            {
-                checkDomainContent(toAdd);
-                if(domainNumber == 1)
-                    managHandler.killManagement();
-                toAdd.setupManagement(MANAGPORT + toAdd.Name, nodeConnectionPort++);
-                domainList.Add(toAdd);
-                consoleWriter("Domain added");
-            }
-            else
-            {
-                errorMessage("Domains can't cross each others or domain too small for rendering.");
-            }
-        }
-
-        private void checkDomainContent(Domain domain)
-        {
-            Rectangle domainRect = new Rectangle(domain.getPointStart(), domain.Size);
-            foreach(Node n in nodeList)
-            {
-                if(domainRect.Contains(n.Position))
-                    errorMessage(n.Name + " is in domain.");
-            }
-            
         }
 
         private void selectAffectedElements(Node node)
@@ -779,8 +740,7 @@ namespace ManagementApp
 
         private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
         {
-            managHandler.stopRunning();
-            cableHandler.stopRunning();
+            controler.formClosing();
         }
 
         private void saveConfBtn_Click(object sender, EventArgs e)
@@ -834,7 +794,7 @@ namespace ManagementApp
         //    management.clearAllTrails();
         //}
 
-        private void consoleWriter(String msg)
+        public void consoleWriter(String msg)
         {
             consoleTextBox.AppendText("# " + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString());
             consoleTextBox.AppendText(Environment.NewLine);
@@ -844,33 +804,12 @@ namespace ManagementApp
 
         private void addClientNode(int x, int y)
         {
-            foreach (Node node in nodeList)
-                if (node.Position.Equals(new Point(x, y)))
-                {
-                    errorMessage("There is already node in that position.");
-                    return;
-                }
-            Node client = new Node(x, y, Node.NodeType.CLIENT, "CN." + clientNodesNumber, 8000 + clientNodesNumber);
-            ++clientNodesNumber;
-            nodeList.Add(client);
-            addNodeToTable(client);
-            addNode(client);
+            controler.addClient(new Point(x, y));
         }
 
         public void addNetworkNode(int x, int y)
         {
-
-            foreach (Node node in nodeList)
-                if (node.Position.Equals(new Point(x, y)))
-                {
-                    errorMessage("There is already node in that position.");
-                    return;
-                }
-            Node network = new Node(x, y, Node.NodeType.NETWORK, "NN." + networkNodesNumber, 8500 + networkNodesNumber);
-            ++networkNodesNumber;
-            nodeList.Add(network);
-            addNodeToTable(network);
-            addNode(network);
+            controler.addNetwork(new Point(x, y));
         }
 
         public void addNode(Node node)
@@ -953,16 +892,16 @@ namespace ManagementApp
                     return;
                 }
             if (from.Type.Equals(Node.NodeType.NETWORK))
-                if (numberOfNodeConnections(from) == NETNODECONNECTIONS)
+                if (controler.isNumberOfNodeConnectionsLessThenPossible(from))
                 {
-                    errorMessage("Network node have " + NETNODECONNECTIONS + " ports");
+                    errorMessage("Network node have " + controler.NETNODECONNECTIONS + " ports");
                     return;
                 }
 
             if (to.Type.Equals(Node.NodeType.NETWORK))
-                if (numberOfNodeConnections(to) == NETNODECONNECTIONS)
+                if (controler.isNumberOfNodeConnectionsLessThenPossible(to))
                 {
-                    errorMessage("Network node have " + NETNODECONNECTIONS + " ports");
+                    errorMessage("Network node have " + controler.NETNODECONNECTIONS + " ports");
                     return;
                 }
             if (to != null)
@@ -980,7 +919,6 @@ namespace ManagementApp
                     else if (connectionList.Where(i => i.From.Equals(to.Name)).ToList().Where(i => i.VirtualPortFrom.Equals(portTo)).Any())
                         errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.1");
                     else if (connectionList.Where(i => i.To.Equals(to.Name)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any())
-                        //connectionList.Where(i => i.To.Equals(to)).ToList().Where(i => i.VirtualPortTo.Equals(portTo)).Any();
                         errorMessage("Port " + portTo + " in Node: " + to.Name + " is occupited.2");
                     else if (connectionList.Where(i => i.From.Equals(from.Name)).ToList().Where(i => i.VirtualPortFrom.Equals(portFrom)).Any())
                         errorMessage("Port " + portFrom + " in Node: " + from.Name + " is occupited.3");
@@ -997,11 +935,6 @@ namespace ManagementApp
         private bool isConnectionExist(Node f, Node t)
         {
             return connectionList.Where(i => (i.From.Equals(f.Name) && i.To.Equals(t.Name)) || (i.From.Equals(t.Name) && i.To.Equals(f.Name))).Any();
-        }
-
-        private int numberOfNodeConnections(Node n)
-        {
-            return connectionList.Where(i => i.From.Equals(n.Name) || i.To.Equals(n.Name)).Count();
         }
 
         public void isSpaceAvailable(Node node, int x, int y, int maxW, int maxH)
@@ -1025,32 +958,11 @@ namespace ManagementApp
             node.Position = new Point(x, y);
         }
 
-        public void removeConnection(NodeConnection conn)
-        {
-            connectionList.RemoveAt(connectionList.IndexOf(conn));
-        }
+
 
         internal void restartNode(string v)
         {
-            Node n = nodeList.Where(s => s.Name.Equals(v)).FirstOrDefault();
-            if (n.ProcessHandle.HasExited)
-            {
-                nodeList.Remove(n);
-                if (n is Node)
-                    n = new Node((Node)n);
-                nodeList.Add(n);
-                //List<string> conL = findElemAtPosition(n.Position.X, n.Position.Y);
-                foreach (NodeConnection c in connectionList)
-                {
-                    if (c.From.Equals(n.Name))
-                        c.From = n.Name;
-                    if (c.To.Equals(n.Name))
-                        c.To = n.Name;
-                }
-                updateConnections(connectionList);
-
-                //TODO Update management
-            }
+            controler.restartNode(v);
         }
 
         public void load()

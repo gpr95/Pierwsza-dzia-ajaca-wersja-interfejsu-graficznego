@@ -22,16 +22,18 @@ namespace ManagementApp
         private Point position;
         private NodeType nodeType;
         private Process processHandle;
+        private int subnetwork;
 
-        public Node(int x, int y, NodeType n, String name, int localPort)
+        public Node(Point point, NodeType n, String name, int localPort, int mPort, int cPort)
         {
             nodeType = n;
             if (n.Equals(NodeType.CLIENT))
             {
                 this.Name = name;
                 this.LocalPort = localPort;
-                this.Position = new Point(x, y);
-
+                this.Position = point;
+                this.ManagmentPort = mPort;
+                this.ControlPort = cPort;
                 String parameters = name + " " + this.LocalPort + " " + this.ManagmentPort;
                 ProcessStartInfo startInfo = new ProcessStartInfo("ClientNode.exe");
                 startInfo.WindowStyle = ProcessWindowStyle.Minimized;
@@ -43,9 +45,9 @@ namespace ManagementApp
             {
                 this.Name = name;
                 this.LocalPort = localPort;
-                this.Position = new Point(x, y);
+                this.Position = point;
 
-                String parameters = name + " " + this.LocalPort + " " + this.ManagmentPort;
+                String parameters = name + " " + this.LocalPort + " " + this.ManagmentPort + " " + this.ControlPort;
                 ProcessStartInfo startInfo = new ProcessStartInfo("NetNode.exe");
                 startInfo.WindowStyle = ProcessWindowStyle.Minimized;
                 startInfo.Arguments = parameters;
@@ -54,7 +56,7 @@ namespace ManagementApp
             }
         }
 
-        public Node(Node n) : this(n.Position.X, n.Position.Y, n.Type, n.Name, n.LocalPort)
+        public Node(Node n) : this(n.Position, n.Type, n.Name, n.LocalPort, n.ManagmentPort, n.ControlPort)
         {
             
         }
@@ -129,5 +131,7 @@ namespace ManagementApp
                 processHandle = value;
             }
         }
+
+        public int ControlPort { get; private set; }
     }
 }

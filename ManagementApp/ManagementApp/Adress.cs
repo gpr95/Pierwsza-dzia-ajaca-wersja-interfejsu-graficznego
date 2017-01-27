@@ -13,7 +13,7 @@ namespace ManagementApp
         private int domain;
         private int space;
 
-        Address(String addres)
+        public Address(String addres)
         {
             String[] addressArray = addres.Split('.');
             int.TryParse(addressArray[0], out this.type);
@@ -21,7 +21,24 @@ namespace ManagementApp
             int.TryParse(addressArray[2], out this.domain);
             int.TryParse(addressArray[3], out this.space);
         }
-        Address(int type, int domain, int space)
+
+        public Address(bool isClient, int domain, int space)
+        {
+            if(isClient)
+            {
+                this.type = 192;
+                this.filler = 168;
+            }
+            else
+            {
+                this.type = 10;
+                this.filler = 0;
+            }
+            this.domain = domain;
+            this.space = space;
+        }
+
+        public Address(int type, int domain, int space)
         {
             this.type = type;
             if(type == 10)
@@ -31,7 +48,8 @@ namespace ManagementApp
             this.domain = domain;
             this.space = space;
         }
-        Address(int type, int filler, int domain, int space)
+
+        public Address(int type, int filler, int domain, int space)
         {
             this.type = type;
             this.filler = filler;
