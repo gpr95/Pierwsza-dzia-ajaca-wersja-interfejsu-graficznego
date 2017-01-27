@@ -90,13 +90,13 @@ namespace NetNode
             writer.Write(send_object);
         }
 
-        public static void sendTopologyInit(string from)
+        public static void sendTopologyInit(string ip)
         {
-            NetNode.log("sending inittopology to RC: " + from, ConsoleColor.Yellow);
+            NetNode.log("sending inittopology to RC: " + ip, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_INIT;
-            protocol.NodeName = from;
+            protocol.NodeName = ip;
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
         }
@@ -122,7 +122,7 @@ namespace NetNode
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE;
-            protocol.ConnectedNodePort = port;
+            //protocol.ConnectedNodePort = port;
             protocol.ConnectedNode = to;
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);
