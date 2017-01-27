@@ -23,13 +23,12 @@ namespace ClientWindow
         BinaryReader reader;
         BinaryWriter writer;
         private Thread thread;
-        private string domainNumber;
+
     
-        public CPCC(ClientWindow clientWindowHandler, string domainNumber)
+        public CPCC(ClientWindow clientWindowHandler, string controlPort)
         {
             this.clientWindowHandler = clientWindowHandler;
-            this.domainNumber = domainNumber;
-            this.readConfig();
+            bool res = int.TryParse(controlPort, out this.controlPort);
             ip = "127.0.0.1";
         }
 
@@ -83,13 +82,5 @@ namespace ClientWindow
 
         }
 
-        private void readConfig()
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load("config.xml");
-            XmlNode portNode = doc.DocumentElement.SelectSingleNode("/domain"+ domainNumber +"/controlPort");
-            string port = portNode.InnerText;
-            bool res = int.TryParse(port, out this.controlPort);
-        }
     }
 }

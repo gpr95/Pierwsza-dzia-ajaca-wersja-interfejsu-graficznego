@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<domain1>
-<controlPort>29899</controlPort>
-<client>CN0</client>
-<client>CN1</client>
-<client>CN2</client>
-<client>CN3</client>
-</domain1>
