@@ -290,7 +290,7 @@ namespace ManagementApp
             switch (oType)
             {
                 case OperationType.ADD_CONNECTION:
-                    if (nodeFrom == null)
+                    if (nodeFrom == null || virtualNodeTo == null)
                         break;
                     Node nodeTo = getNodeFrom(x, y);
                     if (autoAggregation.Checked)

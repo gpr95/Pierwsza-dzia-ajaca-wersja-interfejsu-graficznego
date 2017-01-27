@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Timers;
 
 using ClientWindow;
@@ -17,8 +17,8 @@ namespace NetNode
         //receive and interpret ip of neighbours and for now print it then send to RC
         
         public static BinaryWriter writer;
-        private Timer timerForSending;
-        private Timer timerForConf;
+        private System.Timers.Timer timerForSending;
+        private System.Timers.Timer timerForConf;
         private string virtualIp;
         public static Dictionary<int, string> connections = new Dictionary<int,string>();
         private static Dictionary<int, bool> confirmations = new Dictionary<int, bool>();
@@ -30,17 +30,17 @@ namespace NetNode
             this.virtualIp = virtualIp;
             initResources(resources);
 
-            //Timer
-            timerForSending = new Timer();
+            //Timer for topology
+            timerForSending = new System.Timers.Timer();
             timerForSending.Elapsed += new ElapsedEventHandler(sendMessage);
-            timerForSending.Interval = 10000; //10 seconds
+            timerForSending.Interval = 5000;
             timerForSending.Enabled = true;
 
-            //Timer
-            timerForConf = new Timer();
-            timerForConf.Elapsed += new ElapsedEventHandler(confirmAlive);
-            timerForConf.Interval = 10000; //10 seconds
-            timerForConf.Enabled = true;
+            //Timer for keepalive
+            //timerForConf = new Timer();
+            //timerForConf.Elapsed += new ElapsedEventHandler(confirmAlive);
+            //timerForConf.Interval = 10000;
+            //timerForConf.Enabled = true;
         }
 
         private void initResources(List<Resource> resources)
@@ -102,6 +102,8 @@ namespace NetNode
 
                 writer.Write(data);
             }
+            Thread.Sleep(4900);
+            this.confirmAlive();
         }
 
         private void saveConnection(int port, string virtualIp)
@@ -115,7 +117,7 @@ namespace NetNode
             }
         }
 
-        private void confirmAlive(object sender, EventArgs e)
+        private void confirmAlive()
         {
             foreach (var i in connections)
             {
