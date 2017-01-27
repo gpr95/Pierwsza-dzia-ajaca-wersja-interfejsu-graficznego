@@ -20,7 +20,6 @@ namespace ControlNCC
         private TcpClient connection;
         private Thread thread;
         private string ip;
-        private int connectionControlPort;   //do dodania
         BinaryWriter writerToCC;
 
         public ControlConnectionService(TcpClient clientHandler, NetworkCallControl handlerNCC)

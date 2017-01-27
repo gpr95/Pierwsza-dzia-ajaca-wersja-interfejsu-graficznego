@@ -54,7 +54,7 @@ namespace ControlNCC
             while (true)
             {
                 TcpClient client = listener.AcceptTcpClient();
-                //ControlConnectionService service = new ControlConnectionService(client, this);
+                ControlConnectionService service = new ControlConnectionService(client, this);
             }
         }
 
