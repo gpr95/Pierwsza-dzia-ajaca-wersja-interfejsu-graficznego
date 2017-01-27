@@ -472,15 +472,19 @@ namespace ControlCCRC
 
         public void deleteTopologyElementFromLRM(String whoDied)
         {
-            topologyUnallocatedLayer1.Remove(whoDied);
-            topologyUnallocatedLayer2.Remove(whoDied);
-            topologyUnallocatedLayer3.Remove(whoDied);
+            
             foreach (var item in topologyUnallocatedLayer1.Where(node => node.Value.ContainsKey(whoDied)).ToList())
                 item.Value.Remove(whoDied);
             foreach (var item in topologyUnallocatedLayer2.Where(node => node.Value.ContainsKey(whoDied)).ToList())
                 item.Value.Remove(whoDied);
             foreach (var item in topologyUnallocatedLayer3.Where(node => node.Value.ContainsKey(whoDied)).ToList())
                 item.Value.Remove(whoDied);
+            foreach (var item in wholeTopologyNodesAndConnectedNodesWithPorts.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                item.Value.Remove(whoDied);
+            topologyUnallocatedLayer1.Remove(whoDied);
+            topologyUnallocatedLayer2.Remove(whoDied);
+            topologyUnallocatedLayer3.Remove(whoDied);
+            wholeTopologyNodesAndConnectedNodesWithPorts.Remove(whoDied);
         }
 
         public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate)
