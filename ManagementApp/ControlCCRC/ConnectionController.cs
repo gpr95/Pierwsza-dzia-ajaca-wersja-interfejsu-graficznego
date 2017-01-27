@@ -38,7 +38,7 @@ namespace ControlCCRC
 
             if (iAmDomain)
             {
-                consoleWriter("[INIT] DOMAIN");
+                consoleWriter("[INIT] DOMAIN - " + identifier);
                 identifier = "DOMAIN_" + identifier;
                 try
                 {
@@ -55,7 +55,7 @@ namespace ControlCCRC
             }
             else
             {
-                consoleWriter("[INIT] SUBNETWORK");
+                consoleWriter("[INIT] SUBNETWORK - " + identifier);
                 try
                 {
                     int ccPort;

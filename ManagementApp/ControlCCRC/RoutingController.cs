@@ -52,11 +52,11 @@ namespace ControlCCRC
 
             if (!iAmDomain)
             {
-                consoleWriter("[INIT] SUBNETWORK");
+                consoleWriter("[INIT] SUBNETWORK - " + identifier);
                 try
                 {
                     int rccId;
-                    int.TryParse(args[0], out rccId);
+                    int.TryParse(args[1], out rccId);
                     RCClient = new TcpClient("localhost", rccId);
                 }
                 catch (SocketException ex)
@@ -68,7 +68,7 @@ namespace ControlCCRC
             }
             else
             {
-                consoleWriter("[INIT] DOMAIN");
+                consoleWriter("[INIT] DOMAIN - " + identifier);
                 identifier = "DOMAIN_" + identifier;
             }
 

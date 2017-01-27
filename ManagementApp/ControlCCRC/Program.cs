@@ -29,11 +29,9 @@ namespace ControlCCRC
         static void Main(string[] args)
         {
             Dictionary<String, BinaryWriter> socketHandler = new Dictionary<string, BinaryWriter>();
-            int domainId;
-            int.TryParse(args[1],out domainId);
 
-            string rcId = "RC_" + domainId;
-            string ccId = "CC_" + domainId;
+            string rcId = "RC_" + args[1];
+            string ccId = "CC_" + args[1];
 
             string[] rcArgs = new string[] { };
             if (args.Length == 4)
