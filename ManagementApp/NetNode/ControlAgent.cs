@@ -58,8 +58,14 @@ namespace NetNode
                         //TODO allocate resources
                         foreach (var row in rec)
                         {
-                            LRM.allocateResource(row.iport, row.in_cont);
-                            LRM.allocateResource(row.oport, row.out_cont);
+                            if(LRM.allocateResource(row.iport, row.in_cont))
+                            {
+                                sendTopologyAllocated(row.iport, row.in_cont);
+                            }
+                            if(LRM.allocateResource(row.oport, row.out_cont))
+                            {
+                                sendTopologyAllocated(row.iport, row.in_cont);
+                            }
                             SwitchingField.addToSwitch(row);
                             //adding fib for two-way communication
                             SwitchingField.addToSwitch(new FIB(row.oport,row.out_cont,row.iport,row.in_cont));
@@ -103,6 +109,19 @@ namespace NetNode
             writer.Write(send_object);
         }
 
+        public static void sendTopologyAllocated(int port, int no_vc3)
+        {
+            string to;
+            LRM.connections.TryGetValue(port, out to);
+            NetNode.log("sending topology to RC: " + to + " " + no_vc3, ConsoleColor.Yellow);
+
+            RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
+            protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_ALLOCATED;
+            protocol.ConnectedNode = to;
+            protocol.AllocatedSlot = no_vc3;
+            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+            writer.Write(send_object);
+        }
 
         public static void sendDeleted(string from, int port, string to)
         {
