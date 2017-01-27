@@ -15,34 +15,30 @@ namespace ControlCCRC
 {
     class ConnectionController
     {
-        private TcpListener CCListener;
         private TcpClient CCClient;
         private TcpClient NCCClient;
 
-        private Thread threadListenCC;
         private Thread threadconnectCC;
         private Thread threadconnectNCC;
 
         private RoutingController rcHandler;
-
-        private Dictionary<String, CCThread> lastCCNodes;
+        private Dictionary<String, ListenerHandler> socketHandler;
 
         private Boolean iAmDomain;
         /**
-         * DOMAIN [listen CC, connect NCC]
-         * SUBNETWORK [listen CC, connect up CC, JUST_FLAG]
+         * DOMAIN [connect NCC]
+         * SUBNETWORK [connect up CC, flag] 
          */
         public ConnectionController(string[] args)
         {
-            iAmDomain = (args.Length == 2);
-            lastCCNodes = new Dictionary<string, CCThread>();
+            iAmDomain = (args.Length == 1);
 
-            if(iAmDomain)
+            if (iAmDomain)
             {
                 consoleWriter("[INIT] DOMAIN");
                 try
                 {
-                    NCCClient = new TcpClient("localhost", Convert.ToInt32(args[1]));
+                    NCCClient = new TcpClient("localhost", Convert.ToInt32(args[0]));
                 }
                 catch (SocketException ex)
                 {
@@ -56,7 +52,7 @@ namespace ControlCCRC
                 consoleWriter("[INIT] SUBNETWORK");
                 try
                 {
-                    CCClient = new TcpClient("localhost", Convert.ToInt32(args[1]));
+                    CCClient = new TcpClient("localhost", Convert.ToInt32(args[0]));
                 }
                 catch (SocketException ex)
                 {
@@ -66,9 +62,6 @@ namespace ControlCCRC
                 threadconnectCC.Start();
             }
 
-            this.CCListener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[0]));
-            this.threadListenCC = new Thread(new ThreadStart(ccListen));
-            threadListenCC.Start();
 
             consoleStart();
         }
@@ -76,6 +69,11 @@ namespace ControlCCRC
         public void setRCHandler(RoutingController rc)
         {
             this.rcHandler = rc;
+        }
+
+        public void setSocketHandler(Dictionary<String, ListenerHandler> socketHandler)
+        {
+            this.socketHandler = socketHandler;
         }
 
         private void nccConnect()
@@ -93,18 +91,11 @@ namespace ControlCCRC
                     if (received_object.Type != typeof(CCtoNCCSingallingMessage))
                         noError = false;
                     CCtoNCCSingallingMessage msg = received_object.Value.ToObject<CCtoNCCSingallingMessage>();
-                    switch(msg.State)
+                    switch (msg.State)
                     {
+                        // POPRAWIC
                         case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:
-                            Dictionary<String,List<FIB>> fibs = rcHandler.findPath(msg.NodeFrom, msg.NodeTo, msg.Rate);
-                            if(fibs != null)
-                                for(int i = 0; i<fibs.Count; i++)
-                                {
-                                    foreach(FIB fib in fibs[fibs.Keys.ElementAt(i)])
-                                    {
-                                        lastCCNodes[fibs.Keys.ElementAt(i)].writeFIB(fib);
-                                    }
-                                }
+                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate);
                             break;
                     }
                 }
@@ -138,116 +129,28 @@ namespace ControlCCRC
             }
         }
 
-        private void ccListen()
+        public void setFibsFromRC(Dictionary<String, List<FIB>> fibs)
         {
-            this.CCListener.Start();
-
-            Boolean noError = true;
-            while (noError)
-            {
-                try
+            if (fibs != null)
+                for (int i = 0; i < fibs.Count; i++)
                 {
-                    TcpClient client = CCListener.AcceptTcpClient();
-                    CCThread thread = new CCThread(client, ref lastCCNodes);
+                    socketHandler[fibs.Keys.ElementAt(i)].writeFIB(fibs.Values.ElementAt(i));
                 }
-                catch (SocketException ex)
-                {
-                    consoleWriter("[ERROR] Socket failed. CC Listener.");
-                    noError = false;
-                }
-            }
+            else
+                consoleWriter("[ERROR] FIBS null - connection can't be made.")
         }
 
         private void consoleStart()
         {
-            consoleWriter("[INIT] CC started.");
+            consoleWriter("[INIT] Started.");
         }
         private void consoleWriter(String msg)
         {
-            Console.ForegroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.BackgroundColor = ConsoleColor.White;
 
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:[CC]" + msg);
             Console.Write(Environment.NewLine);
-        }
-    }
-
-    class CCThread
-    {
-        private Thread thread;
-        private BinaryWriter writer;
-        private Dictionary<String, CCThread> lastCCNodes;
-        private String nodeName;
-        public CCThread(TcpClient con, ref Dictionary<String, CCThread> lastCCNodes)
-        {
-            this.lastCCNodes = lastCCNodes;
-            thread = new Thread(new ParameterizedThreadStart(ccListen));
-            thread.Start(con);
-        }
-
-        private void ccListen(Object con)
-        {
-            TcpClient ccClient = (TcpClient)con;
-            BinaryReader reader = new BinaryReader(ccClient.GetStream());
-            writer = new BinaryWriter(ccClient.GetStream());
-
-            Boolean noError = true;
-            Boolean lastCC = false;
-            while (noError)
-            {
-                string received_data = reader.ReadString();
-                JMessage received_object = JMessage.Deserialize(received_data);
-                if (received_object.Type != typeof(CCtoCCSignallingMessage))
-                {
-                    consoleWriter("[ERROR] Received wrong data format.");
-                    return;
-                }
-
-                CCtoCCSignallingMessage msg = received_object.Value.ToObject<CCtoCCSignallingMessage>();
-                lastCC = msg.LastCC;
-
-                if(lastCC)
-                {
-                    //@TODO communication with NetNode CC
-                    switch(msg.State)
-                    {
-                        case CCtoCCSignallingMessage.CC_LOW_INIT:
-                            nodeName = msg.NodeName;
-                            lastCCNodes.Add(nodeName, this);
-                            break;
-
-                    }
-                }
-                else
-                {
-                    //@TODO communication with subnetwork CC
-                }
-            }
-        }
-
-
-        private void consoleWriter(String msg)
-        {
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.BackgroundColor = ConsoleColor.White;
-
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
-            Console.Write(Environment.NewLine);
-        }
-
-        internal void writeFIB(FIB fib)
-        {
-            try
-            {
-                CCtoCCSignallingMessage msg = new CCtoCCSignallingMessage();
-                msg.State = CCtoCCSignallingMessage.CC_UP_FIB_CHANGE;
-                string data = JMessage.Serialize(JMessage.FromValue(msg));
-                writer.Write(data);
-            }
-            catch (Exception e)
-            {
-                consoleWriter("[ERROR] Sending FIB failed");
-            }
         }
     }
 }

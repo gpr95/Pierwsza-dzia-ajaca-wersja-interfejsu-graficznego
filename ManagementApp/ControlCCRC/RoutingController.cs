@@ -16,36 +16,25 @@ namespace ControlCCRC
     class RoutingController
     {
         private Boolean iAmDomain;
+        private String identifier;
 
-        private TcpListener LRMAndRCListener;
         private TcpClient RCClient;
-
-        private Thread threadListenLRMAndRC;
         private Thread threadconnectRC;
-
-        private Dictionary<String, LRMRCThread> threadsMap;
 
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer1;
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer2;
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3;
-
-        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer1;
-        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2;
-        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3;
-
         private Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts;
 
-        private Dictionary<String,FIB> latestBuildedPathLayer1;
-        private Dictionary<String, FIB> latestBuildedPathLayer2;
-        private Dictionary<String, FIB> latestBuildedPathLayer3;
 
         private ConnectionController ccHandler;
+        private Dictionary<String, ListenerHandler> socketHandler;
 
-     
+
 
         /**
-        * DOMAIN [listen LRM_AND_RC]
-        * SUBNETWORK [listen LRM_AND_RC , connect up RC] 
+        * DOMAIN [RC_ID]
+        * SUBNETWORK [RC_ID, connect up RC] 
         */
         public RoutingController(string[] args)
         {
@@ -56,7 +45,7 @@ namespace ControlCCRC
                 consoleWriter("[INIT] SUBNETWORK");
                 try
                 {
-                    RCClient = new TcpClient("localhost", Convert.ToInt32(args[1]));
+                    RCClient = new TcpClient("localhost", Convert.ToInt32(args[0]));
                 }
                 catch (SocketException ex)
                 {
@@ -72,13 +61,6 @@ namespace ControlCCRC
             topologyUnallocatedLayer1 = new Dictionary<String, Dictionary<String, int>>();
             topologyUnallocatedLayer2 = new Dictionary<String, Dictionary<String, int>>();
             topologyUnallocatedLayer3 = new Dictionary<String, Dictionary<String, int>>();
-            topologyAllocatedLayer1 = new Dictionary<String, Dictionary<String, int>>();
-            topologyAllocatedLayer2 = new Dictionary<String, Dictionary<String, int>>();
-            topologyAllocatedLayer3 = new Dictionary<String, Dictionary<String, int>>();
-
-            this.LRMAndRCListener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[0]));
-            this.threadListenLRMAndRC = new Thread(new ThreadStart(lrmAndRcListening));
-            threadListenLRMAndRC.Start();
 
             consoleStart();
         }
@@ -86,6 +68,11 @@ namespace ControlCCRC
         public void setCCHandler(ConnectionController cc)
         {
             this.ccHandler = cc;
+        }
+
+        public void setSocketHandler(Dictionary<String, ListenerHandler> socketHandler)
+        {
+            this.socketHandler = socketHandler;
         }
 
         private void rcConnecting()
@@ -106,29 +93,6 @@ namespace ControlCCRC
                 }
                 catch (IOException ex)
                 {
-                    noError = false;
-                }
-            }
-        }
-
-        private void lrmAndRcListening()
-        {
-            this.LRMAndRCListener.Start();
-
-            Boolean noError = true;
-            while (noError)
-            {
-                try
-                {
-                    TcpClient client = LRMAndRCListener.AcceptTcpClient();
-                    LRMRCThread thread = new LRMRCThread(client, ref threadsMap,
-                        ref topologyUnallocatedLayer1, ref topologyUnallocatedLayer2, ref topologyUnallocatedLayer3,
-                        ref topologyAllocatedLayer1, ref topologyAllocatedLayer2, ref topologyAllocatedLayer3,
-                        ref wholeTopologyNodesAndConnectedNodesWithPorts);
-                }
-                catch (SocketException sEx)
-                {
-                    consoleWriter("[ERROR] Socket failed. Listener.");
                     noError = false;
                 }
             }
@@ -351,153 +315,56 @@ namespace ControlCCRC
             return path;
         }
 
-        private void consoleStart()
-        {
-            consoleWriter("[INIT] RC started.");
-        }
+       
 
       
+        public void initLRMNode(String nodeName)
+        {
+            topologyUnallocatedLayer1.Add(nodeName, new Dictionary<string, int>());
+            topologyUnallocatedLayer2.Add(nodeName, new Dictionary<string, int>());
+            topologyUnallocatedLayer3.Add(nodeName, new Dictionary<string, int>());
+            wholeTopologyNodesAndConnectedNodesWithPorts.Add(nodeName, new Dictionary<string, int>());
+        }
 
+        public void addTopologyElementFromLRM(String nodeName, String connectedNode, int connectedNodePort)
+        {
+            topologyUnallocatedLayer1[nodeName].Add(connectedNode, 1);
+            topologyUnallocatedLayer2[nodeName].Add(connectedNode, 1);
+            topologyUnallocatedLayer3[nodeName].Add(connectedNode, 1);
+            wholeTopologyNodesAndConnectedNodesWithPorts[nodeName]
+                .Add(connectedNode, connectedNodePort);
+        }
+
+        public void deleteTopologyElementFromLRM(String whoDied)
+        {
+            topologyUnallocatedLayer1.Remove(whoDied);
+            topologyUnallocatedLayer2.Remove(whoDied);
+            topologyUnallocatedLayer3.Remove(whoDied);
+            foreach (var item in topologyUnallocatedLayer1.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                item.Value.Remove(whoDied);
+            foreach (var item in topologyUnallocatedLayer2.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                item.Value.Remove(whoDied);
+            foreach (var item in topologyUnallocatedLayer3.Where(node => node.Value.ContainsKey(whoDied)).ToList())
+                item.Value.Remove(whoDied);
+        }
+
+        public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate)
+        {
+
+        }
 
         private void consoleWriter(String msg)
         {
-            Console.ForegroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.DarkBlue;
             Console.BackgroundColor = ConsoleColor.White;
 
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:[RC]" + msg);
             Console.Write(Environment.NewLine);
         }
 
-     
-
-    }
-
-
-    class LRMRCThread
-    {
-        private String nodeName;
-        private Thread thread;
-
-        /** Hadnlers */
-        private Dictionary<String, LRMRCThread> threadsMap;
-        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer1;
-        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer2;
-        private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3;
-
-        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer1;
-        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2;
-        private Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3;
-
-        private Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts;
-
-        public LRMRCThread(TcpClient connection, 
-            ref Dictionary<String, LRMRCThread> threadsMap,
-            ref Dictionary<String,Dictionary<String, int>> topologyUnallocatedLayer1,
-          ref  Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer2,
-          ref Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3,
-            ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer1,
-          ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer2,
-          ref Dictionary<String, Dictionary<String, int>> topologyAllocatedLayer3,
-          ref Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts)
+        private void consoleStart()
         {
-            this.threadsMap = threadsMap;
-            this.topologyUnallocatedLayer1 = topologyUnallocatedLayer1;
-            this.topologyUnallocatedLayer2 = topologyUnallocatedLayer2;
-            this.topologyUnallocatedLayer3 = topologyUnallocatedLayer3;
-            this.topologyAllocatedLayer1 = topologyAllocatedLayer1;
-            this.topologyAllocatedLayer2 = topologyAllocatedLayer2;
-            this.topologyAllocatedLayer3 = topologyAllocatedLayer3;
-            this.wholeTopologyNodesAndConnectedNodesWithPorts = wholeTopologyNodesAndConnectedNodesWithPorts;
-
-            thread = new Thread(new ParameterizedThreadStart(lrmThread));
-            thread.Start(connection);
-        }
-
-
-        public void lrmThread(Object lrm)
-        {
-            TcpClient lrmClient = (TcpClient)lrm;
-            BinaryReader reader = new BinaryReader(lrmClient.GetStream());
-            BinaryWriter writer = new BinaryWriter(lrmClient.GetStream());
-
-            Boolean noError = true;
-            Boolean lrmConnection = false;
-            while (noError)
-            {
-                string received_data = reader.ReadString();
-                JMessage received_object = JMessage.Deserialize(received_data);
-                if (received_object.Type == typeof(RCtoLRMSignallingMessage))
-                    lrmConnection = true;
-                else if (received_object.Type == typeof(RCtoRCSignallingMessage))
-                    lrmConnection = false;
-                else
-                {
-                    consoleWriter("[ERROR] Received wrong data format.");
-                    return;
-                }
-
-                if(lrmConnection)
-                {
-                    RCtoLRMSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoLRMSignallingMessage>();
-                    switch(lrmMsg.State)
-                    {
-                        case RCtoLRMSignallingMessage.LRM_INIT:
-                            nodeName = lrmMsg.NodeName;
-                            topologyUnallocatedLayer1.Add(nodeName, new Dictionary<string, int>());
-                            topologyUnallocatedLayer2.Add(nodeName, new Dictionary<string, int>());
-                            topologyUnallocatedLayer3.Add(nodeName, new Dictionary<string, int>());
-                            topologyAllocatedLayer1.Add(nodeName, new Dictionary<string, int>());
-                            topologyAllocatedLayer2.Add(nodeName, new Dictionary<string, int>());
-                            topologyAllocatedLayer3.Add(nodeName, new Dictionary<string, int>());
-                            wholeTopologyNodesAndConnectedNodesWithPorts.Add(nodeName, new Dictionary<string, int>());
-                            threadsMap.Add(nodeName, this);
-                            break;
-                        case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
-                            topologyUnallocatedLayer1[nodeName].Add(lrmMsg.ConnectedNode, 1);
-                            topologyUnallocatedLayer2[nodeName].Add(lrmMsg.ConnectedNode, 1);
-                            topologyUnallocatedLayer3[nodeName].Add(lrmMsg.ConnectedNode, 1);
-                            wholeTopologyNodesAndConnectedNodesWithPorts[nodeName]
-                                .Add(lrmMsg.ConnectedNode, lrmMsg.ConnectedNodePort);
-                            break;
-                        case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
-                            String whoDied = lrmMsg.ConnectedNode;
-                            topologyUnallocatedLayer1.Remove(whoDied);
-                            topologyUnallocatedLayer2.Remove(whoDied);
-                            topologyUnallocatedLayer3.Remove(whoDied);
-                            topologyAllocatedLayer1.Remove(whoDied);
-                            topologyAllocatedLayer2.Remove(whoDied);
-                            topologyAllocatedLayer3.Remove(whoDied);
-                            foreach (var item in topologyUnallocatedLayer1.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                                item.Value.Remove(whoDied);
-                            foreach (var item in topologyUnallocatedLayer2.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                                item.Value.Remove(whoDied);
-                            foreach (var item in topologyUnallocatedLayer3.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                                item.Value.Remove(whoDied);
-                            foreach (var item in topologyAllocatedLayer1.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                                item.Value.Remove(whoDied);
-                            foreach (var item in topologyAllocatedLayer2.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                                item.Value.Remove(whoDied);
-                            foreach (var item in topologyAllocatedLayer3.Where(node => node.Value.ContainsKey(whoDied)).ToList())
-                                item.Value.Remove(whoDied);
-                            break;                           
-                    }
-                }
-                else
-                {
-                    RCtoRCSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
-                    //@TODO
-                }
-            }
-        }
-
-
-        private void consoleWriter(String msg)
-        {
-            Console.ForegroundColor = ConsoleColor.Black;
-            Console.BackgroundColor = ConsoleColor.White;
-
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
-            Console.Write(Environment.NewLine);
+            consoleWriter("[INIT] Started.");
         }
     }
 }
