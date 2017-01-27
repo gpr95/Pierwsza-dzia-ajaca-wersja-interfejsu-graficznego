@@ -248,43 +248,30 @@ namespace ClientWindow
                 STM1 frame;
 
                 string data;
-                if (currentSpeed == 3)
+                Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
+                foreach (int slot in slots)
                 {
-
-                    VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), message);
-                    Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
-                    vc3List.Add(currentSlot, vc3);
-                    frame = new STM1(adaptation2(), vc3List);
-                    //SYGNAL
-                    signal = new Signal(virtualPort, frame);
-                    data = JMessage.Serialize(JMessage.FromValue(signal));
-                    isVc3 = true;
-
+                    VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), "Slot" + slot + " :" + message);
+                    vc3List.Add(slot, vc3);
                 }
-                else
-                {
+                frame = new STM1(adaptation2(), vc3List);
+                //SYGNAL
+                signal = new Signal(virtualPort, frame);
+                data = JMessage.Serialize(JMessage.FromValue(signal));
 
-                    frame = new STM1(adaptation(), message);
-                    //SYGNAL
-                    signal = new Signal(virtualPort, frame);
-                    data = JMessage.Serialize(JMessage.FromValue(signal));
 
-                }
 
                 while (cyclic_sending)
                 {
 
                     try
                     {
-
                         writer.Write(data);
-                        if (isVc3)
                             foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
                             {
                                 Log1("OUT", virtualIP, virtualPort.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                             }
-                        else
-                            Log1("OUT", virtualIP, virtualPort.ToString(), 1, "VC-4", frame.vc4.POH.ToString(), frame.vc4.C4);
+
                         await Task.Delay(TimeSpan.FromMilliseconds(period));
                     }
                     catch (Exception e)
