@@ -76,10 +76,15 @@ namespace ControlCCRC
 
                     switch(rcMsg.State)
                     {
+                        case RCtoRCSignallingMessage.RC_FROM_SUBNETWORK_INIT:
+                            if (!socketHandler.ContainsKey(rcMsg.Identifier))
+                                socketHandler.Add(rcMsg.Identifier, writer);
+                            break;
                         case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM:
-                            rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights);
+                            rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights, rcMsg.RateToCountWeights, rcMsg.Identifier);
                             break;
                         case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE:
+                            rc.lowerRcSendedRejectAction(rcMsg.RateToCountWeights,rcMsg.Identifier);
                             break;
                     }
                 }

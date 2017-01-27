@@ -143,7 +143,13 @@ namespace ControlCCRC
                     if (received_object.Type != typeof(CCtoCCSignallingMessage))
                         noError = false;
                     CCtoCCSignallingMessage msg = received_object.Value.ToObject<CCtoCCSignallingMessage>();
-                    //@TODO communication with upper CC
+                    
+                    switch(msg.State)
+                    {
+                        case CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST:
+                            ///////////////////////////////////
+                            break;
+                    }
                 }
                 catch (IOException ex)
                 {
@@ -174,6 +180,19 @@ namespace ControlCCRC
 
             Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:[CC]" + msg);
             Console.Write(Environment.NewLine);
+        }
+
+        internal void sendRequestToSubnetworkCCToBuildPath(string rcName, string nodeFrom, string nodeTo, int rate)
+        {
+            CCtoCCSignallingMessage ccRequest = new CCtoCCSignallingMessage();
+            ccRequest.State = CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST;
+            ccRequest.NodeFrom = nodeFrom;
+            ccRequest.NodeTo = nodeTo;
+            ccRequest.Rate = rate;
+
+            String dataToSend = JMessage.Serialize(JMessage.FromValue(ccRequest));
+            socketHandler["CC_" + rcName.Substring(rcName.IndexOf("_") + 1)].Write(dataToSend);
+
         }
     }
 }

@@ -8,9 +8,12 @@ namespace ControlCCRC.Protocols
 {
     class RCtoRCSignallingMessage
     {
-        public const int COUNT_ALL_PATHS=0;
-        public const int COUNTED_ALL_PATHS_CONFIRM = 1;
-        public const int COUNTED_ALL_PATHS_REFUSE = 2;
+        // lower identifier sending identifier RC_ID to upper RC (identifier)
+        public const int RC_FROM_SUBNETWORK_INIT = 0;
+        // upper RC request for couning his all paths (allUpperNodesToCountWeights, rateToCountWeights)
+        public const int COUNT_ALL_PATHS_REQUEST = 1;
+        public const int COUNTED_ALL_PATHS_CONFIRM = 2;
+        public const int COUNTED_ALL_PATHS_REFUSE = 3;
         private int state;
 
 

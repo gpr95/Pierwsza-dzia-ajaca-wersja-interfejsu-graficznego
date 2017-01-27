@@ -32,8 +32,8 @@ namespace ControlCCRC
             int domainId;
             int.TryParse(args[1],out domainId);
 
-            string rcId = "RC" + domainId;
-            string ccId = "CC" + domainId;
+            string rcId = "RC_" + domainId;
+            string ccId = "CC_" + domainId;
 
             string[] rcArgs = new string[] { };
             if (args.Length == 4)

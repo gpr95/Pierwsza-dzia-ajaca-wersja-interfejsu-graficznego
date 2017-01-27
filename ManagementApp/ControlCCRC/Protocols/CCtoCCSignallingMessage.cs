@@ -17,6 +17,8 @@ namespace ControlCCRC.Protocols
         public const int CC_UP_FIB_CHANGE = 2;
         // middle cc
         public const int CC_MIDDLE_INIT = 3;
+        // cc requests to build path between two nodes
+        public const int CC_BUILD_PATH_REQUEST = 4;
         
 
 
@@ -27,6 +29,11 @@ namespace ControlCCRC.Protocols
         private List<FIB> fib_table;
         // middle CC id
         private String identifier;
+
+        // state 4
+        private String nodeFrom;
+        private String nodeTo;
+        private int rate;
 
         public bool LastCC
         {
@@ -77,6 +84,45 @@ namespace ControlCCRC.Protocols
             set
             {
                 identifier = value;
+            }
+        }
+
+        public string NodeFrom
+        {
+            get
+            {
+                return nodeFrom;
+            }
+
+            set
+            {
+                nodeFrom = value;
+            }
+        }
+
+        public string NodeTo
+        {
+            get
+            {
+                return nodeTo;
+            }
+
+            set
+            {
+                nodeTo = value;
+            }
+        }
+
+        public int Rate
+        {
+            get
+            {
+                return rate;
+            }
+
+            set
+            {
+                rate = value;
             }
         }
     }

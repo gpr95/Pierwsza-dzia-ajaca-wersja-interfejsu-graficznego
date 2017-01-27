@@ -18,6 +18,8 @@ namespace ControlCCRC
         private Boolean iAmDomain;
         private String identifier;
 
+        private int lowerRcRequestedInAction;
+
         private TcpClient RCClient;
         private Thread threadconnectRC;
 
@@ -25,9 +27,14 @@ namespace ControlCCRC
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer2;
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3;
         private Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts;
-
+        Dictionary<String, String> mapNodeConnectedNodeAndAssociatedRCSubnetwork;
         private List<String> pathNeededToBeCount;
         private String upperRc;
+        private BinaryWriter upperWriter;
+
+        private String requestNodeFrom;
+        private String requestNodeTo;
+        private int requestRate;
 
         private ConnectionController ccHandler;
         private Dictionary<String, BinaryWriter> socketHandler;
@@ -70,6 +77,7 @@ namespace ControlCCRC
             topologyUnallocatedLayer2 = new Dictionary<String, Dictionary<String, int>>();
             topologyUnallocatedLayer3 = new Dictionary<String, Dictionary<String, int>>();
             wholeTopologyNodesAndConnectedNodesWithPorts = new Dictionary<string, Dictionary<string, int>>();
+            mapNodeConnectedNodeAndAssociatedRCSubnetwork = new Dictionary<String, String>();
 
             consoleStart();
         }
@@ -87,14 +95,15 @@ namespace ControlCCRC
         private void rcConnecting()
         {
             BinaryReader reader = new BinaryReader(RCClient.GetStream());
-            BinaryWriter writer = new BinaryWriter(RCClient.GetStream());
+            upperWriter = new BinaryWriter(RCClient.GetStream());
 
 
 
             RCtoRCSignallingMessage initMsg = new RCtoRCSignallingMessage();
+            initMsg.State = RCtoRCSignallingMessage.RC_FROM_SUBNETWORK_INIT;
             initMsg.Identifier = identifier;
             String send_object = JMessage.Serialize(JMessage.FromValue(initMsg));
-            writer.Write(send_object);
+            upperWriter.Write(send_object);
 
             Boolean noError = true;
             while (noError)
@@ -108,51 +117,26 @@ namespace ControlCCRC
                     RCtoRCSignallingMessage msg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
                     switch(msg.State)
                     {
-                        case RCtoRCSignallingMessage.COUNT_ALL_PATHS:
+                        case RCtoRCSignallingMessage.COUNT_ALL_PATHS_REQUEST:
                             pathNeededToBeCount = msg.AllUpperNodesToCountWeights;
                             upperRc = msg.Identifier;
-                            if(socketHandler.Keys.Where(id => id.StartsWith("RC")).Count() > 0)
+                            if (socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count() > 0)
+                            {
+                                lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count();
                                 foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC")))
                                 {
                                     RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
-                                    countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS;
+                                    countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS_REQUEST;
+                                    countPathsMsg.Identifier = identifier;
                                     countPathsMsg.AllUpperNodesToCountWeights = wholeTopologyNodesAndConnectedNodesWithPorts.Keys.ToList();
+                                    countPathsMsg.RateToCountWeights = msg.RateToCountWeights;
                                     String dataToSend = JMessage.Serialize(JMessage.FromValue(countPathsMsg));
                                     socketHandler[id].Write(dataToSend);
                                 }
+                            }
                             else
                             {
-                                RCtoRCSignallingMessage countedPathValue = new RCtoRCSignallingMessage();
-
-                                Dictionary<String, String> pairs;
-                                Dictionary<String, Dictionary<String, int>> nodeConnectionsAndWeights = new Dictionary<string, Dictionary<string, int>>();
-                                for (int i=0; i< pathNeededToBeCount.Count(); i++)
-                                {
-                                    List<String> others = pathNeededToBeCount
-                                        .Where(node => !node.Equals(pathNeededToBeCount[i])).ToList();
-
-                                    Dictionary<String, int> connections = new Dictionary<string, int>();
-                                    foreach (String s in others)
-                                    {
-                                        if (findWeightBetweenTwoNodes(pathNeededToBeCount[i], s, msg.RateToCountWeights) != 0)
-                                            connections.Add(s, findWeightBetweenTwoNodes(pathNeededToBeCount[i], s, msg.RateToCountWeights));
-                                    }
-
-                                    nodeConnectionsAndWeights.Add(pathNeededToBeCount[i], connections);
-                                }
-
-                                if (nodeConnectionsAndWeights.Count != 0)
-                                {
-                                    countedPathValue.NodeConnectionsAndWeights = nodeConnectionsAndWeights;
-                                    countedPathValue.State = RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM;
-                                }
-                                else
-                                {
-                                    countedPathValue.State = RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE;
-                                }
-
-                                String dataToSend = JMessage.Serialize(JMessage.FromValue(countedPathValue));
-                                writer.Write(dataToSend);
+                                sendCountedWeightsToUpperNode(msg.RateToCountWeights);
                             }
                             break;
                     }
@@ -164,7 +148,41 @@ namespace ControlCCRC
             }
         }
 
-    
+        private void sendCountedWeightsToUpperNode( int rate)
+        {
+            RCtoRCSignallingMessage countedPathValue = new RCtoRCSignallingMessage();
+            Dictionary<String, Dictionary<String, int>> nodeConnectionsAndWeights =
+                new Dictionary<string, Dictionary<string, int>>();
+            for (int i = 0; i < pathNeededToBeCount.Count(); i++)
+            {
+                List<String> others = pathNeededToBeCount
+                    .Where(node => !node.Equals(pathNeededToBeCount[i])).ToList();
+
+                Dictionary<String, int> connections = new Dictionary<string, int>();
+                foreach (String s in others)
+                {
+                    if (findWeightBetweenTwoNodes(pathNeededToBeCount[i], s, rate) != 0)
+                        connections.Add(s, findWeightBetweenTwoNodes(pathNeededToBeCount[i], s, rate));
+                }
+
+                nodeConnectionsAndWeights.Add(pathNeededToBeCount[i], connections);
+            }
+
+            if (nodeConnectionsAndWeights.Count != 0)
+            {
+                countedPathValue.NodeConnectionsAndWeights = nodeConnectionsAndWeights;
+                countedPathValue.State = RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM;
+            }
+            else
+            {
+                countedPathValue.State = RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE;
+            }
+            countedPathValue.RateToCountWeights = rate;
+            countedPathValue.Identifier = identifier;
+            String dataToSend = JMessage.Serialize(JMessage.FromValue(countedPathValue));
+            upperWriter.Write(dataToSend);
+        }
+
 
         public int findWeightBetweenTwoNodes(String startNode, String endNode, int howMuchVC3)
         {
@@ -218,7 +236,7 @@ namespace ControlCCRC
                     if (shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2) != null &&
                         shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3) != null)
                     {
-                        shortest3 = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1).Count + 2;
+                        shortest3 = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2).Count + 2;
                     }
                     int[] anArray = { shortest1, shortest2, shortest3};
                     result = anArray.Max();
@@ -233,6 +251,84 @@ namespace ControlCCRC
 
             return result;
         }
+
+
+        public List<String> findChepestNodesBetweenTwoNodes(String startNode, String endNode, int howMuchVC3)
+        {
+            List<String> result = new List<string>();
+            consoleWriter("[RC] calculating shortest path (only calculating): " + startNode + " and " + endNode + " with:"
+                + howMuchVC3 + "x VC-3");
+
+            if (wholeTopologyNodesAndConnectedNodesWithPorts
+               .Where(node => node.Value.ContainsKey(startNode)) == null)
+            {
+                return null;
+            }
+            if (wholeTopologyNodesAndConnectedNodesWithPorts
+                .Where(node => node.Value.ContainsKey(endNode)) == null)
+            {
+                return null;
+            }
+
+            String firstInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
+                .Where(node => node.Value.ContainsKey(startNode)).First().Key;
+
+            String lastInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
+                .Where(node => node.Value.ContainsKey(endNode)).First().Key;
+
+
+            switch (howMuchVC3)
+            {
+                case 1:
+                    if (shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1) != null)
+                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1);
+                    if ((result == null || result.Count == 0) 
+                        && shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2) != null)
+                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2);
+                    if ((result == null || result.Count == 0)
+                        && shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3) != null)
+                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3);
+                    break;
+                case 2:
+                    List<String> shortest1 = null;
+                    List<String> shortest2 = null;
+                    List<String> shortest3 = null;
+
+                    if (shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1) != null &&
+                        shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2) != null)
+                    {
+                        shortest1 = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1);
+                    }
+                    if (shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1) != null &&
+                        shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3) != null)
+                    {
+                        shortest2 = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1);
+                    }
+                    if (shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2) != null &&
+                        shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3) != null)
+                    {
+                        shortest3 = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1);
+                    }
+
+                    if (shortest1 != null)
+                        result = shortest1;
+                    else if (shortest2 != null)
+                        result = shortest2;
+                    else if (shortest3 != null)
+                        result = shortest3;
+                    break;
+                case 3:
+                    if (shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1) != null &&
+                        shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer2) != null &&
+                        shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer3) != null)
+                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, ref topologyUnallocatedLayer1);
+                    break;
+            }
+
+            return result;
+        }
+
+
 
         public Dictionary<String,List<FIB>> findPath(String startNode, String endNode, int howMuchVC3)
         {
@@ -489,10 +585,15 @@ namespace ControlCCRC
 
         public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate)
         {
-            foreach(String id in socketHandler.Keys.Where(id => id.StartsWith("RC")))
+            this.requestNodeFrom = nodeFrom;
+            this.requestNodeTo = nodeTo;
+            this.requestRate = rate;
+
+            lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count();
+            foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC_")))
             {
                 RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
-                countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS;
+                countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS_REQUEST;
                 countPathsMsg.Identifier = identifier;
                 countPathsMsg.AllUpperNodesToCountWeights = wholeTopologyNodesAndConnectedNodesWithPorts.Keys.ToList();
                 countPathsMsg.RateToCountWeights = rate;
@@ -501,8 +602,10 @@ namespace ControlCCRC
             }
         }
 
-        internal void lowerRcSendedConnectionsAction(Dictionary<string, Dictionary<string, int>> nodeConnectionsAndWeights)
+        public void lowerRcSendedConnectionsAction(Dictionary<string, Dictionary<string, int>> nodeConnectionsAndWeights, int rate, String rcFrom)
         {
+            lowerRcRequestedInAction--;
+            
             foreach (String node in nodeConnectionsAndWeights.Keys)
             {
                 for (int i = 0; i < nodeConnectionsAndWeights[node].Count; i++)
@@ -512,7 +615,71 @@ namespace ControlCCRC
                         wholeTopologyNodesAndConnectedNodesWithPorts[node]
                             .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
                             nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer1[node]
+                            .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer2[node]
+                            .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer3[node]
+                            .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        mapNodeConnectedNodeAndAssociatedRCSubnetwork.Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i)+ "#" +
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i), rcFrom);
                     }
+                }
+            }
+
+            if (lowerRcRequestedInAction == 0)
+            {
+                if (iAmDomain)
+                {
+                    List<String> path = findChepestNodesBetweenTwoNodes(requestNodeFrom, requestNodeTo, requestRate);
+                    if(path == null || path.Count == 0)
+                    {
+                        consoleWriter("[ERROR] upper path can noc be found");
+                        return;
+                    }
+
+                    if(mapNodeConnectedNodeAndAssociatedRCSubnetwork.ContainsKey(requestNodeFrom + "#"+ path[0]))
+                    {
+                        lowerRcRequestedInAction++;
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(
+                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[requestNodeFrom + "#" + path[0]],requestNodeFrom,path[0]);
+                    }
+                    for(int i = 0; i < path.Count; i++)
+                    {
+                        lowerRcRequestedInAction++;
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(
+                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[path[i] + "#" + path[i+1]], path[i], path[i+1]);
+                    }
+                    if (mapNodeConnectedNodeAndAssociatedRCSubnetwork.ContainsKey(path.Last() + "#" + requestNodeTo))
+                    {
+                        lowerRcRequestedInAction++;
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(
+                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[path.Last() + "#" + requestNodeTo], path.Last(), requestNodeTo);
+                    }
+                }
+                else
+                {
+                    sendCountedWeightsToUpperNode(rate);
+                }
+            }
+        }
+
+
+        internal void lowerRcSendedRejectAction(int rate, String rcFrom)
+        {
+            lowerRcRequestedInAction--;
+            if (lowerRcRequestedInAction == 0)
+            {
+                if (iAmDomain)
+                {
+                    List<String> path = findChepestNodesBetweenTwoNodes(requestNodeFrom, requestNodeTo, requestRate);
+                }
+                else
+                {
+                    sendCountedWeightsToUpperNode(rate);
                 }
             }
         }
