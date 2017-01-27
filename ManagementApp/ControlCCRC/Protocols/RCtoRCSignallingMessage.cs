@@ -22,7 +22,7 @@ namespace ControlCCRC.Protocols
         private int rateToCountWeights;
 
         // state 1
-        private List<Dictionary<String, String>> fromTo;
+        Dictionary<String, Dictionary<String, int>> nodeConnectionsAndWeights;
         private List<int> pathWeight;
 
         public string Identifier
@@ -64,19 +64,6 @@ namespace ControlCCRC.Protocols
             }
         }
 
-        public List<Dictionary<string, string>> FromTo
-        {
-            get
-            {
-                return fromTo;
-            }
-
-            set
-            {
-                fromTo = value;
-            }
-        }
-
         public List<int> PathWeight
         {
             get
@@ -100,6 +87,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 rateToCountWeights = value;
+            }
+        }
+
+        public Dictionary<string, Dictionary<string, int>> NodeConnectionsAndWeights
+        {
+            get
+            {
+                return nodeConnectionsAndWeights;
+            }
+
+            set
+            {
+                nodeConnectionsAndWeights = value;
             }
         }
     }

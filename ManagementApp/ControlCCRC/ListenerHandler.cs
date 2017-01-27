@@ -69,6 +69,15 @@ namespace ControlCCRC
                 {
                     RCtoRCSignallingMessage rcMsg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
                     socketHandler.Add(rcMsg.Identifier, writer);
+
+                    switch(rcMsg.State)
+                    {
+                        case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM:
+                            rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights);
+                            break;
+                        case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE:
+                            break;
+                    }
                 }
                 else if (received_object.Type == typeof(CCtoCCSignallingMessage))
                 {

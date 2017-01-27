@@ -33,7 +33,7 @@ namespace ControlCCRC
          */
         public ConnectionController(string[] args)
         {
-            iAmDomain = (args.Length == 1);
+            iAmDomain = (args.Length == 2);
             identifier = args[0];
 
             if (iAmDomain)
@@ -84,6 +84,12 @@ namespace ControlCCRC
         {
             BinaryReader reader = new BinaryReader(NCCClient.GetStream());
             BinaryWriter writer = new BinaryWriter(NCCClient.GetStream());
+
+
+            CCtoNCCSingallingMessage initMsg = new CCtoNCCSingallingMessage();
+            initMsg.State = CCtoNCCSingallingMessage.INIT_FROM_CC;
+            String dataToSend = JMessage.Serialize(JMessage.FromValue(initMsg));
+
 
             Boolean noError = true;
             while (noError)
