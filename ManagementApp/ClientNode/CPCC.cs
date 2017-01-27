@@ -57,6 +57,18 @@ namespace ClientWindow
                         {
                             if (packet.state == ControlPacket.ACCEPT)
                             {
+                                if(packet.Vc11  != 0)
+                                {
+                                    clientWindowHandler.slots.Add(11);
+                                }
+                                if(packet.Vc12 != 0)
+                                {
+                                    clientWindowHandler.slots.Add(12);
+                                }
+                                if(packet.Vc13 != 0)
+                                {
+                                    clientWindowHandler.slots.Add(13);
+                                }
 
                                 clientWindowHandler.Log2("CONTROL", "call request accepted");
                             }else
@@ -79,12 +91,12 @@ namespace ClientWindow
             }
         }
 
-        public void sendRequest(string clientName)
+        public void sendRequest(string clientName, int speed)
         {
-            ControlPacket packet = null;
+            ControlPacket packet = new ControlPacket(ControlInterface.CALL_REQUEST,ControlPacket.IN_PROGRESS,speed,clientName,clientWindowHandler.virtualIP);
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
-            clientWindowHandler.Log2("CONTROL", "send request on " + ControlInterface.CALL_REQUEST + " interface");
+            clientWindowHandler.Log2("CONTROL", "send request on " + ControlInterface.CALL_REQUEST + " interface for"+ clientName);
 
         }
 

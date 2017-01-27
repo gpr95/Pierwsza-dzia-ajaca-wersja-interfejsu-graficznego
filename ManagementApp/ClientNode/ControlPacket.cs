@@ -10,11 +10,15 @@ namespace ClientNode
     {
         public const int ACCEPT = 0;
         public const int REJECT = 1;
+        public const int IN_PROGRESS = 2;
+        public const int RATE_1 = 1;
+        public const int RATE_2 = 2;
+        public const int RATE_3 = 3;
         public string virtualInterface;
         public string originIdentifier;
         public string destinationIdentifier;
-        public int virtualPort;
         public int state;
+        public int speed;
         private int vc11;
         private int vc12;
         private int vc13;
@@ -58,12 +62,13 @@ namespace ClientNode
             }
         }
 
-        public ControlPacket(string virtualInterface,int state, string destinationIdentifier, string originIdentifier)
+        public ControlPacket(string virtualInterface,int state,int speed, string destinationIdentifier, string originIdentifier)
         {
             this.virtualInterface = virtualInterface;
             this.destinationIdentifier = destinationIdentifier;
             this.originIdentifier = originIdentifier;
             this.state = state;
+            this.speed = speed;
         }
 
        

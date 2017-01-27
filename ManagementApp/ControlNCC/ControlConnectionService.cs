@@ -69,6 +69,7 @@ namespace ControlNCC
                                 packetToCC.State = CCtoNCCSingallingMessage.NCC_SET_CONNECTION;
                                 packetToCC.NodeFrom = packet.originIdentifier;
                                 packetToCC.NodeTo = packet.destinationIdentifier;
+                                packetToCC.Rate = packet.speed;
                                 ControlConnectionService CCService = this.handlerNCC.getCCService();
                                 CCService.sendCCRequest(packetToCC);
                                 
@@ -100,7 +101,7 @@ namespace ControlNCC
                         else if(packet.State == CCtoNCCSingallingMessage.CC_CONFIRM)
                         {
                             ControlConnectionService cpccCallService = handlerNCC.getService(packet.NodeFrom);
-                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT,ControlPacket.ACCEPT,packet.NodeTo,packet.NodeTo);
+                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT,ControlPacket.ACCEPT,packet.Rate,packet.NodeTo,packet.NodeTo);
                             if(packet.Vc11 != 0)
                             {
                                 packetToCPCC.Vc11 = 1;
@@ -118,7 +119,7 @@ namespace ControlNCC
                         }else if(packet.State == CCtoNCCSingallingMessage.CC_REJECT)
                         {
                             ControlConnectionService cpccCallService = handlerNCC.getService(packet.NodeFrom);
-                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.REJECT, packet.NodeTo, packet.NodeTo);
+                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.REJECT,packet.Rate, packet.NodeTo, packet.NodeTo);
                             cpccCallService.send(packetToCPCC);
                         }
 
