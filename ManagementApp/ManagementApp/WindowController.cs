@@ -76,7 +76,7 @@ namespace ManagementApp
             if (d == null)
             {
                 a = new Address(false, 0, networkNodesNumber);
-                network = new Node(point, Node.NodeType.NETWORK, a.getName(), 8500 + networkNodesNumber, 0, 0);
+                network = new Node(point, Node.NodeType.NETWORK, a.getName(), 8500 + networkNodesNumber, MANAGPORT, 0);
             }
             else
             {

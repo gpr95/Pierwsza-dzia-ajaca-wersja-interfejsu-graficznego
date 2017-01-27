@@ -71,9 +71,16 @@ namespace ManagementApp
         {
             managementHandler = new ManagementHandler(mANAGPORT, v);
             this.ManagementPort = v;
+
             ProcessStartInfo startInfo = new ProcessStartInfo("ControlNCC.exe");
             startInfo.WindowStyle = ProcessWindowStyle.Minimized;
-            this.ControlPort = PortAggregation.NccPort;
+            this.NccPort = PortAggregation.NccPort;
+            startInfo.Arguments = name + " " + this.NccPort;
+            this.ProcessHandle = Process.Start(startInfo);
+
+            startInfo = new ProcessStartInfo("ControlCCRC.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            this.ControlPort = PortAggregation.CcRcPort;
             startInfo.Arguments = name + " " + this.ControlPort;
             this.ProcessHandle = Process.Start(startInfo);
         }
@@ -196,5 +203,7 @@ namespace ManagementApp
                 numberOfNodes = value;
             }
         }
+
+        public int NccPort { get; set; }
     }
 }

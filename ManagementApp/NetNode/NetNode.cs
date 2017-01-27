@@ -306,9 +306,9 @@ namespace NetNode
 
         static void Main(string[] args)
         {
-            string[] parameters = new string[] { args[0], args[1], args[2] };
+            //string[] parameters = new string[] { args[0], args[1], args[2] };
 
-            NetNode netnode = new NetNode(parameters);
+            NetNode netnode = new NetNode(args);
         }
     }
 }

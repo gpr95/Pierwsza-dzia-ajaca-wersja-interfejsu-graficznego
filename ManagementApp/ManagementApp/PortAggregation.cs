@@ -8,6 +8,7 @@
         static private int clientPort = 8000;
         static private int netPort = 8500;
         static private int nccPort = 9000;
+        static private int ccRcPort = 9100;
 
         public static int CableCloudPort
         {
@@ -46,6 +47,14 @@
             get
             {
                 return nccPort++;
+            }
+        }
+
+        public static int CcRcPort
+        {
+            get
+            {
+                return ccRcPort++;
             }
         }
 
