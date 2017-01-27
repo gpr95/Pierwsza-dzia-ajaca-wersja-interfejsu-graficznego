@@ -290,7 +290,10 @@ namespace ManagementApp
                     domainRect.Contains(c) &&
                     domainRect.Contains(d))
                     output.Add(s);
-                else
+                else if (domainRect.Contains(a) ||
+                    domainRect.Contains(b) ||
+                    domainRect.Contains(c) ||
+                    domainRect.Contains(d))
                     return null;
             }
             return output;

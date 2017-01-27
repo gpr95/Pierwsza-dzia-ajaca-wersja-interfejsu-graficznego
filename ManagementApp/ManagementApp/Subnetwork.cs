@@ -71,7 +71,7 @@ namespace ManagementApp
             ProcessStartInfo startInfo = new ProcessStartInfo("ControlCCRC.exe");
             startInfo.WindowStyle = ProcessWindowStyle.Minimized;
             this.ControlPort = PortAggregation.CcRcPort;
-            startInfo.Arguments = this.ControlPort + " " + name + " " + up.ControlPort + " t";
+            startInfo.Arguments = this.ControlPort + " " + name + " " + up.ControlPort;
             this.ProcessHandle = Process.Start(startInfo);
 
         }
@@ -81,7 +81,7 @@ namespace ManagementApp
             ProcessStartInfo startInfo = new ProcessStartInfo("ControlCCRC.exe");
             startInfo.WindowStyle = ProcessWindowStyle.Minimized;
             this.ControlPort = PortAggregation.CcRcPort;
-            startInfo.Arguments = this.ControlPort + " " + name + " " + up.ControlPort + " t";
+            startInfo.Arguments = this.ControlPort + " " + name + " " + up.ControlPort;
             this.ProcessHandle = Process.Start(startInfo);
 
         }
