@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using ManagementApp;
 
 
 namespace ControlNCC
@@ -18,7 +19,7 @@ namespace ControlNCC
         private int controlPort;
         private TcpListener listener;
         private Dictionary<String, ControlConnectionService> services;
-        private string domainNumber;
+        private int domainNumber;
         private static List<string> directory = new List<string>();
         private ControlConnectionService CCService;
         private ManagementHandler management;
@@ -28,7 +29,7 @@ namespace ControlNCC
             
             services = new Dictionary<String, ControlConnectionService>();
             string ip = "127.0.0.1";
-            this.domainNumber = domainParams[0];
+            int.TryParse(domainParams[0], out domainNumber);
             Console.WriteLine("Domain: " + domainNumber + " Listener: " + domainParams[1] + " Management: " + domainParams[2]);
             //readConfig();
             int.TryParse(domainParams[1], out this.controlPort);
@@ -97,12 +98,21 @@ namespace ControlNCC
 
         public Boolean checkIfInDirectory(string address)
         {
-            if (directory.Contains(address))
+            Address addres = new Address(address);
+            String[] addressArray = address.Split('.');
+            int.TryParse(addressArray[0], out addres.type);
+            int.TryParse(addressArray[1], out addres.domain);
+            int.TryParse(addressArray[2], out addres.subnet);
+            int.TryParse(addressArray[3], out addres.space);
+            if(addres.domain == domainNumber)
             {
                 return true;
-            }
-            else
+            }else
+            {
                 return false;
+            }
+
+            
         }
     }
 }

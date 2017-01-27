@@ -29,7 +29,7 @@ namespace ControlCCRC
         static void Main(string[] args)
         {
             Dictionary<String, BinaryWriter> socketHandler = new Dictionary<string, BinaryWriter>();
-
+            Console.Title = args[1];
             string rcId = "RC_" + args[1];
             string ccId = "CC_" + args[1];
 

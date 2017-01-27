@@ -14,11 +14,14 @@ namespace ClientNode
         public const int RATE_1 = 1;
         public const int RATE_2 = 2;
         public const int RATE_3 = 3;
+        public const int INTRADOMAIN = 0;
+        public const int INTERDOMAIN = 1;
         public string virtualInterface;
         public string originIdentifier;
         public string destinationIdentifier;
         public int state;
         public int speed;
+        public int domain;
         private int vc11;
         private int vc12;
         private int vc13;

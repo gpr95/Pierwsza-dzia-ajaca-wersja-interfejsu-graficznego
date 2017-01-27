@@ -95,10 +95,12 @@ namespace ControlNCC
                         CCtoNCCSingallingMessage packet = received_object.Value.ToObject<CCtoNCCSingallingMessage>();
                         if (packet.State == CCtoNCCSingallingMessage.INIT_FROM_CC)
                         {
+                            Console.WriteLine("[CC]Connection established");
                             handlerNCC.setCCService(this);
                         }
                         else if(packet.State == CCtoNCCSingallingMessage.CC_CONFIRM)
                         {
+                            Console.WriteLine("[CC]Receive connection confirm");
                             ControlConnectionService cpccCallService = handlerNCC.getService(packet.NodeFrom);
                             ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT,ControlPacket.ACCEPT,packet.Rate,packet.NodeTo,packet.NodeTo);
                             if(packet.Vc11 != 0)
@@ -117,6 +119,7 @@ namespace ControlNCC
 
                         }else if(packet.State == CCtoNCCSingallingMessage.CC_REJECT)
                         {
+                            Console.WriteLine("[CC]Receive connection reject");
                             ControlConnectionService cpccCallService = handlerNCC.getService(packet.NodeFrom);
                             ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.REJECT,packet.Rate, packet.NodeTo, packet.NodeTo);
                             cpccCallService.send(packetToCPCC);

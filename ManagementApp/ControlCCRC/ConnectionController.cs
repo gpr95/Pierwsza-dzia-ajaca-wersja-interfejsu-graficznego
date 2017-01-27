@@ -194,5 +194,17 @@ namespace ControlCCRC
             socketHandler["CC_" + rcName.Substring(rcName.IndexOf("_") + 1)].Write(dataToSend);
 
         }
+
+        internal void sendFibs(Dictionary<string, List<FIB>> dictionary)
+        {
+            foreach(string nodeName in dictionary.Keys)
+            {
+                CCtoCCSignallingMessage fibsMsg = new CCtoCCSignallingMessage();
+                fibsMsg.State = CCtoCCSignallingMessage.CC_UP_FIB_CHANGE;
+                fibsMsg.Fib_table = dictionary[nodeName];
+                String dataOut = JMessage.Serialize(JMessage.FromValue(fibsMsg));
+                socketHandler[nodeName].Write(dataOut);
+            }
+        }
     }
 }

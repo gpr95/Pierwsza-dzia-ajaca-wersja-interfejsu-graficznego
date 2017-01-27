@@ -45,58 +45,65 @@ namespace ControlCCRC
             Boolean noError = true;
             while (noError)
             {
-                string received_data = reader.ReadString();
-                JMessage received_object = JMessage.Deserialize(received_data);
-                if (received_object.Type == typeof(RCtoLRMSignallingMessage))
+                try
                 {
-                    RCtoLRMSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoLRMSignallingMessage>();
-                    switch (lrmMsg.State)
+                    string received_data = reader.ReadString();
+                    JMessage received_object = JMessage.Deserialize(received_data);
+                    if (received_object.Type == typeof(RCtoLRMSignallingMessage))
                     {
-                        case RCtoLRMSignallingMessage.LRM_INIT:
-                            consoleWriter("LRM_INIT");
-                            identifier = lrmMsg.NodeName;
-                            rc.initLRMNode(identifier);
-                            socketHandler.Add(identifier, writer);
-                            consoleWriter("SOCKETHANDLER KONIEC");
-                            break;
-                        case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
-                            consoleWriter("LRM_TOP_ADD");
-                            rc.addTopologyElementFromLRM(identifier, lrmMsg.ConnectedNode, lrmMsg.ConnectedNodePort);
-                            break;
-                        case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
-                            consoleWriter("LRM_TOP_DEL");
-                            rc.deleteTopologyElementFromLRM(lrmMsg.ConnectedNode);
-                            break;
+                        RCtoLRMSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoLRMSignallingMessage>();
+                        switch (lrmMsg.State)
+                        {
+                            case RCtoLRMSignallingMessage.LRM_INIT:
+                                consoleWriter("LRM_INIT");
+                                identifier = lrmMsg.NodeName;
+                                rc.initLRMNode(identifier);
+                                socketHandler.Add(identifier, writer);
+                                consoleWriter("SOCKETHANDLER KONIEC");
+                                break;
+                            case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
+                                consoleWriter("LRM_TOP_ADD");
+                                rc.addTopologyElementFromLRM(identifier, lrmMsg.ConnectedNode, lrmMsg.ConnectedNodePort);
+                                break;
+                            case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
+                                consoleWriter("LRM_TOP_DEL");
+                                rc.deleteTopologyElementFromLRM(lrmMsg.ConnectedNode);
+                                break;
+                        }
                     }
-                }
-                else if (received_object.Type == typeof(RCtoRCSignallingMessage))
-                {
-                    RCtoRCSignallingMessage rcMsg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
-                    socketHandler.Add(rcMsg.Identifier, writer);
+                    else if (received_object.Type == typeof(RCtoRCSignallingMessage))
+                    {
+                        RCtoRCSignallingMessage rcMsg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
+                        socketHandler.Add(rcMsg.Identifier, writer);
 
-                    switch(rcMsg.State)
+                        switch (rcMsg.State)
+                        {
+                            case RCtoRCSignallingMessage.RC_FROM_SUBNETWORK_INIT:
+                                if (!socketHandler.ContainsKey(rcMsg.Identifier))
+                                    socketHandler.Add(rcMsg.Identifier, writer);
+                                break;
+                            case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM:
+                                rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights, rcMsg.RateToCountWeights, rcMsg.Identifier);
+                                break;
+                            case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE:
+                                rc.lowerRcSendedRejectAction(rcMsg.RateToCountWeights, rcMsg.Identifier);
+                                break;
+                        }
+                    }
+                    else if (received_object.Type == typeof(CCtoCCSignallingMessage))
                     {
-                        case RCtoRCSignallingMessage.RC_FROM_SUBNETWORK_INIT:
-                            if (!socketHandler.ContainsKey(rcMsg.Identifier))
-                                socketHandler.Add(rcMsg.Identifier, writer);
-                            break;
-                        case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM:
-                            rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights, rcMsg.RateToCountWeights, rcMsg.Identifier);
-                            break;
-                        case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE:
-                            rc.lowerRcSendedRejectAction(rcMsg.RateToCountWeights,rcMsg.Identifier);
-                            break;
+                        CCtoCCSignallingMessage ccMsg = received_object.Value.ToObject<CCtoCCSignallingMessage>();
+
+                        switch (ccMsg.State)
+                        {
+                            /////////////////////////
+
+                        }
                     }
                 }
-                else if (received_object.Type == typeof(CCtoCCSignallingMessage))
+                catch(IOException ex)
                 {
-                    CCtoCCSignallingMessage ccMsg = received_object.Value.ToObject<CCtoCCSignallingMessage>();
-                    
-                    switch (ccMsg.State)
-                    {
-/////////////////////////
-                       
-                    }
+                    Environment.Exit(1);
                 }
             }
         }
