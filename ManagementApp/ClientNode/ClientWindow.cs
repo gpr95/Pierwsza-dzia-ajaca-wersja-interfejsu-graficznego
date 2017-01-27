@@ -20,14 +20,13 @@ namespace ClientWindow
         private static bool cyclic_sending = false;
         string[] args2 = new string[3];
         private int currentSpeed = 3;
-        private int currentSlot;
         private static string path;
         private Dictionary<String, int> possibleDestinations = new Dictionary<string, int>();
         private int virtualPort = 1;
         private int managementPort;
         private CPCC controlAgent;
-        private int containersNumber;
-        public List<int> slots; 
+        public List<int> slots;
+        Random r;
 
 
         public ClientWindow(string[] args)
@@ -50,6 +49,7 @@ namespace ClientWindow
             Log2("INFO", "START LOG");
             controlAgent = new CPCC(this, args[3]);
             initSpeedComboBox();
+            r = new Random();
         }
 
         private void initSpeedComboBox()
@@ -201,7 +201,7 @@ namespace ClientWindow
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), "Slot"+slot+" :"+message);
                     vc3List.Add(slot, vc3);
                 }
-                    STM1 frame = new STM1(adaptation2(),vc3List);
+                    STM1 frame = new STM1(adaptation(),vc3List);
                     //SYGNAL
                     Signal signal = new Signal(virtualPort, frame);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
@@ -222,18 +222,12 @@ namespace ClientWindow
 
         }
 
-        private int adaptation()
+        public int adaptation()
         {
-            Random r = new Random();
             int POH = r.Next(10000, 40000);
             return POH;
         }
-        private int adaptation2()
-        {
-            Random r = new Random();
-            int POH = r.Next(50000, 80000);
-            return POH;
-        }
+       
 
 
 
@@ -254,7 +248,7 @@ namespace ClientWindow
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), "Slot" + slot + " :" + message);
                     vc3List.Add(slot, vc3);
                 }
-                frame = new STM1(adaptation2(), vc3List);
+                frame = new STM1(adaptation(), vc3List);
                 //SYGNAL
                 signal = new Signal(virtualPort, frame);
                 data = JMessage.Serialize(JMessage.FromValue(signal));

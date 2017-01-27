@@ -24,6 +24,7 @@ namespace ControlCCRC.Protocols
         private String nodeFrom;
         private String nodeTo;
         private int rate;
+        private int requestID;
 
         // state 2
         private int vc11;
@@ -120,6 +121,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 vc13 = value;
+            }
+        }
+
+        public int RequestID
+        {
+            get
+            {
+                return requestID;
+            }
+
+            set
+            {
+                requestID = value;
             }
         }
     }

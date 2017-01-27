@@ -16,6 +16,7 @@ namespace ClientNode
         public const int RATE_3 = 3;
         public const int INTRADOMAIN = 0;
         public const int INTERDOMAIN = 1;
+        private int requestID;
         public string virtualInterface;
         public string originIdentifier;
         public string destinationIdentifier;
@@ -65,13 +66,27 @@ namespace ClientNode
             }
         }
 
-        public ControlPacket(string virtualInterface,int state,int speed, string destinationIdentifier, string originIdentifier)
+        public int RequestID
+        {
+            get
+            {
+                return requestID;
+            }
+
+            set
+            {
+                requestID = value;
+            }
+        }
+
+        public ControlPacket(string virtualInterface,int state,int speed, string destinationIdentifier, string originIdentifier,int ID)
         {
             this.virtualInterface = virtualInterface;
             this.destinationIdentifier = destinationIdentifier;
             this.originIdentifier = originIdentifier;
             this.state = state;
             this.speed = speed;
+            this.requestID = ID;
         }
 
        

@@ -52,7 +52,7 @@ namespace ControlNCC
                         ControlPacket packet = received_object.Value.ToObject<ControlPacket>();
                         if(packet.virtualInterface == ControlInterface.CALL_REQUEST)
                         {
-                            handlerNCC.addService(packet.originIdentifier, this);
+                            handlerNCC.addService(packet.RequestID, this);
                             Console.WriteLine("[CPCC]Receive call request for "+packet.destinationIdentifier+" on " + ControlInterface.CALL_REQUEST_ACCEPT + " interface");
                             Console.WriteLine("[DIRECTORY]Send directory request");//sprawdzenie czy w naszej domenie 
                             if (handlerNCC.checkIfInDirectory(packet.destinationIdentifier))
@@ -69,6 +69,7 @@ namespace ControlNCC
                                 packetToCC.NodeFrom = packet.originIdentifier;
                                 packetToCC.NodeTo = packet.destinationIdentifier;
                                 packetToCC.Rate = packet.speed;
+                                packetToCC.RequestID = packet.RequestID;
                                 ControlConnectionService CCService = this.handlerNCC.getCCService();
                                 CCService.sendCCRequest(packetToCC);
                                 
@@ -101,8 +102,8 @@ namespace ControlNCC
                         else if(packet.State == CCtoNCCSingallingMessage.CC_CONFIRM)
                         {
                             Console.WriteLine("[CC]Receive connection confirm");
-                            ControlConnectionService cpccCallService = handlerNCC.getService(packet.NodeFrom);
-                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT,ControlPacket.ACCEPT,packet.Rate,packet.NodeTo,packet.NodeTo);
+                            ControlConnectionService cpccCallService = handlerNCC.getService(packet.RequestID);
+                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT,ControlPacket.ACCEPT,packet.Rate,packet.NodeTo,packet.NodeTo, packet.RequestID);
                             if(packet.Vc11 != 0)
                             {
                                 packetToCPCC.Vc11 = 1;
@@ -120,8 +121,8 @@ namespace ControlNCC
                         }else if(packet.State == CCtoNCCSingallingMessage.CC_REJECT)
                         {
                             Console.WriteLine("[CC]Receive connection reject");
-                            ControlConnectionService cpccCallService = handlerNCC.getService(packet.NodeFrom);
-                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.REJECT,packet.Rate, packet.NodeTo, packet.NodeTo);
+                            ControlConnectionService cpccCallService = handlerNCC.getService(packet.RequestID);
+                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.REJECT,packet.Rate, packet.NodeTo, packet.NodeTo, packet.RequestID);
                             cpccCallService.send(packetToCPCC);
                         }
 

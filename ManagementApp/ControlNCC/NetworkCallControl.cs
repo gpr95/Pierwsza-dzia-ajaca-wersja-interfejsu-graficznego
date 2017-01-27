@@ -18,7 +18,7 @@ namespace ControlNCC
     {
         private int controlPort;
         private TcpListener listener;
-        private Dictionary<String, ControlConnectionService> services;
+        private Dictionary<int, ControlConnectionService> services;
         private int domainNumber;
         private static List<string> directory = new List<string>();
         private ControlConnectionService CCService;
@@ -27,7 +27,7 @@ namespace ControlNCC
         public NetworkCallControl(string[] domainParams)
         {
             
-            services = new Dictionary<String, ControlConnectionService>();
+            services = new Dictionary<int, ControlConnectionService>();
             string ip = "127.0.0.1";
             int.TryParse(domainParams[0], out domainNumber);
             Console.WriteLine("Domain: " + domainNumber + " Listener: " + domainParams[1] + " Management: " + domainParams[2]);
@@ -59,12 +59,12 @@ namespace ControlNCC
             }
         }
 
-        public void addService(string ID, ControlConnectionService handler)
+        public void addService(int ID, ControlConnectionService handler)
         {
             services.Add(ID, handler);
         }
 
-        public ControlConnectionService getService(string ID)
+        public ControlConnectionService getService(int ID)
         {
             return services[ID];
         }

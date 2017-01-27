@@ -93,7 +93,7 @@ namespace ClientWindow
 
         public void sendRequest(string clientName, int speed)
         {
-            ControlPacket packet = new ControlPacket(ControlInterface.CALL_REQUEST,ControlPacket.IN_PROGRESS,speed,clientName,clientWindowHandler.virtualIP);
+            ControlPacket packet = new ControlPacket(ControlInterface.CALL_REQUEST,ControlPacket.IN_PROGRESS,speed,clientName,clientWindowHandler.virtualIP, clientWindowHandler.adaptation());
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
             clientWindowHandler.Log2("CONTROL", "send request on " + ControlInterface.CALL_REQUEST + " interface for"+ clientName);
