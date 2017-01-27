@@ -26,7 +26,9 @@ namespace ControlCCRC.Protocols
         private int rate;
 
         // state 2
-        private int vc3;
+        private int vc11;
+        private int vc12;
+        private int vc13;
 
         public int State
         {

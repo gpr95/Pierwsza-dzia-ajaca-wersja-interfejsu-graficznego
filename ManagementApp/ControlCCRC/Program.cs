@@ -60,7 +60,9 @@ namespace ControlCCRC
             cc.setSocketHandler(socketHandler);
 
             // LISTENER[0]
-            TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[0]));
+            int listenerPort;
+            int.TryParse(args[0], out listenerPort);
+            TcpListener listener = new TcpListener(IPAddress.Parse("127.0.0.1"), listenerPort);
             listener.Start();
 
             Boolean noError = true;

@@ -42,7 +42,9 @@ namespace ControlCCRC
                 identifier = "DOMAIN_" + identifier;
                 try
                 {
-                    NCCClient = new TcpClient("localhost", Convert.ToInt32(args[1]));
+                    int nccPort;
+                    int.TryParse(args[1], out nccPort);
+                    NCCClient = new TcpClient("localhost", nccPort);
                 }
                 catch (SocketException ex)
                 {
@@ -56,7 +58,9 @@ namespace ControlCCRC
                 consoleWriter("[INIT] SUBNETWORK");
                 try
                 {
-                    CCClient = new TcpClient("localhost", Convert.ToInt32(args[1]));
+                    int ccPort;
+                    int.TryParse(args[1], out ccPort);
+                    CCClient = new TcpClient("localhost", ccPort);
                 }
                 catch (SocketException ex)
                 {

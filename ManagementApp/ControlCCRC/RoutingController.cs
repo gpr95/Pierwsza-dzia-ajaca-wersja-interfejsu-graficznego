@@ -48,7 +48,9 @@ namespace ControlCCRC
                 consoleWriter("[INIT] SUBNETWORK");
                 try
                 {
-                    RCClient = new TcpClient("localhost", Convert.ToInt32(args[0]));
+                    int rccId;
+                    int.TryParse(args[0], out rccId);
+                    RCClient = new TcpClient("localhost", rccId);
                 }
                 catch (SocketException ex)
                 {

@@ -83,6 +83,15 @@ namespace ControlCCRC
                 {
                     CCtoCCSignallingMessage ccMsg = received_object.Value.ToObject<CCtoCCSignallingMessage>();
                     socketHandler.Add(ccMsg.Identifier, writer);
+                    switch (ccMsg.State)
+                    {
+                        case CCtoCCSignallingMessage.CC_LOW_INIT:
+                           // identifier = ccMsg.NodeName;
+                           // rc.initLRMNode(identifier);
+                           // socketHandler.Add(identifier, writer);
+                            break;
+                       
+                    }
                 }
             }
         }
