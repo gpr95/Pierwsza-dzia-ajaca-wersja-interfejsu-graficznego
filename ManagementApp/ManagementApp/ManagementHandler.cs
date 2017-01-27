@@ -18,12 +18,12 @@ namespace ManagementApp
         private TcpListener listenerManagement;
         private Thread threadManagement;
 
-        public ManagementHandler(int applicationPort, int nodeConnectionPort)
+        public ManagementHandler(int applicationPort, int nodeConnectionPort, int nccPort = 0)
         {
             listenerManagement = new TcpListener(IPAddress.Parse("127.0.0.1"), applicationPort);
             threadManagement = new Thread(new ThreadStart(listenForManagement));
             threadManagement.Start();
-            String parameters = "" + applicationPort + " " + nodeConnectionPort;
+            String parameters = applicationPort + " " + nodeConnectionPort + " " + nccPort;
             System.Diagnostics.Process.Start("Management.exe", parameters);
         }
 

@@ -216,8 +216,8 @@ namespace ManagementApp
             if (add)
             {
                 checkDomainContent(toAdd);
-                if (domainNumber == 1)
-                    managHandler.killManagement();
+                //if (domainNumber == 1)
+                //    managHandler.killManagement();
                 toAdd.setupManagement(MANAGPORT + toAdd.Name, PortAggregation.ManagementNodePort);
                 domainList.Add(toAdd);
                 mainWindow.consoleWriter("Domain added");

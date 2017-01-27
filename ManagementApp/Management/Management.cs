@@ -15,11 +15,12 @@ namespace Management
         // CONNECTIONS
         private AgentApplication agentApplication;
         private AgentNode agentNode;
+        private AgentNCC agentNcc { get; set; }
 
         // CONSTS 
         private int APPLICATIONPORT = 7777;
         private int NODEPORT = 7778;
-
+        private int NCCPORT = 7779;
         // LOGICAL VARIABLES
         private List<Node> nodeList = new List<Node>();
         private List<NodeConnection> connectionList = new List<NodeConnection>();
@@ -29,6 +30,7 @@ namespace Management
         {
             int.TryParse(args[0], out this.APPLICATIONPORT);
             int.TryParse(args[1], out this.NODEPORT);
+            int.TryParse(args[2], out this.NCCPORT);
 
             UserInterface.Management = this;
 
@@ -36,7 +38,11 @@ namespace Management
             this.agentApplication = new AgentApplication(APPLICATIONPORT, this);
             // Listener for Nodes
             this.agentNode = new AgentNode(NODEPORT, nodeList, this);
-
+            // Listener for NCC
+            if (this.NCCPORT != 0)
+                this.agentNcc = new AgentNCC(this.NCCPORT);
+            else
+                this.agentNcc = null;
             Thread.Sleep(100);
             if(APPLICATIONPORT != 7777)
                 UserInterface.showDomain(APPLICATIONPORT);

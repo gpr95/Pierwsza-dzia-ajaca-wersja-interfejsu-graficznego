@@ -10,6 +10,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
+
 namespace ControlNCC
 {
     class NetworkCallControl
@@ -20,24 +21,30 @@ namespace ControlNCC
         private string domainNumber;
         private static List<string> directory = new List<string>();
         private ControlConnectionService CCService;
-
+        private ManagementHandler management;
+        private int managementPort;
         public NetworkCallControl(string[] domainParams)
         {
+            
             services = new Dictionary<String, ControlConnectionService>();
             string ip = "127.0.0.1";
             this.domainNumber = domainParams[0];
+            Console.WriteLine("Domain: " + domainNumber + " Listener: " + domainParams[1] + " Management: " + domainParams[2]);
             //readConfig();
             int.TryParse(domainParams[1], out this.controlPort);
             listener = new TcpListener(IPAddress.Parse(ip), controlPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
-
+            Console.WriteLine("Nodes in my network: ");
             Console.WriteLine("[INIT]Start NCC, IP: " + ip + " Port: " + controlPort);
             Console.WriteLine("Nodes in my network: ");
             foreach(string node in directory)
             {
                 Console.WriteLine(node);
             }
+
+            int.TryParse(domainParams[2], out this.managementPort);
+            management = new ManagementHandler(this.managementPort, this);
         }
 
         private void Listen()
@@ -47,7 +54,7 @@ namespace ControlNCC
             while (true)
             {
                 TcpClient client = listener.AcceptTcpClient();
-                ControlConnectionService service = new ControlConnectionService(client, this);
+                //ControlConnectionService service = new ControlConnectionService(client, this);
             }
         }
 

@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlConnectionService.cs" />
+    <Compile Include="ManagementHandler.cs" />
     <Compile Include="NetworkCallControl.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

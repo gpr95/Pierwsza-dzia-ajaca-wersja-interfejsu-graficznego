@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgentApplication.cs" />
+    <Compile Include="AgentNCC.cs" />
     <Compile Include="AgentNode.cs" />
     <Compile Include="ClientNode.cs" />
     <Compile Include="FIB.cs" />

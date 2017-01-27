@@ -70,13 +70,15 @@ namespace ManagementApp
 
         internal void setupManagement(int mANAGPORT, int v)
         {
-            managementHandler = new ManagementHandler(mANAGPORT, v);
+            this.NccPort = PortAggregation.NccPort;
+            this.ManagementNccPort = PortAggregation.ManagementNccListener;
+            managementHandler = new ManagementHandler(mANAGPORT, v, this.ManagementNccPort);
             this.ManagementPort = v;
 
             ProcessStartInfo startInfo = new ProcessStartInfo("ControlNCC.exe");
             startInfo.WindowStyle = ProcessWindowStyle.Minimized;
-            this.NccPort = PortAggregation.NccPort;
-            startInfo.Arguments = name + " " + this.NccPort;
+
+            startInfo.Arguments = name + " " + this.NccPort + " " + this.ManagementNccPort;
             this.ProcessHandle = Process.Start(startInfo);
 
             startInfo = new ProcessStartInfo("ControlCCRC.exe");
@@ -205,6 +207,6 @@ namespace ManagementApp
             }
         }
 
-
+        public int ManagementNccPort { get; set; }
     }
 }
