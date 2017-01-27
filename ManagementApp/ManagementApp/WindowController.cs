@@ -49,13 +49,34 @@ namespace ManagementApp
             Domain d = checkWhatDomain(point);
             if(d == null)
             {
-                a = new Address(true, 0, clientNodesNumber);
+                a = new Address(true, 0, 0, clientNodesNumber);
                 client = new Node(point, Node.NodeType.CLIENT, a.getName(), 8000 + clientNodesNumber, 0, 0);
             } else
             {
-                a = new Address(true, d.Name, d.NumberOfNodes);
-                client = new Node(point, Node.NodeType.CLIENT, a.getName(), 8000 + clientNodesNumber, d.ManagementPort, 0, d.NccPort);
+                List<Subnetwork> temporaryListOfSubnetworks = checkWhatSubnetwork(point);
+                Subnetwork up = default(Subnetwork);
+                if (temporaryListOfSubnetworks.Any())
+                {
+                    up = temporaryListOfSubnetworks.ElementAt(0);
+                    foreach (Subnetwork s in temporaryListOfSubnetworks)
+                    {
+                        if (s.Size.Height < up.Size.Height &&
+                            s.Size.Width < up.Size.Width)
+                        {
+                            up = s;
+                        }
+                    }
+                }
                 d.NumberOfNodes++;
+                if (up == default(Subnetwork))
+                {
+                    a = new Address(false, d.Name, 0, d.NumberOfNodes);
+                }
+                else
+                {
+                    a = new Address(false, d.Name, up.Name - 100, d.NumberOfNodes);
+                }
+                client = new Node(point, Node.NodeType.CLIENT, a.getName(), 8000 + clientNodesNumber, d.ManagementPort, 0, d.NccPort);
             }
             ++clientNodesNumber;
             nodeList.Add(client);
@@ -76,7 +97,7 @@ namespace ManagementApp
             Domain d = checkWhatDomain(point);
             if (d == null)
             {
-                a = new Address(false, 0, networkNodesNumber);
+                a = new Address(false, 0, 0,networkNodesNumber);
                 network = new Node(point, Node.NodeType.NETWORK, a.getName(), 8500 + networkNodesNumber, MANAGPORT, 0);
             }
             else
@@ -95,12 +116,18 @@ namespace ManagementApp
                         }
                     }
                 }
-                a = new Address(false, d.Name, d.NumberOfNodes);
                 d.NumberOfNodes++;
                 if(up == default(Subnetwork))
+                {
+                    a = new Address(false, d.Name, 0, d.NumberOfNodes);
                     network = new Node(point, Node.NodeType.NETWORK, a.getName(), 8500 + networkNodesNumber, d.ManagementPort, d.ControlPort);
+                }
                 else
+                {
+                    a = new Address(false, d.Name, up.Name - 100, d.NumberOfNodes);
                     network = new Node(point, Node.NodeType.NETWORK, a.getName(), 8500 + networkNodesNumber, d.ManagementPort, up.ControlPort);
+                }
+                   
             }
             ++networkNodesNumber;
             nodeList.Add(network);

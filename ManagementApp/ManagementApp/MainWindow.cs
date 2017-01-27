@@ -12,7 +12,7 @@ namespace ManagementApp
     {
         private WindowController controler;
         // CONSTS
-        private const int gAP = 14;
+        private const int gAP = 20;
 
         // LOGICAL VARS
         private OperationType oType;
