@@ -52,8 +52,8 @@ namespace NetNode
                     resources.Add(new Resource(i,j,false));
                 }
             }
-            //ControlAgent.sendTopologyInit(this.virtualIp);
-            //ControlAgent.sendCCInit(this.virtualIp);
+            ControlAgent.sendTopologyInit(this.virtualIp);
+            ControlAgent.sendCCInit(this.virtualIp);
         }
 
         public void receivedMessage(string lrmProtocol, int port)

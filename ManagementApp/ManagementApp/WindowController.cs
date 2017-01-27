@@ -265,7 +265,7 @@ namespace ManagementApp
                 else
                     toAdd.setupControl(up);
                 subnetworkList.Add(toAdd);
-                mainWindow.consoleWriter("Subnetwork added " + subNumber);
+                mainWindow.consoleWriter("Subnetwork added " + toAdd.Name);
                 return true;
             }
             else
