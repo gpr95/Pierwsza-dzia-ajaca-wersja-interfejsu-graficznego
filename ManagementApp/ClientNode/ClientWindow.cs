@@ -26,6 +26,7 @@ namespace ClientWindow
         private int virtualPort = 1;
         private int managementPort;
         private CPCC controlAgent;
+        private int containersNumber;
 
 
         public ClientWindow(string[] args)

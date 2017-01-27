@@ -55,8 +55,14 @@ namespace ClientWindow
                     ControlPacket packet = received_object.Value.ToObject<ControlPacket>();
                     if(packet.virtualInterface == ControlInterface.CALL_ACCEPT)
                         {
-                            clientWindowHandler.Log2("CONTROL", "uuu mam slot i port moge slac");
-                            
+                            if (packet.state == ControlPacket.ACCEPT)
+                            {
+
+                                clientWindowHandler.Log2("CONTROL", "call request accepted");
+                            }else
+                            {
+                                clientWindowHandler.Log2("CONTROL", "call request rejected");
+                            }
                         }
 
                 }

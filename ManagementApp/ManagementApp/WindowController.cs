@@ -81,9 +81,26 @@ namespace ManagementApp
             }
             else
             {
+                List<Subnetwork> temporaryListOfSubnetworks = checkWhatSubnetwork(point);
+                Subnetwork up = default(Subnetwork);
+                if (temporaryListOfSubnetworks.Any())
+                {
+                    up = temporaryListOfSubnetworks.ElementAt(0);
+                    foreach (Subnetwork s in temporaryListOfSubnetworks)
+                    {
+                        if (s.Size.Height < up.Size.Height &&
+                            s.Size.Width < up.Size.Width)
+                        {
+                            up = s;
+                        }
+                    }
+                }
                 a = new Address(false, d.Name, d.NumberOfNodes);
                 d.NumberOfNodes++;
-                network = new Node(point, Node.NodeType.NETWORK, a.getName(), 8500 + networkNodesNumber, d.ManagementPort, d.ControlPort);
+                if(up == default(Subnetwork))
+                    network = new Node(point, Node.NodeType.NETWORK, a.getName(), 8500 + networkNodesNumber, d.ManagementPort, d.ControlPort);
+                else
+                    network = new Node(point, Node.NodeType.NETWORK, a.getName(), 8500 + networkNodesNumber, d.ManagementPort, up.ControlPort);
             }
             ++networkNodesNumber;
             nodeList.Add(network);
@@ -222,12 +239,13 @@ namespace ManagementApp
             
             List<Subnetwork> tempListOfSubnetworks = checkWhatSubnetwork(subFrom, new Point(subFrom.X, subTo.Y), subTo, new Point(subTo.X, subFrom.Y));
             if (tempListOfSubnetworks == null) { add = false;}
-            
-            Subnetwork toAdd = new Subnetwork(subFrom, subTo, ++subNumber);
-            if (toAdd.Size.Width < MainWindow.GAP || toAdd.Size.Height < MainWindow.GAP)
+            Size tempSize = new Size(Math.Abs(subFrom.X - subTo.X), Math.Abs(subFrom.Y - subTo.Y));
+            if (tempSize.Width < MainWindow.GAP || tempSize.Height < MainWindow.GAP)
                 add = false;
             if (add)
             {
+                ++subNumber;
+                Subnetwork toAdd = new Subnetwork(subFrom, subTo, subnetworkStart.Name * 100 + subNumber);
                 checkSubnetworkContent(toAdd);
                 Subnetwork up = default(Subnetwork);
                 if(tempListOfSubnetworks.Any())
@@ -247,7 +265,7 @@ namespace ManagementApp
                 else
                     toAdd.setupControl(up);
                 subnetworkList.Add(toAdd);
-                mainWindow.consoleWriter("Subnetwork added " + subNumber);
+                mainWindow.consoleWriter("Subnetwork added " + toAdd.Name);
                 return true;
             }
             else
@@ -267,15 +285,16 @@ namespace ManagementApp
             }
         }
 
-        private Subnetwork checkWhatSubnetwork(Point p)
+        private List<Subnetwork> checkWhatSubnetwork(Point p)
         {
+            List<Subnetwork> output = new List<Subnetwork>();
             foreach (Subnetwork d in subnetworkList)
             {
                 Rectangle domainRect = new Rectangle(d.getPointStart(), d.Size);
                 if (domainRect.Contains(p))
-                    return d;
+                    output.Add(d);
             }
-            return null;
+            return output;
 
         }
 

@@ -14,7 +14,7 @@ namespace ManagementApp
         private Point pointTo;
         private Point pointFrom;
         private Size size;
-        private int name { get; set; }
+        private int name;
         private Process processHandle;
         private int controlPort;
 
@@ -166,6 +166,18 @@ namespace ManagementApp
             set
             {
                 controlPort = value;
+            }
+        }
+        public int Name
+        {
+            get
+            {
+                return name;
+            }
+
+            set
+            {
+                name = value;
             }
         }
     }

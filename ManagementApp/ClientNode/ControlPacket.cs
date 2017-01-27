@@ -8,17 +8,62 @@ namespace ClientNode
 {
     public class ControlPacket
     {
+        public const int ACCEPT = 0;
+        public const int REJECT = 1;
         public string virtualInterface;
-        public int FLAG = 0;
-        public string resourceIdentifier;
+        public string originIdentifier;
+        public string destinationIdentifier;
         public int virtualPort;
-        public int slot;
+        public int state;
+        private int vc11;
+        private int vc12;
+        private int vc13;
 
-        public ControlPacket(string virtualInterface, int FLAG, string resourceIdentifier)
+        public int Vc11
+        {
+            get
+            {
+                return vc11;
+            }
+
+            set
+            {
+                vc11 = value;
+            }
+        }
+
+        public int Vc13
+        {
+            get
+            {
+                return vc13;
+            }
+
+            set
+            {
+                vc13 = value;
+            }
+        }
+
+        public int Vc12
+        {
+            get
+            {
+                return vc12;
+            }
+
+            set
+            {
+                vc12 = value;
+            }
+        }
+
+        public ControlPacket(string virtualInterface,int state, string destinationIdentifier, string originIdentifier)
         {
             this.virtualInterface = virtualInterface;
-            this.FLAG = FLAG;
-            this.resourceIdentifier = resourceIdentifier;
+            this.destinationIdentifier = destinationIdentifier;
+            this.originIdentifier = originIdentifier;
+            this.state = state;
         }
 
        
