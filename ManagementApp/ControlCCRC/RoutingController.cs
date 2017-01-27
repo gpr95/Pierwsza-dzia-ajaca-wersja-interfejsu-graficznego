@@ -590,6 +590,10 @@ namespace ControlCCRC
             this.requestRate = rate;
 
             lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count();
+            if(socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count() == 0)
+            {
+                ccHandler.sendFibs(findPath(nodeFrom, nodeTo, rate));
+            }
             foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC_")))
             {
                 RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
