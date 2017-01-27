@@ -54,7 +54,7 @@ namespace ManagementApp
             } else
             {
                 a = new Address(true, d.Name, d.NumberOfNodes);
-                client = new Node(point, Node.NodeType.CLIENT, a.getName(), 8000 + clientNodesNumber, d.ManagementPort, d.ControlPort);
+                client = new Node(point, Node.NodeType.CLIENT, a.getName(), 8000 + clientNodesNumber, d.ManagementPort, 0, d.NccPort);
                 d.NumberOfNodes++;
             }
             ++clientNodesNumber;
@@ -229,19 +229,23 @@ namespace ManagementApp
             if (add)
             {
                 checkSubnetworkContent(toAdd);
-                Subnetwork up = tempListOfSubnetworks.ElementAt(0);
-                foreach (Subnetwork s in tempListOfSubnetworks)
+                Subnetwork up = default(Subnetwork);
+                if(tempListOfSubnetworks.Any())
                 {
-                    if (s.Size.Height < up.Size.Height &&
-                        s.Size.Width < up.Size.Width )
+                    up = tempListOfSubnetworks.ElementAt(0);
+                    foreach (Subnetwork s in tempListOfSubnetworks)
                     {
-                        up = s;
+                        if (s.Size.Height < up.Size.Height &&
+                            s.Size.Width < up.Size.Width)
+                        {
+                            up = s;
+                        }
                     }
                 }
-                if(up != null)
-                    toAdd.setupControl(up);
-                else
+                if(up == default(Subnetwork))
                     toAdd.setupControl(subnetworkStart);
+                else
+                    toAdd.setupControl(up);
                 subnetworkList.Add(toAdd);
                 mainWindow.consoleWriter("Subnetwork added " + subNumber);
                 return true;
@@ -286,11 +290,10 @@ namespace ManagementApp
                     domainRect.Contains(c) &&
                     domainRect.Contains(d))
                     output.Add(s);
+                else
+                    return null;
             }
-            if (output.Any())
-                return output;
-            else
-                return null;
+            return output;
         }
     }
 }

@@ -24,7 +24,7 @@ namespace ManagementApp
         private Process processHandle;
         private int subnetwork;
 
-        public Node(Point point, NodeType n, String name, int localPort, int mPort, int ccrcPort, int nccPort)
+        public Node(Point point, NodeType n, String name, int localPort, int mPort, int ccrcPort, int nccPort = 0)
         {
             nodeType = n;
             if (n.Equals(NodeType.CLIENT))

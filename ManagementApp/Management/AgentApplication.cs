@@ -39,7 +39,7 @@ namespace Management
                     JSON received_object = JSON.Deserialize(received_data);
                     ApplicationProtocol received_Protocol = received_object.Value.ToObject<ApplicationProtocol>();
 
-                    if (received_Protocol.State == ApplicationProtocol.A)
+                    if (received_Protocol.State == ApplicationProtocol.CONNECTIONTONCC)
                         Console.WriteLine("Option A");
                     else if (received_Protocol.State == ApplicationProtocol.KILL)
                         Environment.Exit(1);

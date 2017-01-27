@@ -24,11 +24,11 @@ namespace ManagementApp
             this.pointFrom = pointFrom;
             this.name = name;
             this.size = new Size(Math.Abs(pointFrom.X - pointTo.X), Math.Abs(pointFrom.Y - pointTo.Y));
-            ProcessStartInfo startInfo = new ProcessStartInfo("ControlNCC.exe");
-            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
-            //startInfo.Arguments = parameters;
+            //ProcessStartInfo startInfo = new ProcessStartInfo("ControlNCC.exe");
+            //startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            ////startInfo.Arguments = parameters;
 
-            this.ProcessHandle = Process.Start(startInfo);
+            //this.ProcessHandle = Process.Start(startInfo);
         }
 
         public Subnetwork(Subnetwork d) : this(d.PointTo, d.PointFrom, d.name)

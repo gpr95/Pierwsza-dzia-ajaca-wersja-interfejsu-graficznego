@@ -40,6 +40,18 @@ namespace ManagementApp
             threadManagement.Interrupt();
         }
 
+        public void sendConnectClientNcc(List<String> nodeNames)
+        {
+            if (clientManagement != null)
+            {
+                ApplicationProtocol toSend = new ApplicationProtocol();
+                toSend.State = ApplicationProtocol.CONNECTIONTONCC;
+                toSend.ConnectionToNcc = nodeNames;
+                string data = JSON.Serialize(JSON.FromValue(toSend));
+                writerManagement.Write(data);
+            }
+        }
+
         public void killManagement()
         {
             if (clientManagement != null)

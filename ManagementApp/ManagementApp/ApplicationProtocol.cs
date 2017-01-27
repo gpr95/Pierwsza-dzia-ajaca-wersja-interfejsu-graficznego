@@ -8,7 +8,7 @@ namespace ManagementApp
 {
     public class ApplicationProtocol
     {
-        public static readonly int A = 0;
+        public static readonly int CONNECTIONTONCC = 0;
         public static readonly int KILL = 1;
         public static readonly int C = 2;
         public static readonly int D = 3;
@@ -18,6 +18,7 @@ namespace ManagementApp
         public static readonly int H = 7;
 
         private int state;
+        private List<String> connectionToNcc;
 
         public int State
         {
@@ -29,6 +30,19 @@ namespace ManagementApp
             set
             {
                 state = value;
+            }
+        }
+
+        public List<String> ConnectionToNcc
+        {
+            get
+            {
+                return connectionToNcc;
+            }
+
+            set
+            {
+                connectionToNcc = value;
             }
         }
     }
