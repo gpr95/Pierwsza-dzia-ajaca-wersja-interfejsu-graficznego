@@ -20,13 +20,13 @@ namespace ControlNCC
         private string domainNumber;
         private static List<string> directory = new List<string>();
 
-        public NetworkCallControl(string[] domainNumber)
+        public NetworkCallControl(string[] domainParams)
         {
             services = new Dictionary<int, ControlConnectionService>();
             string ip = "127.0.0.1";
-            this.domainNumber = domainNumber[0];
-            readConfig();
-            int.TryParse(domainNumber[1], out this.controlPort);
+            this.domainNumber = domainParams[0];
+            //readConfig();
+            int.TryParse(domainParams[1], out this.controlPort);
             listener = new TcpListener(IPAddress.Parse(ip), controlPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
@@ -57,20 +57,20 @@ namespace ControlNCC
 
         //remove
 
-        private void readConfig()
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load("config.xml");
-            XmlNode portNode = doc.DocumentElement.SelectSingleNode("/domain"+domainNumber+"/controlPort");
-            string controlPort = portNode.InnerText;
-            bool res = int.TryParse(controlPort, out this.controlPort);
-            XmlNodeList clients = doc.DocumentElement.SelectNodes("/domain" + domainNumber + "/client");
-            foreach(XmlNode node in clients)
-            {
-                directory.Add(node.InnerText);
+        //private void readConfig()
+        //{
+        //    XmlDocument doc = new XmlDocument();
+        //    doc.Load("config.xml");
+        //    XmlNode portNode = doc.DocumentElement.SelectSingleNode("/domain"+domainNumber+"/controlPort");
+        //    string controlPort = portNode.InnerText;
+        //    bool res = int.TryParse(controlPort, out this.controlPort);
+        //    XmlNodeList clients = doc.DocumentElement.SelectNodes("/domain" + domainNumber + "/client");
+        //    foreach(XmlNode node in clients)
+        //    {
+        //        directory.Add(node.InnerText);
 
-            }
-        }
+        //    }
+        //}
 
         public Boolean checkIfInDirectory(string address)
         {

@@ -13,13 +13,8 @@ namespace ClientWindow
        
         static void Main(string[] args)
         {
-            // MANAGER [name, cloud port, management port]
-            string domainNumber = "1";
-            string[] parameters = new string[] { args[0], args[1], args[2], domainNumber };
-            //DEBUG
-            //string[] parameters = new string[] { "CN0", "10002", "10001"};
-            //client = new ClientNode(parameters);
-            //GUI
+
+            string[] parameters = new string[] { args[0], args[1], args[2], args[3] };
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             ClientWindow window = new ClientWindow(parameters);
