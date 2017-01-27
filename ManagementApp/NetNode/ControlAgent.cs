@@ -79,17 +79,6 @@ namespace NetNode
             }
         }
 
-        public static void sendCCInit(string ip)
-        {
-            NetNode.log("sending init to CC: " + ip, ConsoleColor.Yellow);
-
-            CCtoCCSignallingMessage protocol = new CCtoCCSignallingMessage();
-            protocol.State = CCtoCCSignallingMessage.CC_LOW_INIT;
-            protocol.NodeName = ip;
-            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
-            writer.Write(send_object);
-        }
-
         public static void sendTopologyInit(string ip)
         {
             NetNode.log("sending inittopology to RC: " + ip, ConsoleColor.Yellow);

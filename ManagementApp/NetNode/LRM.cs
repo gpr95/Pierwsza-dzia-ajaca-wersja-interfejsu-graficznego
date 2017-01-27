@@ -53,7 +53,6 @@ namespace NetNode
                 }
             }
             ControlAgent.sendTopologyInit(this.virtualIp);
-            ControlAgent.sendCCInit(this.virtualIp);
         }
 
         public void receivedMessage(string lrmProtocol, int port)

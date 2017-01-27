@@ -81,7 +81,7 @@ namespace ClientWindow
 
         public void sendRequest(string clientName)
         {
-            ControlPacket packet = new ControlPacket(ControlInterface.CALL_REQUEST, 0, clientName);
+            ControlPacket packet = null;
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
             clientWindowHandler.Log2("CONTROL", "send request on " + ControlInterface.CALL_REQUEST + " interface");
