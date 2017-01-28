@@ -58,7 +58,27 @@ namespace ManagementApp
             toSend.State = ApplicationProtocol.TOOTHERNCC;
             toSend.ConnectionToOtherNcc = nccPorts;
             string data = JSON.Serialize(JSON.FromValue(toSend));
-            writerManagement.Write(data);
+            threadManagement = new Thread(new ParameterizedThreadStart(tryToSendData));
+            threadManagement.Start(data);
+            //Thread.Sleep(100);
+            //writerManagement.Write(data);
+        }
+
+        private void tryToSendData(Object data)
+        {
+            int numberOfAttempts = 0;
+            while (numberOfAttempts < 10)
+            {
+                if (writerManagement == null)
+                    Thread.Sleep(100);
+                else
+                {
+                    writerManagement.Write((string)data);
+                    break;
+                }
+                    
+                numberOfAttempts++;
+            }
         }
 
         public void killManagement()
