@@ -83,8 +83,11 @@ namespace ControlNCC
                                 Console.WriteLine("[DIRECTORY]This client is not in my network");
                                 Address address = new Address(packet.destinationIdentifier);
                                 ControlConnectionService serviceToNCC = handlerNCC.getService(address.domain);
-                                //DODAC DO CONTROL PACKET ID REQUEST PLUS DOMENY, I W CALYM PROJEKCIE TEZ, NAJWYZEJ W KLIENCIE SIE DA Z DUPY
+
+                                //DODAC DO CONTROL PACKET ID REQUEST PLUS DOMENY, 
+                                // I W CALYM PROJEKCIE TEZ, NAJWYZEJ W KLIENCIE SIE DA Z DUPY
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, "BRODER_GATEWAY", packet.destinationIdentifier, handlerNCC.domainNumber);
+                                
                                 //DOROBIC TU ELS IFA CO MA ZROBIC NA CALL INDICATION I CALL_REQUEST ACCEPT
                                 //serviceToNCC.send()
                                 Console.WriteLine("[NCC]Send call request to next NCC");
@@ -105,6 +108,13 @@ namespace ControlNCC
                         else if(packet.virtualInterface == ControlInterface.NETWORK_CALL_COORDINATION_OUT) {
                             Console.WriteLine("[NCC] NCC handshake completed with NCC in doman" + packet.RequestID);
                             handlerNCC.addService(packet.RequestID, this);
+                        }else if(packet.virtualInterface == ControlInterface.CALL_INDICATION)
+                        {
+                            Console.WriteLine("[NCC] Recived request to setup connection from " + packet.originIdentifier + " to: " + packet.destinationIdentifier);
+                        }
+                        else if (packet.virtualInterface == ControlInterface.CALL_REQUEST_ACCEPT)
+                        {
+                            Console.WriteLine("[NCC] Recived CALL_REQUEST_ACCEPT");
                         }
 
                     }else if (received_object.Type == typeof(CCtoNCCSingallingMessage))
