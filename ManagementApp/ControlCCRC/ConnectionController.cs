@@ -230,7 +230,7 @@ namespace ControlCCRC
                     finishMsg.Vc11 = using1;
                     finishMsg.Vc12 = using2;
                     finishMsg.Vc13 = using3;
-                    finishMsg.NodeTo = rcHandler.myBorderNodeAndConnectedOtherBorderNodeMap[dictionary.Keys.First()];
+                    finishMsg.NodeTo = dictionary.Keys.First();
                     finishMsg.RequestID = requestId;
                     String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
                     nccWriter.Write(dataToSend);

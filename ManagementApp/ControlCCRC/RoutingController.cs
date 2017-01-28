@@ -1146,7 +1146,8 @@ namespace ControlCCRC
             Address adr = new Address(connectedNode);
             if (iAmDomain && adr.domain != domainNumber)
             {
-                ccHandler.sendBorderNodesToNCC(adr);
+                Address adr2 = new Address(nodeName);
+                ccHandler.sendBorderNodesToNCC(adr2);
                 myBorderNodeAndConnectedOtherBorderNodeMap.Add(nodeName, connectedNode);
             }
         }
