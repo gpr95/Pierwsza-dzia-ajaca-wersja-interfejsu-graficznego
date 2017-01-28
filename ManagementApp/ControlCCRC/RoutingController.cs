@@ -217,6 +217,14 @@ namespace ControlCCRC
             {
                 countedPathValue.NodeConnectionsAndWeights = nodeConnectionsAndWeights;
                 countedPathValue.State = RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM;
+                foreach(String node in nodeConnectionsAndWeights.Keys)
+                {
+                    foreach(String connection in nodeConnectionsAndWeights[node].Keys)
+                    {
+                        consoleWriter("Sending calculated weights: " + node + " -> " + connection +
+                            " weight:" + nodeConnectionsAndWeights[node][connection]);
+                    }
+                }
             }
             else
             {
@@ -262,11 +270,39 @@ namespace ControlCCRC
             {
                 case 1:
                     if(shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1) != null)
-                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1).Count + 1;
+                    {
+                        int weight = 0;
+                        List<String> path = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        for(int i = 0;i < path.Count-1; i++)
+                        {
+                            weight += topologyUnallocatedLayer1[path[i]][path[i + 1]];
+                            consoleWriter("Weight" + i + " :" + topologyUnallocatedLayer1[path[i]][path[i + 1]]);
+                        }
+                        result = weight + 2;
+                        consoleWriter("Total: " + result);
+                    }
                     if(result == 0 && shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2) != null)
-                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2).Count + 1;
+                    {
+                        int weight = 0;
+                        List<String> path = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        for (int i = 0; i < path.Count - 1; i++)
+                        {
+                            weight += topologyUnallocatedLayer2[path[i]][path[i + 1]];
+                            consoleWriter("Weight" + i + " :" + topologyUnallocatedLayer1[path[i]][path[i + 1]]);
+                        }
+                        result = weight + 2;
+                    }
                     if (result == 0 && shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3) != null)
-                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3).Count + 1;
+                    {
+                        int weight = 0;
+                        List<String> path = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        for (int i = 0; i < path.Count - 1; i++)
+                        {
+                            weight += topologyUnallocatedLayer3[path[i]][path[i + 1]];
+                            consoleWriter("Weight" + i + " :" + topologyUnallocatedLayer1[path[i]][path[i + 1]]);
+                        }
+                        result = weight + 2;
+                    }
                     break;
                 case 2:
                     int shortest1 = 0;
@@ -275,18 +311,36 @@ namespace ControlCCRC
 
                     if (shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1) != null &&
                         shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2) != null)
-                    {
-                        shortest1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1).Count + 1;
+                    {  
+                        int weight = 0;
+                        List<String> path = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        for (int i = 0; i < path.Count - 1; i++)
+                        {
+                            weight += topologyUnallocatedLayer1[path[i]][path[i + 1]];
+                        }
+                        shortest1 = weight + 2; 
                     }
                     if (shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1) != null &&
                         shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3) != null)
                     {
-                        shortest2 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1).Count + 1;
+                        int weight = 0;
+                        List<String> path = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        for (int i = 0; i < path.Count - 1; i++)
+                        {
+                            weight += topologyUnallocatedLayer1[path[i]][path[i + 1]];
+                        }
+                        shortest2 = weight + 2;
                     }
                     if (shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2) != null &&
                         shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3) != null)
                     {
-                        shortest3 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2).Count + 1;
+                        int weight = 0;
+                        List<String> path = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        for (int i = 0; i < path.Count - 1; i++)
+                        {
+                            weight += topologyUnallocatedLayer2[path[i]][path[i + 1]];
+                        }
+                        shortest3 = weight + 2;
                     }
                     int[] anArray = { shortest1, shortest2, shortest3};
                     result = anArray.Max();
@@ -295,10 +349,18 @@ namespace ControlCCRC
                     if (shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1) != null &&
                         shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2) != null &&
                         shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3) != null)
-                        result = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1).Count + 1;
+                    {
+                        int weight = 0;
+                        List<String> path = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        for (int i = 0; i < path.Count - 1; i++)
+                        {
+                            weight += topologyUnallocatedLayer1[path[i]][path[i + 1]];
+                        }
+                        result = weight + 2;
+                    }
                     break;
             }
-
+            consoleWriter("Calculated weight total : " + result);
             return result;
         }
 
@@ -872,12 +934,12 @@ namespace ControlCCRC
                 {
                     if (!wholeTopologyNodesAndConnectedNodesWithPorts[node].ContainsKey(nodeConnectionsAndWeights[node].Keys.ElementAt(i)))
                     {
-                        wholeTopologyNodesAndConnectedNodesWithPorts[node]
-                            .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
-                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
-                        wholeTopologyNodesAndConnectedNodesWithPorts[nodeConnectionsAndWeights[node].Keys.ElementAt(i)]
-                            .Add(node,
-                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+//                        wholeTopologyNodesAndConnectedNodesWithPorts[node]
+  //                          .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
+    //                        nodeConnectionsAndWeights[node].Values.ElementAt(i));
+      //                  wholeTopologyNodesAndConnectedNodesWithPorts[nodeConnectionsAndWeights[node].Keys.ElementAt(i)]
+        //                    .Add(node,
+          //                  nodeConnectionsAndWeights[node].Values.ElementAt(i));
                         topologyUnallocatedLayer1[node]
                             .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
                             nodeConnectionsAndWeights[node].Values.ElementAt(i));
@@ -901,6 +963,8 @@ namespace ControlCCRC
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.Add(
                             nodeConnectionsAndWeights[node].Keys.ElementAt(i) + "#" +
                             node, rcFrom);
+                        consoleWriter("Associated " + nodeConnectionsAndWeights[node].Keys.ElementAt(i) +
+                            " -> " + node + " weight " + nodeConnectionsAndWeights[node].Values.ElementAt(i));
                         consoleWriter("Associated : " +
                             node + "#" +
                             nodeConnectionsAndWeights[node].Keys.ElementAt(i) + " and " + rcFrom);
