@@ -15,7 +15,7 @@ namespace ControlCCRC
 {
     class RoutingController
     {
-        private Boolean iAmDomain;
+        public Boolean iAmDomain;
         private String identifier;
 
         private int lowerRcRequestedInAction;
@@ -145,6 +145,7 @@ namespace ControlCCRC
                             if (socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count() > 0)
                             {
                                 lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count();
+                                Console.WriteLine("DEBUG###1: " + lowerRcRequestedInAction);
                                 foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC")))
                                 {
                                     RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
@@ -889,6 +890,7 @@ namespace ControlCCRC
             this.requestRate = rate;
             this.requestId = requestId;
             lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).ToList().Count();
+            Console.WriteLine("DEBUG###2: " + lowerRcRequestedInAction);
 
             if(lowerRcRequestedInAction == 0)
             {
@@ -918,6 +920,7 @@ namespace ControlCCRC
 
         public void lowerRcSendedConnectionsAction(Dictionary<string, Dictionary<string, int>> nodeConnectionsAndWeights, int rate, String rcFrom)
         {
+            Console.WriteLine("DEBUG###3: " + lowerRcRequestedInAction);
             lowerRcRequestedInAction--;
             consoleWriter("Received counted weigths from " + rcFrom);
             foreach(String node in nodeConnectionsAndWeights.Keys)
@@ -972,7 +975,7 @@ namespace ControlCCRC
                 }
             }
 
-
+            Console.WriteLine("DEBUG###4: " + lowerRcRequestedInAction);
             if (lowerRcRequestedInAction == 0)
             {
                 if (iAmDomain)
@@ -993,20 +996,29 @@ namespace ControlCCRC
                     if(mapNodeConnectedNodeAndAssociatedRCSubnetwork.ContainsKey(requestNodeFrom + "#"+ path[0]))
                     {
                         lowerRcRequestedInAction++;
-                        ccHandler.sendRequestToSubnetworkCCToBuildPath(
-                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[requestNodeFrom + "#" + path[0]],requestNodeFrom,path[0], rate);
+                        string temp;
+                        mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(requestNodeFrom + "#" + path[0], out temp);
+                        Console.WriteLine("DEBUG###: " + temp);
+
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, requestNodeFrom, path[0], rate);
                     }
-                    for(int i = 0; i < path.Count; i++)
+                    for(int i = 0; i < path.Count-1; i++)
                     {
                         lowerRcRequestedInAction++;
-                        ccHandler.sendRequestToSubnetworkCCToBuildPath(
-                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[path[i] + "#" + path[i+1]], path[i], path[i+1], rate);
+                        string temp;
+                        mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(path[i] + "#" + path[i+1], out temp);
+                        Console.WriteLine("DEBUG###: " + temp);
+
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, path[i], path[i+1], rate);
                     }
                     if (mapNodeConnectedNodeAndAssociatedRCSubnetwork.ContainsKey(path.Last() + "#" + requestNodeTo))
                     {
                         lowerRcRequestedInAction++;
-                        ccHandler.sendRequestToSubnetworkCCToBuildPath(
-                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[path.Last() + "#" + requestNodeTo], path.Last(), requestNodeTo, rate);
+                        string temp;
+                        mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(path.Last() + "#" + requestNodeTo, out temp);
+                        Console.WriteLine("DEBUG###: " + temp);
+
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, path.Last(), requestNodeTo, rate);
                     }
                 }
                 else

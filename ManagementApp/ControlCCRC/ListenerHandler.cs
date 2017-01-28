@@ -87,7 +87,14 @@ namespace ControlCCRC
                                     socketHandler.Add(rcMsg.Identifier, writer);
                                 break;
                             case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM:
-                                rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights, rcMsg.RateToCountWeights, rcMsg.Identifier);
+                                if (!rc.iAmDomain)
+                                {
+                                    rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights, rcMsg.RateToCountWeights, rcMsg.Identifier);
+                                }
+                                else
+                                {
+                                    consoleWriter("Received counted weigths from " + rcMsg.Identifier);
+                                }
                                 break;
                             case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE:
                                 rc.lowerRcSendedRejectAction(rcMsg.RateToCountWeights, rcMsg.Identifier);

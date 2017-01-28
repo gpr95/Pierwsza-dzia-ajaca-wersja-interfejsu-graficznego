@@ -152,7 +152,9 @@ namespace ControlCCRC
                     switch(msg.State)
                     {
                         case CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST:
+                            Console.WriteLine("received CC_BUILD_PATH_REQUEST: " + this.identifier);
                            // lowerCcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("CC_")).ToList().Count();
+                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, 0);
                             break;
                     }
                 }
@@ -189,6 +191,7 @@ namespace ControlCCRC
 
         internal void sendRequestToSubnetworkCCToBuildPath(string rcName, string nodeFrom, string nodeTo, int rate)
         {
+            Console.WriteLine("CC_BUILD_PATH_REQUEST to: " + rcName);
             CCtoCCSignallingMessage ccRequest = new CCtoCCSignallingMessage();
             ccRequest.State = CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST;
             ccRequest.NodeFrom = nodeFrom;
