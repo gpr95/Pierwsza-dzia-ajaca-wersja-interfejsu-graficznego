@@ -156,6 +156,11 @@ namespace ControlCCRC
                            // lowerCcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("CC_")).ToList().Count();
                             rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, 0);
                             break;
+                        case CCtoCCSignallingMessage.FIB_SETTING_TOP_BOTTOM:
+                            rcHandler.startProperWeigthComputingTopBottom(new Dictionary<string, Dictionary<string, int>>(),
+                                      new Dictionary<string, string>(), msg.Rate, "",
+                                      msg.NodeFrom, msg.NodeTo);
+                            break;
                     }
                 }
                 catch (IOException ex)
@@ -268,6 +273,18 @@ namespace ControlCCRC
             borderNodeMsg.BorderNode = adr.getName();
             String dataToSend = JMessage.Serialize(JMessage.FromValue(borderNodeMsg));
             nccWriter.Write(dataToSend);
+        }
+
+        public void sendFIBSettingRequestForSubnetwork(String nodeFrom, String nodeTo, String rcName,int rate)
+        {
+            String ccName = rcName.Replace("RC", "CC"); ;
+            CCtoCCSignallingMessage setFIBmsg = new CCtoCCSignallingMessage();
+            setFIBmsg.State = CCtoCCSignallingMessage.FIB_SETTING_TOP_BOTTOM;
+            setFIBmsg.NodeFrom = nodeFrom;
+            setFIBmsg.NodeTo = nodeTo;
+            setFIBmsg.Rate = rate;
+            String dataToSend = JMessage.Serialize(JMessage.FromValue(setFIBmsg));
+            socketHandler[ccName].Write(dataToSend);
         }
     }
 }

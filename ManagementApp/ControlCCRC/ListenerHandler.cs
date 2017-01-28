@@ -116,7 +116,6 @@ namespace ControlCCRC
                                 if (!socketHandler.ContainsKey(ccMsg.Identifier))
                                     socketHandler.Add(ccMsg.Identifier, writer);
                                 break;
-
                         }
                     }
                 }

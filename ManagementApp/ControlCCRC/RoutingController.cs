@@ -530,7 +530,7 @@ namespace ControlCCRC
                                  "internalNodeTo:" + internalNodeTo + "\n" +
                                  "VirtualNodeTo:" + virtualNodeTo + "\n" +
                                  "RC: " + rcNeededToBeSet) ;
-
+                                ccHandler.sendFIBSettingRequestForSubnetwork(virtualNodeFrom, virtualNodeTo, rcNeededToBeSet, howMuchVC3);
                                 result[pathRate1[0]].Add(new FIB(
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
                                     whichTopology + 10,
