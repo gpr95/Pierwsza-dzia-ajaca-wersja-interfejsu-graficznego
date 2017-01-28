@@ -104,13 +104,13 @@ namespace ControlCCRC
         {
             switch(slotVC3)
             {
-                case 1:
+                case 11:
                     topologyUnallocatedLayer1[nodeName].Remove(connectedNode);
                     break;
-                case 2:
+                case 12:
                     topologyUnallocatedLayer2[nodeName].Remove(connectedNode);
                     break;
-                case 3:
+                case 13:
                     topologyUnallocatedLayer3[nodeName].Remove(connectedNode);
                     break;
             }
