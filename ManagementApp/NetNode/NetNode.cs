@@ -255,7 +255,7 @@ namespace NetNode
                         }
                     }
                 }
-                Thread.Sleep(1250);
+                Thread.Sleep(125);
             }
         }
 
