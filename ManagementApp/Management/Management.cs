@@ -190,5 +190,10 @@ namespace Management
                 log("Error: " + e.Message, ConsoleColor.Red);
             }
         }
+
+        internal void connectToOtherNcc(List<int> list)
+        {
+            agentNcc.sandInfoToOtherNcc(list);
+        }
     }
 }

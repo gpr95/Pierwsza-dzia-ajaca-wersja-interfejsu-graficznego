@@ -159,14 +159,29 @@ namespace NetNode
 
         public static bool allocateResource(int port, int no_vc3)
         {
-                if (resources[port].no_vc3 == no_vc3 && resources[port].status == false )
+            foreach (var res in resources)
+            {
+                if (res.port == port && res.no_vc3 == no_vc3 && res.status == false )
                 {
                     //empty so allocating
                     Console.WriteLine("Allocating on port: " + port + "vc3: " + no_vc3);
-                    resources[port].status = true;
+                    resources[resources.IndexOf(res)].status = true;
                     return true;
                 }
+            }
             return false;
+        }
+
+        public static void deallocateResource(int port, int no_vc3)
+        {
+            foreach (var res in resources)
+            {
+                if (res.port == port && res.no_vc3 == no_vc3 && res.status == true)
+                {
+                    Console.WriteLine("Deallocating on port: " + port + "vc3: " + no_vc3);
+                    resources[resources.IndexOf(res)].status = false;
+                }
+            }
         }
 
         private static bool checkResources(int port, int amount)

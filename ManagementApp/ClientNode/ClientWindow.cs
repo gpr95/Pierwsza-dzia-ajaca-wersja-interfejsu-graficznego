@@ -47,6 +47,7 @@ namespace ClientWindow
             InitializeComponent();
             this.Text = virtualIP;
             Log2("INFO", "START LOG");
+            Log2("DEBUG", "cloud port: "+cloudPort);
             controlAgent = new CPCC(this, args[3]);
             initSpeedComboBox();
             r = new Random();
@@ -86,16 +87,9 @@ namespace ClientWindow
                     Signal received_signal = received_object.Value.ToObject<Signal>();
                     if (received_signal.stm1 != null)
                     {
+                        Log2("DEBUG", "cos odebralo");
                         STM1 received_frame = received_signal.stm1;
-                        if (received_frame.vc4.C4 != null)
-                        {
-
-                            receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + received_frame.vc4.C4);
-                            receivedTextBox.AppendText(Environment.NewLine);
-                            Log1("IN", virtualIP, received_signal.port.ToString(), 1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
-                        }
-
-                        else
+                        if (received_frame.vc4.vc3List.Count > 0)
                         {
                             foreach (KeyValuePair<int, VirtualContainer3> v in received_frame.vc4.vc3List)
                             {
@@ -104,6 +98,15 @@ namespace ClientWindow
                                 receivedTextBox.AppendText(Environment.NewLine);
                                 Log1("IN", virtualIP, received_signal.port.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                             }
+
+                        }
+
+                        else
+                        {
+                           
+                            receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + received_frame.vc4.C4);
+                            receivedTextBox.AppendText(Environment.NewLine);
+                            Log1("IN", virtualIP, received_signal.port.ToString(), 1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
                         }
                     }
                     else if (received_signal.lrmProtocol != null)
@@ -198,6 +201,7 @@ namespace ClientWindow
                 Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
                 foreach (int slot in slots)
                 {
+                    Log2("DEBUG", "sloty od controla: "+slot);
                     VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), "Slot"+slot+" :"+message);
                     vc3List.Add(slot, vc3);
                 }

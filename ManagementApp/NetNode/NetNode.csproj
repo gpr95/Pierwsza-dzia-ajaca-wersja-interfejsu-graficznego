@@ -62,9 +62,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="config.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\ClientNode\ClientNode.csproj">
       <Project>{c348fc9f-8edb-415f-8984-2fb7da94b364}</Project>
       <Name>ClientNode</Name>

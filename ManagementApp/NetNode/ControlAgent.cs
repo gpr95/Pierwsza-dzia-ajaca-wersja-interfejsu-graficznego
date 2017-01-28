@@ -58,17 +58,26 @@ namespace NetNode
                         //TODO allocate resources
                         foreach (var row in rec)
                         {
-                            if(LRM.allocateResource(row.iport, row.in_cont))
+                            if (LRM.allocateResource(row.iport, row.in_cont))
                             {
-                                sendTopologyAllocated(row.iport, row.in_cont);
+                                if (LRM.allocateResource(row.oport, row.out_cont))
+                                {
+                                    sendTopologyAllocated(row.iport, row.in_cont);
+                                    sendTopologyAllocated(row.iport, row.in_cont);
+                                    SwitchingField.addToSwitch(row);
+                                    SwitchingField.addToSwitch(new FIB(row.oport, row.out_cont, row.iport, row.in_cont));
+                                    sendConfirmation(row.iport, row.in_cont, true);
+                                }
+                                else
+                                {
+                                    LRM.deallocateResource(row.iport, row.in_cont);
+                                    sendConfirmation(row.iport, row.in_cont, false);
+                                }
                             }
-                            if(LRM.allocateResource(row.oport, row.out_cont))
+                            else
                             {
-                                sendTopologyAllocated(row.iport, row.in_cont);
+                                sendConfirmation(row.iport, row.in_cont, false);
                             }
-                            SwitchingField.addToSwitch(row);
-                            //adding fib for two-way communication
-                            SwitchingField.addToSwitch(new FIB(row.oport,row.out_cont,row.iport,row.in_cont));
                         }
                     }
                     else
@@ -113,7 +122,7 @@ namespace NetNode
         {
             string to;
             LRM.connections.TryGetValue(port, out to);
-            NetNode.log("sending topology to RC: " + to + " " + no_vc3, ConsoleColor.Yellow);
+            NetNode.log("sending topology allocated: " + to + " " + no_vc3, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_ALLOCATED;

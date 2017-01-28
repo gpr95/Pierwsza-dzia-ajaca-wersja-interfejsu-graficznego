@@ -38,11 +38,6 @@ namespace ControlNCC
             thread.Start();
             Console.WriteLine("Nodes in my network: ");
             Console.WriteLine("[INIT]Start NCC, IP: " + ip + " Port: " + controlPort);
-            Console.WriteLine("Nodes in my network: ");
-            foreach(string node in directory)
-            {
-                Console.WriteLine(node);
-            }
 
             int.TryParse(domainParams[2], out this.managementPort);
             management = new ManagementHandler(this.managementPort, this);
