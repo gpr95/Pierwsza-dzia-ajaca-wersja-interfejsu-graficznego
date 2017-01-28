@@ -99,6 +99,7 @@ namespace ControlCCRC
             initMsg.State = CCtoNCCSingallingMessage.INIT_FROM_CC;
             String dataToSend = JMessage.Serialize(JMessage.FromValue(initMsg));
             nccWriter.Write(dataToSend);
+            socketHandler.Add("NCC", nccWriter);
 
             Boolean noError = true;
             while (noError)
@@ -106,7 +107,6 @@ namespace ControlCCRC
                 try
                 {
                     string received_data = reader.ReadString();
-                    socketHandler.Add("NCC", nccWriter);
                     JMessage received_object = JMessage.Deserialize(received_data);
                     if (received_object.Type != typeof(CCtoNCCSingallingMessage))
                         noError = false;

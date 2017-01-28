@@ -729,7 +729,7 @@ namespace ControlCCRC
                     usingTopology2 = 0;
                     usingTopology3 = 0;
                     List<String> pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
-                    if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
+                    if (pathRate1 == null || pathRate1.Count == 0 || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     { 
                         pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
                         whichTopology = 2;
@@ -737,7 +737,7 @@ namespace ControlCCRC
                         usingTopology2 = 1;
                         usingTopology3 = 0;
                     }
-                    if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
+                    if (pathRate1 == null || pathRate1.Count == 0 || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     {
                         pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
                         whichTopology = 3;
@@ -746,7 +746,7 @@ namespace ControlCCRC
                         usingTopology3 = 1;
                     }
 
-                    if (pathRate1 != null || pathRate1.First().Equals(firstInMyNetwork) || pathRate1.Last().Equals(lastInMyNetwork))
+                    if (pathRate1 != null || pathRate1.Count != 0 || pathRate1.First().Equals(firstInMyNetwork) || pathRate1.Last().Equals(lastInMyNetwork))
                     {
                         foreach(var temp in pathRate1)
                         {
