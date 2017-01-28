@@ -77,7 +77,8 @@ namespace ControlCCRC
                     else if (received_object.Type == typeof(RCtoRCSignallingMessage))
                     {
                         RCtoRCSignallingMessage rcMsg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
-                        socketHandler.Add(rcMsg.Identifier, writer);
+                        if (!socketHandler.ContainsKey(rcMsg.Identifier)) 
+                            socketHandler.Add(rcMsg.Identifier, writer);
 
                         switch (rcMsg.State)
                         {
