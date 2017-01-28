@@ -14,8 +14,6 @@ namespace ClientNode
         public const int RATE_1 = 1;
         public const int RATE_2 = 2;
         public const int RATE_3 = 3;
-        public const int INTRADOMAIN = 0;
-        public const int INTERDOMAIN = 1;
         private int requestID;
         public string virtualInterface;
         public string originIdentifier;

@@ -20,15 +20,17 @@ namespace ControlNCC
         private TcpListener listener;
         private Dictionary<int, ControlConnectionService> services;
         public int domainNumber;
-        private static List<string> directory = new List<string>();
         private ControlConnectionService CCService;
         private ManagementHandler management;
         private int managementPort;
-       // SŁOWNIK REQUEST ID PLUS DOMENA ID
+        private Dictionary<int, int> interdomainRequests;
+        private Dictionary<int, string> CNAddressesForInterdomainCalls;
         public NetworkCallControl(string[] domainParams)
         {
             
             services = new Dictionary<int, ControlConnectionService>();
+            interdomainRequests = new Dictionary<int, int>();
+            CNAddressesForInterdomainCalls = new Dictionary<int, string>();
             string ip = "127.0.0.1";
             int.TryParse(domainParams[0], out domainNumber);
             Console.WriteLine("Domain: " + domainNumber + " Listener: " + domainParams[1] + " Management: " + domainParams[2]);
@@ -74,6 +76,43 @@ namespace ControlNCC
         {
             return this.CCService;
         }
+
+        public void addInterdomainRequest(int requestID, int domainID)
+        {
+            interdomainRequests.Add(requestID, domainID);
+        }
+
+        public bool checkIfInterdomainRequest(int requestID)
+        {
+            int domainID;
+            interdomainRequests.TryGetValue(requestID,out domainID);
+            if (domainID != 0)
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public int getDomainService(int requestID)
+        {
+            return interdomainRequests[requestID];
+        }
+
+        public void addCNAddressesForInterdomainCalls(int requestID,string clientIdentifier)
+        {
+            CNAddressesForInterdomainCalls.Add(requestID, clientIdentifier);
+        }
+
+        public string getCNAddressesForInterdomainCalls(int requestID)
+        {
+            return CNAddressesForInterdomainCalls[requestID];
+        }
+        public void clearCNAddressesForInterdomainCalls(int requestID)
+        {
+            CNAddressesForInterdomainCalls.Remove(requestID);
+        }
+
 
         //remove
 

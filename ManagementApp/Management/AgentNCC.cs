@@ -42,8 +42,25 @@ namespace Management
             toSend.State = ManagmentProtocol.TOOTHERNCC;
             toSend.ConnectionToOtherNcc = nccPorts;
             string data = ManagementApp.JSON.Serialize(ManagementApp.JSON.FromValue(toSend));
-            Thread.Sleep(150);
-            writerNCC.Write(data);
+            Thread threadManagement = new Thread(new ParameterizedThreadStart(tryToSendData));
+            threadManagement.Start(data);
+        }
+
+        private void tryToSendData(Object data)
+        {
+            int numberOfAttempts = 0;
+            while (numberOfAttempts < 10)
+            {
+                if (writerNCC == null)
+                    Thread.Sleep(100);
+                else
+                {
+                    writerNCC.Write((string)data);
+                    break;
+                }
+
+                numberOfAttempts++;
+            }
         }
 
         public void sendSoftPernament(String start, String end)
