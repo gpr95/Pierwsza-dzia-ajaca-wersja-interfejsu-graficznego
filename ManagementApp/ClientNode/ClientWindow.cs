@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ManagementApp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -393,10 +394,20 @@ namespace ClientWindow
 
         private void connectButton_Click(object sender, EventArgs e)
         {
-            controlAgent.connect();
-            int speed;
-            bool res = int.TryParse(speedComboBox.SelectedItem.ToString(), out speed);
-            controlAgent.sendRequest(addressTextBox.Text, speed);
+            try {
+                Address address = new Address(addressTextBox.Text);
+                controlAgent.connect();
+                int speed;
+                bool res = int.TryParse(speedComboBox.SelectedItem.ToString(), out speed);
+                controlAgent.sendRequest(addressTextBox.Text, speed);
+            }
+            catch(Exception es)
+            {
+                Log2("ERR", "Wrong address format");
+                addressTextBox.Clear();
+            }
+
+            
         }
 
         private void speedComboBox_SelectedIndexChanged(object sender, EventArgs e)
