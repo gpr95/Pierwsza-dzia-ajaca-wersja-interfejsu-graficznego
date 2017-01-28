@@ -272,12 +272,12 @@ namespace ControlCCRC
 
         }
 
-        public void sendBorderNodesToNCC(Address adr)
+        public void sendBorderNodesToNCC(Address adr, int domain)
         {
             CCtoNCCSingallingMessage borderNodeMsg = new CCtoNCCSingallingMessage();
             borderNodeMsg.State = CCtoNCCSingallingMessage.BORDER_NODE;
             borderNodeMsg.BorderNode = adr.getName();
-            borderNodeMsg.BorderDomain = adr.domain;
+            borderNodeMsg.BorderDomain = domain;
             String dataToSend = JMessage.Serialize(JMessage.FromValue(borderNodeMsg));
             nccWriter.Write(dataToSend);
         }
