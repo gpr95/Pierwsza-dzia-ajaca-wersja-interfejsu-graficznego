@@ -49,6 +49,7 @@ namespace ControlCCRC
 
         private String associatedNodeStart;
         private String associatedNodeStop;
+        public Dictionary<string, string> myBorderNodeAndConnectedOtherBorderNodeMap;
 
 
 
@@ -82,6 +83,7 @@ namespace ControlCCRC
                 consoleWriter("[INIT] DOMAIN - " + identifier);
                int.TryParse(identifier.Substring(identifier.IndexOf("_")+1), out domainNumber);
                 consoleWriter(" DOMAIN NUMBER : " + domainNumber);
+                myBorderNodeAndConnectedOtherBorderNodeMap = new Dictionary<String, String>();
             }
 
 
@@ -890,12 +892,12 @@ namespace ControlCCRC
                     break;
                 case 3:
                     // TODO obsluga
-                    List<String> path31 = shortest_path(startNode, endNode, topologyUnallocatedLayer1);
-                    List<String> path32 = shortest_path(startNode, endNode, topologyUnallocatedLayer2);
-                    List<String> path33 = shortest_path(startNode, endNode, topologyUnallocatedLayer3);
-                    if (path31 != null && path31.First().Equals(startNode) && path31.Last().Equals(endNode) &&
-                       path32 != null && path32.First().Equals(startNode) && path32.Last().Equals(endNode) &&
-                       path33 != null && path33.First().Equals(startNode) && path33.Last().Equals(endNode))
+                    List<String> path31 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                    List<String> path32 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                    List<String> path33 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                    if (path31 != null && path31.Count > 0 && path31.First().Equals(firstInMyNetwork) && path31.Last().Equals(lastInMyNetwork) &&
+                       path32 != null && path32.Count > 0 && path32.First().Equals(firstInMyNetwork) && path32.Last().Equals(lastInMyNetwork) &&
+                       path33 != null && path33.Count > 0 && path33.First().Equals(firstInMyNetwork) && path33.Last().Equals(lastInMyNetwork))
                     {
 
                         usingTopology1 = 1;
@@ -904,15 +906,52 @@ namespace ControlCCRC
                         /** Builded path in 1st layer */
                         /** Builded path in 2nd layer */
                         /** Builded path in 3nd layer */
-
-
                         foreach (String node in path31)
                         {
                             result.Add(node, new List<FIB>());
                         }
+                        for (int trippleRate = 1; trippleRate <= 3; trippleRate++)
+                        {
+                            foreach (var temp in path31)
+                            {
+                                consoleWriter("[INFO] Shortest path : " + temp);
+                            }
+                            foreach (String node in path31)
+                            {
+                                result.Add(node, new List<FIB>());
+                            }
+                            result.First().Value.Add(new FIB(
+                                                wholeTopologyNodesAndConnectedNodesWithPorts[path31[0]][startNode],
+                                                trippleRate + 10,
+                                                wholeTopologyNodesAndConnectedNodesWithPorts[path31[0]][path31[1]],
+                                                trippleRate + 10
+                                                ));
+                            result.Last().Value.Add(new FIB(
+                                                wholeTopologyNodesAndConnectedNodesWithPorts[path31.Last()][path31[path31.Count - 2]],
+                                                trippleRate + 10,
+                                                wholeTopologyNodesAndConnectedNodesWithPorts[path31.Last()][endNode],
+                                                trippleRate + 10
+                                                ));
 
-                        fillFibsInResultPath(result, path31, startNode, endNode,
-                            usingTopology1, usingTopology2, usingTopology3);
+                            for (int i = 1; i < path31.Count - 1; i++)
+                            {
+                                result[path31[i]].Add(new FIB(
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[path31[i]][path31[i - 1]],
+                                    trippleRate + 10,
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[path31[i]][path31[i + 1]],
+                                    trippleRate + 10
+                                    ));
+                            }
+                        }
+                        return result;
+                    }
+                    else
+                    {
+                        consoleWriter("[INFO] NOT able to connect nodes. All paths allocated.");
+                        usingTopology1 = 0;
+                        usingTopology2 = 0;
+                        usingTopology3 = 0;
+                        return null;
                     }
 
                     break;
@@ -1112,6 +1151,7 @@ namespace ControlCCRC
             if (iAmDomain && adr.domain != domainNumber)
             {
                 ccHandler.sendBorderNodesToNCC(adr);
+                myBorderNodeAndConnectedOtherBorderNodeMap.Add(nodeName, connectedNode);
             }
         }
 

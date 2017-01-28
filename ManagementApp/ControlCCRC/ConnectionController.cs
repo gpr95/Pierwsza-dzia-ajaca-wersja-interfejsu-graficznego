@@ -210,13 +210,16 @@ namespace ControlCCRC
 
         internal void sendFibs(Dictionary<string, List<FIB>> dictionary, int using1, int using2, int using3, int requestId)
         {
-            foreach(string nodeName in dictionary.Keys)
+            if (dictionary != null)
             {
-                CCtoCCSignallingMessage fibsMsg = new CCtoCCSignallingMessage();
-                fibsMsg.State = CCtoCCSignallingMessage.CC_UP_FIB_CHANGE;
-                fibsMsg.Fib_table = dictionary[nodeName];
-                String dataOut = JMessage.Serialize(JMessage.FromValue(fibsMsg));
-                socketHandler[nodeName].Write(dataOut);
+                foreach (string nodeName in dictionary.Keys)
+                {
+                    CCtoCCSignallingMessage fibsMsg = new CCtoCCSignallingMessage();
+                    fibsMsg.State = CCtoCCSignallingMessage.CC_UP_FIB_CHANGE;
+                    fibsMsg.Fib_table = dictionary[nodeName];
+                    String dataOut = JMessage.Serialize(JMessage.FromValue(fibsMsg));
+                    socketHandler[nodeName].Write(dataOut);
+                }
             }
             if(iAmDomain)
             {
@@ -236,6 +239,9 @@ namespace ControlCCRC
                 {
                     CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
                     finishMsg.State = CCtoNCCSingallingMessage.CC_REJECT;
+                    finishMsg.Vc11 = using1;
+                    finishMsg.Vc12 = using2;
+                    finishMsg.Vc13 = using3;
                     finishMsg.RequestID = requestId;
                     String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
                     nccWriter.Write(dataToSend);
@@ -270,7 +276,7 @@ namespace ControlCCRC
         {
             CCtoNCCSingallingMessage borderNodeMsg = new CCtoNCCSingallingMessage();
             borderNodeMsg.State = CCtoNCCSingallingMessage.BORDER_NODE;
-            borderNodeMsg.BorderNode = adr.getName();
+            borderNodeMsg.BorderNode = rcHandler.myBorderNodeAndConnectedOtherBorderNodeMap[adr.getName()];
             String dataToSend = JMessage.Serialize(JMessage.FromValue(borderNodeMsg));
             nccWriter.Write(dataToSend);
         }
