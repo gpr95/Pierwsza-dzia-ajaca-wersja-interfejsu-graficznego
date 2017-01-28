@@ -100,7 +100,10 @@ namespace ControlCCRC
 
                         switch (ccMsg.State)
                         {
-                            /////////////////////////
+                            case CCtoCCSignallingMessage.CC_MIDDLE_INIT:
+                                if (!socketHandler.ContainsKey(ccMsg.Identifier))
+                                    socketHandler.Add(ccMsg.Identifier, writer);
+                                break;
 
                         }
                     }

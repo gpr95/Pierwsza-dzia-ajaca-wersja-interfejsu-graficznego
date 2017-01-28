@@ -28,6 +28,7 @@ namespace ControlCCRC
         private RoutingController rcHandler;
         private Dictionary<String, BinaryWriter> socketHandler;
 
+        private int lowerCcRequestedInAction;
         private Boolean iAmDomain;
         /**
          * DOMAIN [CC_ID, connect NCC]
@@ -132,6 +133,7 @@ namespace ControlCCRC
 
             CCtoCCSignallingMessage initMsg = new CCtoCCSignallingMessage();
             initMsg.Identifier = identifier;
+            initMsg.State = CCtoCCSignallingMessage.CC_MIDDLE_INIT;
             String send_object = JMessage.Serialize(JMessage.FromValue(initMsg));
             ccWriter.Write(send_object);
 
@@ -150,7 +152,7 @@ namespace ControlCCRC
                     switch(msg.State)
                     {
                         case CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST:
-                            ///////////////////////////////////
+                           // lowerCcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("CC_")).ToList().Count();
                             break;
                     }
                 }

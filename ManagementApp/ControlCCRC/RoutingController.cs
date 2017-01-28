@@ -920,6 +920,11 @@ namespace ControlCCRC
                         consoleWriter("[ERROR] upper path can noc be found");
                         return;
                     }
+                    consoleWriter("debug cheapest path calculated:");
+                    foreach(String node in path)
+                    {
+                        consoleWriter(node);
+                    }
 
                     if(mapNodeConnectedNodeAndAssociatedRCSubnetwork.ContainsKey(requestNodeFrom + "#"+ path[0]))
                     {
