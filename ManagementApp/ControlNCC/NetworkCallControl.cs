@@ -24,6 +24,7 @@ namespace ControlNCC
         private ControlConnectionService CCService;
         private ManagementHandler management;
         private int managementPort;
+       // SŁOWNIK REQUEST ID PLUS DOMENA ID
         public NetworkCallControl(string[] domainParams)
         {
             
