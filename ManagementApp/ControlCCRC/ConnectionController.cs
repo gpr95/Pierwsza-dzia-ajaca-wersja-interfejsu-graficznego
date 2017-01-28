@@ -277,6 +277,7 @@ namespace ControlCCRC
             CCtoNCCSingallingMessage borderNodeMsg = new CCtoNCCSingallingMessage();
             borderNodeMsg.State = CCtoNCCSingallingMessage.BORDER_NODE;
             borderNodeMsg.BorderNode = adr.getName();
+            borderNodeMsg.BorderDomain = adr.domain;
             String dataToSend = JMessage.Serialize(JMessage.FromValue(borderNodeMsg));
             nccWriter.Write(dataToSend);
         }

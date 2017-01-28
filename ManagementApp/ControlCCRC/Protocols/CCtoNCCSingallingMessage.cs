@@ -27,7 +27,10 @@ namespace ControlCCRC.Protocols
         private String nodeTo;
         private int rate;
         private int requestID;
+
+        // state 4
         private String borderNode;
+        private int borderDomain;
 
         // state 2
         private int vc11;
@@ -150,6 +153,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 borderNode = value;
+            }
+        }
+
+        public int BorderDomain
+        {
+            get
+            {
+                return borderDomain;
+            }
+
+            set
+            {
+                borderDomain = value;
             }
         }
     }

@@ -820,40 +820,18 @@ namespace ControlCCRC
                     List<String> path1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
                     List<String> path2 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
                     List<String> path3 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
-
-                    foreach (var temp in path1)
-                    {
-                        consoleWriter("[INFO] Shortest path : " + temp);
-                    }
-                    foreach (var temp in path2)
-                    {
-                        consoleWriter("[INFO] Shortest path : " + temp);
-                    }
-                    foreach (var temp in path3)
-                    {
-                        consoleWriter("[INFO] Shortest path : " + temp);
-                    }
-
-
-                    if (path1 != null && path1.First().Equals(startNode) && path1.Last().Equals(endNode) &&
-                       path2 != null && path2.First().Equals(startNode) && path2.Last().Equals(endNode))
+                    if (path1 != null && path1.Count > 0 && path1.First().Equals(firstInMyNetwork) && path1.Last().Equals(lastInMyNetwork) &&
+                       path2 != null && path2.Count > 0 && path2.First().Equals(firstInMyNetwork) && path2.Last().Equals(lastInMyNetwork))
                     {
                         usingTopology1 = 1;
                         usingTopology2 = 1;
                         usingTopology3 = 0;
                         /** Builded path in 1st layer */
                         /** Builded path in 2nd layer */
-                        foreach (String node in path1)
-                        {
-                            result.Add(node, new List<FIB>());
-                        }
-
-                        fillFibsInResultPath(result,path1,startNode,endNode,
-                            usingTopology1, usingTopology2, usingTopology3);
                         
                     }
-                    else if (path1 != null && path1.First().Equals(startNode) && path1.Last().Equals(endNode) &&
-                             path3 != null && path3.First().Equals(startNode) && path3.Last().Equals(endNode))
+                    else if (path1 != null && path1.Count > 0 && path1.First().Equals(firstInMyNetwork) && path1.Last().Equals(lastInMyNetwork) &&
+                             path3 != null && path3.Count > 0 && path3.First().Equals(firstInMyNetwork) && path3.Last().Equals(lastInMyNetwork))
                     {
                         usingTopology1 = 1;
                         usingTopology2 = 0;
@@ -861,35 +839,75 @@ namespace ControlCCRC
                         /** Builded path in 1st layer */
                         /** Builded path in 3nd layer */
 
-                        foreach (String node in path1)
-                        {
-                            result.Add(node, new List<FIB>());
-                        }
-
-                        fillFibsInResultPath(result, path1, startNode, endNode,
-                            usingTopology1, usingTopology2, usingTopology3);
-
                     }
-                    else if (path2 != null && path2.First().Equals(startNode) && path2.Last().Equals(endNode) &&
-                             path3 != null && path3.First().Equals(startNode) && path3.Last().Equals(endNode))
+                    else if (path2 != null && path2.Count > 0 && path2.First().Equals(firstInMyNetwork) && path2.Last().Equals(lastInMyNetwork) &&
+                             path3 != null && path3.Count > 0 && path3.First().Equals(firstInMyNetwork) && path3.Last().Equals(lastInMyNetwork))
                     {
                         usingTopology1 = 0;
                         usingTopology2 = 1;
                         usingTopology3 = 1;
                         /** Builded path in 2nd layer */
                         /** Builded path in 3nd layer */
+                    }
+                    else
+                    {
+                        consoleWriter("[INFO] NOT able to connect nodes. All paths allocated.");
+                        usingTopology1 = 0;
+                        usingTopology2 = 0;
+                        usingTopology3 = 0;
+                        return null;
+                    }
+                    List<int> makePaths = new List<int>();
+                    if (usingTopology1 == 1)
+                        makePaths.Add(1);
+                    if (usingTopology2 == 1)
+                        makePaths.Add(2);
+                    if (usingTopology3 == 1)
+                        makePaths.Add(3);
+                    List<String> properPath = null;
+                    if (usingTopology1 == 1)
+                        properPath = path1;
+                    if (usingTopology2 == 1)
+                        properPath = path2;
+                    if (usingTopology3 == 1)
+                        properPath = path3;
 
-                        foreach (String node in path1)
-                        {
-                            result.Add(node, new List<FIB>());
-                        }
-
-                        fillFibsInResultPath(result, path2, startNode, endNode,
-                            usingTopology1, usingTopology2, usingTopology3);
-
+                    foreach (String node in properPath)
+                    {
+                        result.Add(node, new List<FIB>());
                     }
 
-                    break;
+                    foreach (int layers in makePaths)
+                    {
+                        foreach (var temp in properPath)
+                        {
+                            consoleWriter("[INFO] Shortest path : " + temp);
+                        }
+                        result.First().Value.Add(new FIB(
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[properPath[0]][startNode],
+                                            layers + 10,
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[properPath[0]][properPath[1]],
+                                            layers + 10
+                                            ));
+                        result.Last().Value.Add(new FIB(
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[properPath.Last()][properPath[properPath.Count - 2]],
+                                            layers + 10,
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[properPath.Last()][endNode],
+                                            layers + 10
+                                            ));
+
+                        for (int i = 1; i < properPath.Count - 1; i++)
+                        {
+                            result[properPath[i]].Add(new FIB(
+                                wholeTopologyNodesAndConnectedNodesWithPorts[properPath[i]][properPath[i - 1]],
+                                layers + 10,
+                                wholeTopologyNodesAndConnectedNodesWithPorts[properPath[i]][properPath[i + 1]],
+                                layers + 10
+                                ));
+                        }
+                    }
+
+                    return result;
                 case 3:
                     // TODO obsluga
                     List<String> path31 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
