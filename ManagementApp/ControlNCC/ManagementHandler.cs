@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Management;
 using ManagementApp;
+using ClientNode;
 
 namespace ControlNCC
 {
@@ -42,9 +43,16 @@ namespace ControlNCC
                     if (received_object.Type == typeof(Management.ManagmentProtocol))
                     {
                         Management.ManagmentProtocol management_packet = received_object.Value.ToObject<Management.ManagmentProtocol>();
-                        if (management_packet.State == Management.ManagmentProtocol.WHOIS)
+                        if (management_packet.State == Management.ManagmentProtocol.TOOTHERNCC)
                         {
-                            //connection to NCC + init message
+                            foreach(int port in management_packet.ConnectionToOtherNcc)
+                            {
+                                TcpClient connection  = new TcpClient("127.0.0.1", port);
+                                ControlConnectionService service = new ControlConnectionService(connection, control);
+                                Thread.Sleep(500);
+                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.NETWORK_CALL_COORDINATION_IN,ControlPacket.IN_PROGRESS,0,"","",control.domainNumber);
+                                service.send(packetToNCC);
+                            }
 
 
                         }

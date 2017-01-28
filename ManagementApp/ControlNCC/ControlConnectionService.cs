@@ -88,6 +88,16 @@ namespace ControlNCC
                             Console.WriteLine("[CPCC] Call confirmed or not");
 
 
+                        }else if(packet.virtualInterface == ControlInterface.NETWORK_CALL_COORDINATION_IN){
+                            Console.WriteLine("[NCC] Receive NCC invitation from NCC in domain"+ packet.RequestID);
+                            handlerNCC.addService(packet.RequestID, this);
+                            ControlPacket packetToNCCResponse = new ControlPacket(ControlInterface.NETWORK_CALL_COORDINATION_OUT, ControlPacket.IN_PROGRESS, 0, "", "", handlerNCC.domainNumber);
+                            send(packetToNCCResponse);
+                            Console.WriteLine("[NCC] Send invitation response to NCC in domain" + packetToNCCResponse.RequestID);
+                        }
+                        else if(packet.virtualInterface == ControlInterface.NETWORK_CALL_COORDINATION_OUT) {
+                            Console.WriteLine("[NCC] NCC handshake completed with NCC in doman" + packet.RequestID);
+                            handlerNCC.addService(packet.RequestID, this);
                         }
 
                     }else if (received_object.Type == typeof(CCtoNCCSingallingMessage))
