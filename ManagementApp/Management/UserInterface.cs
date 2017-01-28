@@ -102,6 +102,7 @@ namespace Management
             int temp = aPPLICATIONPORT - 7777;
             Console.WriteLine("\nManagement for domain: " + temp);
             Console.ForegroundColor = ConsoleColor.White;
+            Console.Title = "D" + temp + " Management";
         }
 
         public static void nodeList(List<Node> nodeList)

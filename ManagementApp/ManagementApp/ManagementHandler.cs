@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -23,8 +24,10 @@ namespace ManagementApp
             listenerManagement = new TcpListener(IPAddress.Parse("127.0.0.1"), applicationPort);
             threadManagement = new Thread(new ThreadStart(listenForManagement));
             threadManagement.Start();
-            String parameters = applicationPort + " " + nodeConnectionPort + " " + nccPort;
-            System.Diagnostics.Process.Start("Management.exe", parameters);
+            ProcessStartInfo startInfo = new ProcessStartInfo("Management.exe");
+            startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+            startInfo.Arguments = applicationPort + " " + nodeConnectionPort + " " + nccPort;
+            Process.Start(startInfo);
         }
 
         private void listenForManagement()
@@ -60,8 +63,6 @@ namespace ManagementApp
             string data = JSON.Serialize(JSON.FromValue(toSend));
             threadManagement = new Thread(new ParameterizedThreadStart(tryToSendData));
             threadManagement.Start(data);
-            //Thread.Sleep(100);
-            //writerManagement.Write(data);
         }
 
         private void tryToSendData(Object data)

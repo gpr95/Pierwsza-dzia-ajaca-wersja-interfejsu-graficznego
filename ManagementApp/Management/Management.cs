@@ -44,6 +44,7 @@ namespace Management
             else
                 this.agentNcc = null;
             Thread.Sleep(100);
+            Console.Title = "Management";
             if(APPLICATIONPORT != 7777)
                 UserInterface.showDomain(APPLICATIONPORT);
             UserInterface.showMenu();
