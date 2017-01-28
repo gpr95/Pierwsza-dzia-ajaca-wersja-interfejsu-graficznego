@@ -96,7 +96,8 @@ namespace ControlCCRC
                                 {
                                     consoleWriter("Received counted weigths from " + rcMsg.Identifier);
                                     rc.startProperWeigthComputingTopBottom(rcMsg.NodeConnectionsAndWeights,
-                                          rcMsg.AssociatedNodesInSubnetwork, rcMsg.RateToCountWeights, rcMsg.Identifier);
+                                          rcMsg.AssociatedNodesInSubnetwork, rcMsg.RateToCountWeights, rcMsg.Identifier,
+                                          rc.requestNodeFrom, rc.requestNodeTo);
                                 }
                                 break;
                             case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE:

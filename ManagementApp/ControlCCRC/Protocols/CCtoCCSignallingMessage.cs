@@ -19,6 +19,8 @@ namespace ControlCCRC.Protocols
         public const int CC_MIDDLE_INIT = 3;
         // cc requests to build path between two nodes
         public const int CC_BUILD_PATH_REQUEST = 4;
+
+        public const int FIB_SETTING_TOP_BOTTOM = 5;
         
 
 
