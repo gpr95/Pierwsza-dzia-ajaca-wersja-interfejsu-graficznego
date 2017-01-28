@@ -1,6 +1,7 @@
 ﻿using ClientWindow;
 using ControlCCRC.Protocols;
 using Management;
+using ManagementApp;
 using System;
 using System.Collections.Generic;
 using System.IO;

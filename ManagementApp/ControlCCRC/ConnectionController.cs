@@ -10,6 +10,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using ManagementApp;
 
 namespace ControlCCRC
 {
@@ -258,6 +259,15 @@ namespace ControlCCRC
                 }
             }
 
+        }
+
+        public void sendBorderNodesToNCC(Address adr)
+        {
+            CCtoNCCSingallingMessage borderNodeMsg = new CCtoNCCSingallingMessage();
+            borderNodeMsg.State = CCtoNCCSingallingMessage.BORDER_NODE;
+            borderNodeMsg.BorderNode = adr.getName();
+            String dataToSend = JMessage.Serialize(JMessage.FromValue(borderNodeMsg));
+            nccWriter.Write(dataToSend);
         }
     }
 }

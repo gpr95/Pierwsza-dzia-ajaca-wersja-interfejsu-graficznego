@@ -1,6 +1,7 @@
 ﻿using ClientWindow;
 using ControlCCRC.Protocols;
 using Management;
+using ManagementApp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,8 @@ namespace ControlCCRC
     class RoutingController
     {
         public Boolean iAmDomain;
+        public int domainNumber;
+
         private String identifier;
 
         private int lowerRcRequestedInAction;
@@ -78,6 +81,7 @@ namespace ControlCCRC
             {
                 consoleWriter("[INIT] DOMAIN - " + identifier);
                 identifier = "DOMAIN_" + identifier;
+                int.TryParse(identifier.Substring(identifier.IndexOf('_') + 1), out domainNumber);
             }
 
 
@@ -1078,6 +1082,12 @@ namespace ControlCCRC
             topologyUnallocatedLayer2.Add(nodeName, new Dictionary<string, int>());
             topologyUnallocatedLayer3.Add(nodeName, new Dictionary<string, int>());
             wholeTopologyNodesAndConnectedNodesWithPorts.Add(nodeName, new Dictionary<string, int>());
+
+            Address adr = new Address(nodeName);
+            if(iAmDomain && adr.domain != domainNumber)
+            {
+                ccHandler.sendBorderNodesToNCC(adr);
+            }
         }
 
         public void addTopologyElementFromLRM(String nodeName, String connectedNode, int connectedNodePort)

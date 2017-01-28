@@ -15,6 +15,8 @@ namespace ControlCCRC.Protocols
         public const int CC_CONFIRM = 2;
         // CC - unable to set
         public const int CC_REJECT = 3;
+        // CC sending border node address to NCC
+        public const int BORDER_NODE = 4;
 
 
 
@@ -25,6 +27,7 @@ namespace ControlCCRC.Protocols
         private String nodeTo;
         private int rate;
         private int requestID;
+        private String borderNode;
 
         // state 2
         private int vc11;
@@ -134,6 +137,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 requestID = value;
+            }
+        }
+
+        public string BorderNode
+        {
+            get
+            {
+                return borderNode;
+            }
+
+            set
+            {
+                borderNode = value;
             }
         }
     }
