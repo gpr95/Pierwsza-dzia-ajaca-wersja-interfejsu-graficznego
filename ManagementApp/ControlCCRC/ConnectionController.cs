@@ -21,7 +21,9 @@ namespace ControlCCRC
         private TcpClient NCCClient;
 
         private Thread threadconnectCC;
+        private BinaryWriter ccWriter;
         private Thread threadconnectNCC;
+        private BinaryWriter nccWriter;
 
         private RoutingController rcHandler;
         private Dictionary<String, BinaryWriter> socketHandler;
@@ -88,13 +90,13 @@ namespace ControlCCRC
         private void nccConnect()
         {
             BinaryReader reader = new BinaryReader(NCCClient.GetStream());
-            BinaryWriter writer = new BinaryWriter(NCCClient.GetStream());
+            nccWriter = new BinaryWriter(NCCClient.GetStream());
 
 
             CCtoNCCSingallingMessage initMsg = new CCtoNCCSingallingMessage();
             initMsg.State = CCtoNCCSingallingMessage.INIT_FROM_CC;
             String dataToSend = JMessage.Serialize(JMessage.FromValue(initMsg));
-            writer.Write(dataToSend);
+            nccWriter.Write(dataToSend);
 
             Boolean noError = true;
             while (noError)
@@ -102,7 +104,7 @@ namespace ControlCCRC
                 try
                 {
                     string received_data = reader.ReadString();
-                    socketHandler.Add("NCC", writer);
+                    socketHandler.Add("NCC", nccWriter);
                     JMessage received_object = JMessage.Deserialize(received_data);
                     if (received_object.Type != typeof(CCtoNCCSingallingMessage))
                         noError = false;
@@ -111,7 +113,7 @@ namespace ControlCCRC
                     {
                         // POPRAWIC
                         case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:
-                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate);
+                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestID);
                             break;
                     }
                 }
@@ -125,13 +127,13 @@ namespace ControlCCRC
         private void ccConnect()
         {
             BinaryReader reader = new BinaryReader(CCClient.GetStream());
-            BinaryWriter writer = new BinaryWriter(CCClient.GetStream());
+            ccWriter = new BinaryWriter(CCClient.GetStream());
 
 
             CCtoCCSignallingMessage initMsg = new CCtoCCSignallingMessage();
             initMsg.Identifier = identifier;
             String send_object = JMessage.Serialize(JMessage.FromValue(initMsg));
-            writer.Write(send_object);
+            ccWriter.Write(send_object);
 
 
             Boolean noError = true;
@@ -196,7 +198,7 @@ namespace ControlCCRC
 
         }
 
-        internal void sendFibs(Dictionary<string, List<FIB>> dictionary)
+        internal void sendFibs(Dictionary<string, List<FIB>> dictionary, int using1, int using2, int using3, int requestId)
         {
             foreach(string nodeName in dictionary.Keys)
             {
@@ -206,6 +208,51 @@ namespace ControlCCRC
                 String dataOut = JMessage.Serialize(JMessage.FromValue(fibsMsg));
                 socketHandler[nodeName].Write(dataOut);
             }
+            if(iAmDomain)
+            {
+                if (dictionary != null)
+                {
+                    CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
+                    finishMsg.State = CCtoNCCSingallingMessage.CC_CONFIRM;
+                    finishMsg.Vc11 = using1;
+                    finishMsg.Vc12 = using2;
+                    finishMsg.Vc13 = using3;
+                    finishMsg.RequestID = requestId;
+                    String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
+                    nccWriter.Write(dataToSend);
+                }
+                else
+                {
+                    CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
+                    finishMsg.State = CCtoNCCSingallingMessage.CC_REJECT;
+                    finishMsg.RequestID = requestId;
+                    String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
+                    nccWriter.Write(dataToSend);
+                }
+            }
+            else
+            {
+                if (dictionary != null)
+                {
+                    CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
+                    finishMsg.State = CCtoNCCSingallingMessage.CC_CONFIRM;
+                    finishMsg.Vc11 = using1;
+                    finishMsg.Vc12 = using2;
+                    finishMsg.Vc13 = using3;
+                    finishMsg.RequestID = requestId;
+                    String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
+                    ccWriter.Write(dataToSend);
+                }
+                else
+                {
+                    CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
+                    finishMsg.State = CCtoNCCSingallingMessage.CC_REJECT;
+                    finishMsg.RequestID = requestId;
+                    String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
+                    ccWriter.Write(dataToSend);
+                }
+            }
+
         }
     }
 }

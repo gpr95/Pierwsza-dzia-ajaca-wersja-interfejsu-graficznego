@@ -39,6 +39,10 @@ namespace ControlCCRC
         private ConnectionController ccHandler;
         private Dictionary<String, BinaryWriter> socketHandler;
 
+        private int usingTopology1 = 0;
+        private int usingTopology2 = 0;
+        private int usingTopology3 = 0;
+
 
 
         /**
@@ -352,16 +356,25 @@ namespace ControlCCRC
             {
                 case 1:
                     int whichTopology = 1;
+                    usingTopology1 = 1;
+                    usingTopology2 = 0;
+                    usingTopology3 = 0;
                     List<String> pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
                     if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     { 
                         pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
                         whichTopology = 2;
+                        usingTopology1 = 0;
+                        usingTopology2 = 1;
+                        usingTopology3 = 0;
                     }
                     if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     {
                         pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
                         whichTopology = 3;
+                        usingTopology1 = 0;
+                        usingTopology2 = 0;
+                        usingTopology3 = 1;
                     }
 
                     if (pathRate1 != null || pathRate1.First().Equals(firstInMyNetwork) || pathRate1.Last().Equals(lastInMyNetwork))
@@ -443,6 +456,9 @@ namespace ControlCCRC
                     else
                     {
                         consoleWriter("[INFO] NOT able to connect nodes. All paths allocated.");
+                        usingTopology1 = 0;
+                        usingTopology2 = 0;
+                        usingTopology3 = 0;
                         return null;
                     }
                 case 2:
@@ -607,7 +623,7 @@ namespace ControlCCRC
             wholeTopologyNodesAndConnectedNodesWithPorts.Remove(whoDied);
         }
 
-        public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate)
+        public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate, int requestId)
         {
             this.requestNodeFrom = nodeFrom;
             this.requestNodeTo = nodeTo;
@@ -623,7 +639,7 @@ namespace ControlCCRC
                             wholeTopologyNodesAndConnectedNodesWithPorts[node][connectedNode]+ "]");
                     }
                 }
-                ccHandler.sendFibs(findPath(nodeFrom, nodeTo, rate));
+                ccHandler.sendFibs(findPath(nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3,requestId);
             }
             foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC_")))
             {
