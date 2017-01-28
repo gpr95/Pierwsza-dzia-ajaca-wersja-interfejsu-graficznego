@@ -89,11 +89,14 @@ namespace ControlCCRC
                             case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM:
                                 if (!rc.iAmDomain)
                                 {
-                                    rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights, rcMsg.RateToCountWeights, rcMsg.Identifier);
+                                    rc.lowerRcSendedConnectionsAction(rcMsg.NodeConnectionsAndWeights,
+                                        rcMsg.AssociatedNodesInSubnetwork, rcMsg.RateToCountWeights, rcMsg.Identifier);
                                 }
                                 else
                                 {
                                     consoleWriter("Received counted weigths from " + rcMsg.Identifier);
+                                    rc.startProperWeigthComputingTopBottom(rcMsg.NodeConnectionsAndWeights,
+                                          rcMsg.AssociatedNodesInSubnetwork, rcMsg.RateToCountWeights, rcMsg.Identifier);
                                 }
                                 break;
                             case RCtoRCSignallingMessage.COUNTED_ALL_PATHS_REFUSE:

@@ -32,9 +32,9 @@ namespace ControlCCRC
         private String upperRc;
         private BinaryWriter upperWriter;
 
-        private String requestNodeFrom;
-        private String requestNodeTo;
-        private int requestRate;
+        public String requestNodeFrom;
+        public String requestNodeTo;
+        public int requestRate;
         private int requestId;
 
         private ConnectionController ccHandler;
@@ -43,6 +43,9 @@ namespace ControlCCRC
         private int usingTopology1 = 0;
         private int usingTopology2 = 0;
         private int usingTopology3 = 0;
+
+        private String associatedNodeStart;
+        private String associatedNodeStop;
 
 
 
@@ -176,6 +179,8 @@ namespace ControlCCRC
             RCtoRCSignallingMessage countedPathValue = new RCtoRCSignallingMessage();
             Dictionary<String, Dictionary<String, int>> nodeConnectionsAndWeights =
                 new Dictionary<string, Dictionary<string, int>>();
+            Dictionary<string, string> nodeConnectionsIntoSubnet =
+                new Dictionary<string, string>();
             Dictionary<String, List<String>> computedPaths = new Dictionary<string, List<string>>();
 
             for (int i = 0; i < pathNeededToBeCount.Count(); i++)
@@ -193,6 +198,7 @@ namespace ControlCCRC
                         consoleWriter("[RC] Computing weights between: " + pathNeededToBeCount[i] + " and " + s + " with:"
                         + rate + "x VC-3");
                         connections.Add(s, findWeightBetweenTwoNodes(pathNeededToBeCount[i], s, rate));
+                        nodeConnectionsIntoSubnet.Add(pathNeededToBeCount[i], associatedNodeStart + "#" + associatedNodeStop);
                         consoleWriter("Computed weight  between:" + pathNeededToBeCount[i] + " and " + s +
                             "with w=" + connections[s]);
                     }
@@ -217,6 +223,7 @@ namespace ControlCCRC
             if (nodeConnectionsAndWeights.Count != 0)
             {
                 countedPathValue.NodeConnectionsAndWeights = nodeConnectionsAndWeights;
+                countedPathValue.AssociatedNodesInSubnetwork = nodeConnectionsIntoSubnet;
                 countedPathValue.State = RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM;
                 foreach(String node in nodeConnectionsAndWeights.Keys)
                 {
@@ -280,6 +287,8 @@ namespace ControlCCRC
                             consoleWriter("Weight" + i + " :" + topologyUnallocatedLayer1[path[i]][path[i + 1]]);
                         }
                         result = weight + 2;
+                        associatedNodeStart = path.First();
+                        associatedNodeStop = path.Last();
                         consoleWriter("Total: " + result);
                     }
                     if(result == 0 && shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2) != null)
@@ -292,6 +301,8 @@ namespace ControlCCRC
                             consoleWriter("Weight" + i + " :" + topologyUnallocatedLayer1[path[i]][path[i + 1]]);
                         }
                         result = weight + 2;
+                        associatedNodeStart = path.First();
+                        associatedNodeStop = path.Last();
                     }
                     if (result == 0 && shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3) != null)
                     {
@@ -303,6 +314,8 @@ namespace ControlCCRC
                             consoleWriter("Weight" + i + " :" + topologyUnallocatedLayer1[path[i]][path[i + 1]]);
                         }
                         result = weight + 2;
+                        associatedNodeStart = path.First();
+                        associatedNodeStop = path.Last();
                     }
                     break;
                 case 2:
@@ -319,7 +332,9 @@ namespace ControlCCRC
                         {
                             weight += topologyUnallocatedLayer1[path[i]][path[i + 1]];
                         }
-                        shortest1 = weight + 2; 
+                        shortest1 = weight + 2;
+                        associatedNodeStart = path.First();
+                        associatedNodeStop = path.Last();
                     }
                     if (shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1) != null &&
                         shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3) != null)
@@ -358,6 +373,8 @@ namespace ControlCCRC
                             weight += topologyUnallocatedLayer1[path[i]][path[i + 1]];
                         }
                         result = weight + 2;
+                        associatedNodeStart = path.First();
+                        associatedNodeStop = path.Last();
                     }
                     break;
             }
@@ -918,7 +935,8 @@ namespace ControlCCRC
             }
         }
 
-        public void lowerRcSendedConnectionsAction(Dictionary<string, Dictionary<string, int>> nodeConnectionsAndWeights, int rate, String rcFrom)
+        public void lowerRcSendedConnectionsAction(Dictionary<string, Dictionary<string, int>> nodeConnectionsAndWeights, 
+            Dictionary<string, string> associatedNodes, int rate, String rcFrom)
         {
             Console.WriteLine("DEBUG###3: " + lowerRcRequestedInAction);
             lowerRcRequestedInAction--;
@@ -930,6 +948,14 @@ namespace ControlCCRC
                     consoleWriter("debug:" + node + ":" + connected + " weight:" + nodeConnectionsAndWeights[node][connected]);
                 }
                 
+            }
+            foreach (String node in associatedNodes.Keys)
+            {
+                foreach (String connected in nodeConnectionsAndWeights[node].Keys)
+                {
+                    consoleWriter("debug associated:" + node + ":" + connected + " between:" + nodeConnectionsAndWeights[node][connected]);
+                }
+
             }
             foreach (String node in nodeConnectionsAndWeights.Keys)
             {
@@ -962,10 +988,16 @@ namespace ControlCCRC
                             .Add(node,
                             nodeConnectionsAndWeights[node].Values.ElementAt(i));
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.Add(node + "#" +
-                            nodeConnectionsAndWeights[node].Keys.ElementAt(i), rcFrom);
+                            nodeConnectionsAndWeights[node].Keys.ElementAt(i), rcFrom 
+                            + "#" + associatedNodes[node].Substring(0, associatedNodes[node].IndexOf("#")));
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.Add(
                             nodeConnectionsAndWeights[node].Keys.ElementAt(i) + "#" +
-                            node, rcFrom);
+                            node, rcFrom + "#" + associatedNodes[node].Substring(associatedNodes[node].IndexOf("#") + 1));
+                        foreach(String mapNode in mapNodeConnectedNodeAndAssociatedRCSubnetwork.Keys)
+                        {
+                            consoleWriter("MAPNODE DEBUG : "
+                                + mapNode + " :: " + mapNodeConnectedNodeAndAssociatedRCSubnetwork[mapNode]);
+                        }
                         consoleWriter("Associated " + nodeConnectionsAndWeights[node].Keys.ElementAt(i) +
                             " -> " + node + " weight " + nodeConnectionsAndWeights[node].Values.ElementAt(i));
                         consoleWriter("Associated : " +
@@ -1028,6 +1060,62 @@ namespace ControlCCRC
             }
         }
 
+
+        public void startProperWeigthComputingTopBottom(Dictionary<string, Dictionary<string, int>> nodeConnectionsAndWeights,
+            Dictionary<string, string> associatedNodes, int rate, String rcFrom)
+        {
+            foreach (String node in nodeConnectionsAndWeights.Keys)
+            {
+                for (int i = 0; i < nodeConnectionsAndWeights[node].Count; i++)
+                {
+                    if (!wholeTopologyNodesAndConnectedNodesWithPorts[node].ContainsKey(nodeConnectionsAndWeights[node].Keys.ElementAt(i)))
+                    {
+                        //                        wholeTopologyNodesAndConnectedNodesWithPorts[node]
+                        //                          .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
+                        //                        nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        //                  wholeTopologyNodesAndConnectedNodesWithPorts[nodeConnectionsAndWeights[node].Keys.ElementAt(i)]
+                        //                    .Add(node,
+                        //                  nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer1[node]
+                            .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer1[nodeConnectionsAndWeights[node].Keys.ElementAt(i)]
+                            .Add(node,
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer2[node]
+                            .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer2[nodeConnectionsAndWeights[node].Keys.ElementAt(i)]
+                            .Add(node,
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer3[node]
+                            .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        topologyUnallocatedLayer3[nodeConnectionsAndWeights[node].Keys.ElementAt(i)]
+                            .Add(node,
+                            nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        mapNodeConnectedNodeAndAssociatedRCSubnetwork.Add(node + "#" +
+                            nodeConnectionsAndWeights[node].Keys.ElementAt(i), rcFrom
+                            + "#" + associatedNodes[node].Substring(0, associatedNodes[node].IndexOf("#")));
+                        mapNodeConnectedNodeAndAssociatedRCSubnetwork.Add(
+                            nodeConnectionsAndWeights[node].Keys.ElementAt(i) + "#" +
+                            node, rcFrom + "#" + associatedNodes[node].Substring(associatedNodes[node].IndexOf("#") + 1));
+                        foreach (String mapNode in mapNodeConnectedNodeAndAssociatedRCSubnetwork.Keys)
+                        {
+                            consoleWriter("MAPNODE DEBUG : "
+                                + mapNode + " :: " + mapNodeConnectedNodeAndAssociatedRCSubnetwork[mapNode]);
+                        }
+                        consoleWriter("Associated " + nodeConnectionsAndWeights[node].Keys.ElementAt(i) +
+                            " -> " + node + " weight " + nodeConnectionsAndWeights[node].Values.ElementAt(i));
+                        consoleWriter("Associated : " +
+                            node + "#" +
+                            nodeConnectionsAndWeights[node].Keys.ElementAt(i) + " and " + rcFrom);
+                    }
+                }
+            }
+
+            ///////TODO zestawianie fibow
+        }
 
         internal void lowerRcSendedRejectAction(int rate, String rcFrom)
         {

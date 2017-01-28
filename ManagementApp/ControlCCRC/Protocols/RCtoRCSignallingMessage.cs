@@ -26,6 +26,7 @@ namespace ControlCCRC.Protocols
 
         // state 1
         Dictionary<String, Dictionary<String, int>> nodeConnectionsAndWeights;
+        Dictionary<String, String> associatedNodesInSubnetwork;
         private List<int> pathWeight;
 
         public string Identifier
@@ -103,6 +104,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 nodeConnectionsAndWeights = value;
+            }
+        }
+
+        public Dictionary<string, string> AssociatedNodesInSubnetwork
+        {
+            get
+            {
+                return associatedNodesInSubnetwork;
+            }
+
+            set
+            {
+                associatedNodesInSubnetwork = value;
             }
         }
     }
