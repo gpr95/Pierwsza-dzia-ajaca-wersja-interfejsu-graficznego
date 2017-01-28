@@ -194,7 +194,13 @@ namespace Management
 
         internal void connectToOtherNcc(List<int> list)
         {
-            agentNcc.sandInfoToOtherNcc(list);
+            agentNcc.sendInfoToOtherNcc(list);
+        }
+
+        internal void createSoft(string nodeStart, string end)
+        {
+            //Send info to NCC for creation soft pernament connecion;
+            agentNcc.sendSoftPernament(nodeStart, end)
         }
     }
 }

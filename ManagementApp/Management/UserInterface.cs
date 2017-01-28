@@ -13,8 +13,10 @@ namespace Management
         private static Dictionary<int, Node> nodeDictionary;
         private static Boolean quit = false;
 
+        private static String nodeStart = null;
+
         private enum OPERATION
-        { ENTRY, TABLE, SHOW, INTERFACES, CLEAR, NONE }
+        { ENTRY, TABLE, SOFT, SHOW, INTERFACES, CLEAR, NONE }
 
         internal static ManagementPlane Management
         {
@@ -48,11 +50,15 @@ namespace Management
             {
                 //Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("\n MENU: ");
+                Console.WriteLine("\n --- Hard  Pernament --- ");
                 Console.WriteLine("\n\t 1) Insert forwarding entry to Node");
                 Console.WriteLine("\n\t 2) Insert forwarding table to Node");
-                Console.WriteLine("\n\t 3) Show connection table of Node");
-                Console.WriteLine("\n\t 4) Show interfaces of Node");
-                Console.WriteLine("\n\t 5) Clear connection table of Node");
+                Console.WriteLine("\n --- Soft  Pernament --- ");
+                Console.WriteLine("\n\t 3) Create soft pernament trail");
+                Console.WriteLine("\n --- More Operations --- ");
+                Console.WriteLine("\n\t 4) Show connection table of Node");
+                Console.WriteLine("\n\t 5) Show interfaces of Node");
+                Console.WriteLine("\n\t 6) Clear connection table of Node");
                 Console.WriteLine("\n");
 
                 int choice;
@@ -71,14 +77,18 @@ namespace Management
                             management.getNodes();
                             break;
                         case 3:
-                            operation = OPERATION.SHOW;
+                            operation = OPERATION.SOFT;
                             management.getNodes();
                             break;
                         case 4:
-                            operation = OPERATION.INTERFACES;
+                            operation = OPERATION.SHOW;
                             management.getNodes();
                             break;
                         case 5:
+                            operation = OPERATION.INTERFACES;
+                            management.getNodes();
+                            break;
+                        case 6:
                             operation = OPERATION.CLEAR;
                             management.getNodes();
                             break;
@@ -133,7 +143,7 @@ namespace Management
                 }
             if (n == null)
                 return;
-            if(operation != OPERATION.CLEAR)
+            if(!(operation == OPERATION.CLEAR || operation == OPERATION.SOFT))
                 management.getInterfaces(n);
             //log("#DEBUG3.2", ConsoleColor.Magenta);
             switch (operation)
@@ -174,6 +184,18 @@ namespace Management
                                 log("Wrong format, please try again.", ConsoleColor.Red);
                         }
                         management.sendTable(n, tableList);
+                    break;
+                case OPERATION.SOFT:
+                    if(n == null)
+                    {
+                        nodeStart = n.Name;
+                        management.getNodes();
+                    }
+                    else
+                    {
+                        management.createSoft(nodeStart, n.Name);
+                        nodeStart = null;
+                    } 
                     break;
                 case OPERATION.SHOW:
                     management.sendShowTable(n);

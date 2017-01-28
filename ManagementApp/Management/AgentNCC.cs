@@ -36,13 +36,23 @@ namespace Management
             UserInterface.log("Connection successfully established with NCC.", ConsoleColor.Green);
         }
 
-        public void sandInfoToOtherNcc(List<int> nccPorts)
+        public void sendInfoToOtherNcc(List<int> nccPorts)
         {
             ManagmentProtocol toSend = new ManagmentProtocol();
             toSend.State = ManagmentProtocol.TOOTHERNCC;
             toSend.ConnectionToOtherNcc = nccPorts;
             string data = ManagementApp.JSON.Serialize(ManagementApp.JSON.FromValue(toSend));
             Thread.Sleep(150);
+            writerNCC.Write(data);
+        }
+
+        public void sendSoftPernament(String start, String end)
+        {
+            ManagmentProtocol toSend = new ManagmentProtocol();
+            toSend.State = ManagmentProtocol.SOFTPERNAMENT;
+            toSend.NodeStart = start;
+            toSend.NodeEnd = end;
+            string data = ManagementApp.JSON.Serialize(ManagementApp.JSON.FromValue(toSend));
             writerNCC.Write(data);
         }
 
