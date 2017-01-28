@@ -96,6 +96,22 @@ namespace ControlCCRC
             this.socketHandler = socketHandler;
         }
 
+        public void allocatedTopologyConnection(string nodeName, string connectedNode, int slotVC3)
+        {
+            switch(slotVC3)
+            {
+                case 1:
+                    topologyUnallocatedLayer1[nodeName].Remove(connectedNode);
+                    break;
+                case 2:
+                    topologyUnallocatedLayer2[nodeName].Remove(connectedNode);
+                    break;
+                case 3:
+                    topologyUnallocatedLayer3[nodeName].Remove(connectedNode);
+                    break;
+            }
+        }
+
         private void rcConnecting()
         {
             BinaryReader reader = new BinaryReader(RCClient.GetStream());
@@ -411,37 +427,37 @@ namespace ControlCCRC
                                     ));
                         }
 
-                        switch (whichTopology)
-                        {
-                            case 1:
-                                /** Builded path in 1st layer */
-                                for (int i = 0; i < pathRate1.Count - 1; i++)
-                                {
-                                    topologyUnallocatedLayer1[pathRate1[i]].Remove(pathRate1[i + 1]);
-                                }                               
-                                break;
-                            case 2:
-                                /** Builded path in 2nd layer */
-                                for (int i = 0; i < pathRate1.Count - 1; i++)
-                                {
-                                    topologyUnallocatedLayer2[pathRate1[i]].Remove(pathRate1[i + 1]);
-                                    if (i != 0 && i != pathRate1.Count - 1)
-                                        result[pathRate1[i]].Add(new FIB(
-                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
-                                            1,
-                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i + 1]],
-                                            1
-                                            ));
-                                }
-                                break;
-                            case 3:
-                                /** Builded path in 3th layer */
-                                for (int i = 0; i < pathRate1.Count - 1; i++)
-                                {
-                                    topologyUnallocatedLayer3[pathRate1[i]].Remove(pathRate1[i + 1]);
-                                }
-                                break;
-                        }
+                        //switch (whichTopology)
+                        //{
+                        //    case 1:
+                        //        /** Builded path in 1st layer */
+                        //        for (int i = 0; i < pathRate1.Count - 1; i++)
+                        //        {
+                        //            topologyUnallocatedLayer1[pathRate1[i]].Remove(pathRate1[i + 1]);
+                        //        }                               
+                        //        break;
+                        //    case 2:
+                        //        /** Builded path in 2nd layer */
+                        //        for (int i = 0; i < pathRate1.Count - 1; i++)
+                        //        {
+                        //            topologyUnallocatedLayer2[pathRate1[i]].Remove(pathRate1[i + 1]);
+                        //            if (i != 0 && i != pathRate1.Count - 1)
+                        //                result[pathRate1[i]].Add(new FIB(
+                        //                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
+                        //                    1,
+                        //                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i + 1]],
+                        //                    1
+                        //                    ));
+                        //        }
+                        //        break;
+                        //    case 3:
+                        //        /** Builded path in 3th layer */
+                        //        for (int i = 0; i < pathRate1.Count - 1; i++)
+                        //        {
+                        //            topologyUnallocatedLayer3[pathRate1[i]].Remove(pathRate1[i + 1]);
+                        //        }
+                        //        break;
+                        //}
 
                         foreach (var temp in result)
                         {
@@ -466,35 +482,73 @@ namespace ControlCCRC
                     List<String> path1 = shortest_path(startNode, endNode, topologyUnallocatedLayer1);
                     List<String> path2 = shortest_path(startNode, endNode, topologyUnallocatedLayer2);
                     List<String> path3 = shortest_path(startNode, endNode, topologyUnallocatedLayer3);
-                    if(path1 != null && path1.First().Equals(startNode) && path1.Last().Equals(endNode) &&
+
+                    foreach (var temp in path1)
+                    {
+                        consoleWriter("[INFO] Shortest path : " + temp);
+                    }
+                    foreach (var temp in path2)
+                    {
+                        consoleWriter("[INFO] Shortest path : " + temp);
+                    }
+                    foreach (var temp in path3)
+                    {
+                        consoleWriter("[INFO] Shortest path : " + temp);
+                    }
+
+
+                    if (path1 != null && path1.First().Equals(startNode) && path1.Last().Equals(endNode) &&
                        path2 != null && path2.First().Equals(startNode) && path2.Last().Equals(endNode))
                     {
+                        usingTopology1 = 1;
+                        usingTopology2 = 1;
+                        usingTopology3 = 0;
                         /** Builded path in 1st layer */
                         /** Builded path in 2nd layer */
-                        for (int i = 0; i < path1.Count - 1; i++)
-                            topologyUnallocatedLayer1[path1[i]].Remove(path1[i + 1]);
-                        for (int i = 0; i < path2.Count - 1; i++)
-                            topologyUnallocatedLayer2[path2[i]].Remove(path2[i + 1]);
+                        foreach (String node in path1)
+                        {
+                            result.Add(node, new List<FIB>());
+                        }
+
+                        fillFibsInResultPath(result,path1,startNode,endNode,
+                            usingTopology1, usingTopology2, usingTopology3);
+                        
                     }
                     else if (path1 != null && path1.First().Equals(startNode) && path1.Last().Equals(endNode) &&
                              path3 != null && path3.First().Equals(startNode) && path3.Last().Equals(endNode))
                     {
+                        usingTopology1 = 1;
+                        usingTopology2 = 0;
+                        usingTopology3 = 1;
                         /** Builded path in 1st layer */
                         /** Builded path in 3nd layer */
-                        for (int i = 0; i < path1.Count - 1; i++)
-                            topologyUnallocatedLayer1[path1[i]].Remove(path1[i + 1]);
-                        for (int i = 0; i < path3.Count - 1; i++)
-                            topologyUnallocatedLayer3[path3[i]].Remove(path3[i + 1]);
+
+                        foreach (String node in path1)
+                        {
+                            result.Add(node, new List<FIB>());
+                        }
+
+                        fillFibsInResultPath(result, path1, startNode, endNode,
+                            usingTopology1, usingTopology2, usingTopology3);
+
                     }
                     else if (path2 != null && path2.First().Equals(startNode) && path2.Last().Equals(endNode) &&
                              path3 != null && path3.First().Equals(startNode) && path3.Last().Equals(endNode))
                     {
+                        usingTopology1 = 0;
+                        usingTopology2 = 1;
+                        usingTopology3 = 1;
                         /** Builded path in 2nd layer */
                         /** Builded path in 3nd layer */
-                        for (int i = 0; i < path2.Count - 1; i++)
-                            topologyUnallocatedLayer2[path2[i]].Remove(path2[i + 1]);
-                        for (int i = 0; i < path3.Count - 1; i++)
-                            topologyUnallocatedLayer3[path3[i]].Remove(path3[i + 1]);
+
+                        foreach (String node in path1)
+                        {
+                            result.Add(node, new List<FIB>());
+                        }
+
+                        fillFibsInResultPath(result, path2, startNode, endNode,
+                            usingTopology1, usingTopology2, usingTopology3);
+
                     }
 
                     break;
@@ -507,9 +561,22 @@ namespace ControlCCRC
                        path32 != null && path32.First().Equals(startNode) && path32.Last().Equals(endNode) &&
                        path33 != null && path33.First().Equals(startNode) && path33.Last().Equals(endNode))
                     {
+
+                        usingTopology1 = 1;
+                        usingTopology2 = 1;
+                        usingTopology3 = 1;
                         /** Builded path in 1st layer */
                         /** Builded path in 2nd layer */
                         /** Builded path in 3nd layer */
+
+
+                        foreach (String node in path31)
+                        {
+                            result.Add(node, new List<FIB>());
+                        }
+
+                        fillFibsInResultPath(result, path31, startNode, endNode,
+                            usingTopology1, usingTopology2, usingTopology3);
                     }
 
                     break;
@@ -521,6 +588,113 @@ namespace ControlCCRC
             return null;
         }
 
+        private void fillFibsInResultPath(Dictionary<string, List<FIB>> result, List<string> path, String startNode, 
+            String endNode, int usingTopology1, int usingTopology2, int usingTopology3)
+        {
+            if(usingTopology1 != 0)
+            {
+                result.First().Value.Add(new FIB(
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][startNode],
+                                            11,
+                                            wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][path[1]],
+                                            11
+                                            ));
+                result.Last().Value.Add(new FIB(
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][path[path.Count - 2]],
+                                    11,
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][endNode],
+                                    11
+                                    ));
+
+                for (int i = 1; i < path.Count - 1; i++)
+                {
+                    result[path[i]].Add(new FIB(
+                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i - 1]],
+                        11,
+                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i + 1]],
+                        11
+                        ));
+                }
+
+                foreach (var temp in result)
+                {
+                    foreach (var fib in temp.Value)
+                    {
+                        Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
+                    }
+                }
+            }
+            if(usingTopology2 != 0)
+            {
+                result.First().Value.Add(new FIB(
+                                           wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][startNode],
+                                           12,
+                                           wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][path[1]],
+                                           12
+                                           ));
+                result.Last().Value.Add(new FIB(
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][path[path.Count - 2]],
+                                    12,
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][endNode],
+                                    12
+                                    ));
+
+                for (int i = 1; i < path.Count - 1; i++)
+                {
+                    result[path[i]].Add(new FIB(
+                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i - 1]],
+                        12,
+                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i + 1]],
+                        12
+                        ));
+                }
+
+                foreach (var temp in result)
+                {
+                    foreach (var fib in temp.Value)
+                    {
+                        Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
+                    }
+                }
+            }
+            if(usingTopology3 != 0)
+            {
+                result.First().Value.Add(new FIB(
+                                           wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][startNode],
+                                           13,
+                                           wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][path[1]],
+                                           13
+                                           ));
+                result.Last().Value.Add(new FIB(
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][path[path.Count - 2]],
+                                    13,
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][endNode],
+                                    13
+                                    ));
+
+                for (int i = 1; i < path.Count - 1; i++)
+                {
+                    result[path[i]].Add(new FIB(
+                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i - 1]],
+                        13,
+                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i + 1]],
+                        13
+                        ));
+                }
+
+                foreach (var temp in result)
+                {
+                    foreach (var fib in temp.Value)
+                    {
+                        Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
+                    }
+                }
+            }
+            
+        }
+
+ 
+            
 
         public List<String> shortest_path(String start, String finish, Dictionary<String, Dictionary<String, int>> topology)
         {
@@ -592,13 +766,6 @@ namespace ControlCCRC
 
         public void addTopologyElementFromLRM(String nodeName, String connectedNode, int connectedNodePort)
         {
-        //    if (wholeTopologyNodesAndConnectedNodesWithPorts.ContainsKey(nodeName))
-        //        if (wholeTopologyNodesAndConnectedNodesWithPorts[nodeName].ContainsKey(connectedNode))
-        //            return;
-        //    if (wholeTopologyNodesAndConnectedNodesWithPorts.ContainsKey(connectedNode))
-        //        if (wholeTopologyNodesAndConnectedNodesWithPorts[connectedNode].ContainsKey(nodeName))
-        //            return;
-
             topologyUnallocatedLayer1[nodeName].Add(connectedNode, 1);
             topologyUnallocatedLayer2[nodeName].Add(connectedNode, 1);
             topologyUnallocatedLayer3[nodeName].Add(connectedNode, 1);
@@ -629,7 +796,8 @@ namespace ControlCCRC
             this.requestNodeTo = nodeTo;
             this.requestRate = rate;
             lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).ToList().Count();
-            if(socketHandler.Keys.Where(id => id.StartsWith("RC_")).ToList().Count() == 0)
+
+            if(lowerRcRequestedInAction == 0)
             {
                 foreach(String node in wholeTopologyNodesAndConnectedNodesWithPorts.Keys)
                 {
@@ -641,6 +809,7 @@ namespace ControlCCRC
                 }
                 ccHandler.sendFibs(findPath(nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3,requestId);
             }
+
             foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC_")))
             {
                 RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();

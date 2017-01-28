@@ -55,19 +55,22 @@ namespace ControlCCRC
                         switch (lrmMsg.State)
                         {
                             case RCtoLRMSignallingMessage.LRM_INIT:
-                                consoleWriter("LRM_INIT");
+                                consoleWriter("[received from LRRM] LRM_INIT");
                                 identifier = lrmMsg.NodeName;
                                 rc.initLRMNode(identifier);
                                 socketHandler.Add(identifier, writer);
-                                consoleWriter("SOCKETHANDLER KONIEC");
                                 break;
                             case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
-                                consoleWriter("LRM_TOP_ADD");
+                                consoleWriter("[received from LRRM] LRM_TOP_ADD");
                                 rc.addTopologyElementFromLRM(identifier, lrmMsg.ConnectedNode, lrmMsg.ConnectedNodePort);
                                 break;
                             case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
-                                consoleWriter("LRM_TOP_DEL");
+                                consoleWriter("[received from LRRM] LRM_TOP_DEL");
                                 rc.deleteTopologyElementFromLRM(lrmMsg.ConnectedNode);
+                                break;
+                            case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ALLOCATED:
+                                consoleWriter("[received from LRRM] LRM_ALLOCATED");
+                                rc.allocatedTopologyConnection(identifier, lrmMsg.ConnectedNode, lrmMsg.AllocatedSlot);
                                 break;
                         }
                     }
