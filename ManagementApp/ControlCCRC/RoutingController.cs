@@ -518,14 +518,10 @@ namespace ControlCCRC
                                 String rcNeededToBeSet =
                                     mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
                                      mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
-                                String internalNodeFrom =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(
-                                         mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#") + 1, 0);
-                                String internalNodeTo =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Substring(
-                                         mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].IndexOf("#") + 1, 0);
+                                String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
+                                String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
                                 consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                                   virtualNodeFrom + ":" + internalNodeTo + "  " + virtualNodeTo + ":" + internalNodeTo);
+                                   virtualNodeFrom + ":" + internalNodeFrom + "  " + virtualNodeTo + ":" + internalNodeTo);
 
                                 result[pathRate1[0]].Add(new FIB(
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
@@ -558,6 +554,8 @@ namespace ControlCCRC
                         }
                         else
                         {
+                            int startFibSettingFrom = 1;
+                            int startFibSettingTo = pathRate1.Count - 2;
                             if (topologyUnallocatedLayer1[pathRate1.ElementAt(0)][pathRate1.ElementAt(1)] > 1)
                             {
                                 String virtualNodeFrom = pathRate1.ElementAt(0);
@@ -565,14 +563,10 @@ namespace ControlCCRC
                                 String rcNeededToBeSet =
                                     mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
                                      mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
-                                String internalNodeFrom =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(
-                                         mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#") + 1, 0);
-                                String internalNodeTo =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Substring(
-                                         mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].IndexOf("#") + 1, 0);
+                                String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
+                                String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
                                 consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                                   virtualNodeFrom + ":" + internalNodeTo + "  " + virtualNodeTo + ":" + internalNodeTo);
+                                   virtualNodeFrom + ":" + internalNodeFrom + "  " + virtualNodeTo + ":" + internalNodeTo);
 
                                 result[pathRate1[0]].Add(new FIB(
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
@@ -583,9 +577,10 @@ namespace ControlCCRC
                                 result[pathRate1[1]].Add(new FIB(
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][internalNodeTo],
                                     whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][pathRate1[2]],
+                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][pathRate1[1]],
                                     whichTopology + 10
                                     ));
+                                startFibSettingFrom = 2;
                             }
                             else
                             {
@@ -604,14 +599,10 @@ namespace ControlCCRC
                                 String rcNeededToBeSet =
                                     mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
                                      mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
-                                String internalNodeFrom =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(
-                                         mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#") + 1, 0);
-                                String internalNodeTo =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Substring(
-                                         mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].IndexOf("#") + 1, 0);
+                                String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
+                                String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
                                 consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                                   virtualNodeFrom + ":" + internalNodeTo + "  " + virtualNodeTo + ":" + internalNodeTo);
+                                   virtualNodeFrom + ":" + internalNodeFrom + "  " + virtualNodeTo + ":" + internalNodeTo);
 
                                 result[pathRate1[pathRate1.Count - 2]].Add(new FIB(
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][pathRate1[pathRate1.Count - 3]],
@@ -625,6 +616,7 @@ namespace ControlCCRC
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][endNode],
                                     whichTopology + 10
                                     ));
+                                startFibSettingTo = pathRate1.Count - 3;
                             }
                             else
                             {
@@ -637,7 +629,7 @@ namespace ControlCCRC
                             }
                             
 
-                            for (int i = 1; i < pathRate1.Count - 1; i++)
+                            for (int i = startFibSettingFrom; i <= startFibSettingTo; i++)
                             {
                                 if (topologyUnallocatedLayer1[pathRate1.ElementAt(i)][pathRate1.ElementAt(i + 1)] > 1)
                                 {
@@ -646,14 +638,10 @@ namespace ControlCCRC
                                     String rcNeededToBeSet =
                                         mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
                                          mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
-                                    String internalNodeFrom =
-                                        mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(
-                                             mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#") + 1, 0);
-                                    String internalNodeTo =
-                                        mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Substring(
-                                             mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].IndexOf("#") + 1, 0);
+                                    String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
+                                    String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
                                     consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                                       virtualNodeFrom + ":" + internalNodeTo + "  " + virtualNodeTo + ":" + internalNodeTo);
+                                       virtualNodeFrom + ":" + internalNodeFrom + "  " + virtualNodeTo + ":" + internalNodeTo);
                                     result[pathRate1[i]].Add(new FIB(
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
                                     whichTopology + 10,
