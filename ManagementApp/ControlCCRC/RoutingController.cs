@@ -1098,12 +1098,6 @@ namespace ControlCCRC
             topologyUnallocatedLayer2.Add(nodeName, new Dictionary<string, int>());
             topologyUnallocatedLayer3.Add(nodeName, new Dictionary<string, int>());
             wholeTopologyNodesAndConnectedNodesWithPorts.Add(nodeName, new Dictionary<string, int>());
-
-            Address adr = new Address(nodeName);
-            if(iAmDomain && adr.domain != domainNumber)
-            {
-                ccHandler.sendBorderNodesToNCC(adr);
-            }
         }
 
         public void addTopologyElementFromLRM(String nodeName, String connectedNode, int connectedNodePort)
@@ -1113,6 +1107,12 @@ namespace ControlCCRC
             topologyUnallocatedLayer3[nodeName].Add(connectedNode, 1);
             wholeTopologyNodesAndConnectedNodesWithPorts[nodeName]
                 .Add(connectedNode, connectedNodePort);
+
+            Address adr = new Address(connectedNode);
+            if (iAmDomain && adr.domain != domainNumber)
+            {
+                ccHandler.sendBorderNodesToNCC(adr);
+            }
         }
 
         public void deleteTopologyElementFromLRM(String whoDied)
@@ -1195,12 +1195,6 @@ namespace ControlCCRC
                 {
                     if (!wholeTopologyNodesAndConnectedNodesWithPorts[node].ContainsKey(nodeConnectionsAndWeights[node].Keys.ElementAt(i)))
                     {
-//                        wholeTopologyNodesAndConnectedNodesWithPorts[node]
-  //                          .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
-    //                        nodeConnectionsAndWeights[node].Values.ElementAt(i));
-      //                  wholeTopologyNodesAndConnectedNodesWithPorts[nodeConnectionsAndWeights[node].Keys.ElementAt(i)]
-        //                    .Add(node,
-          //                  nodeConnectionsAndWeights[node].Values.ElementAt(i));
                         topologyUnallocatedLayer1[node]
                             .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
                             nodeConnectionsAndWeights[node].Values.ElementAt(i));
