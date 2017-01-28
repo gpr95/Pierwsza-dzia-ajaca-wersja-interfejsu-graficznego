@@ -111,12 +111,15 @@ namespace ControlCCRC
             switch(slotVC3)
             {
                 case 11:
+                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
                     topologyUnallocatedLayer1[nodeName].Remove(connectedNode);
                     break;
                 case 12:
+                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
                     topologyUnallocatedLayer2[nodeName].Remove(connectedNode);
                     break;
                 case 13:
+                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
                     topologyUnallocatedLayer3[nodeName].Remove(connectedNode);
                     break;
             }
