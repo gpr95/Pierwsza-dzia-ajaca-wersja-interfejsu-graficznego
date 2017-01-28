@@ -35,6 +35,8 @@ namespace ManagementApp
         private Graphics myGraphics;
         private Point subFrom;
 
+        public Node a, b, c, d, e, f, g, h;
+
         public static int GAP
         {
             get
@@ -64,6 +66,57 @@ namespace ManagementApp
             InitializeComponent();
             hidePortSetup();
             RenderTable();
+
+            //fillTopology();
+            //Thread t = new Thread(new ThreadStart(fillConnection));
+            //t.Start();
+            
+        }
+
+        private void fillTopology()
+        {
+            //Thread.Sleep(1000);
+            controler.addDomainToQueue(new Point(GAP * 1, GAP * 6), new Point(GAP * 28, GAP * 24));
+            Thread.Sleep(1000);
+            controler.addSubnetworkToQueue(new Point(GAP * 5, GAP * 14), new Point(GAP * 24, GAP * 23));
+            Thread.Sleep(1000);
+            controler.addSubnetworkToQueue(new Point(GAP * 9, GAP * 18), new Point(GAP * 20, GAP * 22));
+            Thread.Sleep(3000);
+            a = controler.addNetwork(new Point(GAP * 11, GAP * 20));
+            Thread.Sleep(100);
+            b = controler.addNetwork(new Point(GAP * 18, GAP * 20));
+            Thread.Sleep(100);
+            c = controler.addNetwork(new Point(GAP * 7, GAP * 16));
+            Thread.Sleep(100);
+            d = controler.addNetwork(new Point(GAP * 22, GAP * 16));
+            Thread.Sleep(100);
+            e = controler.addNetwork(new Point(GAP * 3, GAP * 12));
+            Thread.Sleep(100);
+            f = controler.addNetwork(new Point(GAP * 26, GAP * 12));
+            Thread.Sleep(100);
+            g = controler.addClient(new Point(GAP * 7, GAP * 8));
+            Thread.Sleep(100);
+            h = controler.addClient(new Point(GAP * 22, GAP * 8));
+
+        }
+
+        private void fillConnection()
+        {
+            Thread.Sleep(200);
+            addConnection(a, getPort(a), b, getPort(b));
+            Thread.Sleep(200);
+            addConnection(a, getPort(a), c, getPort(c));
+            Thread.Sleep(200);
+            addConnection(c, getPort(c), e, getPort(e));
+            Thread.Sleep(200);
+            addConnection(e, getPort(e), g, getPort(g));
+            Thread.Sleep(200);
+            addConnection(b, getPort(b), d, getPort(d));
+            Thread.Sleep(200);
+            addConnection(d, getPort(d), f, getPort(f));
+            Thread.Sleep(200);
+            addConnection(f, getPort(f), h, getPort(h));
+            Refresh();
         }
 
         public void setLists(List<Node> nodeList, List<Domain> domainList, List<Subnetwork> subnetworkList, List<NodeConnection> connectionList)
@@ -88,6 +141,8 @@ namespace ManagementApp
             }
             myGraphics = containerPictureBox.CreateGraphics();
             myGraphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            //fillConnection();
         }
 
         private DataTable makeTable()
@@ -645,8 +700,8 @@ namespace ManagementApp
             panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             Pen blackPen = new Pen(Color.WhiteSmoke, 2);
             panel.DrawLine(blackPen, conn.Start, conn.End);
-            panel.DrawString(conn.Name, new Font("Arial", GAP / 2), Brushes.Gainsboro, new Point((conn.Start.X + conn.End.X) / 2 + (GAP / 2),
-               (conn.Start.Y + conn.End.Y) / 2 + (GAP / 2)));
+            //panel.DrawString(conn.Name, new Font("Arial", GAP / 2), Brushes.Gainsboro, new Point((conn.Start.X + conn.End.X) / 2 + (GAP / 2),
+            //   (conn.Start.Y + conn.End.Y) / 2 + (GAP / 2)));
         }
 
         private void drawDomain(Domain domain, Graphics panel)
@@ -1024,16 +1079,9 @@ namespace ManagementApp
             oType = OperationType.ADD_SUBNETWORK;
         }
 
-        //private int getNumberOfConnectionsBetweenNodes(Node from, Node to)
-        //{
-        //    return connectionList.Where(i => (
-        //                i.Start.Equals(from.Position) &&
-        //                i.Start.Equals(to.Position)) || (
-        //                i.Start.Equals(to.Position) &&
-        //                i.Start.Equals(from.Position))
-        //                ).Count();
-        //}
-
-
+        public void refreshTopology()
+        {
+            containerPictureBox.Refresh();
+        }
     }
 }
