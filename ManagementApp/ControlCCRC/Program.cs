@@ -29,15 +29,21 @@ namespace ControlCCRC
         static void Main(string[] args)
         {
             Dictionary<String, BinaryWriter> socketHandler = new Dictionary<string, BinaryWriter>();
-            Console.Title = args[1];
+           
             string rcId = "RC_" + args[1];
             string ccId = "CC_" + args[1];
 
             string[] rcArgs = new string[] { };
             if (args.Length == 4)
+            {
                 rcArgs = new string[] { rcId }; // DOMAIN [RC_ID]
+                Console.Title = "DN"+ args[1] +" Control RC_CC";
+            }
             else if (args.Length == 3)
-                rcArgs = new string[] { rcId, args[2]}; // SUBNETWORK [RC_ID, connect up RC] 
+            {
+                rcArgs = new string[] { rcId, args[2] }; // SUBNETWORK [RC_ID, connect up RC] 
+                Console.Title = "SN" + args[1] + " Control RC_CC";
+            }
             else
                 errorWriter("[ERROR] Wrong aguments.");
 

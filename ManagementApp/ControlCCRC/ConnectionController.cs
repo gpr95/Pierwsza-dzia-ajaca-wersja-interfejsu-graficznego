@@ -43,7 +43,6 @@ namespace ControlCCRC
             if (iAmDomain)
             {
                 consoleWriter("[INIT] DOMAIN - " + identifier);
-                identifier = "DOMAIN_" + identifier;
                 try
                 {
                     int nccPort;
