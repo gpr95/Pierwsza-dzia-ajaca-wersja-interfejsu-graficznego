@@ -44,6 +44,7 @@ namespace ControlCCRC
                 {
                     int nccPort;
                     int.TryParse(args[1], out nccPort);
+                    Thread.Sleep(500);
                     NCCClient = new TcpClient("localhost", nccPort);
                 }
                 catch (SocketException ex)
@@ -93,7 +94,7 @@ namespace ControlCCRC
             CCtoNCCSingallingMessage initMsg = new CCtoNCCSingallingMessage();
             initMsg.State = CCtoNCCSingallingMessage.INIT_FROM_CC;
             String dataToSend = JMessage.Serialize(JMessage.FromValue(initMsg));
-
+            writer.Write(dataToSend);
 
             Boolean noError = true;
             while (noError)
