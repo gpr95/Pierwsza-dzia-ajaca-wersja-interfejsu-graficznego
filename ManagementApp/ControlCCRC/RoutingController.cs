@@ -366,29 +366,35 @@ namespace ControlCCRC
 
                     if (pathRate1 != null || pathRate1.First().Equals(firstInMyNetwork) || pathRate1.Last().Equals(lastInMyNetwork))
                     {
-                        consoleWriter("[INFO] Shortest path : " + pathRate1);
-                        foreach (String node in pathRate1)
-                            result.Add(node, new List<FIB>());
-                        result.First().Value.Add(new FIB(
-                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
-                                            whichTopology,
-                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][pathRate1[1]],
-                                            whichTopology
-                                            ));
-                        result.Last().Value.Add(new FIB(
-                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][pathRate1[pathRate1.Count-2]],
-                                            whichTopology,
-                                            wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][endNode],
-                                            whichTopology
-                                            ));
-                        for(int i =0; i< pathRate1.Count; i++)
+                        foreach(var temp in pathRate1)
                         {
-                            if (i != 0 && i != pathRate1.Count - 1)
+                            consoleWriter("[INFO] Shortest path : " + temp);
+                        }
+                        foreach (String node in pathRate1)
+                        {
+                            result.Add(node, new List<FIB>());
+                        }
+                            result.First().Value.Add(new FIB(
+                                                wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
+                                                whichTopology + 10,
+                                                wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][pathRate1[1]],
+                                                whichTopology + 10
+                                                ));
+                            result.Last().Value.Add(new FIB(
+                                                wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][pathRate1[pathRate1.Count - 2]],
+                                                whichTopology+10,
+                                                wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][endNode],
+                                                whichTopology + 10
+                                                ));
+
+                        for(int i =1; i< pathRate1.Count-1; i++)
+                        {
+                            //if (i != 0 && i != pathRate1.Count - 1)
                                 result[pathRate1[i]].Add(new FIB(
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
-                                    1,
+                                    whichTopology + 10,
                                     wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i + 1]],
-                                    1
+                                    whichTopology + 10
                                     ));
                         }
 
@@ -423,6 +429,15 @@ namespace ControlCCRC
                                 }
                                 break;
                         }
+
+                        foreach (var temp in result)
+                        {
+                            foreach (var fib in temp.Value)
+                            {
+                                Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
+                            }
+                        }
+
                         return result;
                     }
                     else
