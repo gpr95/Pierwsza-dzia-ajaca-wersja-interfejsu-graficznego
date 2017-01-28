@@ -21,7 +21,7 @@ namespace ManagementApp
         private int managementPort;
         private int controlPort;
         private int numberOfNodes = 0;
-        public int NccPort { get; set; }
+        private int nccPort;
 
         private ManagementHandler managementHandler;
 
@@ -204,6 +204,32 @@ namespace ManagementApp
             set
             {
                 numberOfNodes = value;
+            }
+        }
+
+        public int NccPort
+        {
+            get
+            {
+                return nccPort;
+            }
+
+            set
+            {
+                nccPort = value;
+            }
+        }
+
+        public ManagementHandler ManagementH
+        {
+            get
+            {
+                return managementHandler;
+            }
+
+            set
+            {
+                managementHandler = value;
             }
         }
 

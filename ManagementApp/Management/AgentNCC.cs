@@ -12,28 +12,38 @@ namespace Management
 {
     class AgentNCC
     {
-        private TcpClient clientManagement;
-        private BinaryWriter writerManagement;
-        private BinaryReader readerManagement;
-        private TcpListener listenerManagement;
+        private TcpClient clientNCC;
+        private BinaryWriter writerNCC;
+        private BinaryReader readerNCC;
+        private TcpListener listenerNCC;
         private Thread threadNCC;
 
         public AgentNCC(int nccPort)
         {
             Thread.Sleep(100);
             UserInterface.log("Lisening for NCC started at " + nccPort, ConsoleColor.Yellow);
-            listenerManagement = new TcpListener(IPAddress.Parse("127.0.0.1"), nccPort);
+            listenerNCC = new TcpListener(IPAddress.Parse("127.0.0.1"), nccPort);
             threadNCC = new Thread(new ThreadStart(listenForNCC));
             threadNCC.Start();
         }
 
         private void listenForNCC()
         {
-            listenerManagement.Start();
-            clientManagement = listenerManagement.AcceptTcpClient();
-            writerManagement = new BinaryWriter(clientManagement.GetStream());
-            readerManagement = new BinaryReader(clientManagement.GetStream());
+            listenerNCC.Start();
+            clientNCC = listenerNCC.AcceptTcpClient();
+            writerNCC = new BinaryWriter(clientNCC.GetStream());
+            readerNCC = new BinaryReader(clientNCC.GetStream());
             UserInterface.log("Connection successfully established with NCC.", ConsoleColor.Green);
+        }
+
+        public void sandInfoToOtherNcc(List<int> nccPorts)
+        {
+            ManagmentProtocol toSend = new ManagmentProtocol();
+            toSend.State = ManagmentProtocol.TOOTHERNCC;
+            toSend.ConnectionToOtherNcc = nccPorts;
+            string data = ManagementApp.JSON.Serialize(ManagementApp.JSON.FromValue(toSend));
+            Thread.Sleep(150);
+            writerNCC.Write(data);
         }
 
         public void stopRunning()

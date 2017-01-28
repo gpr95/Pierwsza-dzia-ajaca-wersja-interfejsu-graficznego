@@ -13,6 +13,7 @@ namespace Management
         public static readonly int INTERFACEINFORMATION = 5;
         public static readonly int CLEARTABLE = 6;
         public static readonly int GETTABLE = 7;
+        public static readonly int TOOTHERNCC = 8;
 
         private int state;
         private int port;
@@ -22,6 +23,7 @@ namespace Management
         private String name;
         private Dictionary<String, int> possibleDestinations;
         private Dictionary<int, String> interfaces;
+        private List<int> connectionToOtherNcc;
 
         public int State
         {
@@ -124,6 +126,19 @@ namespace Management
             set
             {
                 possibleDestinations = value;
+            }
+        }
+
+        public List<int> ConnectionToOtherNcc
+        {
+            get
+            {
+                return connectionToOtherNcc;
+            }
+
+            set
+            {
+                connectionToOtherNcc = value;
             }
         }
     }

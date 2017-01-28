@@ -8,17 +8,18 @@ namespace ManagementApp
 {
     public class ApplicationProtocol
     {
-        public static readonly int CONNECTIONTONCC = 0;
-        public static readonly int KILL = 1;
-        public static readonly int C = 2;
-        public static readonly int D = 3;
-        public static readonly int E = 4;
-        public static readonly int F = 5;
-        public static readonly int G = 6;
-        public static readonly int H = 7;
+        public const int CONNECTIONTONCC = 0;
+        public const int KILL = 1;
+        public const int TOOTHERNCC = 2;
+        public const int D = 3;
+        public const int E = 4;
+        public const int F = 5;
+        public const int G = 6;
+        public const int H = 7;
 
         private int state;
         private List<String> connectionToNcc;
+        private List<int> connectionToOtherNcc;
 
         public int State
         {
@@ -43,6 +44,19 @@ namespace ManagementApp
             set
             {
                 connectionToNcc = value;
+            }
+        }
+
+        public List<int> ConnectionToOtherNcc
+        {
+            get
+            {
+                return connectionToOtherNcc;
+            }
+
+            set
+            {
+                connectionToOtherNcc = value;
             }
         }
     }

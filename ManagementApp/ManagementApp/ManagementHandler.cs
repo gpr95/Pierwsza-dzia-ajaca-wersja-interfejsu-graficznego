@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ManagementApp
 {
-    class ManagementHandler
+    public class ManagementHandler
     {
         private TcpClient clientManagement;
         private BinaryWriter writerManagement;
@@ -50,6 +50,15 @@ namespace ManagementApp
                 string data = JSON.Serialize(JSON.FromValue(toSend));
                 writerManagement.Write(data);
             }
+        }
+
+        public void sandInfoToOtherNcc(List<int> nccPorts)
+        {
+            ApplicationProtocol toSend = new ApplicationProtocol();
+            toSend.State = ApplicationProtocol.TOOTHERNCC;
+            toSend.ConnectionToOtherNcc = nccPorts;
+            string data = JSON.Serialize(JSON.FromValue(toSend));
+            writerManagement.Write(data);
         }
 
         public void killManagement()

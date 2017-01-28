@@ -220,12 +220,27 @@ namespace ManagementApp
                 //    managHandler.killManagement();
                 toAdd.setupManagement(MANAGPORT + toAdd.Name, PortAggregation.ManagementNodePort);
                 domainList.Add(toAdd);
+                sendNccInfoAboutOtherDomains(toAdd);
                 mainWindow.consoleWriter("Domain added");
             }
             else
             {
                 mainWindow.errorMessage("Domains can't cross each others or domain too small for rendering.");
             }
+        }
+
+        private void sendNccInfoAboutOtherDomains(Domain toAdd)
+        {
+            if (domainList.Count == 1)
+                return;
+            List<int> toSend = new List<int>();
+            foreach(Domain d in domainList)
+            {
+                if (!d.Equals(toAdd))
+                    toSend.Add(d.NccPort);
+            }
+            if (toSend.Any())
+                toAdd.ManagementH.sandInfoToOtherNcc(toSend);
         }
 
         private void checkDomainContent(Domain domain)

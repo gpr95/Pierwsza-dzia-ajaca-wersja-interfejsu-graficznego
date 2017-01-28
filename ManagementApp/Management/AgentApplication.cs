@@ -39,10 +39,26 @@ namespace Management
                     JSON received_object = JSON.Deserialize(received_data);
                     ApplicationProtocol received_Protocol = received_object.Value.ToObject<ApplicationProtocol>();
 
-                    if (received_Protocol.State == ApplicationProtocol.CONNECTIONTONCC)
-                        Console.WriteLine("Option A");
-                    else if (received_Protocol.State == ApplicationProtocol.KILL)
-                        Environment.Exit(1);
+                    switch(received_Protocol.State)
+                    {
+                        case ApplicationProtocol.CONNECTIONTONCC:
+                            Console.WriteLine("Option A");
+                            break;
+                        case ApplicationProtocol.KILL:
+                            Environment.Exit(1);
+                            break;
+                        case ApplicationProtocol.TOOTHERNCC:
+                            UserInterface.log("Recived ConnectToOtherDomains", ConsoleColor.Yellow);
+                            Thread.Sleep(50);
+                            management.connectToOtherNcc(received_Protocol.ConnectionToOtherNcc);
+                            break;
+                        default:
+                            break;
+                    }
+                    //if (received_Protocol.State == ApplicationProtocol.CONNECTIONTONCC)
+                    //    Console.WriteLine("Option A");
+                    //else if (received_Protocol.State == ApplicationProtocol.KILL)
+                        
                 }
             }
             catch (SocketException e)
