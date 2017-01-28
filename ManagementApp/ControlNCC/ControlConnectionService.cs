@@ -106,6 +106,7 @@ namespace ControlNCC
                             ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT,ControlPacket.ACCEPT,packet.Rate,packet.NodeTo,packet.NodeTo, packet.RequestID);
                             if(packet.Vc11 != 0)
                             {
+
                                 packetToCPCC.Vc11 = 1;
                             }
                             if(packet.Vc12 != 0)
