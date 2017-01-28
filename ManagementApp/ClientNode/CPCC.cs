@@ -57,6 +57,7 @@ namespace ClientWindow
                         {
                             if (packet.state == ControlPacket.ACCEPT)
                             {
+                                clientWindowHandler.slots.Clear();
                                 if(packet.Vc11  != 0)
                                 {
                                     clientWindowHandler.slots.Add(11);

@@ -91,12 +91,15 @@ namespace ClientWindow
                         STM1 received_frame = received_signal.stm1;
                         if (received_frame.vc4.vc3List.Count > 0)
                         {
+                            slots.Clear();
                             foreach (KeyValuePair<int, VirtualContainer3> v in received_frame.vc4.vc3List)
                             {
 
                                 receivedTextBox.AppendText(DateTime.Now.ToLongTimeString() + " : " + v.Value.C3);
                                 receivedTextBox.AppendText(Environment.NewLine);
                                 Log1("IN", virtualIP, received_signal.port.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                                slots.Add(v.Key);
+                                Log2("DEBUG", "sloty w druga strone: " + v.Key);
                             }
 
                         }
