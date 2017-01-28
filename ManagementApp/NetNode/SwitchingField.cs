@@ -74,7 +74,7 @@ namespace NetNode
                 if (counter == fib.Count)
                 {
                     fib.Add(row);
-                    Console.WriteLine("New conn entry added");
+                    Console.WriteLine("New fib entry added");
                 }
             }          
         }
