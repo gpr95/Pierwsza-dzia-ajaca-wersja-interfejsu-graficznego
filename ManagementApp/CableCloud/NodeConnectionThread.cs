@@ -49,7 +49,7 @@ namespace CableCloud
 
         private void nodeConnectionThread()
         {
-            consoleWriter("Initialize connection: " + name, INFO_COLOR);
+            consoleWriter("Initialize connection: " + name);
             writer = new BinaryWriter(connection.GetStream());
             reader = new BinaryReader(connection.GetStream());
 
@@ -65,18 +65,19 @@ namespace CableCloud
                 }
                 catch(IOException ex)
                 {
-                    consoleWriter("ERROR: Connection LOST: " + name,ERROR_COLOR);
+                    consoleWriter("ERROR: Connection LOST: " + name);
                     deleteCable(fromPort, virtualFromPort);
-                    consoleWriter("CONNECTION REMOVED FROM TABLE " + name, INFO_COLOR);
+                    consoleWriter("CONNECTION REMOVED FROM TABLE " + name);
                     return;
                 }
                 if (received_data == null || received_data.Length == 0)
                     continue;
 
+                Signal signal = null;
                 JMessage received_object = JMessage.Deserialize(received_data);
                 if (received_object.Type == typeof(Signal))
                 {
-                    Signal signal = received_object.Value.ToObject<Signal>();  
+                    signal = received_object.Value.ToObject<Signal>();  
 
                     fromPort = ((IPEndPoint)connection.Client.RemoteEndPoint).Port;
                     virtualFromPort = signal.port;
@@ -91,23 +92,25 @@ namespace CableCloud
                         {
                             toPort = (int)dr["toPort"];
                             virtualToPort = (int)dr["virtualToPort"];
-                            consoleWriter("Connection: " + name + " received data.",INFO_COLOR);
+                            if(portToThreadMap.ContainsKey(toPort + ":" + virtualToPort))
+                                consoleWriterWithKeepAliveChecking("Connection: " + name + " received data.", signal);
                         }
                     }
                     signal.port = virtualToPort;
-                    consoleWriter("Connection: " + name + " sending data.",INFO_COLOR);
+                    if (portToThreadMap.ContainsKey(toPort + ":" + virtualToPort))
+                        consoleWriterWithKeepAliveChecking("Connection: " + name + " sending data.", signal);
                     try
                     {
                         portToThreadMap[toPort + ":" + virtualToPort].sendSignal(signal, toPort);
                     }
                     catch(KeyNotFoundException ex)
                     {
-                        consoleWriter("There is no such a connection! Signal sended nowhere.", ERROR_COLOR);
+                        //consoleWriterWithKeepAliveChecking("There is no such a connection! Signal sended nowhere.", signal);
                     }
                 }
                 else
                 {
-                    consoleWriter(ERROR_MSG + "received from node wrong data format. Node PORT: "+ ((IPEndPoint)connection.Client.RemoteEndPoint).Port,ERROR_COLOR);
+                    consoleWriterWithKeepAliveChecking(ERROR_MSG + "received from node wrong data format. Node PORT: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port, signal);
                 }
                 Thread.Sleep(150);
             }
@@ -122,7 +125,7 @@ namespace CableCloud
             }
             catch(IOException ex)
             {
-                consoleWriter(ERROR_MSG + "Trying to send data failed", ERROR_COLOR);
+                consoleWriterWithKeepAliveChecking(ERROR_MSG + "Trying to send data failed", toSend);
                 deleteCable(fromPort, virtualFromPort);
             }
         }
@@ -132,11 +135,11 @@ namespace CableCloud
             {
                 table.Rows.Add(fromPort, virtualFromPort, toPort, virtualToPort);
                 consoleWriter("Made connection: from-" + fromPort + "(" + virtualFromPort + ")" + " to-" +
-                                  toPort + "(" + virtualToPort + ")", ADMIN_COLOR);
+                                  toPort + "(" + virtualToPort + ")");
             }
             catch(ArgumentException ex)
             {
-                consoleWriter("Connection already existed in table.", INFO_COLOR);
+                consoleWriter("Connection already existed in table.");
             }
         }
 
@@ -153,18 +156,29 @@ namespace CableCloud
                     }
                     catch(RowNotInTableException ex)
                     {
-                        consoleWriter("Element already deleted from table.", ERROR_COLOR);
+                        consoleWriter("Element already deleted from table.");
                     }
                     portToThreadMap.Remove(fromPort + ":" + virtualFromPort);
                 }
             }
         }
-        private void consoleWriter(String msg, ConsoleColor cc)
+        private void consoleWriter(String msg)
         {
             Console.ForegroundColor = ConsoleColor.Black;
             Console.BackgroundColor = ConsoleColor.White;
             Console.WriteLine();
             Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+        }
+
+        private void consoleWriterWithKeepAliveChecking(String msg,Signal sig)
+        {
+            if(sig.stm1 != null)
+            {
+                Console.ForegroundColor = ConsoleColor.Black;
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.WriteLine();
+                Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+            }
         }
 
     }
