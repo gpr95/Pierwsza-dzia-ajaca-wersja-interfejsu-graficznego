@@ -817,9 +817,9 @@ namespace ControlCCRC
                     }
                 case 2:
                     // TODO obsluga
-                    List<String> path1 = shortest_path(startNode, endNode, topologyUnallocatedLayer1);
-                    List<String> path2 = shortest_path(startNode, endNode, topologyUnallocatedLayer2);
-                    List<String> path3 = shortest_path(startNode, endNode, topologyUnallocatedLayer3);
+                    List<String> path1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                    List<String> path2 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                    List<String> path3 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
 
                     foreach (var temp in path1)
                     {
@@ -915,10 +915,6 @@ namespace ControlCCRC
                             foreach (var temp in path31)
                             {
                                 consoleWriter("[INFO] Shortest path : " + temp);
-                            }
-                            foreach (String node in path31)
-                            {
-                                result.Add(node, new List<FIB>());
                             }
                             result.First().Value.Add(new FIB(
                                                 wholeTopologyNodesAndConnectedNodesWithPorts[path31[0]][startNode],

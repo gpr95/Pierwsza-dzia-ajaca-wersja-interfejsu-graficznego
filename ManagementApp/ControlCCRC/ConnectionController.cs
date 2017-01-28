@@ -230,7 +230,7 @@ namespace ControlCCRC
                     finishMsg.Vc11 = using1;
                     finishMsg.Vc12 = using2;
                     finishMsg.Vc13 = using3;
-                    finishMsg.NodeTo = dictionary.Keys.First();
+                    finishMsg.NodeTo = rcHandler.myBorderNodeAndConnectedOtherBorderNodeMap[dictionary.Keys.First()];
                     finishMsg.RequestID = requestId;
                     String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
                     nccWriter.Write(dataToSend);
@@ -276,7 +276,7 @@ namespace ControlCCRC
         {
             CCtoNCCSingallingMessage borderNodeMsg = new CCtoNCCSingallingMessage();
             borderNodeMsg.State = CCtoNCCSingallingMessage.BORDER_NODE;
-            borderNodeMsg.BorderNode = rcHandler.myBorderNodeAndConnectedOtherBorderNodeMap[adr.getName()];
+            borderNodeMsg.BorderNode = adr.getName();
             String dataToSend = JMessage.Serialize(JMessage.FromValue(borderNodeMsg));
             nccWriter.Write(dataToSend);
         }
