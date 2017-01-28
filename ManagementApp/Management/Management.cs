@@ -200,7 +200,7 @@ namespace Management
         internal void createSoft(string nodeStart, string end)
         {
             //Send info to NCC for creation soft pernament connecion;
-            agentNcc.sendSoftPernament(nodeStart, end)
+            agentNcc.sendSoftPernament(nodeStart, end);
         }
     }
 }

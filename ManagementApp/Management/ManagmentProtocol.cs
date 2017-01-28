@@ -14,6 +14,7 @@ namespace Management
         public static readonly int CLEARTABLE = 6;
         public static readonly int GETTABLE = 7;
         public static readonly int TOOTHERNCC = 8;
+        public static readonly int SOFTPERNAMENT = 8;
 
         private int state;
         private int port;
@@ -24,6 +25,8 @@ namespace Management
         private Dictionary<String, int> possibleDestinations;
         private Dictionary<int, String> interfaces;
         private List<int> connectionToOtherNcc;
+        private String nodeStart;
+        private String nodeEnd;
 
         public int State
         {
@@ -139,6 +142,32 @@ namespace Management
             set
             {
                 connectionToOtherNcc = value;
+            }
+        }
+
+        public string NodeStart
+        {
+            get
+            {
+                return nodeStart;
+            }
+
+            set
+            {
+                nodeStart = value;
+            }
+        }
+
+        public string NodeEnd
+        {
+            get
+            {
+                return nodeEnd;
+            }
+
+            set
+            {
+                nodeEnd = value;
             }
         }
     }
