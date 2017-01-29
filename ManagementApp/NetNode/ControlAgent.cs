@@ -82,9 +82,17 @@ namespace NetNode
                     }
                     else if (received_Protocol.State == CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM)
                     {
-                        foreach (var temp in received_Protocol.Fib_table)
+                        foreach (var fib in received_Protocol.Fib_table)
                         {
-                          NetNode.log("deallocate" + temp.toString(),ConsoleColor.Green);
+                          NetNode.log("deallocate" + fib.toString(),ConsoleColor.Green);
+                          if(LRM.deallocateResource(fib.iport,fib.in_cont))
+                          {
+                              sendTopologyDeallocated(fib.iport, fib.in_cont);
+                          }
+                          if(LRM.deallocateResource(fib.oport, fib.out_cont))
+                          {
+                              sendTopologyDeallocated(fib.oport, fib.out_cont);
+                          }
                         }
                     }
                     else

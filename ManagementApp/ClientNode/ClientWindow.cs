@@ -528,7 +528,7 @@ namespace ClientWindow
                 if(temp.Value == ip)
                 {
                     id = temp.Key;
-                    controlAgent.sendRelease(id);
+                    controlAgent.sendRelease(id, ip);
                 }
             }
         }
