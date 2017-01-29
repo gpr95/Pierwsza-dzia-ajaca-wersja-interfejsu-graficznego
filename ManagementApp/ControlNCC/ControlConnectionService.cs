@@ -159,6 +159,9 @@ namespace ControlNCC
                                 Console.WriteLine("[CC]Send connection request from: " + packetToCC.NodeFrom + " to: " + packetToCC.NodeTo);
                                 packetToCC.Rate = packet.speed;
                                 packetToCC.RequestID = packet.RequestID;
+                                packetToCC.Vc11 = packet.Vc11;
+                                packetToCC.Vc12 = packet.Vc12;
+                                packetToCC.Vc13 = packet.Vc13;
                                 ControlConnectionService CCService = this.handlerNCC.getCCService();
                                 CCService.sendCCRequest(packetToCC);
                             }
