@@ -95,5 +95,20 @@ namespace NetNode
         {
             fib.Clear();
         }
+
+        public static void clearFib(FIB row)
+        {
+            Console.WriteLine("Removing fib: " + row.toString());
+            int id = 0;
+            foreach (var temp in fib)
+            {
+                if (row.iport == temp.iport)
+                    if (row.in_cont == temp.in_cont)
+                        if (row.oport == temp.oport)
+                            if (row.out_cont == temp.out_cont)
+                                id = fib.IndexOf(temp);
+            }
+            fib.RemoveAt(id);
+        }
     }
 }
