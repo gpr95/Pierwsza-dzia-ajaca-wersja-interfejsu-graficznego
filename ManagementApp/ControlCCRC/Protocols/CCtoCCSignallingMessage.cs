@@ -37,6 +37,10 @@ namespace ControlCCRC.Protocols
         private String nodeTo;
         private int rate;
 
+        private int vc1 =1;
+        private int vc2 =1;
+        private int vc3 =1;
+
         public bool LastCC
         {
             get
@@ -125,6 +129,45 @@ namespace ControlCCRC.Protocols
             set
             {
                 rate = value;
+            }
+        }
+
+        public int Vc1
+        {
+            get
+            {
+                return vc1;
+            }
+
+            set
+            {
+                vc1 = value;
+            }
+        }
+
+        public int Vc2
+        {
+            get
+            {
+                return vc2;
+            }
+
+            set
+            {
+                vc2 = value;
+            }
+        }
+
+        public int Vc3
+        {
+            get
+            {
+                return vc3;
+            }
+
+            set
+            {
+                vc3 = value;
             }
         }
     }

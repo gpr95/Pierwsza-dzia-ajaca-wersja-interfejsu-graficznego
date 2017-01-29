@@ -51,6 +51,10 @@ namespace ControlCCRC
         private String associatedNodeStop;
         public Dictionary<string, string> myBorderNodeAndConnectedOtherBorderNodeMap;
 
+        public bool vc1Forbidden { get; private set; } = false;
+        public bool vc2Forbidden { get; private set; } = false;
+        public bool vc3Forbidden { get; private set; } = false;
+
 
 
         /**
@@ -522,10 +526,11 @@ namespace ControlCCRC
                     usingTopology1 = 1;
                     usingTopology2 = 0;
                     usingTopology3 = 0;
-                    List<String> pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                    List<String> pathRate1 = null;
+                        pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
                     if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     {
-                        pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                            pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
                         whichTopology = 2;
                         usingTopology1 = 0;
                         usingTopology2 = 1;
@@ -533,7 +538,7 @@ namespace ControlCCRC
                     }
                     if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     {
-                        pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                            pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
                         whichTopology = 3;
                         usingTopology1 = 0;
                         usingTopology2 = 0;
@@ -564,9 +569,12 @@ namespace ControlCCRC
                         return null;
                     }
                 case 2:
-                    List<String> path1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
-                    List<String> path2 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
-                    List<String> path3 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                    List<String> path1 = null;
+                    List<String> path2 = null;
+                    List<String> path3 = null;
+                        path1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        path2 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                        path3 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
                     if (path1 != null && path1.Count > 0 && path1.First().Equals(firstInMyNetwork) && path1.Last().Equals(lastInMyNetwork) &&
                        path2 != null && path2.Count > 0 && path2.First().Equals(firstInMyNetwork) && path2.Last().Equals(lastInMyNetwork))
                     {
@@ -616,9 +624,12 @@ namespace ControlCCRC
                            startNode, endNode, usingTopology1, usingTopology2, usingTopology3);
                     return result;
                 case 3:
-                    List<String> path31 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
-                    List<String> path32 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
-                    List<String> path33 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                    List<String> path31 = null;
+                    List<String> path32 = null;
+                    List<String> path33 = null;
+                        path31 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        path32 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                        path33 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
                     if (path31 != null && path31.Count > 0 && path31.First().Equals(firstInMyNetwork) && path31.Last().Equals(lastInMyNetwork) &&
                        path32 != null && path32.Count > 0 && path32.First().Equals(firstInMyNetwork) && path32.Last().Equals(lastInMyNetwork) &&
                        path33 != null && path33.Count > 0 && path33.First().Equals(firstInMyNetwork) && path33.Last().Equals(lastInMyNetwork))
@@ -678,9 +689,18 @@ namespace ControlCCRC
 
             foreach (int layer in layers)
             {
+
                 for (int i = 1; i < additionalPath.Count - 1; i++)
                 {
-                    if (topologyUnallocatedLayer1[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
+                    bool isSubnetwork = false;
+                    if (layer == 1 && topologyUnallocatedLayer1[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
+                        isSubnetwork = true;
+                    else if (layer == 1 && topologyUnallocatedLayer2[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
+                        isSubnetwork = true;
+                    else if (layer == 1 && topologyUnallocatedLayer3[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
+                        isSubnetwork = true;
+
+                    if (isSubnetwork)
                     {
                         String virtualNodeFrom = additionalPath.ElementAt(i);
                         String virtualNodeTo = additionalPath.ElementAt(i + 1);
@@ -707,22 +727,78 @@ namespace ControlCCRC
                         wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][internalNodeFrom],
                         layer + 10
                         ));
+                        int lastFib = layer;
+                        if (layer == 1 && vc1Forbidden)
+                        {
+                            if (!vc2Forbidden)
+                                lastFib = 2;
+                            else
+                                lastFib = 3;
+                        }
+                        else if (layer == 2 && vc2Forbidden)
+                        {
+                            if (!vc3Forbidden)
+                                lastFib = 3;
+                            else
+                                lastFib = 1;
+                        }
+                        else if (layer == 3 && vc3Forbidden)
+                        {
+                            if (!vc2Forbidden)
+                                lastFib = 2;
+                            else
+                                lastFib = 1;
+                        }
                         result[additionalPath[i + 1]].Add(new FIB(
                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i + 1]][internalNodeTo],
                        layer + 10,
                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i + 1]][additionalPath[i + 2]],
-                       layer + 10
+                       lastFib + 10
                        ));
 
                         i++;
                         continue;
                     }
-                    result[additionalPath[i]].Add(new FIB(
-                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
-                        layer + 10,
-                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
-                        layer + 10
-                        ));
+                    if (i == additionalPath.Count - 2)
+                    {
+                        int lastFib = layer;
+                        if (layer == 1 && vc1Forbidden)
+                        {
+                            if (!vc2Forbidden)
+                                lastFib = 2;
+                            else
+                                lastFib = 3;
+                        }
+                        else if (layer == 2 && vc2Forbidden)
+                        {
+                            if (!vc3Forbidden)
+                                lastFib = 3;
+                            else
+                                lastFib = 1;
+                        }
+                        else if (layer == 3 && vc3Forbidden)
+                        {
+                            if (!vc2Forbidden)
+                                lastFib = 2;
+                            else
+                                lastFib = 1;
+                        }
+                        result[additionalPath[i]].Add(new FIB(
+                           wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
+                           layer + 10,
+                           wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
+                           lastFib + 10
+                           ));
+                    }
+                    else
+                    {
+                        result[additionalPath[i]].Add(new FIB(
+                            wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
+                            layer + 10,
+                            wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
+                            layer + 10
+                            ));
+                    }
                 }
             }
 
@@ -759,10 +835,11 @@ namespace ControlCCRC
                     usingTopology1 = 1;
                     usingTopology2 = 0;
                     usingTopology3 = 0;
-                    List<String> pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                    List<String> pathRate1 = null;
+                        pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
                     if (pathRate1 == null || pathRate1.Count == 0 || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
-                    { 
-                        pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                    {
+                            pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
                         whichTopology = 2;
                         usingTopology1 = 0;
                         usingTopology2 = 1;
@@ -770,7 +847,7 @@ namespace ControlCCRC
                     }
                     if (pathRate1 == null || pathRate1.Count == 0 || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     {
-                        pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                            pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
                         whichTopology = 3;
                         usingTopology1 = 0;
                         usingTopology2 = 0;
@@ -793,11 +870,42 @@ namespace ControlCCRC
                                                 wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][pathRate1[1]],
                                                 whichTopology + 10
                                                 ));
+                        int lastSlot = whichTopology;
+                        switch(whichTopology)
+                        {
+                            case 1:
+                                if (vc1Forbidden)
+                                {
+                                    if (!vc2Forbidden)
+                                        lastSlot = 2;
+                                    else
+                                        lastSlot = 3;
+                                }
+                                break;
+                            case 2:
+                                if (vc2Forbidden)
+                                {
+                                    if (!vc1Forbidden)
+                                        lastSlot = 1;
+                                    else
+                                        lastSlot = 3;
+                                }
+                                break;
+                            case 3:
+                                if (vc3Forbidden)
+                                {
+                                    if (!vc1Forbidden)
+                                        lastSlot = 1;
+                                    else
+                                        lastSlot = 2;
+                                }
+                                break;
+                        }
                             result.Last().Value.Add(new FIB(
                                                 wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][pathRate1[pathRate1.Count - 2]],
                                                 whichTopology+10,
                                                 wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][endNode],
-                                                whichTopology + 10
+                                                lastSlot + 10
                                                 ));
 
                         for(int i =1; i< pathRate1.Count-1; i++)
@@ -829,10 +937,12 @@ namespace ControlCCRC
                         return null;
                     }
                 case 2:
-                    // TODO obsluga
-                    List<String> path1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
-                    List<String> path2 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
-                    List<String> path3 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                    List<String> path1 =null;
+                    List<String> path2 = null;
+                    List<String> path3 = null;
+                        path1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        path2 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                        path3 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
                     if (path1 != null && path1.Count > 0 && path1.First().Equals(firstInMyNetwork) && path1.Last().Equals(lastInMyNetwork) &&
                        path2 != null && path2.Count > 0 && path2.First().Equals(firstInMyNetwork) && path2.Last().Equals(lastInMyNetwork))
                     {
@@ -877,6 +987,19 @@ namespace ControlCCRC
                         makePaths.Add(2);
                     if (usingTopology3 == 1)
                         makePaths.Add(3);
+                    List<int> lastSlots = new List<int>();
+                    if (usingTopology1 == 1 && !vc1Forbidden)
+                        lastSlots.Add(1);
+                    if (usingTopology2 == 1 && !vc2Forbidden)
+                        lastSlots.Add(2);
+                    if (usingTopology3 == 1 && !vc2Forbidden)
+                        lastSlots.Add(3);
+                    if (!vc1Forbidden && !lastSlots.Contains(1) && lastSlots.Count != 2)
+                        lastSlots.Add(1);
+                    if (!vc2Forbidden && !lastSlots.Contains(2) && lastSlots.Count != 2)
+                        lastSlots.Add(2);
+                    if (!vc3Forbidden && !lastSlots.Contains(3) && lastSlots.Count != 2)
+                        lastSlots.Add(3);
                     List<String> properPath = null;
                     if (usingTopology1 == 1)
                         properPath = path1;
@@ -890,6 +1013,7 @@ namespace ControlCCRC
                         result.Add(node, new List<FIB>());
                     }
 
+                    int counter = 0;
                     foreach (int layers in makePaths)
                     {
                         foreach (var temp in properPath)
@@ -906,7 +1030,7 @@ namespace ControlCCRC
                                             wholeTopologyNodesAndConnectedNodesWithPorts[properPath.Last()][properPath[properPath.Count - 2]],
                                             layers + 10,
                                             wholeTopologyNodesAndConnectedNodesWithPorts[properPath.Last()][endNode],
-                                            layers + 10
+                                            lastSlots.ElementAt(counter++) + 10
                                             ));
 
                         for (int i = 1; i < properPath.Count - 1; i++)
@@ -922,10 +1046,12 @@ namespace ControlCCRC
 
                     return result;
                 case 3:
-                    // TODO obsluga
-                    List<String> path31 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
-                    List<String> path32 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
-                    List<String> path33 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                    List<String> path31 = null;
+                    List<String> path32 = null;
+                    List<String> path33 = null;
+                        path31 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                        path32 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                        path33 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
                     if (path31 != null && path31.Count > 0 && path31.First().Equals(firstInMyNetwork) && path31.Last().Equals(lastInMyNetwork) &&
                        path32 != null && path32.Count > 0 && path32.First().Equals(firstInMyNetwork) && path32.Last().Equals(lastInMyNetwork) &&
                        path33 != null && path33.Count > 0 && path33.First().Equals(firstInMyNetwork) && path33.Last().Equals(lastInMyNetwork))
@@ -1097,12 +1223,21 @@ namespace ControlCCRC
             socketHandler.Remove(whoDied);
         }
 
-        public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate, int requestId)
+        public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate, int requestId, int vc1, int vc2, int vc3)
         {
             this.requestNodeFrom = nodeFrom;
             this.requestNodeTo = nodeTo;
             this.requestRate = rate;
             this.requestId = requestId;
+            if (vc1 == 0)
+                this.vc1Forbidden = true;
+            if (vc2 == 0)
+                this.vc2Forbidden = true;
+            if (vc3 == 0)
+                this.vc3Forbidden = true;
+            consoleWriter("%%% VC1=" + vc1Forbidden);
+            consoleWriter("%%% VC2=" + vc2Forbidden);
+            consoleWriter("%%% VC3=" + vc3Forbidden);
             lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).ToList().Count();
             Console.WriteLine("DEBUG###2: " + lowerRcRequestedInAction);
 
@@ -1158,7 +1293,7 @@ namespace ControlCCRC
             {
                 for (int i = 0; i < nodeConnectionsAndWeights[node].Count; i++)
                 {
-                    if (!wholeTopologyNodesAndConnectedNodesWithPorts[node].ContainsKey(nodeConnectionsAndWeights[node].Keys.ElementAt(i)))
+                    if (!topologyUnallocatedLayer1[node].ContainsKey(nodeConnectionsAndWeights[node].Keys.ElementAt(i)))
                     {
                         topologyUnallocatedLayer1[node]
                             .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),
@@ -1261,7 +1396,7 @@ namespace ControlCCRC
             {
                 for (int i = 0; i < nodeConnectionsAndWeights[node].Count; i++)
                 {
-                    if (!wholeTopologyNodesAndConnectedNodesWithPorts[node].ContainsKey(nodeConnectionsAndWeights[node].Keys.ElementAt(i)))
+                    if (!topologyUnallocatedLayer1[node].ContainsKey(nodeConnectionsAndWeights[node].Keys.ElementAt(i)))
                     {
                         topologyUnallocatedLayer1[node]
                             .Add(nodeConnectionsAndWeights[node].Keys.ElementAt(i),

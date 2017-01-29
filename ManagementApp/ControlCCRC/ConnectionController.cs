@@ -114,13 +114,17 @@ namespace ControlCCRC
                     {
                         // POPRAWIC
                         case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:
-                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestID);
+                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestID, msg.Vc11, msg.Vc12, msg.Vc13);
+                            consoleWriter("VC1 SENDING TO SUBNETWORK :" + msg.Vc11);
+                            consoleWriter("VC2 SENDING TO SUBNETWORK :" + msg.Vc12);
+                            consoleWriter("VC3 SENDING TO SUBNETWORK :" + msg.Vc13);
+
                             break;
                     }
                 }
                 catch (IOException ex)
                 {
-                    noError = false;
+                    Environment.Exit(1);
                 }
             }
         }
@@ -154,7 +158,7 @@ namespace ControlCCRC
                         case CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST:
                             Console.WriteLine("received CC_BUILD_PATH_REQUEST: " + this.identifier);
                            // lowerCcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("CC_")).ToList().Count();
-                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, 0);
+                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, 0, msg.Vc1, msg.Vc2, msg.Vc3);
                             break;
                         case CCtoCCSignallingMessage.FIB_SETTING_TOP_BOTTOM:
                             rcHandler.startProperWeigthComputingTopBottom(new Dictionary<string, Dictionary<string, int>>(),
@@ -165,7 +169,7 @@ namespace ControlCCRC
                 }
                 catch (IOException ex)
                 {
-                    noError = false;
+                    Environment.Exit(1);
                 }
             }
         }
@@ -202,6 +206,24 @@ namespace ControlCCRC
             ccRequest.NodeFrom = nodeFrom;
             ccRequest.NodeTo = nodeTo;
             ccRequest.Rate = rate;
+            if (rcHandler.vc1Forbidden)
+                ccRequest.Vc1 = 0;
+            else
+                ccRequest.Vc1 = 1;
+
+            if (rcHandler.vc2Forbidden)
+                ccRequest.Vc2 = 0;
+            else
+                ccRequest.Vc2 = 1;
+
+            if (rcHandler.vc3Forbidden)
+                ccRequest.Vc3 = 0;
+            else
+                ccRequest.Vc3 = 1;
+
+            consoleWriter("VC1 SENDING TO SUBNETWORK :" + ccRequest.Vc1);
+            consoleWriter("VC2 SENDING TO SUBNETWORK :" + ccRequest.Vc2);
+            consoleWriter("VC3 SENDING TO SUBNETWORK :" + ccRequest.Vc3);
 
             String dataToSend = JSON.Serialize(JSON.FromValue(ccRequest));
             socketHandler["CC_" + rcName.Substring(rcName.IndexOf("_") + 1)].Write(dataToSend);
