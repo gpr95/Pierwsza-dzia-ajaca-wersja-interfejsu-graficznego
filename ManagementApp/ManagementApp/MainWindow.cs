@@ -1226,6 +1226,7 @@ namespace ManagementApp
             connect(f, d);
             connect(f, g);
             connect(f, j);
+            controler.updateCableCloud();
             Refresh();
         }
 
@@ -1254,6 +1255,7 @@ namespace ManagementApp
             connect(n, l);
             connect(r, p);
             connect(s, o);
+            controler.updateCableCloud();
             Refresh();
         }
 
