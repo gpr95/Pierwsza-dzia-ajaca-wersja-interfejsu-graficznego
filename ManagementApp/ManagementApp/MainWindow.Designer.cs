@@ -67,6 +67,7 @@ namespace ManagementApp
             this.domenaToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.podsiećToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.połączenieToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.usuńElementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.kursorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.widokToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -75,12 +76,12 @@ namespace ManagementApp
             this.autoAgregacjaPortówToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scenariuszeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scenariusz1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.label3 = new System.Windows.Forms.Label();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.wyczyśćScenariuszToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.scenariusz2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.scenariusz15ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.scenariusz2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.wyczyśćScenariuszToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label3 = new System.Windows.Forms.Label();
+            this.scenariusz25ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.containerPictureBox)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -505,6 +506,11 @@ namespace ManagementApp
             this.połączenieToolStripMenuItem.Text = "Połączenie";
             this.połączenieToolStripMenuItem.Click += new System.EventHandler(this.połączenieToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(193, 6);
+            // 
             // usuńElementToolStripMenuItem
             // 
             this.usuńElementToolStripMenuItem.Name = "usuńElementToolStripMenuItem";
@@ -533,7 +539,7 @@ namespace ManagementApp
             // 
             this.logiToolStripMenuItem.Name = "logiToolStripMenuItem";
             this.logiToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.L)));
-            this.logiToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.logiToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             this.logiToolStripMenuItem.Text = "Logi";
             this.logiToolStripMenuItem.Click += new System.EventHandler(this.logiToolStripMenuItem_Click);
             // 
@@ -559,6 +565,7 @@ namespace ManagementApp
             this.scenariusz1ToolStripMenuItem,
             this.scenariusz15ToolStripMenuItem,
             this.scenariusz2ToolStripMenuItem,
+            this.scenariusz25ToolStripMenuItem,
             this.toolStripSeparator2,
             this.wyczyśćScenariuszToolStripMenuItem});
             this.scenariuszeToolStripMenuItem.Name = "scenariuszeToolStripMenuItem";
@@ -573,6 +580,33 @@ namespace ManagementApp
             this.scenariusz1ToolStripMenuItem.Text = "Scenariusz 1";
             this.scenariusz1ToolStripMenuItem.Click += new System.EventHandler(this.scenariusz1ToolStripMenuItem_Click);
             // 
+            // scenariusz15ToolStripMenuItem
+            // 
+            this.scenariusz15ToolStripMenuItem.Name = "scenariusz15ToolStripMenuItem";
+            this.scenariusz15ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.scenariusz15ToolStripMenuItem.Text = "Scenariusz 1.5";
+            this.scenariusz15ToolStripMenuItem.Click += new System.EventHandler(this.scenariusz15ToolStripMenuItem_Click);
+            // 
+            // scenariusz2ToolStripMenuItem
+            // 
+            this.scenariusz2ToolStripMenuItem.Name = "scenariusz2ToolStripMenuItem";
+            this.scenariusz2ToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F2)));
+            this.scenariusz2ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.scenariusz2ToolStripMenuItem.Text = "Scenariusz 2";
+            this.scenariusz2ToolStripMenuItem.Click += new System.EventHandler(this.scenariusz2ToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(181, 6);
+            // 
+            // wyczyśćScenariuszToolStripMenuItem
+            // 
+            this.wyczyśćScenariuszToolStripMenuItem.Name = "wyczyśćScenariuszToolStripMenuItem";
+            this.wyczyśćScenariuszToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.wyczyśćScenariuszToolStripMenuItem.Text = "Wyczyść scenariusz";
+            this.wyczyśćScenariuszToolStripMenuItem.Click += new System.EventHandler(this.wyczyśćScenariuszToolStripMenuItem_Click);
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -586,37 +620,12 @@ namespace ManagementApp
             this.label3.Visible = false;
             this.label3.Click += new System.EventHandler(this.label3_Click);
             // 
-            // toolStripSeparator1
+            // scenariusz25ToolStripMenuItem
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(193, 6);
-            // 
-            // wyczyśćScenariuszToolStripMenuItem
-            // 
-            this.wyczyśćScenariuszToolStripMenuItem.Name = "wyczyśćScenariuszToolStripMenuItem";
-            this.wyczyśćScenariuszToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.wyczyśćScenariuszToolStripMenuItem.Text = "Wyczyść scenariusz";
-            this.wyczyśćScenariuszToolStripMenuItem.Click += new System.EventHandler(this.wyczyśćScenariuszToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(181, 6);
-            // 
-            // scenariusz2ToolStripMenuItem
-            // 
-            this.scenariusz2ToolStripMenuItem.Name = "scenariusz2ToolStripMenuItem";
-            this.scenariusz2ToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F2)));
-            this.scenariusz2ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.scenariusz2ToolStripMenuItem.Text = "Scenariusz 2";
-            this.scenariusz2ToolStripMenuItem.Click += new System.EventHandler(this.scenariusz2ToolStripMenuItem_Click);
-            // 
-            // scenariusz15ToolStripMenuItem
-            // 
-            this.scenariusz15ToolStripMenuItem.Name = "scenariusz15ToolStripMenuItem";
-            this.scenariusz15ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.scenariusz15ToolStripMenuItem.Text = "Scenariusz 1.5";
-            this.scenariusz15ToolStripMenuItem.Click += new System.EventHandler(this.scenariusz15ToolStripMenuItem_Click);
+            this.scenariusz25ToolStripMenuItem.Name = "scenariusz25ToolStripMenuItem";
+            this.scenariusz25ToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.scenariusz25ToolStripMenuItem.Text = "Scenariusz 2.5";
+            this.scenariusz25ToolStripMenuItem.Click += new System.EventHandler(this.scenariusz25ToolStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -711,6 +720,7 @@ namespace ManagementApp
         private System.Windows.Forms.ToolStripMenuItem wyczyśćScenariuszToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem scenariusz2ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem scenariusz15ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem scenariusz25ToolStripMenuItem;
     }
 }
 
