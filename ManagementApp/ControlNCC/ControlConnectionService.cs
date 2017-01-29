@@ -71,6 +71,9 @@ namespace ControlNCC
                                 packetToCC.NodeTo = packet.destinationIdentifier;
                                 packetToCC.Rate = packet.speed;
                                 packetToCC.RequestID = packet.RequestID;
+                                packetToCC.Vc11 = 1;
+                                packetToCC.Vc12 = 1;
+                                packetToCC.Vc13 = 1;
                                 ControlConnectionService CCService = this.handlerNCC.getCCService();
                                 CCService.sendCCRequest(packetToCC);
                             }
@@ -207,6 +210,9 @@ namespace ControlNCC
                                 //Nodeto GW, NodeFrom CN in other domain address
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_REQUEST_ACCEPT, ControlPacket.ACCEPT, packet.Rate, packet.NodeTo, packet.NodeFrom, packet.RequestID);
                                 packetToNCC.domain = handlerNCC.domainNumber;
+                                packetToNCC.Vc11 = packet.Vc11;
+                                packetToNCC.Vc12 = packet.Vc12;
+                                packetToNCC.Vc13 = packet.Vc13;
                                 NCCService.send(packetToNCC);
                             }
                             else
