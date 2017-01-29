@@ -443,15 +443,19 @@ namespace ClientWindow
         {
             try {
                 Address address;
-                logTextBox.AppendText("#" + comboBox1.GetItemText(comboBox1.SelectedItem) + "#");
+                String adr = comboBox1.GetItemText(comboBox1.SelectedItem);
+                logTextBox.AppendText("#" + adr + "#");
                 if (addressTextBox.Text.Equals(""))
-                    address = new Address(comboBox1.GetItemText(comboBox1.SelectedItem));
+                    address = new Address(adr);
                 else
+                {
                     address = new Address(addressTextBox.Text);
+                    adr = addressTextBox.Text;
+                } 
                 controlAgent.connect();
                 int speed;
                 bool res = int.TryParse(speedComboBox.SelectedItem.ToString(), out speed);
-                controlAgent.sendRequest(addressTextBox.Text, speed);
+                controlAgent.sendRequest(adr, speed);
             }
             catch(Exception es)
             {
