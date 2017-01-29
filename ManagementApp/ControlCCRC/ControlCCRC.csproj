@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Graphicloads-Colorful-Long-Shadow-Files-2.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\ClientNode\bin\Debug\Newtonsoft.Json.dll</HintPath>
@@ -72,6 +75,9 @@
       <Project>{bce5238d-1404-4544-b40b-8ae246d6bb36}</Project>
       <Name>Management</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Graphicloads-Colorful-Long-Shadow-Files-2.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

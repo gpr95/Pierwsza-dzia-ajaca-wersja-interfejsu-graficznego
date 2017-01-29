@@ -36,7 +36,7 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Hopstarter-Plastic-Mini-User-Clients.ico</ApplicationIcon>
+    <ApplicationIcon>Graphicloads-Colorful-Long-Shadow-Rss.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -90,6 +90,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Graphicloads-Colorful-Long-Shadow-Rss.ico" />
     <Content Include="Hopstarter-Plastic-Mini-User-Clients.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

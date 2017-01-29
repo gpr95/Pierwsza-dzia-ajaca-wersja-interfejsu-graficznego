@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Diagnostics;
+using System.Threading;
 
 namespace ManagementApp
 {
@@ -86,6 +87,8 @@ namespace ManagementApp
             this.ControlPort = PortAggregation.CcRcPort;
             startInfo.Arguments = this.ControlPort + " " + name + " " + this.NccPort + " t";
             this.ProcessHandle = Process.Start(startInfo);
+            Thread.Sleep(50);
+            Program.SwitchToThisWindow(Process.GetCurrentProcess().MainWindowHandle, true);
         }
 
         public Point getPointStart()

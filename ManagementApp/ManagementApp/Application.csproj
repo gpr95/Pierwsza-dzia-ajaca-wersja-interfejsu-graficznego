@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Icons8-Windows-8-Network-Linux-Client.ico</ApplicationIcon>
+    <ApplicationIcon>Graphicloads-Colorful-Long-Shadow-Chart.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -103,6 +103,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Graphicloads-Colorful-Long-Shadow-Chart.ico" />
     <Content Include="Icons8-Windows-8-Network-Linux-Client.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

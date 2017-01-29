@@ -30,10 +30,10 @@ namespace ManagementApp
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle37 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle38 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle39 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle40 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.containerPictureBox = new System.Windows.Forms.PictureBox();
             this.clientNodeBtn = new System.Windows.Forms.Button();
@@ -253,46 +253,46 @@ namespace ManagementApp
             // 
             // dataGridView1
             // 
-            dataGridViewCellStyle37.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle37.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
-            dataGridViewCellStyle37.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
-            dataGridViewCellStyle37.ForeColor = System.Drawing.Color.Gainsboro;
-            dataGridViewCellStyle37.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            dataGridViewCellStyle37.SelectionForeColor = System.Drawing.Color.Gainsboro;
-            dataGridViewCellStyle37.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle37;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
             this.dataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridView1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle38.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle38.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
-            dataGridViewCellStyle38.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            dataGridViewCellStyle38.ForeColor = System.Drawing.Color.Gainsboro;
-            dataGridViewCellStyle38.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            dataGridViewCellStyle38.SelectionForeColor = System.Drawing.Color.Gainsboro;
-            dataGridViewCellStyle38.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle38;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridViewCellStyle39.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle39.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
-            dataGridViewCellStyle39.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            dataGridViewCellStyle39.ForeColor = System.Drawing.Color.Gainsboro;
-            dataGridViewCellStyle39.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            dataGridViewCellStyle39.SelectionForeColor = System.Drawing.Color.Gainsboro;
-            dataGridViewCellStyle39.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle39;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridView1.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(63)))), ((int)(((byte)(63)))), ((int)(((byte)(70)))));
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
-            dataGridViewCellStyle40.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle40.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
-            dataGridViewCellStyle40.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            dataGridViewCellStyle40.ForeColor = System.Drawing.Color.Gainsboro;
-            dataGridViewCellStyle40.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
-            dataGridViewCellStyle40.SelectionForeColor = System.Drawing.Color.Gainsboro;
-            dataGridViewCellStyle40.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridView1.RowHeadersDefaultCellStyle = dataGridViewCellStyle40;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(67)))), ((int)(((byte)(67)))), ((int)(((byte)(70)))));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(122)))), ((int)(((byte)(204)))));
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Gainsboro;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridView1.RowHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.Size = new System.Drawing.Size(278, 494);
             this.dataGridView1.TabIndex = 0;
@@ -469,7 +469,7 @@ namespace ManagementApp
             // 
             this.węzełKlienckiToolStripMenuItem.Name = "węzełKlienckiToolStripMenuItem";
             this.węzełKlienckiToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.węzełKlienckiToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.węzełKlienckiToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.węzełKlienckiToolStripMenuItem.Text = "Węzeł kliencki";
             this.węzełKlienckiToolStripMenuItem.Click += new System.EventHandler(this.węzełKlienckiToolStripMenuItem_Click);
             // 
@@ -477,7 +477,7 @@ namespace ManagementApp
             // 
             this.węzełSieciowyToolStripMenuItem.Name = "węzełSieciowyToolStripMenuItem";
             this.węzełSieciowyToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.węzełSieciowyToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.węzełSieciowyToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.węzełSieciowyToolStripMenuItem.Text = "Węzeł sieciowy";
             this.węzełSieciowyToolStripMenuItem.Click += new System.EventHandler(this.węzełSieciowyToolStripMenuItem_Click);
             // 
@@ -485,7 +485,7 @@ namespace ManagementApp
             // 
             this.domenaToolStripMenuItem.Name = "domenaToolStripMenuItem";
             this.domenaToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.domenaToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.domenaToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.domenaToolStripMenuItem.Text = "Domena";
             this.domenaToolStripMenuItem.Click += new System.EventHandler(this.domenaToolStripMenuItem_Click);
             // 
@@ -493,7 +493,7 @@ namespace ManagementApp
             // 
             this.podsiećToolStripMenuItem.Name = "podsiećToolStripMenuItem";
             this.podsiećToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
-            this.podsiećToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.podsiećToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.podsiećToolStripMenuItem.Text = "Podsieć";
             this.podsiećToolStripMenuItem.Click += new System.EventHandler(this.podsiećToolStripMenuItem_Click);
             // 
@@ -501,7 +501,7 @@ namespace ManagementApp
             // 
             this.połączenieToolStripMenuItem.Name = "połączenieToolStripMenuItem";
             this.połączenieToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.połączenieToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.połączenieToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.połączenieToolStripMenuItem.Text = "Połączenie";
             this.połączenieToolStripMenuItem.Click += new System.EventHandler(this.połączenieToolStripMenuItem_Click);
             // 
@@ -509,15 +509,15 @@ namespace ManagementApp
             // 
             this.usuńElementToolStripMenuItem.Name = "usuńElementToolStripMenuItem";
             this.usuńElementToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Delete)));
-            this.usuńElementToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
-            this.usuńElementToolStripMenuItem.Text = "Usuń element";
+            this.usuńElementToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
+            this.usuńElementToolStripMenuItem.Text = "Resetuj/Usuń";
             this.usuńElementToolStripMenuItem.Click += new System.EventHandler(this.usuńElementToolStripMenuItem_Click);
             // 
             // kursorToolStripMenuItem
             // 
             this.kursorToolStripMenuItem.Name = "kursorToolStripMenuItem";
             this.kursorToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.kursorToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.kursorToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.kursorToolStripMenuItem.Text = "Kursor";
             this.kursorToolStripMenuItem.Click += new System.EventHandler(this.kursorToolStripMenuItem_Click);
             // 
@@ -589,19 +589,19 @@ namespace ManagementApp
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(150, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(193, 6);
             // 
             // wyczyśćScenariuszToolStripMenuItem
             // 
             this.wyczyśćScenariuszToolStripMenuItem.Name = "wyczyśćScenariuszToolStripMenuItem";
-            this.wyczyśćScenariuszToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.wyczyśćScenariuszToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.wyczyśćScenariuszToolStripMenuItem.Text = "Wyczyść scenariusz";
             this.wyczyśćScenariuszToolStripMenuItem.Click += new System.EventHandler(this.wyczyśćScenariuszToolStripMenuItem_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(173, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(181, 6);
             // 
             // scenariusz2ToolStripMenuItem
             // 

@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Custom-Icon-Design-Flatastic-5-Web-management.ico</ApplicationIcon>
+    <ApplicationIcon>Graphicloads-Colorful-Long-Shadow-Settings.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed" />
@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Custom-Icon-Design-Flatastic-5-Web-management.ico" />
+    <Content Include="Graphicloads-Colorful-Long-Shadow-Settings.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
