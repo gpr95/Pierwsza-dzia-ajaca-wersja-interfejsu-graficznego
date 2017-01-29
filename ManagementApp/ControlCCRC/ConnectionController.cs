@@ -231,7 +231,12 @@ namespace ControlCCRC
                     finishMsg.Vc12 = using2;
                     finishMsg.Vc13 = using3;
                     finishMsg.NodeTo = dictionary.Keys.First();
-                    finishMsg.NodeFrom = rcHandler.myBorderNodeAndConnectedOtherBorderNodeMap[dictionary.Keys.Last()];
+                    foreach(String connectedNode in 
+                        rcHandler.wholeTopologyNodesAndConnectedNodesWithPorts[dictionary.Keys.Last()].Keys)
+                    {
+                        if (connectedNode.StartsWith("192"))
+                            finishMsg.NodeFrom = connectedNode;
+                    }
                     finishMsg.RequestID = requestId;
                     String dataToSend = JSON.Serialize(JSON.FromValue(finishMsg));
                     nccWriter.Write(dataToSend);

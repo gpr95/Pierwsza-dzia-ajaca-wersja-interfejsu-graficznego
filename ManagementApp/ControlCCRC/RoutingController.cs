@@ -29,7 +29,7 @@ namespace ControlCCRC
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer1;
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer2;
         private Dictionary<String, Dictionary<String, int>> topologyUnallocatedLayer3;
-        private Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts;
+        public Dictionary<String, Dictionary<String, int>> wholeTopologyNodesAndConnectedNodesWithPorts;
         Dictionary<String, String> mapNodeConnectedNodeAndAssociatedRCSubnetwork;
         private List<String> pathNeededToBeCount;
         private String upperRc;
