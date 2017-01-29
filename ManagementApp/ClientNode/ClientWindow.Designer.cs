@@ -73,7 +73,7 @@
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
             this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.logTextBox.Size = new System.Drawing.Size(311, 143);
+            this.logTextBox.Size = new System.Drawing.Size(311, 118);
             this.logTextBox.TabIndex = 3;
             // 
             // receivedTextBox
