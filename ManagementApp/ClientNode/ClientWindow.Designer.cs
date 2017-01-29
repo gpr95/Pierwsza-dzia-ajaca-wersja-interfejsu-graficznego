@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClientWindow));
             this.logPanel = new System.Windows.Forms.Panel();
             this.logTextBox = new System.Windows.Forms.TextBox();
             this.logLbl = new System.Windows.Forms.Label();
@@ -365,6 +366,7 @@
             this.Controls.Add(this.sendingGroupBox);
             this.Controls.Add(this.logPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ClientWindow";
             this.Text = "ClientWindow";
             this.logPanel.ResumeLayout(false);
