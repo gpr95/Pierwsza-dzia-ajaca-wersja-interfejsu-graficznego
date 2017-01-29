@@ -267,6 +267,7 @@ namespace ControlCCRC
                 {
                     CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
                     finishMsg.State = CCtoNCCSingallingMessage.CC_REJECT;
+                    finishMsg.Rate = rate;
                     finishMsg.Vc11 = using1;
                     finishMsg.Vc12 = using2;
                     finishMsg.Vc13 = using3;
