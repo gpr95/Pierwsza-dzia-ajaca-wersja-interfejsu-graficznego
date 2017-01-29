@@ -120,7 +120,7 @@ namespace ControlCCRC
                             consoleWriter("VC3 SENDING TO SUBNETWORK :" + msg.Vc13);
                             break;
                         case CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID:
-                            ////////////////
+                            rcHandler.releaseConnection(msg.RequestID);
                             break;
                     }
                 }
@@ -166,6 +166,9 @@ namespace ControlCCRC
                             rcHandler.startProperWeigthComputingTopBottom(new Dictionary<string, Dictionary<string, int>>(),
                                       new Dictionary<string, string>(), msg.Rate, "",
                                       msg.NodeFrom, msg.NodeTo);
+                            break;
+                        case CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM:
+                            rcHandler.releaseConnection(msg.RequestId);
                             break;
                     }
                 }
@@ -297,6 +300,18 @@ namespace ControlCCRC
 
         }
 
+        public void sendRealeseFibs(Dictionary<string, List<FIB>> dictionary,int requestId)
+        {
+            foreach (string nodeName in dictionary.Keys)
+            {
+                CCtoCCSignallingMessage fibsMsg = new CCtoCCSignallingMessage();
+                fibsMsg.State = CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM;
+                fibsMsg.Fib_table = dictionary[nodeName];
+                String dataOut = JSON.Serialize(JSON.FromValue(fibsMsg));
+                socketHandler[nodeName].Write(dataOut);
+            }
+        }
+
         public void sendBorderNodesToNCC(Address adr, int domain)
         {
             CCtoNCCSingallingMessage borderNodeMsg = new CCtoNCCSingallingMessage();
@@ -315,6 +330,16 @@ namespace ControlCCRC
             setFIBmsg.NodeFrom = nodeFrom;
             setFIBmsg.NodeTo = nodeTo;
             setFIBmsg.Rate = rate;
+            String dataToSend = JSON.Serialize(JSON.FromValue(setFIBmsg));
+            socketHandler[ccName].Write(dataToSend);
+        }
+
+        internal void sendFIBRealeaseForSubnetwork(String rcName, int requestIdToRealese)
+        {
+            String ccName = rcName.Replace("RC", "CC"); ;
+            CCtoCCSignallingMessage setFIBmsg = new CCtoCCSignallingMessage();
+            setFIBmsg.State = CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM;
+            setFIBmsg.RequestId = requestIdToRealese;
             String dataToSend = JSON.Serialize(JSON.FromValue(setFIBmsg));
             socketHandler[ccName].Write(dataToSend);
         }

@@ -40,7 +40,7 @@ namespace ControlCCRC
         public int requestRate;
         private int requestId;
         private Dictionary<int, Dictionary<String, List<FIB>>> requestForFibs;
-
+        private Dictionary<int, Dictionary<String, String>> requestIdAndRcNames;
         private ConnectionController ccHandler;
         private Dictionary<String, BinaryWriter> socketHandler;
 
@@ -68,7 +68,7 @@ namespace ControlCCRC
             vc2Forbidden = false;
             vc3Forbidden = false;
             requestForFibs = new Dictionary<int, Dictionary<string, List<FIB>>>();
-
+            requestIdAndRcNames = new Dictionary<int, Dictionary<string, string>>();
             iAmDomain = (args.Length == 1);
             identifier = args[0];
             domainNumber = 0;
@@ -777,6 +777,7 @@ namespace ControlCCRC
                     nodeToListAndRcName.Keys.ElementAt(i), nodeFromListAndRcName.Values.ElementAt(i), vc31 + vc32 + vc33);
 
             requestForFibs.Add(requestId, result);
+            requestIdAndRcNames.Add(requestId, nodeFromListAndRcName);
             return result;
         }
 
@@ -1430,10 +1431,11 @@ namespace ControlCCRC
 
         public void releaseConnection(int requestIdToRealese)
         {
-            foreach(String node in requestForFibs[requestIdToRealese].Keys)
-            {
-                
-            }
+            consoleWriter("[PROPER LOG] - RC get from CC - REALEASE FIBS for id:" + requestIdToRealese);
+            ccHandler.sendRealeseFibs(requestForFibs[requestIdToRealese],requestIdToRealese);
+
+            for (int i = 0; i < requestIdAndRcNames.Count; i++)
+                ccHandler.sendFIBRealeaseForSubnetwork(requestIdAndRcNames[requestIdToRealese].Values.ElementAt(i),requestIdToRealese);
         }
 
         private void consoleWriter(String msg)

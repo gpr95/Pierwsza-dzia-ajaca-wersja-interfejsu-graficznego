@@ -23,7 +23,7 @@ namespace ControlCCRC.Protocols
         public const int FIB_SETTING_TOP_BOTTOM = 5;
 
         // release
-        public const int REALEASE_TOP_BOTTOM = 5;
+        public const int REALEASE_TOP_BOTTOM = 6;
 
 
         private int state;
