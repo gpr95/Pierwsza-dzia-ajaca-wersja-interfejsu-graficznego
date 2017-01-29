@@ -708,9 +708,9 @@ namespace ControlCCRC
                     bool isSubnetwork = false;
                     if (layer == 1 && topologyUnallocatedLayer1[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
                         isSubnetwork = true;
-                    else if (layer == 1 && topologyUnallocatedLayer2[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
+                    else if (layer == 2 && topologyUnallocatedLayer2[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
                         isSubnetwork = true;
-                    else if (layer == 1 && topologyUnallocatedLayer3[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
+                    else if (layer == 3 && topologyUnallocatedLayer3[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
                         isSubnetwork = true;
 
                     if (isSubnetwork)
@@ -750,24 +750,29 @@ namespace ControlCCRC
                         i++;
                         continue;
                     }
-                    if (i == additionalPath.Count - 2)
-                    {
-                        result[additionalPath[i]].Add(new FIB(
-                           wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
-                           layer + 10,
-                           wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
-                           lastFibs[counter] + 10
-                           ));
-                    }
                     else
                     {
-                        result[additionalPath[i]].Add(new FIB(
-                            wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
-                            layer + 10,
-                            wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
-                            layer + 10
-                            ));
+                        if (i == additionalPath.Count - 2)
+                        {
+                            result[additionalPath[i]].Add(new FIB(
+                               wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
+                               layer + 10,
+                               wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
+                               lastFibs[counter] + 10
+                               ));
+                        }
+                        else
+                        {
+                            result[additionalPath[i]].Add(new FIB(
+                                wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
+                                layer + 10,
+                                wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
+                                layer + 10
+                                ));
+                        }
                     }
+                    
+                    
                 }
                 counter++;
             }
