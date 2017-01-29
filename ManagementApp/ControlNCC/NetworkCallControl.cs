@@ -23,11 +23,12 @@ namespace ControlNCC
         private ControlConnectionService CCService;
         public ManagementHandler management;
         private int managementPort;
-        private Dictionary<int, int> interdomainRequests;
+        public Dictionary<int, int> interdomainRequests;
         //private Dictionary<string, int> interdomainCalls;
         private Dictionary<int, List<string>> intrerdomainCallsAttempts;
         private Dictionary<int, string> CNAddressesForInterdomainCalls;
         private Dictionary<string, int> borderGateways;
+        public Dictionary<int, string> rejectedDestinations;
         public NetworkCallControl(string[] domainParams)
         {
 
@@ -35,6 +36,7 @@ namespace ControlNCC
             interdomainRequests = new Dictionary<int, int>();
             CNAddressesForInterdomainCalls = new Dictionary<int, string>();
             borderGateways = new Dictionary<string, int>();
+            rejectedDestinations = new Dictionary<int, string>();
             //interdomainCalls = new Dictionary<int, string>();
             intrerdomainCallsAttempts = new Dictionary<int, List<string>>();
             string ip = "127.0.0.1";
@@ -126,11 +128,11 @@ namespace ControlNCC
         public List<string> returnBorderGateway(int domain)
         {
             List<string> res = new List<string>();
-            foreach (var temp in borderGateways)
+            foreach(var addresDomainPair in borderGateways)
             {
-                if (temp.Value == domain)
+                if(addresDomainPair.Value == domain)
                 {
-                    res.Add(temp.Key);
+                    res.Add(addresDomainPair.Key);
                 }
             }
             return res;
@@ -157,15 +159,20 @@ namespace ControlNCC
         public string getAnotherBorderGatewayAddress(int interdomainRequestID, string addressToGetDomain)
         {
             Address tmpAddress = new Address(addressToGetDomain);
-            List<string> borderGWAddresses = returnBorderGateway(tmpAddress.domain);
-            string result = "0.0.0.0";
-            for (int i = 0; i < borderGWAddresses.Count; i++)
+            List<string> borderGWAddresses = new List<string>();
+            borderGWAddresses = returnBorderGateway(tmpAddress.domain);
+            foreach (var addresDomain in borderGateways)
+            {
+                borderGWAddresses.Add(addresDomain.Key);
+            }
+            string result = null;
+            
+           for (int i = 0; i < borderGWAddresses.Count; i++)
             {
                 foreach (string borderGWAddressUsed in intrerdomainCallsAttempts[interdomainRequestID])
                 {
-                    if (borderGWAddresses[i] == borderGWAddressUsed)
-                        break;
-                    else
+                    Console.WriteLine("uzyte: " + borderGWAddressUsed + "porownuje z: " + borderGWAddresses[i]);
+                    if (borderGWAddresses[i] != borderGWAddressUsed)
                     {
                         result = borderGWAddresses[i];
                         return result;
@@ -184,6 +191,13 @@ namespace ControlNCC
         public void addIntrerdomainCallsAttempts(int interdomainRequestID, string borderGWaddress)
         {
             intrerdomainCallsAttempts[interdomainRequestID].Add(borderGWaddress);
+        }
+
+        public void showInterdomainAttemptsForRequestID(int requestID)
+        {
+            foreach (string addres in intrerdomainCallsAttempts[requestID])
+                Console.WriteLine("Próby dla "+requestID+" :"+addres);
+
         }
 
         public void clearInterdomainCallAttempt(int interdomainCallRequestIDToClear)
