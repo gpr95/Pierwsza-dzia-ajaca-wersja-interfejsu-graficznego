@@ -57,7 +57,8 @@ namespace CableCloud
             /** Add new cable to table */
             addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
             portToThreadMap.Add(fromPort + ":" + virtualFromPort, this);
-            while (true)
+            bool noError = true;
+            while (noError)
             {
                 string received_data = null;
                 try
@@ -114,14 +115,13 @@ namespace CableCloud
                     }
                     catch(KeyNotFoundException ex)
                     {
-                        //consoleWriterWithKeepAliveChecking("There is no such a connection! Signal sended nowhere.", signal);
+                        noError = false;
                     }
                 }
                 else
                 {
                     consoleWriterWithKeepAliveChecking(ERROR_MSG + "received from node wrong data format. Node PORT: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port, signal);
                 }
-                Thread.Sleep(150);
             }
         }
 
