@@ -240,9 +240,10 @@ namespace ControlNCC
                                 //NIE UDALO SIE ZROBIC U MNIE, ZWOLNIJ U SIEBIE TO CO ZROBILES DLA TEGO REQUESTA
                                 ControlConnectionService NCCService = handlerNCC.getService(handlerNCC.getDomainService(packet.RequestID));
                                 //Nodeto GW, NodeFrom CN in other domain address
+                                Console.WriteLine("[CC]Destination node to previous ncc: " + packet.NodeFrom);
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_REQUEST_ACCEPT, ControlPacket.REJECT, packet.Rate, packet.NodeTo, packet.NodeFrom, packet.RequestID);
-                                // packetToNCC.domain = handlerNCC.domainNumber;
-                                //NCCService.send(packetToNCC);
+                                 packetToNCC.domain = handlerNCC.domainNumber;
+                                NCCService.send(packetToNCC);
                             }
                             else
                             {
