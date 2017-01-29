@@ -132,6 +132,20 @@ namespace NetNode
             writer.Write(send_object);
         }
 
+        public static void sendTopologyDeallocated(int port, int no_vc3)
+        {
+            string to;
+            LRM.connections.TryGetValue(port, out to);
+            NetNode.log("sending topology deallocated: " + to + " " + no_vc3, ConsoleColor.Red);
+
+            RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
+            protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_DEALLOCATED;
+            protocol.ConnectedNode = to;
+            protocol.AllocatedSlot = no_vc3;
+            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+            writer.Write(send_object);
+        }
+
         public static void sendDeleted(string from, int port, string to)
         {
             string toSend = port.ToString() + " " + to;

@@ -68,6 +68,7 @@ namespace NetNode
                 }
                 else if (temp[0] == "whoyouare")
                 {
+                    Thread.Sleep(100);
                     this.sendMessageToOne(port,temp[1]);
                 }
             }
