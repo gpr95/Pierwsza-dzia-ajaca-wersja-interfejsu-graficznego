@@ -1203,9 +1203,9 @@ namespace ManagementApp
         private void fillTopologyOne()
         {
             controler.addDomainToQueue(new Point(GAP * 1, GAP * 3), new Point(GAP * 32, GAP * 21));
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             controler.addSubnetworkToQueue(new Point(GAP * 5, GAP * 11), new Point(GAP * 24, GAP * 20));
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             controler.addSubnetworkToQueue(new Point(GAP * 9, GAP * 15), new Point(GAP * 20, GAP * 19));
             Thread.Sleep(3000);
             a = addN(11, 17);
@@ -1263,9 +1263,9 @@ namespace ManagementApp
         {
             controler.addDomainToQueue(new Point(GAP * 1, GAP * 3), new Point(GAP * 32, GAP * 21));
             controler.addDomainToQueue(new Point(GAP * 34, GAP * 3), new Point(GAP * 50, GAP * 21));
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             controler.addSubnetworkToQueue(new Point(GAP * 5, GAP * 11), new Point(GAP * 24, GAP * 20));
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             controler.addSubnetworkToQueue(new Point(GAP * 9, GAP * 15), new Point(GAP * 20, GAP * 19));
             Thread.Sleep(3000);
             a = addN(11, 17);
@@ -1318,13 +1318,13 @@ namespace ManagementApp
 
         private Node addN(int x, int y)
         {
-            Thread.Sleep(100);
+            //Thread.Sleep(50);
             return controler.addNetwork(new Point(GAP * x, GAP * y));
         }
 
         private Node addC(int x, int y)
         {
-            Thread.Sleep(100);
+            //Thread.Sleep(10);
             return controler.addClient(new Point(GAP * x, GAP * y));
         }
     }
