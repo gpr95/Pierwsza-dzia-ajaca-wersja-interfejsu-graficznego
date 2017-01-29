@@ -92,6 +92,9 @@ namespace ControlNCC
                                // handlerNCC.addInterdomainCall(borderGWAddress, packet.RequestID);
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, packet.destinationIdentifier, borderGWAddress, packet.RequestID);
                                 packetToNCC.domain = handlerNCC.domainNumber;
+                                packetToNCC.Vc11 = 1;
+                                packetToNCC.Vc12 = 1;
+                                packetToNCC.Vc13 = 1;
                                 serviceToNCC.send(packetToNCC);
                                 Console.WriteLine("[NCC]Send call request to next NCC, destination: "+packet.destinationIdentifier+" origin(BG address): "+ borderGWAddress);
                             }
