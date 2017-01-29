@@ -65,10 +65,10 @@ namespace Management
             nodeList.Add(nodeBeingAllocated);
         }
 
-        internal void getNodes()
+        internal void getNodes(bool clientsOnly = false)
         {
             log("#DEBUG2", ConsoleColor.Magenta);
-            UserInterface.nodeList(nodeList);
+            UserInterface.nodeList(nodeList, clientsOnly);
         }
 
         public void getInterfaces(Node n)
@@ -197,10 +197,10 @@ namespace Management
             agentNcc.sendInfoToOtherNcc(list);
         }
 
-        internal void createSoft(string nodeStart, string end)
+        internal void createSoft(string nodeStart, string end, int speed)
         {
             //Send info to NCC for creation soft pernament connecion;
-            agentNcc.sendSoftPernament(nodeStart, end);
+            agentNcc.sendSoftPernament(nodeStart, end, speed);
         }
 
         internal void sendAllClients(List<string> list)

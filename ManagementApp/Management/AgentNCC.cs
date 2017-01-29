@@ -63,12 +63,13 @@ namespace Management
             }
         }
 
-        public void sendSoftPernament(String start, String end)
+        public void sendSoftPernament(String start, String end, int speed)
         {
             ManagmentProtocol toSend = new ManagmentProtocol();
             toSend.State = ManagmentProtocol.SOFTPERNAMENT;
             toSend.NodeStart = start;
             toSend.NodeEnd = end;
+            toSend.Speed = speed;
             string data = ManagementApp.JSON.Serialize(ManagementApp.JSON.FromValue(toSend));
             writerNCC.Write(data);
         }

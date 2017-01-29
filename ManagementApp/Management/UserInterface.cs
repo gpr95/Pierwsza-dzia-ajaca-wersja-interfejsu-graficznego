@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ManagementApp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -78,7 +79,7 @@ namespace Management
                             break;
                         case 3:
                             operation = OPERATION.SOFT;
-                            management.getNodes();
+                            management.getNodes(true);
                             break;
                         case 4:
                             operation = OPERATION.SHOW;
@@ -115,7 +116,7 @@ namespace Management
             Console.Title = "D" + temp + " Management";
         }
 
-        public static void nodeList(List<Node> nodeList)
+        public static void nodeList(List<Node> nodeList, bool onlyClients)
         {
             //log("#DEBUG3", ConsoleColor.Magenta);
             nodeDictionary = new Dictionary<int, Node>();
@@ -123,26 +124,47 @@ namespace Management
             Console.ForegroundColor = ConsoleColor.White;
             foreach (Node node in nodeList)
             {
-                Console.WriteLine(enumerate + ") " + node.Name);
-                nodeDictionary.Add(enumerate++, node);
+                if (onlyClients)
+                {
+                    if(node.Name.Contains("192."))
+                    {
+                        Console.WriteLine(enumerate + ") " + node.Name);
+                        nodeDictionary.Add(enumerate++, node);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine(enumerate + ") " + node.Name);
+                    nodeDictionary.Add(enumerate++, node);
+                }
+                
             }
             String s;
             Node n = null;
             //log("#DEBUG3.1", ConsoleColor.Magenta);
+            Address a = null;
             if (nodeDictionary.Count != 0)
                 while (true)
                 {
                     s = Console.ReadLine();
                     if (s.Equals("q"))
                         return;
-                    int choice;
-                    bool res = int.TryParse(s, out choice);
-                    nodeDictionary.TryGetValue(choice, out n);
-                    if (n != null)
+                    
+                    try
+                    {
+                        a = new Address(s);
                         break;
+                    }catch(Exception e)
+                    {
+                        int choice;
+                        bool res = int.TryParse(s, out choice);
+                        nodeDictionary.TryGetValue(choice, out n);
+                        if (n != null)
+                            break;
+                    }
                 }
-            if (n == null)
-                return;
+            //if (n == null)
+            //    return;
             if(!(operation == OPERATION.CLEAR || operation == OPERATION.SOFT))
                 management.getInterfaces(n);
             //log("#DEBUG3.2", ConsoleColor.Magenta);
@@ -186,14 +208,20 @@ namespace Management
                         management.sendTable(n, tableList);
                     break;
                 case OPERATION.SOFT:
-                    if(n == null)
+                    if (nodeStart == null)
                     {
-                        nodeStart = n.Name;
-                        management.getNodes();
+                        if (n == null)
+                            nodeStart = a.ToString();
+                        else
+                            nodeStart = n.Name;
+                        management.getNodes(true);
                     }
                     else
                     {
-                        management.createSoft(nodeStart, n.Name);
+                        if (n == null)
+                            getSpeed(a.ToString());
+                        else
+                            getSpeed(n.Name);
                         nodeStart = null;
                     } 
                     break;
@@ -212,6 +240,15 @@ namespace Management
                     operation = OPERATION.NONE;
                     break;
             }
+        }
+
+        private static void getSpeed(String n)
+        {
+            log("Enter speed(1, 2, 3):", ConsoleColor.Blue);
+            String s = Console.ReadLine();
+            int i = 0;
+            int.TryParse(s, out i);
+            management.createSoft(nodeStart, n, i);
         }
 
         internal static void showTable(List<FIB> routingTable)

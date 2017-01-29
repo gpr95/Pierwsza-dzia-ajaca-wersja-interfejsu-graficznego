@@ -14,7 +14,7 @@ namespace Management
         public static readonly int CLEARTABLE = 6;
         public static readonly int GETTABLE = 7;
         public static readonly int TOOTHERNCC = 8;
-        public static readonly int SOFTPERNAMENT = 8;
+        public static readonly int SOFTPERNAMENT = 9;
 
         private int state;
         private int port;
@@ -27,6 +27,7 @@ namespace Management
         private List<int> connectionToOtherNcc;
         private String nodeStart;
         private String nodeEnd;
+        private int speed;
 
         public int State
         {
@@ -168,6 +169,19 @@ namespace Management
             set
             {
                 nodeEnd = value;
+            }
+        }
+
+        public int Speed
+        {
+            get
+            {
+                return speed;
+            }
+
+            set
+            {
+                speed = value;
             }
         }
     }

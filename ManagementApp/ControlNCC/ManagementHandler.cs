@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Management;
 using ManagementApp;
 using ClientNode;
+using ControlCCRC.Protocols;
 
 namespace ControlNCC
 {
@@ -19,6 +20,7 @@ namespace ControlNCC
         private TcpClient client;
         private NetworkCallControl control;
         private BinaryWriter writer;
+        private Random r;
 
         public ManagementHandler(int port, NetworkCallControl control)
         {
@@ -27,6 +29,7 @@ namespace ControlNCC
             this.port = port;
             thread = new Thread(new ThreadStart(Listen));
             thread.Start();
+            r = new Random();
         }
 
         private void Listen()
@@ -46,16 +49,24 @@ namespace ControlNCC
                         Management.ManagmentProtocol management_packet = received_object.Value.ToObject<Management.ManagmentProtocol>();
                         if (management_packet.State == Management.ManagmentProtocol.TOOTHERNCC)
                         {
-                            foreach(int port in management_packet.ConnectionToOtherNcc)
+                            foreach (int port in management_packet.ConnectionToOtherNcc)
                             {
-                                TcpClient connection  = new TcpClient("127.0.0.1", port);
+                                TcpClient connection = new TcpClient("127.0.0.1", port);
                                 ControlConnectionService service = new ControlConnectionService(connection, control);
                                 Thread.Sleep(500);
-                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.NETWORK_CALL_COORDINATION_IN,ControlPacket.IN_PROGRESS,0,"","",control.domainNumber);
+                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.NETWORK_CALL_COORDINATION_IN, ControlPacket.IN_PROGRESS, 0, "", "", control.domainNumber);
                                 service.send(packetToNCC);
                             }
-
-
+                        }
+                        else if (management_packet.State == Management.ManagmentProtocol.SOFTPERNAMENT)
+                        {
+                            CCtoNCCSingallingMessage packet = new CCtoNCCSingallingMessage();
+                            packet.State = CCtoNCCSingallingMessage.NCC_SET_CONNECTION;
+                            packet.NodeFrom = management_packet.NodeStart;
+                            packet.NodeTo = management_packet.NodeEnd;
+                            packet.Rate = management_packet.Speed;
+                            packet.RequestID = r.Next(10000, 40000);
+                            control.getCCService().sendCCRequest(packet);
                         }
                     }
                 }
