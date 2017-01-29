@@ -104,12 +104,24 @@ namespace ControlNCC
                             //RELEASE
                             int id = packet.RequestID;
                             Console.WriteLine("[CPCC] Release connection id: " + id);
-                            Console.WriteLine("[CC]Send connection release");
-                            CCtoNCCSingallingMessage packetToCC = new CCtoNCCSingallingMessage();
-                            packetToCC.State = CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID;
-                            packetToCC.RequestID = packet.RequestID;
-                            ControlConnectionService CCService = this.handlerNCC.getCCService();
-                            CCService.sendCCRequest(packetToCC);
+
+                            if (!handlerNCC.checkIfInterdomainRequest(id))
+                            {
+                                Console.WriteLine("[CC]Send connection release");
+                                CCtoNCCSingallingMessage packetToCC = new CCtoNCCSingallingMessage();
+                                packetToCC.State = CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID;
+                                packetToCC.RequestID = packet.RequestID;
+                                ControlConnectionService CCService = this.handlerNCC.getCCService();
+                                CCService.sendCCRequest(packetToCC);
+                            }
+                            else
+                            {
+                                Address address = new Address(packet.destinationIdentifier);
+                                ControlConnectionService serviceToNCC = handlerNCC.getService(address.domain);
+                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_RELEASE_IN, ControlPacket.IN_PROGRESS, 0, packet.destinationIdentifier, packet.originIdentifier, id);
+                                serviceToNCC.send(packetToNCC);
+                                Console.WriteLine("[NCC]Send call release to next NCC: ");
+                            }
                         }
                        
                         else if (packet.virtualInterface == ControlInterface.NETWORK_CALL_COORDINATION_IN)

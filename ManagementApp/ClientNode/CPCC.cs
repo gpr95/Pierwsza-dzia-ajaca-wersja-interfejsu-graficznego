@@ -102,9 +102,9 @@ namespace ClientWindow
         }
 
 
-        public void sendRelease(int id)
+        public void sendRelease(int id, string to)
         {
-            ControlPacket packet = new ControlPacket(ControlInterface.CALL_RELEASE_IN, ControlPacket.IN_PROGRESS, 0, "", clientWindowHandler.virtualIP, id);
+            ControlPacket packet = new ControlPacket(ControlInterface.CALL_RELEASE_IN, ControlPacket.IN_PROGRESS, 0, to, clientWindowHandler.virtualIP, id);
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
             clientWindowHandler.Log2("CONTROL", "send release on " + ControlInterface.CALL_RELEASE_IN);
