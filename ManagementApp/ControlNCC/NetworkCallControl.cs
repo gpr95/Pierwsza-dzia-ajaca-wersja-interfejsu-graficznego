@@ -24,15 +24,19 @@ namespace ControlNCC
         private ManagementHandler management;
         private int managementPort;
         private Dictionary<int, int> interdomainRequests;
+        private Dictionary<string, int> interdomainCalls;
+        private Dictionary<int, List<string>> intrerdomainCallsAttempts;
         private Dictionary<int, string> CNAddressesForInterdomainCalls;
         private Dictionary<string, int> borderGateways;
         public NetworkCallControl(string[] domainParams)
         {
-            
+
             services = new Dictionary<int, ControlConnectionService>();
             interdomainRequests = new Dictionary<int, int>();
             CNAddressesForInterdomainCalls = new Dictionary<int, string>();
             borderGateways = new Dictionary<string, int>();
+            interdomainCalls = new Dictionary<string, int>();
+            intrerdomainCallsAttempts = new Dictionary<int, List<string>>();
             string ip = "127.0.0.1";
             int.TryParse(domainParams[0], out domainNumber);
             Console.WriteLine("Domain: " + domainNumber + " Listener: " + domainParams[1] + " Management: " + domainParams[2]);
@@ -87,7 +91,7 @@ namespace ControlNCC
         public bool checkIfInterdomainRequest(int requestID)
         {
             int domainID;
-            interdomainRequests.TryGetValue(requestID,out domainID);
+            interdomainRequests.TryGetValue(requestID, out domainID);
             if (domainID != 0)
             {
                 return true;
@@ -101,7 +105,7 @@ namespace ControlNCC
             return interdomainRequests[requestID];
         }
 
-        public void addCNAddressesForInterdomainCalls(int requestID,string clientIdentifier)
+        public void addCNAddressesForInterdomainCalls(int requestID, string clientIdentifier)
         {
             CNAddressesForInterdomainCalls.Add(requestID, clientIdentifier);
         }
@@ -122,9 +126,9 @@ namespace ControlNCC
         public List<string> returnBorderGateway(int domain)
         {
             List<string> res = new List<string>();
-            foreach ( var temp in borderGateways)
+            foreach (var temp in borderGateways)
             {
-                if(temp.Value == domain)
+                if (temp.Value == domain)
                 {
                     res.Add(temp.Key);
                 }
@@ -132,6 +136,65 @@ namespace ControlNCC
             return res;
         }
 
+        public void addInterdomainCall(string borderGWaddress, int interdomainRequestID)
+        {
+            interdomainCalls.Add(borderGWaddress, interdomainRequestID);
+        }
+        public bool checkIfInterdomainCall(int interdomainRequestID)
+        {
+            bool result = false;
+            foreach (var borderGwRequestIDPair in interdomainCalls)
+            {
+                if (borderGwRequestIDPair.Value == interdomainRequestID)
+                {
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+        }
+        //addresTo get z listy interdomain calls 
+        public string getAnotherBorderGatewayAddress(int interdomainRequestID, string addressToGetDomain)
+        {
+            Address tmpAddress = new Address(addressToGetDomain);
+            List<string> borderGWAddresses = returnBorderGateway(tmpAddress.domain);
+            string result = "0.0.0.0";
+            for (int i = 0; i < borderGWAddresses.Count; i++)
+            {
+                foreach (string borderGWAddressUsed in intrerdomainCallsAttempts[interdomainRequestID])
+                {
+                    if (borderGWAddresses[i] == borderGWAddressUsed)
+                        break;
+                    else
+                    {
+                        result = borderGWAddresses[i];
+                        return result;
+                    }
+
+                }
+            }
+
+            return result;
+        }
+        public void initInterdomanCallTask(int interdomainRequestID, string borderGWaddress)
+        {
+            intrerdomainCallsAttempts.Add(interdomainRequestID, new List<string>());
+            intrerdomainCallsAttempts[interdomainRequestID].Add(borderGWaddress);
+        }
+        public void addIntrerdomainCallsAttempts(int interdomainRequestID, string borderGWaddress)
+        {
+            intrerdomainCallsAttempts[interdomainRequestID].Add(borderGWaddress);
+        }
+
+        public void clearInterdomainCallAttempt(int interdomainCallRequestIDToClear)
+        {
+            foreach (var tmp in interdomainCalls)
+            {
+                if (tmp.Value == interdomainCallRequestIDToClear)
+                    interdomainCalls.Remove(tmp.Key);
+            }
+            intrerdomainCallsAttempts.Remove(interdomainCallRequestIDToClear);
+        }
 
         //remove
 
@@ -153,15 +216,16 @@ namespace ControlNCC
         public Boolean checkIfInDirectory(string address)
         {
             Address addres = new Address(address);
-            if(addres.domain == domainNumber)
+            if (addres.domain == domainNumber)
             {
                 return true;
-            }else
+            }
+            else
             {
                 return false;
             }
 
-            
+
         }
     }
 }
