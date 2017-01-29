@@ -32,10 +32,9 @@ namespace CableCloud
         private int virtualToPort;
         private String name; 
 
-        public NodeConnectionThread(ref TcpClient connection,
+        public NodeConnectionThread(
             ref Dictionary<String, NodeConnectionThread> portToThreadMap, DataTable table, String name, int fromPort, int virtualFromPort, int toPort, int virtualToPort)
         {
-            this.connection = connection;
             this.portToThreadMap = portToThreadMap;
             this.table = table;
             this.name = name;
@@ -50,6 +49,15 @@ namespace CableCloud
 
         private void nodeConnectionThread()
         {
+            try
+            {
+                connection = new TcpClient("localhost", fromPort);
+            }
+            catch (SocketException ex)
+            {
+                consoleWriter("Connection can't be made on port " + toPort);
+                return;
+            }
             consoleWriter("Initialize connection: " + name);
             writer = new BinaryWriter(connection.GetStream());
             reader = new BinaryReader(connection.GetStream());

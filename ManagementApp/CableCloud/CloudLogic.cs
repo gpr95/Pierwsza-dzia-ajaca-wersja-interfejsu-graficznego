@@ -101,6 +101,7 @@ namespace CableCloud
                         List<ConnectionProperties> received_connections = receivedMessage.Value.ToObject<List<ConnectionProperties>>();
                         foreach (ConnectionProperties received_connection in received_connections)
                         {
+                            
                             if (received_connection.LocalPortTo == 0 && received_connection.VirtualPortTo == 0)
                             {
                                 deleteCable(received_connection.LocalPortFrom, received_connection.VirtualPortFrom);
@@ -135,44 +136,19 @@ namespace CableCloud
         public void connectToNodes(int fromPort, int virtualFromPort,
                                     int toPort, int virtualToPort) 
         {
-    //        if (!portToThreadMap.ContainsKey(fromPort + ":" + virtualFromPort))
-    //        {
-                TcpClient connectionFrom = null;
-                try
-                { 
-                    connectionFrom = new TcpClient("localhost", fromPort);
-                }
-                catch (SocketException ex)
-                {
-                    consoleWriter("Connection can't be made on port " + toPort);
-                    return;
-                }
                 String connection1Name = +fromPort +
                               "(virtual:" + virtualFromPort + ")-->" + toPort +
                                "(virtual:" + virtualToPort + ")";
-                NodeConnectionThread fromThread = new NodeConnectionThread(ref connectionFrom,
+                NodeConnectionThread fromThread = new NodeConnectionThread(
                     ref portToThreadMap, tableWithPorts, connection1Name, fromPort, virtualFromPort,
                    toPort, virtualToPort);
-
-  //          }
-   //         if (!portToThreadMap.ContainsKey(toPort + ":" + virtualToPort))
-    //        {
-                TcpClient connectionTo = null;
-                try
-                {
-                    connectionTo = new TcpClient("localhost", toPort);
-                }
-                catch (SocketException ex)
-                {
-                    consoleWriter("Connection can't be made on port " + toPort);
-                    return;
-                }
-                String connection2Name = toPort +
+            Thread.Sleep(100);
+            String connection2Name = toPort +
                               "(virtual:" + virtualToPort + ")-->" + fromPort +
                                "(virtual:" + virtualFromPort + ")";
-                NodeConnectionThread toThread = new NodeConnectionThread(ref connectionTo,
+                NodeConnectionThread toThread = new NodeConnectionThread(
                     ref portToThreadMap, tableWithPorts, connection2Name, toPort, virtualToPort, fromPort, virtualFromPort);
-   //         }
+            Thread.Sleep(100);
         }
 
 
