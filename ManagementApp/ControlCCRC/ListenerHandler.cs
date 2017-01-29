@@ -73,6 +73,10 @@ namespace ControlCCRC
                                 consoleWriter("[received from LRRM] LRM_ALLOCATED");
                                 rc.allocatedTopologyConnection(identifier, lrmMsg.ConnectedNode, lrmMsg.AllocatedSlot);
                                 break;
+                            case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DEALLOCATED:
+                                consoleWriter("[received from LRRM] LRM_DEALLOCATED");
+                                rc.deallocatedTopologyConnection(identifier, lrmMsg.ConnectedNode, lrmMsg.AllocatedSlot);
+                                break;
                         }
                     }
                     else if (received_object.Type == typeof(RCtoRCSignallingMessage))

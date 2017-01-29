@@ -125,6 +125,25 @@ namespace ControlCCRC
             }
         }
 
+        public void deallocatedTopologyConnection(string nodeName, string connectedNode, int slotVC3)
+        {
+            switch (slotVC3)
+            {
+                case 11:
+                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
+                    topologyUnallocatedLayer1[nodeName].Add(connectedNode,1);
+                    break;
+                case 12:
+                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
+                    topologyUnallocatedLayer2[nodeName].Add(connectedNode, 1);
+                    break;
+                case 13:
+                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
+                    topologyUnallocatedLayer3[nodeName].Add(connectedNode, 1);
+                    break;
+            }
+        }
+
         private void rcConnecting()
         {
             BinaryReader reader = new BinaryReader(RCClient.GetStream());

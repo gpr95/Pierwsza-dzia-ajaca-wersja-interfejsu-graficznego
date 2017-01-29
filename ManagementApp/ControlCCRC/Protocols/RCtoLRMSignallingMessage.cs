@@ -15,8 +15,11 @@ namespace ControlCCRC.Protocols
         public const int LRM_TOPOLOGY_ADD = 1;
         // who died from connected nodes
         public const int LRM_TOPOLOGY_DELETE = 2;
-        // deallocated node
+        // allocated node
         public const int LRM_TOPOLOGY_ALLOCATED = 3;
+        // deallocated node
+        public const int LRM_TOPOLOGY_DEALLOCATED = 4;
+
 
         private int state;
         private int connectedNodePort;
