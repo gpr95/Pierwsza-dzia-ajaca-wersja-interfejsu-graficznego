@@ -225,8 +225,8 @@ namespace ControlCCRC
                         computedPaths[pathNeededToBeCount[i]].Add(other);
                     }
                 }
-
-                nodeConnectionsAndWeights.Add(pathNeededToBeCount[i], connections);
+                if(connections.Count > 0)
+                    nodeConnectionsAndWeights.Add(pathNeededToBeCount[i], connections);
             }
 
             if (nodeConnectionsAndWeights.Count != 0)
@@ -257,7 +257,21 @@ namespace ControlCCRC
         public int findWeightBetweenTwoNodes(String startNode, String endNode, int howMuchVC3)
         {
             int result = 0;
-           
+
+            bool ableToConnect1 = false;
+            bool ableToConnect2 = false;
+            foreach (String myNode in wholeTopologyNodesAndConnectedNodesWithPorts.Keys)
+            {
+                foreach(String connectedNode in wholeTopologyNodesAndConnectedNodesWithPorts[myNode].Keys)
+                {
+                    if (connectedNode.Equals(startNode))
+                        ableToConnect1 = true;
+                    if (connectedNode.Equals(endNode))
+                        ableToConnect2 = true;
+                }
+            }
+            if (!ableToConnect1 || !ableToConnect2)
+                return 0;
 
             if (wholeTopologyNodesAndConnectedNodesWithPorts
                .Where(node => node.Value.ContainsKey(startNode)) == null)
@@ -506,7 +520,7 @@ namespace ControlCCRC
                         usingTopology3 = 1;
                     }
 
-                    if (pathRate1 != null || pathRate1.First().Equals(firstInMyNetwork) || pathRate1.Last().Equals(lastInMyNetwork))
+                    if (pathRate1 != null && pathRate1.First().Equals(firstInMyNetwork) && pathRate1.Last().Equals(lastInMyNetwork))
                     {
                         foreach (var temp in pathRate1)
                         {
@@ -517,192 +531,8 @@ namespace ControlCCRC
                             result.Add(node, new List<FIB>());
                         }
 
-
-                        if (pathRate1.Count == 2)
-                        {
-                            if (topologyUnallocatedLayer1[pathRate1.ElementAt(0)][pathRate1.ElementAt(1)] > 1)
-                            {
-                                String virtualNodeFrom = pathRate1.ElementAt(0);
-                                String virtualNodeTo = pathRate1.ElementAt(1);
-                                String rcNeededToBeSet =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
-                                     mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
-                                String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
-                                String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
-                                consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                                 "VirtualNodeFrom:" + virtualNodeFrom + "\n" +
-                                 "internalNodeFrom:" + internalNodeFrom + "\n" +
-                                 "internalNodeTo:" + internalNodeTo + "\n" +
-                                 "VirtualNodeTo:" + virtualNodeTo + "\n" +
-                                 "RC: " + rcNeededToBeSet) ;
-                                ccHandler.sendFIBSettingRequestForSubnetwork(virtualNodeFrom, virtualNodeTo, rcNeededToBeSet, howMuchVC3);
-                                result[pathRate1[0]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][internalNodeFrom],
-                                    whichTopology + 10
-                                    ));
-                                result[pathRate1[1]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][internalNodeTo],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][endNode],
-                                    whichTopology + 10
-                                    ));
-                            }
-                            else
-                            {
-                                result[pathRate1[0]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][pathRate1[1]],
-                                    whichTopology + 10
-                                    ));
-                                result[pathRate1[1]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][pathRate1[0]],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][endNode],
-                                    whichTopology + 10
-                                    ));
-                            }
-                        }
-                        else
-                        {
-                            int startFibSettingFrom = 1;
-                            int startFibSettingTo = pathRate1.Count - 2;
-                            if (topologyUnallocatedLayer1[pathRate1.ElementAt(0)][pathRate1.ElementAt(1)] > 1)
-                            {
-                                String virtualNodeFrom = pathRate1.ElementAt(0);
-                                String virtualNodeTo = pathRate1.ElementAt(1);
-                                String rcNeededToBeSet =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
-                                     mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
-                                String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
-                                String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
-                                consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                                "VirtualNodeFrom:" + virtualNodeFrom + "\n" +
-                                "internalNodeFrom:" + internalNodeFrom + "\n" +
-                                "internalNodeTo:" + internalNodeTo + "\n" +
-                                "VirtualNodeTo:" + virtualNodeTo + "\n" +
-                                "RC: " + rcNeededToBeSet);
-
-                                result[pathRate1[0]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][internalNodeFrom],
-                                    whichTopology + 10
-                                    ));
-                                result[pathRate1[1]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][internalNodeTo],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][pathRate1[1]],
-                                    whichTopology + 10
-                                    ));
-                                startFibSettingFrom = 2;
-                            }
-                            else
-                            {
-                                result.First().Value.Add(new FIB(
-                                   wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][startNode],
-                                   whichTopology + 10,
-                                   wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][pathRate1[1]],
-                                   whichTopology + 10
-                                   ));
-                            }
-                           
-                            if(topologyUnallocatedLayer1[pathRate1.ElementAt(pathRate1.Count-2)][pathRate1.ElementAt(pathRate1.Count - 1)] > 1)
-                            {
-                                String virtualNodeFrom = pathRate1.ElementAt(0);
-                                String virtualNodeTo = pathRate1.ElementAt(1);
-                                String rcNeededToBeSet =
-                                    mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
-                                     mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
-                                String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
-                                String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
-                                consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                                "VirtualNodeFrom:" + virtualNodeFrom + "\n" +
-                                "internalNodeFrom:" + internalNodeFrom + "\n" +
-                                "internalNodeTo:" + internalNodeTo + "\n" +
-                                "VirtualNodeTo:" + virtualNodeTo + "\n" +
-                                "RC: " + rcNeededToBeSet);
-
-                                result[pathRate1[pathRate1.Count - 2]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][pathRate1[pathRate1.Count - 3]],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[0]][internalNodeFrom],
-                                    whichTopology + 10
-                                    ));
-                                result[pathRate1[pathRate1.Count - 1]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][internalNodeTo],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[1]][endNode],
-                                    whichTopology + 10
-                                    ));
-                                startFibSettingTo = pathRate1.Count - 3;
-                            }
-                            else
-                            {
-                                result.Last().Value.Add(new FIB(
-                                                wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][pathRate1[pathRate1.Count - 2]],
-                                                whichTopology + 10,
-                                                wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1.Last()][endNode],
-                                                whichTopology + 10
-                                                ));
-                            }
-                            
-
-                            for (int i = startFibSettingFrom; i <= startFibSettingTo; i++)
-                            {
-                                if (topologyUnallocatedLayer1[pathRate1.ElementAt(i)][pathRate1.ElementAt(i + 1)] > 1)
-                                {
-                                    String virtualNodeFrom = pathRate1.ElementAt(i);
-                                    String virtualNodeTo = pathRate1.ElementAt(i + 1);
-                                    String rcNeededToBeSet =
-                                        mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
-                                         mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
-                                    String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
-                                    String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
-                                    consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                                "VirtualNodeFrom:" + virtualNodeFrom + "\n" +
-                                "internalNodeFrom:" + internalNodeFrom + "\n" +
-                                "internalNodeTo:" + internalNodeTo + "\n" +
-                                "VirtualNodeTo:" + virtualNodeTo + "\n" +
-                                "RC: " + rcNeededToBeSet);
-                                    result[pathRate1[i]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][internalNodeFrom],
-                                    whichTopology + 10
-                                    ));
-                                    result[pathRate1[i + 1]].Add(new FIB(
-                                   wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i + 1]][internalNodeTo],
-                                   whichTopology + 10,
-                                   wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i + 1]][
-                                       internalNodeTo],
-                                   whichTopology + 10
-                                   ));
-
-                                    i++;
-                                    continue;
-                                }
-                                result[pathRate1[i]].Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i - 1]],
-                                    whichTopology + 10,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[pathRate1[i]][pathRate1[i + 1]],
-                                    whichTopology + 10
-                                    ));
-                            }
-                        }
-
-                        
-
-                        foreach (var temp in result)
-                        {
-                            foreach (var fib in temp.Value)
-                            {
-                                Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
-                            }
-                        }
-
+                        result = setFibsForRateAndCallSubnetworks(pathRate1,
+                            startNode, endNode, usingTopology1, usingTopology2, usingTopology3);
                         return result;
                     }
                     else
@@ -713,12 +543,172 @@ namespace ControlCCRC
                         usingTopology3 = 0;
                         return null;
                     }
-                    break;
+                case 2:
+                    List<String> path1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                    List<String> path2 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                    List<String> path3 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                    if (path1 != null && path1.Count > 0 && path1.First().Equals(firstInMyNetwork) && path1.Last().Equals(lastInMyNetwork) &&
+                       path2 != null && path2.Count > 0 && path2.First().Equals(firstInMyNetwork) && path2.Last().Equals(lastInMyNetwork))
+                    {
+                        usingTopology1 = 1;
+                        usingTopology2 = 1;
+                        usingTopology3 = 0;
+                        /** Builded path in 1st layer */
+                        /** Builded path in 2nd layer */
+
+                    }
+                    else if (path1 != null && path1.Count > 0 && path1.First().Equals(firstInMyNetwork) && path1.Last().Equals(lastInMyNetwork) &&
+                             path3 != null && path3.Count > 0 && path3.First().Equals(firstInMyNetwork) && path3.Last().Equals(lastInMyNetwork))
+                    {
+                        usingTopology1 = 1;
+                        usingTopology2 = 0;
+                        usingTopology3 = 1;
+                        /** Builded path in 1st layer */
+                        /** Builded path in 3nd layer */
+
+                    }
+                    else if (path2 != null && path2.Count > 0 && path2.First().Equals(firstInMyNetwork) && path2.Last().Equals(lastInMyNetwork) &&
+                             path3 != null && path3.Count > 0 && path3.First().Equals(firstInMyNetwork) && path3.Last().Equals(lastInMyNetwork))
+                    {
+                        usingTopology1 = 0;
+                        usingTopology2 = 1;
+                        usingTopology3 = 1;
+                        /** Builded path in 2nd layer */
+                        /** Builded path in 3nd layer */
+                    }
+                    else
+                    {
+                        consoleWriter("[INFO] NOT able to connect nodes. All paths allocated.");
+                        usingTopology1 = 0;
+                        usingTopology2 = 0;
+                        usingTopology3 = 0;
+                        return null;
+                    }
+
+                    List<String> properPath = null;
+                    if (usingTopology1 == 1)
+                        properPath = path1;
+                    if (usingTopology2 == 1)
+                        properPath = path2;
+                    if (usingTopology3 == 1)
+                        properPath = path3;
+                    result = setFibsForRateAndCallSubnetworks(properPath,
+                           startNode, endNode, usingTopology1, usingTopology2, usingTopology3);
+                    return result;
+                case 3:
+                    List<String> path31 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer1);
+                    List<String> path32 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
+                    List<String> path33 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
+                    if (path31 != null && path31.Count > 0 && path31.First().Equals(firstInMyNetwork) && path31.Last().Equals(lastInMyNetwork) &&
+                       path32 != null && path32.Count > 0 && path32.First().Equals(firstInMyNetwork) && path32.Last().Equals(lastInMyNetwork) &&
+                       path33 != null && path33.Count > 0 && path33.First().Equals(firstInMyNetwork) && path33.Last().Equals(lastInMyNetwork))
+                    {
+
+                        usingTopology1 = 1;
+                        usingTopology2 = 1;
+                        usingTopology3 = 1;
+                    }
+                    else
+                    {
+                        consoleWriter("[INFO] NOT able to connect nodes. All paths allocated.");
+                        usingTopology1 = 0;
+                        usingTopology2 = 0;
+                        usingTopology3 = 0;
+                        return null;
+                    }
+                    result = setFibsForRateAndCallSubnetworks(path31,
+                           startNode, endNode, usingTopology1, usingTopology2, usingTopology3);
+                    return result;
             }
 
 
 
 
+
+            return result;
+        }
+
+        public Dictionary<string,List<FIB>> setFibsForRateAndCallSubnetworks(List<String> path,String startNode,
+            String endNode, int vc31,int vc32, int vc33)
+        {
+            Dictionary<string, List<FIB>> result = new Dictionary<string, List<FIB>>();
+            List<String> additionalPath = new List<string>();
+            additionalPath.Add(startNode);
+            foreach(String node in path)
+            {
+                additionalPath.Add(node);
+            }
+            additionalPath.Add(endNode);
+
+            Dictionary<String,String> nodeFromListAndRcName = new Dictionary<String, String>();
+            Dictionary<String, String> nodeToListAndRcName = new Dictionary<String, String>();
+
+            foreach (String node in additionalPath)
+            {
+                if(!node.Equals(startNode) && !node.Equals(endNode))
+                    result.Add(node, new List<FIB>());
+            }
+            List<int> layers = new List<int>();
+            if (vc31 != 0)
+                layers.Add(1);
+            if (vc32 != 0)
+                layers.Add(2);
+            if (vc33 != 0)
+                layers.Add(3);
+
+            foreach (int layer in layers)
+            {
+                for (int i = 1; i < additionalPath.Count - 1; i++)
+                {
+                    if (topologyUnallocatedLayer1[additionalPath.ElementAt(i)][additionalPath.ElementAt(i + 1)] > 1)
+                    {
+                        String virtualNodeFrom = additionalPath.ElementAt(i);
+                        String virtualNodeTo = additionalPath.ElementAt(i + 1);
+                        String rcNeededToBeSet =
+                            mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Substring(0,
+                             mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
+                        String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
+                        String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
+                        consoleWriter("While setting FIB founded subnetwork!!!\n " +
+                            "VirtualNodeFrom:" + virtualNodeFrom + "\n" +
+                            "internalNodeFrom:" + internalNodeFrom + "\n" +
+                            "internalNodeTo:" + internalNodeTo + "\n" +
+                            "VirtualNodeTo:" + virtualNodeTo + "\n" +
+                            "RC: " + rcNeededToBeSet);
+
+                        if(!nodeFromListAndRcName.Keys.Contains(virtualNodeFrom))
+                            nodeFromListAndRcName.Add(virtualNodeFrom, rcNeededToBeSet);
+                        if (!nodeToListAndRcName.Keys.Contains(virtualNodeTo))
+                            nodeToListAndRcName.Add(virtualNodeTo, rcNeededToBeSet);
+
+                        result[additionalPath[i]].Add(new FIB(
+                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
+                        layer + 10,
+                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][internalNodeFrom],
+                        layer + 10
+                        ));
+                        result[additionalPath[i + 1]].Add(new FIB(
+                       wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i + 1]][internalNodeTo],
+                       layer + 10,
+                       wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i + 1]][additionalPath[i + 2]],
+                       layer + 10
+                       ));
+
+                        i++;
+                        continue;
+                    }
+                    result[additionalPath[i]].Add(new FIB(
+                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
+                        layer + 10,
+                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
+                        layer + 10
+                        ));
+                }
+            }
+
+            for(int i = 0; i < nodeFromListAndRcName.Count; i++)
+                ccHandler.sendFIBSettingRequestForSubnetwork(nodeFromListAndRcName.Keys.ElementAt(i), 
+                    nodeToListAndRcName.Keys.ElementAt(i), nodeFromListAndRcName.Values.ElementAt(i), vc31 + vc32 + vc33);
 
             return result;
         }
@@ -767,7 +757,7 @@ namespace ControlCCRC
                         usingTopology3 = 1;
                     }
 
-                    if (pathRate1 != null || pathRate1.Count != 0 || pathRate1.First().Equals(firstInMyNetwork) || pathRate1.Last().Equals(lastInMyNetwork))
+                    if (pathRate1 != null && pathRate1.Count != 0 && pathRate1.First().Equals(firstInMyNetwork) && pathRate1.Last().Equals(lastInMyNetwork))
                     {
                         foreach(var temp in pathRate1)
                         {
@@ -970,8 +960,6 @@ namespace ControlCCRC
                         usingTopology3 = 0;
                         return null;
                     }
-
-                    break;
                 default:
                     consoleWriter("[ERROR] Wrong VC-3 number");
                     break;
@@ -980,110 +968,7 @@ namespace ControlCCRC
             return null;
         }
 
-        private void fillFibsInResultPath(Dictionary<string, List<FIB>> result, List<string> path, String startNode, 
-            String endNode, int usingTopology1, int usingTopology2, int usingTopology3)
-        {
-            if(usingTopology1 != 0)
-            {
-                result.First().Value.Add(new FIB(
-                                            wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][startNode],
-                                            11,
-                                            wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][path[1]],
-                                            11
-                                            ));
-                result.Last().Value.Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][path[path.Count - 2]],
-                                    11,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][endNode],
-                                    11
-                                    ));
-
-                for (int i = 1; i < path.Count - 1; i++)
-                {
-                    result[path[i]].Add(new FIB(
-                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i - 1]],
-                        11,
-                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i + 1]],
-                        11
-                        ));
-                }
-
-                foreach (var temp in result)
-                {
-                    foreach (var fib in temp.Value)
-                    {
-                        Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
-                    }
-                }
-            }
-            if(usingTopology2 != 0)
-            {
-                result.First().Value.Add(new FIB(
-                                           wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][startNode],
-                                           12,
-                                           wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][path[1]],
-                                           12
-                                           ));
-                result.Last().Value.Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][path[path.Count - 2]],
-                                    12,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][endNode],
-                                    12
-                                    ));
-
-                for (int i = 1; i < path.Count - 1; i++)
-                {
-                    result[path[i]].Add(new FIB(
-                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i - 1]],
-                        12,
-                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i + 1]],
-                        12
-                        ));
-                }
-
-                foreach (var temp in result)
-                {
-                    foreach (var fib in temp.Value)
-                    {
-                        Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
-                    }
-                }
-            }
-            if(usingTopology3 != 0)
-            {
-                result.First().Value.Add(new FIB(
-                                           wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][startNode],
-                                           13,
-                                           wholeTopologyNodesAndConnectedNodesWithPorts[path[0]][path[1]],
-                                           13
-                                           ));
-                result.Last().Value.Add(new FIB(
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][path[path.Count - 2]],
-                                    13,
-                                    wholeTopologyNodesAndConnectedNodesWithPorts[path.Last()][endNode],
-                                    13
-                                    ));
-
-                for (int i = 1; i < path.Count - 1; i++)
-                {
-                    result[path[i]].Add(new FIB(
-                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i - 1]],
-                        13,
-                        wholeTopologyNodesAndConnectedNodesWithPorts[path[i]][path[i + 1]],
-                        13
-                        ));
-                }
-
-                foreach (var temp in result)
-                {
-                    foreach (var fib in temp.Value)
-                    {
-                        Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
-                    }
-                }
-            }
-            
-        }
+     
 
  
             
