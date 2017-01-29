@@ -25,14 +25,14 @@ namespace ControlNCC
         private int managementPort;
         private Dictionary<int, int> interdomainRequests;
         private Dictionary<int, string> CNAddressesForInterdomainCalls;
-        private Dictionary<int, string> borderGateways;
+        private Dictionary<string, int> borderGateways;
         public NetworkCallControl(string[] domainParams)
         {
             
             services = new Dictionary<int, ControlConnectionService>();
             interdomainRequests = new Dictionary<int, int>();
             CNAddressesForInterdomainCalls = new Dictionary<int, string>();
-            borderGateways = new Dictionary<int, string>();
+            borderGateways = new Dictionary<string, int>();
             string ip = "127.0.0.1";
             int.TryParse(domainParams[0], out domainNumber);
             Console.WriteLine("Domain: " + domainNumber + " Listener: " + domainParams[1] + " Management: " + domainParams[2]);
@@ -117,11 +117,19 @@ namespace ControlNCC
 
         public void addBorderGateway(int domain, string address)
         {
-            borderGateways.Add(domain, address);
+            borderGateways.Add(address, domain);
         }
-        public string returnBorderGateway(int domain)
+        public List<string> returnBorderGateway(int domain)
         {
-            return borderGateways[domain];
+            List<string> res = new List<string>();
+            foreach ( var temp in borderGateways)
+            {
+                if(temp.Value == domain)
+                {
+                    res.Add(temp.Key);
+                }
+            }
+            return res;
         }
 
 

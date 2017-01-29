@@ -80,12 +80,17 @@ namespace ControlNCC
                                 Address address = new Address(packet.destinationIdentifier);
                                 ControlConnectionService serviceToNCC = handlerNCC.getService(address.domain);
                                 handlerNCC.addCNAddressesForInterdomainCalls(packet.RequestID, packet.originIdentifier);
-                                //BORDER GATEWAY
+
                                 Address addressFromOtherDomain = new Address(packet.destinationIdentifier);
-                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, packet.destinationIdentifier, handlerNCC.returnBorderGateway(addressFromOtherDomain.domain), packet.RequestID);
+                                //WYBRAC GATEWAY ODPOWIEDNI
+                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, packet.destinationIdentifier, "", packet.RequestID);
                                 packetToNCC.domain = handlerNCC.domainNumber;
+                                //packetToNCC.bordergateway = handlerNCC.returnBorderGateway(addressFromOtherDomain.domain);
                                 serviceToNCC.send(packetToNCC);
-                                Console.WriteLine("[NCC]Send call request to next NCC with border gateway: "+ handlerNCC.returnBorderGateway(addressFromOtherDomain.domain));
+                                foreach (var temp in handlerNCC.returnBorderGateway(addressFromOtherDomain.domain))
+                                {
+                                    Console.WriteLine("[NCC]Send call request to next NCC with border gateway: "+ temp);
+                                }
                             }
 
                         }
@@ -159,7 +164,7 @@ namespace ControlNCC
                                 //NIE UDALO SIE U NAS, WYSLAC DO TAMTEGO NCC NIECH ROZLACZY JEDNAK
                                 //W DOMAIN Z TMATEGO NCC JEGO DOMAIN, ZEBY ODESLAC MU NIECH ROZLACZY
                                 ControlConnectionService nccCallService = handlerNCC.getService(packet.domain);
-                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.REJECT, packet.speed, "BRODER_GATEWAY", packet.destinationIdentifier, packet.RequestID);
+                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.REJECT, packet.speed, "BORDER_GATEWAY", packet.destinationIdentifier, packet.RequestID);
                                 nccCallService.send(packetToNCC);
 
                             }
