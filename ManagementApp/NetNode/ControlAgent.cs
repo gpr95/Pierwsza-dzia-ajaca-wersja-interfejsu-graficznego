@@ -93,6 +93,8 @@ namespace NetNode
                           {
                               sendTopologyDeallocated(fib.oport, fib.out_cont);
                           }
+                          SwitchingField.clearFib(fib);
+                          SwitchingField.clearFib(new FIB(fib.oport,fib.out_cont,fib.iport,fib.in_cont));
                         }
                     }
                     else
