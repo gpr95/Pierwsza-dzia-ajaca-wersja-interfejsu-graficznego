@@ -192,6 +192,7 @@ namespace ControlCCRC
                                     RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
                                     countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS_REQUEST;
                                     countPathsMsg.Identifier = identifier;
+                                    countPathsMsg.RequestId = requestId;
                                     countPathsMsg.AllUpperNodesToCountWeights = wholeTopologyNodesAndConnectedNodesWithPorts.Keys.ToList();
                                     countPathsMsg.RateToCountWeights = msg.RateToCountWeights;
                                     String dataToSend = JSON.Serialize(JSON.FromValue(countPathsMsg));
@@ -1439,10 +1440,15 @@ namespace ControlCCRC
         public void releaseConnection(int requestIdToRealese)
         {
             consoleWriter("[PROPER LOG] - RC get from CC - REALEASE FIBS for id:" + requestIdToRealese);
+
             ccHandler.sendRealeseFibs(requestForFibs[requestIdToRealese],requestIdToRealese);
 
-            for (int i = 0; i < requestIdAndRcNames.Count; i++)
-                ccHandler.sendFIBRealeaseForSubnetwork(requestIdAndRcNames[requestIdToRealese].Values.ElementAt(i),requestIdToRealese);
+            if (requestIdAndRcNames.ContainsKey(requestIdToRealese))
+                for (int i = 0; i < requestIdAndRcNames[requestIdToRealese].Values.Count; i++)
+            {
+                    ccHandler.sendFIBRealeaseForSubnetwork(requestIdAndRcNames[requestIdToRealese].Values.ElementAt(i), requestIdToRealese);
+            }
+               
         }
 
         private void consoleWriter(String msg)
