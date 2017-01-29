@@ -35,7 +35,9 @@ namespace ManagementApp
         private Graphics myGraphics;
         private Point subFrom;
 
-        public Node a, b, c, d, e, f, g, h;
+        public bool istabVisible = false;
+
+        public Node a, b, c, d, e, f, g, h, i, j, k, l, m, n;
 
         public static int GAP
         {
@@ -67,56 +69,14 @@ namespace ManagementApp
             hidePortSetup();
             RenderTable();
 
+            kursorToolStripMenuItem.PerformClick();
+            autoAgregacjaPortówToolStripMenuItem.Checked = true;
+            wyczyśćScenariuszToolStripMenuItem.Enabled = false;
+            scenariusz15ToolStripMenuItem.Enabled = false;
             //fillTopology();
             //Thread t = new Thread(new ThreadStart(fillConnection));
             //t.Start();
             
-        }
-
-        private void fillTopology()
-        {
-            //Thread.Sleep(1000);
-            controler.addDomainToQueue(new Point(GAP * 1, GAP * 6), new Point(GAP * 28, GAP * 24));
-            Thread.Sleep(1000);
-            controler.addSubnetworkToQueue(new Point(GAP * 5, GAP * 14), new Point(GAP * 24, GAP * 23));
-            Thread.Sleep(1000);
-            controler.addSubnetworkToQueue(new Point(GAP * 9, GAP * 18), new Point(GAP * 20, GAP * 22));
-            Thread.Sleep(3000);
-            a = controler.addNetwork(new Point(GAP * 11, GAP * 20));
-            Thread.Sleep(100);
-            b = controler.addNetwork(new Point(GAP * 18, GAP * 20));
-            Thread.Sleep(100);
-            c = controler.addNetwork(new Point(GAP * 7, GAP * 16));
-            Thread.Sleep(100);
-            d = controler.addNetwork(new Point(GAP * 22, GAP * 16));
-            Thread.Sleep(100);
-            e = controler.addNetwork(new Point(GAP * 3, GAP * 12));
-            Thread.Sleep(100);
-            f = controler.addNetwork(new Point(GAP * 26, GAP * 12));
-            Thread.Sleep(100);
-            g = controler.addClient(new Point(GAP * 7, GAP * 8));
-            Thread.Sleep(100);
-            h = controler.addClient(new Point(GAP * 22, GAP * 8));
-
-        }
-
-        private void fillConnection()
-        {
-            Thread.Sleep(200);
-            addConnection(a, getPort(a), b, getPort(b));
-            Thread.Sleep(200);
-            addConnection(a, getPort(a), c, getPort(c));
-            Thread.Sleep(200);
-            addConnection(c, getPort(c), e, getPort(e));
-            Thread.Sleep(200);
-            addConnection(e, getPort(e), g, getPort(g));
-            Thread.Sleep(200);
-            addConnection(b, getPort(b), d, getPort(d));
-            Thread.Sleep(200);
-            addConnection(d, getPort(d), f, getPort(f));
-            Thread.Sleep(200);
-            addConnection(f, getPort(f), h, getPort(h));
-            Refresh();
         }
 
         public void setLists(List<Node> nodeList, List<Domain> domainList, List<Subnetwork> subnetworkList, List<NodeConnection> connectionList)
@@ -348,7 +308,7 @@ namespace ManagementApp
                     if (nodeFrom == null || virtualNodeTo == null)
                         break;
                     Node nodeTo = getNodeFrom(x, y);
-                    if (autoAggregation.Checked)
+                    if (autoAgregacjaPortówToolStripMenuItem.Checked)
                     {
                         addConnection(nodeFrom, getPort(nodeFrom), virtualNodeTo, getPort(virtualNodeTo));
                         hidePortSetup();
@@ -681,8 +641,8 @@ namespace ManagementApp
             else if (node.Type.Equals(Node.NodeType.CLIENT))
                 panel.FillEllipse(Brushes.YellowGreen, rect);
             panel.DrawEllipse(Pens.Black, rect);
-            panel.DrawString(node.Name + ":" + node.LocalPort, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + (GAP / 2),
-                node.Position.Y + 3));
+            panel.DrawString(node.Name, new Font("Arial", GAP / 2), Brushes.LightGray, new Point(node.Position.X + (GAP / 2),
+                node.Position.Y + 3)); // + ":" + node.LocalPort
         }
 
         private void drawMovingConnection(Graphics panel, NodeConnection elem, Point end)
@@ -708,7 +668,7 @@ namespace ManagementApp
         {
             panel.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             Rectangle rect = new Rectangle(domain.getPointStart(), domain.Size);
-            panel.DrawRectangle(new Pen(Color.PaleVioletRed, 3), rect);
+            panel.DrawRectangle(new Pen(Color.Red, 3), rect);
         }
 
         private void drawSubnetwork(Subnetwork sub, Graphics panel)
@@ -1083,5 +1043,285 @@ namespace ManagementApp
         {
             containerPictureBox.Refresh();
         }
+
+        private void logiToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            istabVisible = !istabVisible;
+            tabControl1.Visible = istabVisible;
+            logiToolStripMenuItem.Checked = istabVisible;
+        }
+
+        private void autoAgregacjaPortówToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            autoAgregacjaPortówToolStripMenuItem.Checked = !autoAgregacjaPortówToolStripMenuItem.Checked;
+        }
+
+        private void zapiszToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            saveConfBtn.PerformClick();
+        }
+
+        private void wczytajToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            readConfBtn.PerformClick();
+        }
+
+        private void węzełKlienckiToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            oType = OperationType.ADD_CLIENT_NODE;
+            węzełKlienckiToolStripMenuItem.Checked = true;
+            węzełSieciowyToolStripMenuItem.Checked = false;
+            domenaToolStripMenuItem.Checked = false;
+            podsiećToolStripMenuItem.Checked = false;
+            połączenieToolStripMenuItem.Checked = false;
+            usuńElementToolStripMenuItem.Checked = false;
+            kursorToolStripMenuItem.Checked = false;
+            
+        }
+
+        private void węzełSieciowyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            oType = OperationType.ADD_NETWORK_NODE;
+            węzełKlienckiToolStripMenuItem.Checked = false;
+            węzełSieciowyToolStripMenuItem.Checked = true;
+            domenaToolStripMenuItem.Checked = false;
+            podsiećToolStripMenuItem.Checked = false;
+            połączenieToolStripMenuItem.Checked = false;
+            usuńElementToolStripMenuItem.Checked = false;
+            kursorToolStripMenuItem.Checked = false;
+        }
+
+        private void domenaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            oType = OperationType.ADD_DOMAIN;
+            węzełKlienckiToolStripMenuItem.Checked = false;
+            węzełSieciowyToolStripMenuItem.Checked = false;
+            domenaToolStripMenuItem.Checked = true;
+            podsiećToolStripMenuItem.Checked = false;
+            połączenieToolStripMenuItem.Checked = false;
+            usuńElementToolStripMenuItem.Checked = false;
+            kursorToolStripMenuItem.Checked = false;
+        }
+
+        private void podsiećToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            oType = OperationType.ADD_SUBNETWORK;
+            węzełKlienckiToolStripMenuItem.Checked = false;
+            węzełSieciowyToolStripMenuItem.Checked = false;
+            domenaToolStripMenuItem.Checked = false;
+            podsiećToolStripMenuItem.Checked = true;
+            połączenieToolStripMenuItem.Checked = false;
+            usuńElementToolStripMenuItem.Checked = false;
+            kursorToolStripMenuItem.Checked = false;
+        }
+
+        private void połączenieToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Cross;
+            oType = OperationType.ADD_CONNECTION;
+            węzełKlienckiToolStripMenuItem.Checked = false;
+            węzełSieciowyToolStripMenuItem.Checked = false;
+            domenaToolStripMenuItem.Checked = false;
+            podsiećToolStripMenuItem.Checked = false;
+            połączenieToolStripMenuItem.Checked = true;
+            usuńElementToolStripMenuItem.Checked = false;
+            kursorToolStripMenuItem.Checked = false;
+        }
+
+        private void usuńElementToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Hand;
+            oType = OperationType.DELETE;
+            węzełKlienckiToolStripMenuItem.Checked = false;
+            węzełSieciowyToolStripMenuItem.Checked = false;
+            domenaToolStripMenuItem.Checked = false;
+            podsiećToolStripMenuItem.Checked = false;
+            połączenieToolStripMenuItem.Checked = false;
+            usuńElementToolStripMenuItem.Checked = true;
+            kursorToolStripMenuItem.Checked = false;
+        }
+
+        private void kursorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Cursor = Cursors.Arrow;
+            oType = OperationType.MOVE_NODE;
+            węzełKlienckiToolStripMenuItem.Checked = false;
+            węzełSieciowyToolStripMenuItem.Checked = false;
+            domenaToolStripMenuItem.Checked = false;
+            podsiećToolStripMenuItem.Checked = false;
+            połączenieToolStripMenuItem.Checked = false;
+            usuńElementToolStripMenuItem.Checked = false;
+            kursorToolStripMenuItem.Checked = true;
+        }
+
+        private void scenariusz1ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            fillTopologyOne();
+            label3.Visible = true;
+            scenariusz1ToolStripMenuItem.Enabled = false;
+            wyczyśćScenariuszToolStripMenuItem.Enabled = true;
+            scenariusz2ToolStripMenuItem.Enabled = false;
+            scenariusz15ToolStripMenuItem.Enabled = true;
+        }
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+            label3.Visible = false;
+        }
+
+        private void wyczyśćScenariuszToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Environment.Exit(1);
+        }
+
+        private void fillTopologyOne()
+        {
+            //Thread.Sleep(1000);
+            controler.addDomainToQueue(new Point(GAP * 1, GAP * 3), new Point(GAP * 28, GAP * 21));
+            Thread.Sleep(1000);
+            controler.addSubnetworkToQueue(new Point(GAP * 5, GAP * 11), new Point(GAP * 24, GAP * 20));
+            Thread.Sleep(1000);
+            controler.addSubnetworkToQueue(new Point(GAP * 9, GAP * 15), new Point(GAP * 20, GAP * 19));
+            Thread.Sleep(3000);
+            a = controler.addNetwork(new Point(GAP * 11, GAP * 17));
+            Thread.Sleep(100);
+            b = controler.addNetwork(new Point(GAP * 18, GAP * 17));
+            Thread.Sleep(100);
+            c = controler.addNetwork(new Point(GAP * 7, GAP * 13));
+            Thread.Sleep(100);
+            d = controler.addNetwork(new Point(GAP * 22, GAP * 13));
+            Thread.Sleep(100);
+            e = controler.addNetwork(new Point(GAP * 3, GAP * 9));
+            Thread.Sleep(100);
+            f = controler.addNetwork(new Point(GAP * 26, GAP * 9));
+            Thread.Sleep(100);
+            g = controler.addClient(new Point(GAP * 7, GAP * 5));
+            Thread.Sleep(100);
+            h = controler.addClient(new Point(GAP * 22, GAP * 5));
+            Thread.Sleep(200);
+            addConnection(a, getPort(a), b, getPort(b));
+            Thread.Sleep(200);
+            addConnection(a, getPort(a), c, getPort(c));
+            Thread.Sleep(200);
+            addConnection(c, getPort(c), e, getPort(e));
+            Thread.Sleep(200);
+            addConnection(e, getPort(e), g, getPort(g));
+            Thread.Sleep(200);
+            addConnection(b, getPort(b), d, getPort(d));
+            Thread.Sleep(200);
+            addConnection(d, getPort(d), f, getPort(f));
+            Thread.Sleep(200);
+            addConnection(f, getPort(f), h, getPort(h));
+            Refresh();
+        }
+
+        private void fillTopologyTwo()
+        {
+            controler.addDomainToQueue(new Point(GAP * 1, GAP * 3), new Point(GAP * 28, GAP * 21));
+            controler.addDomainToQueue(new Point(GAP * 30, GAP * 3), new Point(GAP * 42, GAP * 21)); 
+            Thread.Sleep(1000);
+            controler.addSubnetworkToQueue(new Point(GAP * 5, GAP * 11), new Point(GAP * 24, GAP * 20));
+            Thread.Sleep(1000);
+            controler.addSubnetworkToQueue(new Point(GAP * 9, GAP * 15), new Point(GAP * 20, GAP * 19));
+            Thread.Sleep(3000);
+            a = controler.addNetwork(new Point(GAP * 11, GAP * 17));
+            Thread.Sleep(100);
+            b = controler.addNetwork(new Point(GAP * 18, GAP * 17));
+            Thread.Sleep(100);
+            c = controler.addNetwork(new Point(GAP * 7, GAP * 13));
+            Thread.Sleep(100);
+            d = controler.addNetwork(new Point(GAP * 22, GAP * 13));
+            Thread.Sleep(100);
+            e = controler.addNetwork(new Point(GAP * 3, GAP * 9));
+            Thread.Sleep(100);
+            f = controler.addNetwork(new Point(GAP * 26, GAP * 9));
+            Thread.Sleep(100);
+            g = controler.addClient(new Point(GAP * 7, GAP * 5));
+            Thread.Sleep(100);
+            h = controler.addClient(new Point(GAP * 22, GAP * 5));
+            Thread.Sleep(200);
+            addConnection(a, getPort(a), b, getPort(b));
+            Thread.Sleep(200);
+            addConnection(a, getPort(a), c, getPort(c));
+            Thread.Sleep(200);
+            addConnection(c, getPort(c), e, getPort(e));
+            Thread.Sleep(200);
+            addConnection(e, getPort(e), g, getPort(g));
+            Thread.Sleep(200);
+            addConnection(b, getPort(b), d, getPort(d));
+            Thread.Sleep(200);
+            addConnection(d, getPort(d), f, getPort(f));
+            Thread.Sleep(200);
+            addConnection(f, getPort(f), h, getPort(h));
+            i = controler.addNetwork(new Point(GAP * 32, GAP * 9));
+            j = controler.addNetwork(new Point(GAP * 36, GAP * 13));
+            k = controler.addNetwork(new Point(GAP * 32, GAP * 17));
+            l = controler.addClient(new Point(GAP * 36, GAP * 5));
+            m = controler.addClient(new Point(GAP * 40, GAP * 9));
+            n = controler.addNetwork(new Point(GAP * 26, GAP * 17));
+            Thread.Sleep(200);
+            addConnection(f, getPort(f), i, getPort(i));
+            Thread.Sleep(200);
+            addConnection(n, getPort(n), k, getPort(k));//
+            Thread.Sleep(200);
+            addConnection(j, getPort(j), i, getPort(i));
+            Thread.Sleep(200);
+            addConnection(j, getPort(j), k, getPort(k));
+            Thread.Sleep(200);
+            addConnection(j, getPort(j), m, getPort(m));
+            Thread.Sleep(200);
+            addConnection(i, getPort(i), l, getPort(l));
+            Thread.Sleep(200);
+            addConnection(n, getPort(n), d, getPort(d));
+            Refresh();
+        }
+
+        private void scenariusz2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            fillTopologyTwo();
+            label3.Visible = true;
+            scenariusz1ToolStripMenuItem.Enabled = false;
+            scenariusz15ToolStripMenuItem.Enabled = false;
+            scenariusz2ToolStripMenuItem.Enabled = false;
+            wyczyśćScenariuszToolStripMenuItem.Enabled = true;
+        }
+
+        private void fillTopologyOneAndAHalf()
+        {  
+            controler.addDomainToQueue(new Point(GAP * 30, GAP * 3), new Point(GAP * 42, GAP * 21));
+            Thread.Sleep(3000);
+            i = controler.addNetwork(new Point(GAP * 32, GAP * 9));
+            j = controler.addNetwork(new Point(GAP * 36, GAP * 13));
+            k = controler.addNetwork(new Point(GAP * 32, GAP * 17));
+            l = controler.addClient(new Point(GAP * 36, GAP * 5));
+            m = controler.addClient(new Point(GAP * 40, GAP * 9));
+            n = controler.addNetwork(new Point(GAP * 26, GAP * 17));
+            Thread.Sleep(200);
+            addConnection(f, getPort(f), i, getPort(i));
+            Thread.Sleep(200);
+            addConnection(n, getPort(n), k, getPort(k));//
+            Thread.Sleep(200);
+            addConnection(j, getPort(j), i, getPort(i));
+            Thread.Sleep(200);
+            addConnection(j, getPort(j), k, getPort(k));
+            Thread.Sleep(200);
+            addConnection(j, getPort(j), m, getPort(m));
+            Thread.Sleep(200);
+            addConnection(i, getPort(i), l, getPort(l));
+            Thread.Sleep(200);
+            addConnection(n, getPort(n), d, getPort(d));
+            Refresh();
+        }
+
+        private void scenariusz15ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            fillTopologyOneAndAHalf();
+            scenariusz15ToolStripMenuItem.Enabled = false;
+        }
+
     }
 }
