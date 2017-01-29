@@ -201,12 +201,10 @@ namespace ClientWindow
             }
         }
 
-        private void send(string message)
+        private void sendSwiched(string message)
         {
-            
             try
             {
-
                 Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
                 foreach (int slot in slots)
                 {
@@ -233,8 +231,34 @@ namespace ClientWindow
 
                 Log2("ERR", "Error sending signal");
             }
+        }
 
+        private void sendHard(string message, string slot)
+        {
+            try
+            {
+                logTextBox.AppendText("DEBISAHFOIS");
+                Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
+                VirtualContainer3 msg = new VirtualContainer3(adaptation(), message);
+                vc3List.Add(int.Parse(slot), msg);
+                STM1 frame = new STM1(adaptation(), vc3List);
+                List<string> temp = new List<string>();
+                temp.Add(this.virtualIP);
+                Signal signal = new Signal(virtualPort, frame, temp);
+                string data = JMessage.Serialize(JMessage.FromValue(signal));
+                writer.Write(data);
+                foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
+                {
+                    Log1("OUT", virtualIP, virtualPort.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
+                }
 
+                sendingTextBox.Clear();
+            }
+            catch (Exception e)
+            {
+
+                Log2("ERR", "Error sending signal");
+            }
         }
 
         public int adaptation()
@@ -362,7 +386,17 @@ namespace ClientWindow
 
         private void sendBtn_Click(object sender, EventArgs e)
         {
-            send(sendingTextBox.Text);
+            if (tabControl1.SelectedTab.Name.Equals("tabPage1"))
+                sendSwiched(sendingTextBox.Text);
+            else if (tabControl1.SelectedTab.Name.Equals("tabPage2"))
+                sendHard(sendingTextBox.Text, slotTextBox.Text);
+            else if (tabControl1.SelectedTab.Name.Equals("tabPage3"))
+                sendSoft(sendingTextBox.Text, slotTextBox.Text);
+        }
+
+        private void sendSoft(string p1, string p2)
+        {
+            
         }
 
         private void sendPeriodicallyBtn_Click(object sender, EventArgs e)

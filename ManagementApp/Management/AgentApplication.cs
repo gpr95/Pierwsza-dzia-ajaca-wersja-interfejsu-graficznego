@@ -52,6 +52,10 @@ namespace Management
                             Thread.Sleep(50);
                             management.connectToOtherNcc(received_Protocol.ConnectionToOtherNcc);
                             break;
+                        case ApplicationProtocol.ALLCLIENTS:
+                            UserInterface.log("Recived AllClients", ConsoleColor.Yellow);
+                            management.sendAllClients(received_Protocol.AllClients);
+                            break;
                         default:
                             break;
                     }

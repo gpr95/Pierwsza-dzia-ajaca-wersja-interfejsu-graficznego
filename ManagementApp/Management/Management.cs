@@ -202,5 +202,28 @@ namespace Management
             //Send info to NCC for creation soft pernament connecion;
             agentNcc.sendSoftPernament(nodeStart, end);
         }
+
+        internal void sendAllClients(List<string> list)
+        {
+            Dictionary<string, int> allClients = new Dictionary<string,int>();
+            int i = 0;
+            foreach(String s in list)
+            {
+                allClients.Add(s, i++);
+                log(s, ConsoleColor.Cyan);
+            }
+            foreach(Node n in nodeList)
+            {
+                Address a = new Address(n.Name);
+                if(a.type.Equals(192))
+                {
+                    ManagmentProtocol toSend = new ManagmentProtocol();
+                    toSend.State = ManagmentProtocol.POSSIBLEDESITATIONS;
+                    toSend.PossibleDestinations = allClients;
+                    string data = JSON.Serialize(JSON.FromValue(toSend));
+                    n.SocketWriter.Write(data);
+                }
+            }
+        }
     }
 }
