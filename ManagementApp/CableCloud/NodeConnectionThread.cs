@@ -184,14 +184,14 @@ namespace CableCloud
 
         private void consoleWriterWithKeepAliveChecking(String msg,Signal sig)
         {
-      //      if(sig.stm1 != null)
-        //    {
+            if(sig.stm1 != null)
+            {
                 Console.ForegroundColor = ConsoleColor.Black;
                 Console.BackgroundColor = ConsoleColor.White;
                 Console.WriteLine();
                 Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
             Console.Write(Environment.NewLine);
-            //  }
+              }
         }
 
     }
