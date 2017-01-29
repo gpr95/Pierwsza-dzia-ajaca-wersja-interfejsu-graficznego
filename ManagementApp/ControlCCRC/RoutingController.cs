@@ -38,7 +38,7 @@ namespace ControlCCRC
         public String requestNodeFrom;
         public String requestNodeTo;
         public int requestRate;
-        private int requestId;
+        public int requestId;
         private Dictionary<int, Dictionary<String, List<FIB>>> requestForFibs;
         private Dictionary<int, Dictionary<String, String>> requestIdAndRcNames;
         private ConnectionController ccHandler;
@@ -182,7 +182,7 @@ namespace ControlCCRC
                         case RCtoRCSignallingMessage.COUNT_ALL_PATHS_REQUEST:
                             pathNeededToBeCount = msg.AllUpperNodesToCountWeights;
                             upperRc = msg.Identifier;
-                            
+                            requestId = msg.RequestId;
                             if (socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count() > 0)
                             {
                                 lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count();
@@ -1198,6 +1198,7 @@ namespace ControlCCRC
             topologyUnallocatedLayer3.Remove(whoDied);
             wholeTopologyNodesAndConnectedNodesWithPorts.Remove(whoDied);
             socketHandler.Remove(whoDied);
+
         }
 
         public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate, int requestId, int vc1, int vc2, int vc3)
@@ -1237,6 +1238,7 @@ namespace ControlCCRC
                 RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
                 countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS_REQUEST;
                 countPathsMsg.Identifier = identifier;
+                countPathsMsg.RequestId = requestId;
                 countPathsMsg.AllUpperNodesToCountWeights = wholeTopologyNodesAndConnectedNodesWithPorts.Keys.ToList();
                 countPathsMsg.RateToCountWeights = rate;
                 String dataToSend = JSON.Serialize(JSON.FromValue(countPathsMsg));

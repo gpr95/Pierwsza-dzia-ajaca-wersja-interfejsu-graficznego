@@ -312,6 +312,7 @@ namespace ControlCCRC
             }
         }
 
+
         public void sendBorderNodesToNCC(Address adr, int domain)
         {
             CCtoNCCSingallingMessage borderNodeMsg = new CCtoNCCSingallingMessage();
@@ -336,6 +337,7 @@ namespace ControlCCRC
 
         internal void sendFIBRealeaseForSubnetwork(String rcName, int requestIdToRealese)
         {
+            consoleWriter("PROPER REQUEST ID:" + rcHandler.requestId);
             String ccName = rcName.Replace("RC", "CC"); ;
             CCtoCCSignallingMessage setFIBmsg = new CCtoCCSignallingMessage();
             setFIBmsg.State = CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM;
