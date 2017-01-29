@@ -65,7 +65,15 @@ namespace CableCloud
                 try
                 {
                     received_data = reader.ReadString();
-                    JSON receivedMessage = JSON.Deserialize(received_data);
+                    JSON receivedMessage = null;
+                    try
+                    {
+                        receivedMessage = JSON.Deserialize(received_data);
+                    }
+                    catch(Exception e)
+                    {
+                        continue;
+                    }
                     if (receivedMessage.Type == typeof(ConnectionProperties))
                     {
                         ConnectionProperties received_connection = receivedMessage.Value.ToObject<ConnectionProperties>();
