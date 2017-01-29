@@ -18,6 +18,7 @@ namespace ControlNCC
         private Thread thread;
         private TcpClient client;
         private NetworkCallControl control;
+        private BinaryWriter writer;
 
         public ManagementHandler(int port, NetworkCallControl control)
         {
@@ -34,7 +35,7 @@ namespace ControlNCC
             {
                 client = new TcpClient("127.0.0.1", this.port);
                 BinaryReader reader = new BinaryReader(client.GetStream());
-                BinaryWriter writer = new BinaryWriter(client.GetStream());
+                writer = new BinaryWriter(client.GetStream());
                 while (true)
                 {
                     string received_data = reader.ReadString();
@@ -68,6 +69,10 @@ namespace ControlNCC
                 Thread.Sleep(1000);
                 Environment.Exit(1);
             }
+        }
+        public void send(string address, List<int> slots)
+        {
+
         }
     }
 }

@@ -21,7 +21,7 @@ namespace ControlNCC
         private Dictionary<int, ControlConnectionService> services;
         public int domainNumber;
         private ControlConnectionService CCService;
-        private ManagementHandler management;
+        public ManagementHandler management;
         private int managementPort;
         private Dictionary<int, int> interdomainRequests;
         //private Dictionary<string, int> interdomainCalls;

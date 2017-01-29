@@ -89,17 +89,21 @@ namespace ControlNCC
                                 borderGWAddresses = handlerNCC.returnBorderGateway(addressFromOtherDomain.domain);
                                 string borderGWAddress = borderGWAddresses.First();
                                 handlerNCC.initInterdomanCallTask(packet.RequestID, borderGWAddress);
-                               // handlerNCC.addInterdomainCall(borderGWAddress, packet.RequestID);
+                                // handlerNCC.addInterdomainCall(borderGWAddress, packet.RequestID);
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, packet.destinationIdentifier, borderGWAddress, packet.RequestID);
                                 packetToNCC.domain = handlerNCC.domainNumber;
                                 packetToNCC.Vc11 = 1;
                                 packetToNCC.Vc12 = 1;
                                 packetToNCC.Vc13 = 1;
                                 serviceToNCC.send(packetToNCC);
-                                Console.WriteLine("[NCC]Send call request to next NCC, destination: "+packet.destinationIdentifier+" origin(BG address): "+ borderGWAddress);
+                                Console.WriteLine("[NCC]Send call request to next NCC, destination: " + packet.destinationIdentifier + " origin(BG address): " + borderGWAddress);
                             }
 
+                        } else if (packet.virtualInterface == ControlInterface.CALL_RELEASE_IN)
+                        {
+                            ///////////////////
                         }
+                       
                         else if (packet.virtualInterface == ControlInterface.NETWORK_CALL_COORDINATION_IN)
                         {
                             Console.WriteLine("[NCC] Receive NCC invitation from NCC in domain" + packet.RequestID);
@@ -223,27 +227,33 @@ namespace ControlNCC
                                 packetToNCC.Vc12 = packet.Vc12;
                                 packetToNCC.Vc13 = packet.Vc13;
                                 NCCService.send(packetToNCC);
+                                handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
                             }
                             else
                             {
                                 ControlConnectionService cpccCallService = handlerNCC.getService(packet.RequestID);
                                 ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.ACCEPT, packet.Rate, packet.NodeTo, packet.NodeTo, packet.RequestID);
+                                List<int> slots = new List<int>();
                                 if (packet.Vc11 != 0)
                                 {
 
                                     packetToCPCC.Vc11 = 1;
+                                    slots.Add(11);
                                 }
                                 if (packet.Vc12 != 0)
                                 {
                                     packetToCPCC.Vc12 = 1;
+                                    slots.Add(12);
                                 }
                                 if (packet.Vc13 != 0)
                                 {
                                     packetToCPCC.Vc13 = 1;
+                                    slots.Add(13);
                                 }
                                 cpccCallService.send(packetToCPCC);
-                                if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
-                                    handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
+                                handlerNCC.management.send(packet.NodeTo, slots);
+                                //if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
+                                  //  handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
                             }
 
 
