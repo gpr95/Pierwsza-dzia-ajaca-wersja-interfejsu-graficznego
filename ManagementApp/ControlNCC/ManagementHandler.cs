@@ -85,9 +85,15 @@ namespace ControlNCC
                 Environment.Exit(1);
             }
         }
-        public void send(string address, List<int> slots)
+        public void send(int reqid, string address)
         {
-
+            ManagmentProtocol protocol = new ManagmentProtocol();
+            protocol.State = ManagmentProtocol.SOFTPERNAMENT;
+            string id = reqid.ToString();
+            protocol.Name = id;
+            protocol.NodeEnd = address; 
+            String send_object = JSON.Serialize(JSON.FromValue(protocol));
+            writer.Write(send_object);
         }
     }
 }

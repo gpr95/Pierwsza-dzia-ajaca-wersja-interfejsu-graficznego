@@ -78,6 +78,7 @@ namespace NetNode
                 while (true)
                 {
                     string received_data = reader.ReadString();
+                    //Console.WriteLine(received_data);
                     JMessage received_object = JMessage.Deserialize(received_data);
                     if (received_object.Type == typeof(Signal))
                     {

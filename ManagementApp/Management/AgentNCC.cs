@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ManagementApp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,6 +35,33 @@ namespace Management
             writerNCC = new BinaryWriter(clientNCC.GetStream());
             readerNCC = new BinaryReader(clientNCC.GetStream());
             UserInterface.log("Connection successfully established with NCC.", ConsoleColor.Green);
+
+            try
+            {
+                while (true)
+                {
+                    string received_data = readerNCC.ReadString();
+                    JSON received_object = JSON.Deserialize(received_data);
+                    ManagmentProtocol received_Protocol = received_object.Value.ToObject<ManagmentProtocol>();
+
+                    if (received_Protocol.State == ManagmentProtocol.SOFTPERNAMENT)
+                    {
+                        Console.WriteLine("Received signal from NCC connection: " + received_Protocol.Name + " " + received_Protocol.NodeEnd);
+                        ManagementPlane.conn.Add(received_Protocol.Name, received_Protocol.NodeEnd);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Signal from management: undefined protocol", ConsoleColor.Red);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("\nError sending signal: " + e.Message, ConsoleColor.Red);
+                Thread.Sleep(2000);
+                Environment.Exit(1);
+            }
+
         }
 
         public void sendInfoToOtherNcc(List<int> nccPorts)

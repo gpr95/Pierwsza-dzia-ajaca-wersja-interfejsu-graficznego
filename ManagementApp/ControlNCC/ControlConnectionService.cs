@@ -293,7 +293,7 @@ namespace ControlNCC
                                     slots.Add(13);
                                 }
                                 cpccCallService.send(packetToCPCC);
-                                handlerNCC.management.send(packet.NodeTo, slots);
+                                handlerNCC.management.send(packet.RequestID, packet.NodeTo);
                                 //if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
                                   //  handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
                             }

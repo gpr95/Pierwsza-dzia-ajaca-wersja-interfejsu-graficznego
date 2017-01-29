@@ -521,6 +521,7 @@ namespace ClientWindow
         {
             conn.Add(id, virtualIP);
             comboBox2.Items.Add(virtualIP);
+            comboBox3.Items.Add(virtualIP);
         }
 
         private void button1_Click(object sender, EventArgs e)

@@ -26,6 +26,8 @@ namespace Management
         private List<NodeConnection> connectionList = new List<NodeConnection>();
         private static ManagmentProtocol protocol = new ManagmentProtocol();
 
+        public static Dictionary<string, string> conn = new Dictionary<string, string>();
+
         public ManagementPlane(string[] args)
         {
             int.TryParse(args[0], out this.APPLICATIONPORT);
@@ -224,6 +226,14 @@ namespace Management
                     n.SocketWriter.Write(data);
                 }
             }
+        }
+
+        public void getConnections()
+        {
+           foreach(var temp in conn)
+           {
+               Console.WriteLine("Connection id: "+temp.Key+ " to: "+temp.Value, ConsoleColor.Yellow);
+           }
         }
     }
 }
