@@ -37,7 +37,7 @@ namespace ManagementApp
 
         public bool istabVisible = false;
 
-        public Node a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, r, s;
+        public Node a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, r, s, t, u, w;
 
         public static int GAP
         {
@@ -73,6 +73,7 @@ namespace ManagementApp
             autoAgregacjaPortówToolStripMenuItem.Checked = true;
             wyczyśćScenariuszToolStripMenuItem.Enabled = false;
             scenariusz15ToolStripMenuItem.Enabled = false;
+            scenariusz25ToolStripMenuItem.Enabled = false;
             //fillTopology();
             //Thread t = new Thread(new ThreadStart(fillConnection));
             //t.Start();
@@ -1197,6 +1198,7 @@ namespace ManagementApp
             scenariusz1ToolStripMenuItem.Enabled = false;
             scenariusz15ToolStripMenuItem.Enabled = false;
             scenariusz2ToolStripMenuItem.Enabled = false;
+            scenariusz25ToolStripMenuItem.Enabled = true;
             wyczyśćScenariuszToolStripMenuItem.Enabled = true;
         }
 
@@ -1309,6 +1311,21 @@ namespace ManagementApp
             Refresh();
         }
 
+        private void fillTopologyTwoAndAHalf()
+        {
+            t = addN(11, 13);
+            u = addN(15, 13);
+            w = addN(19, 13);
+
+            connect(t, u);
+            connect(u, w);
+            connect(t, c);
+            connect(w, d);
+            controler.updateCableCloud();
+            Refresh();
+
+        }
+
         private void connect(Node x, Node y)
         {
             //Thread.Sleep(200);
@@ -1318,14 +1335,20 @@ namespace ManagementApp
 
         private Node addN(int x, int y)
         {
-            //Thread.Sleep(50);
+            Thread.Sleep(50);
             return controler.addNetwork(new Point(GAP * x, GAP * y));
         }
 
         private Node addC(int x, int y)
         {
-            //Thread.Sleep(10);
+            Thread.Sleep(10);
             return controler.addClient(new Point(GAP * x, GAP * y));
+        }
+
+        private void scenariusz25ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            fillTopologyTwoAndAHalf();
+            scenariusz25ToolStripMenuItem.Enabled = false;
         }
     }
 }
