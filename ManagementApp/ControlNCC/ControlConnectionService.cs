@@ -132,6 +132,9 @@ namespace ControlNCC
                                 packetToCC.NodeTo = packet.destinationIdentifier;
                                 packetToCC.Rate = packet.speed;
                                 packetToCC.RequestID = packet.RequestID;
+                                packetToCC.Vc11 = packet.Vc11;
+                                packetToCC.Vc12 = packet.Vc12;
+                                packetToCC.Vc13 = packet.Vc13;
                                 ControlConnectionService CCService = this.handlerNCC.getCCService();
                                 CCService.sendCCRequest(packetToCC);
                             }
