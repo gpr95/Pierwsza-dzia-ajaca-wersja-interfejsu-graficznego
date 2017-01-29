@@ -1116,7 +1116,7 @@ namespace ControlCCRC
                             wholeTopologyNodesAndConnectedNodesWithPorts[node][connectedNode]+ "]");
                     }
                 }
-                ccHandler.sendFibs(findPath(nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3,requestId);
+                ccHandler.sendFibs(findPath(nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3,requestId, rate);
             }
 
             foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC_")))
@@ -1302,7 +1302,7 @@ namespace ControlCCRC
             }
 
             ccHandler.sendFibs(findPathWithSubnetworks(
-                nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3, requestId);
+                nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3, requestId, rate);
             ///////TODO zestawianie fibow
         }
 

@@ -208,7 +208,7 @@ namespace ControlCCRC
 
         }
 
-        internal void sendFibs(Dictionary<string, List<FIB>> dictionary, int using1, int using2, int using3, int requestId)
+        internal void sendFibs(Dictionary<string, List<FIB>> dictionary, int using1, int using2, int using3, int requestId, int rate)
         {
             if (dictionary != null)
             {
@@ -227,6 +227,7 @@ namespace ControlCCRC
                 {
                     CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
                     finishMsg.State = CCtoNCCSingallingMessage.CC_CONFIRM;
+                    finishMsg.Rate = rate;
                     finishMsg.Vc11 = using1;
                     finishMsg.Vc12 = using2;
                     finishMsg.Vc13 = using3;
@@ -235,7 +236,11 @@ namespace ControlCCRC
                         rcHandler.wholeTopologyNodesAndConnectedNodesWithPorts[dictionary.Keys.Last()].Keys)
                     {
                         if (connectedNode.StartsWith("192"))
+                        {
                             finishMsg.NodeFrom = connectedNode;
+                            consoleWriter("###################" + connectedNode);
+                        }
+                            
                     }
                     finishMsg.RequestID = requestId;
                     String dataToSend = JSON.Serialize(JSON.FromValue(finishMsg));
