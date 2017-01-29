@@ -8,6 +8,7 @@ using System.Timers;
 
 using ClientWindow;
 using NetNode;
+using ManagementApp;
 
 namespace NetNode
 {
@@ -62,7 +63,6 @@ namespace NetNode
             {
                 if (temp[0] == "iam")
                 {
-                    //Console.WriteLine("received: "+temp[0] + " from " + temp[1]+"on port: "+port);
                     this.saveConnection(port, temp[1]);
                     confirmations[port] = false;
                 }
@@ -77,9 +77,8 @@ namespace NetNode
         private void sendMessageToOne(int port, string from)
         {
             string message = "iam " + this.virtualIp;
-            //Console.WriteLine("message " + message + "virt port: " + port);
             Signal signal = new Signal(port, message);
-            string data = JMessage.Serialize(JMessage.FromValue(signal));
+            string data = JSON.Serialize(JSON.FromValue(signal));
             writer.Write(data);
         }
 
@@ -88,9 +87,8 @@ namespace NetNode
             for (int i = 0; i < 21; i++)
             {
                 string message = "whoyouare " + this.virtualIp;
-                //Console.WriteLine("message " + message + "virt port: " + i);
                 Signal signal = new Signal(i, message);
-                string data = JMessage.Serialize(JMessage.FromValue(signal));
+                string data = JSON.Serialize(JSON.FromValue(signal));
 
                 if (!confirmations.ContainsKey(i))
                 {

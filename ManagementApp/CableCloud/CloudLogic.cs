@@ -59,22 +59,14 @@ namespace CableCloud
             consoleWriter("Connected with window application");
             TcpClient clienttmp = (TcpClient)connection;
             BinaryReader reader = new BinaryReader(clienttmp.GetStream());
-            bool noError = true;
-            while (noError)
+            while (true)
             {
                 string received_data = null;
                 try
                 {
                     received_data = reader.ReadString();
                     JSON receivedMessage = null;
-                    try
-                    {
-                        receivedMessage = JSON.Deserialize(received_data);
-                    }
-                    catch(Exception e)
-                    {
-                        continue;
-                    }
+                    receivedMessage = JSON.Deserialize(received_data);
                     if (receivedMessage.Type == typeof(ConnectionProperties))
                     {
                         ConnectionProperties received_connection = receivedMessage.Value.ToObject<ConnectionProperties>();
@@ -136,19 +128,25 @@ namespace CableCloud
         public void connectToNodes(int fromPort, int virtualFromPort,
                                     int toPort, int virtualToPort) 
         {
+            if (!portToThreadMap.ContainsKey(fromPort + ":" + virtualFromPort))
+            {
                 String connection1Name = +fromPort +
-                              "(virtual:" + virtualFromPort + ")-->" + toPort +
-                               "(virtual:" + virtualToPort + ")";
+                 "(virtual:" + virtualFromPort + ")-->" + toPort +
+                 "(virtual:" + virtualToPort + ")";
                 NodeConnectionThread fromThread = new NodeConnectionThread(
                     ref portToThreadMap, tableWithPorts, connection1Name, fromPort, virtualFromPort,
-                   toPort, virtualToPort);
-            Thread.Sleep(100);
-            String connection2Name = toPort +
-                              "(virtual:" + virtualToPort + ")-->" + fromPort +
-                               "(virtual:" + virtualFromPort + ")";
+                    toPort, virtualToPort);
+                Thread.Sleep(150);
+            }
+            if (!portToThreadMap.ContainsKey(toPort + ":" + virtualToPort))
+            {
+                String connection2Name = toPort +
+                 "(virtual:" + virtualToPort + ")-->" + fromPort +
+                 "(virtual:" + virtualFromPort + ")";
                 NodeConnectionThread toThread = new NodeConnectionThread(
                     ref portToThreadMap, tableWithPorts, connection2Name, toPort, virtualToPort, fromPort, virtualFromPort);
-            Thread.Sleep(100);
+                Thread.Sleep(150);
+            }
         }
 
 
@@ -173,7 +171,8 @@ namespace CableCloud
             Console.ForegroundColor = ConsoleColor.Black;
             Console.BackgroundColor = ConsoleColor.White;
 
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg + "\n");
+            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+            Console.Write(Environment.NewLine);
         }
     }
 }

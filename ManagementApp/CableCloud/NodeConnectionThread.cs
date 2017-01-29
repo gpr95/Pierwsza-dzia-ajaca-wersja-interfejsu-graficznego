@@ -58,6 +58,7 @@ namespace CableCloud
                 consoleWriter("Connection can't be made on port " + toPort);
                 return;
             }
+
             consoleWriter("Initialize connection: " + name);
             writer = new BinaryWriter(connection.GetStream());
             reader = new BinaryReader(connection.GetStream());
@@ -66,7 +67,7 @@ namespace CableCloud
             addNewCable(fromPort, virtualFromPort, toPort, virtualToPort);
             portToThreadMap.Add(fromPort + ":" + virtualFromPort, this);
             bool noError = true;
-            while (noError)
+            while (true)
             {
                 string received_data = null;
                 try
@@ -80,19 +81,11 @@ namespace CableCloud
                     consoleWriter("CONNECTION REMOVED FROM TABLE " + name);
                     return;
                 }
-                if (received_data == null || received_data.Length == 0)
-                    continue;
 
                 Signal signal = null;
                 JSON received_object = null;
-                try
-                {
-                    received_object = JSON.Deserialize(received_data);
-                }
-                catch (Exception e)
-                {
-                    continue;
-                }
+                received_object = JSON.Deserialize(received_data);
+
                 if (received_object.Type == typeof(Signal))
                 {
                     signal = received_object.Value.ToObject<Signal>();  
@@ -130,6 +123,7 @@ namespace CableCloud
                 {
                     consoleWriterWithKeepAliveChecking(ERROR_MSG + "received from node wrong data format. Node PORT: " + ((IPEndPoint)connection.Client.RemoteEndPoint).Port, signal);
                 }
+                Thread.Sleep(150);
             }
         }
 
@@ -185,17 +179,19 @@ namespace CableCloud
             Console.BackgroundColor = ConsoleColor.White;
             Console.WriteLine();
             Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
+            Console.Write(Environment.NewLine);
         }
 
         private void consoleWriterWithKeepAliveChecking(String msg,Signal sig)
         {
-            if(sig.stm1 != null)
-            {
+      //      if(sig.stm1 != null)
+        //    {
                 Console.ForegroundColor = ConsoleColor.Black;
                 Console.BackgroundColor = ConsoleColor.White;
                 Console.WriteLine();
                 Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:" + msg);
-            }
+            Console.Write(Environment.NewLine);
+            //  }
         }
 
     }
