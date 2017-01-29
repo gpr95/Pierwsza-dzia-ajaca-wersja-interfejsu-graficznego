@@ -64,8 +64,12 @@ namespace ControlNCC
                             packet.State = CCtoNCCSingallingMessage.NCC_SET_CONNECTION;
                             packet.NodeFrom = management_packet.NodeStart;
                             packet.NodeTo = management_packet.NodeEnd;
+                            packet.Vc11 = 1;
+                            packet.Vc12 = 1;
+                            packet.Vc13 = 1;
                             packet.Rate = management_packet.Speed;
                             packet.RequestID = r.Next(10000, 40000);
+                            control.addService(packet.RequestID, control.getCCService());
                             control.getCCService().sendCCRequest(packet);
                         }
                     }
