@@ -128,6 +128,7 @@ namespace ControlNCC
         public List<string> returnBorderGateway(int domain)
         {
             List<string> res = new List<string>();
+            
             foreach(var addresDomainPair in borderGateways)
             {
                 if(addresDomainPair.Value == domain)
@@ -166,24 +167,15 @@ namespace ControlNCC
             Address tmpAddress = new Address(addressToGetDomain);
             List<string> borderGWAddresses = new List<string>();
             borderGWAddresses = returnBorderGateway(tmpAddress.domain);
-            foreach (var addresDomain in borderGateways)
-            {
-                borderGWAddresses.Add(addresDomain.Key);
-            }
             string result = null;
-            
+            foreach(String used in intrerdomainCallsAttempts[interdomainRequestID])
+            {
+                Console.WriteLine("UZYTY id " + interdomainRequestID + ": " + used);
+            }
            for (int i = 0; i < borderGWAddresses.Count; i++)
             {
-                foreach (string borderGWAddressUsed in intrerdomainCallsAttempts[interdomainRequestID])
-                {
-                    Console.WriteLine("uzyte: " + borderGWAddressUsed + "porownuje z: " + borderGWAddresses[i]);
-                    if (borderGWAddresses[i] != borderGWAddressUsed)
-                    {
-                        result = borderGWAddresses[i];
-                        return result;
-                    }
-
-                }
+                if(!intrerdomainCallsAttempts[interdomainRequestID].Contains(borderGWAddresses[i]))
+                    return borderGWAddresses[i];
             }
 
             return result;
