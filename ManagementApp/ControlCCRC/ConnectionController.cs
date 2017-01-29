@@ -96,7 +96,7 @@ namespace ControlCCRC
 
             CCtoNCCSingallingMessage initMsg = new CCtoNCCSingallingMessage();
             initMsg.State = CCtoNCCSingallingMessage.INIT_FROM_CC;
-            String dataToSend = JMessage.Serialize(JMessage.FromValue(initMsg));
+            String dataToSend = JSON.Serialize(JSON.FromValue(initMsg));
             nccWriter.Write(dataToSend);
             socketHandler.Add("NCC", nccWriter);
 
@@ -106,7 +106,7 @@ namespace ControlCCRC
                 try
                 {
                     string received_data = reader.ReadString();
-                    JMessage received_object = JMessage.Deserialize(received_data);
+                    JSON received_object = JSON.Deserialize(received_data);
                     if (received_object.Type != typeof(CCtoNCCSingallingMessage))
                         noError = false;
                     CCtoNCCSingallingMessage msg = received_object.Value.ToObject<CCtoNCCSingallingMessage>();
@@ -134,7 +134,7 @@ namespace ControlCCRC
             CCtoCCSignallingMessage initMsg = new CCtoCCSignallingMessage();
             initMsg.Identifier = identifier;
             initMsg.State = CCtoCCSignallingMessage.CC_MIDDLE_INIT;
-            String send_object = JMessage.Serialize(JMessage.FromValue(initMsg));
+            String send_object = JSON.Serialize(JSON.FromValue(initMsg));
             ccWriter.Write(send_object);
 
 
@@ -144,7 +144,7 @@ namespace ControlCCRC
                 try
                 {
                     string received_data = reader.ReadString();
-                    JMessage received_object = JMessage.Deserialize(received_data);
+                    JSON received_object = JSON.Deserialize(received_data);
                     if (received_object.Type != typeof(CCtoCCSignallingMessage))
                         noError = false;
                     CCtoCCSignallingMessage msg = received_object.Value.ToObject<CCtoCCSignallingMessage>();
@@ -203,7 +203,7 @@ namespace ControlCCRC
             ccRequest.NodeTo = nodeTo;
             ccRequest.Rate = rate;
 
-            String dataToSend = JMessage.Serialize(JMessage.FromValue(ccRequest));
+            String dataToSend = JSON.Serialize(JSON.FromValue(ccRequest));
             socketHandler["CC_" + rcName.Substring(rcName.IndexOf("_") + 1)].Write(dataToSend);
 
         }
@@ -217,7 +217,7 @@ namespace ControlCCRC
                     CCtoCCSignallingMessage fibsMsg = new CCtoCCSignallingMessage();
                     fibsMsg.State = CCtoCCSignallingMessage.CC_UP_FIB_CHANGE;
                     fibsMsg.Fib_table = dictionary[nodeName];
-                    String dataOut = JMessage.Serialize(JMessage.FromValue(fibsMsg));
+                    String dataOut = JSON.Serialize(JSON.FromValue(fibsMsg));
                     socketHandler[nodeName].Write(dataOut);
                 }
             }
@@ -232,7 +232,7 @@ namespace ControlCCRC
                     finishMsg.Vc13 = using3;
                     finishMsg.NodeTo = dictionary.Keys.First();
                     finishMsg.RequestID = requestId;
-                    String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
+                    String dataToSend = JSON.Serialize(JSON.FromValue(finishMsg));
                     nccWriter.Write(dataToSend);
                 }
                 else
@@ -243,7 +243,7 @@ namespace ControlCCRC
                     finishMsg.Vc12 = using2;
                     finishMsg.Vc13 = using3;
                     finishMsg.RequestID = requestId;
-                    String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
+                    String dataToSend = JSON.Serialize(JSON.FromValue(finishMsg));
                     nccWriter.Write(dataToSend);
                 }
             }
@@ -257,7 +257,7 @@ namespace ControlCCRC
                     finishMsg.Vc12 = using2;
                     finishMsg.Vc13 = using3;
                     finishMsg.RequestID = requestId;
-                    String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
+                    String dataToSend = JSON.Serialize(JSON.FromValue(finishMsg));
                     ccWriter.Write(dataToSend);
                 }
                 else
@@ -265,7 +265,7 @@ namespace ControlCCRC
                     CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
                     finishMsg.State = CCtoNCCSingallingMessage.CC_REJECT;
                     finishMsg.RequestID = requestId;
-                    String dataToSend = JMessage.Serialize(JMessage.FromValue(finishMsg));
+                    String dataToSend = JSON.Serialize(JSON.FromValue(finishMsg));
                     ccWriter.Write(dataToSend);
                 }
             }
@@ -278,7 +278,7 @@ namespace ControlCCRC
             borderNodeMsg.State = CCtoNCCSingallingMessage.BORDER_NODE;
             borderNodeMsg.BorderNode = adr.getName();
             borderNodeMsg.BorderDomain = domain;
-            String dataToSend = JMessage.Serialize(JMessage.FromValue(borderNodeMsg));
+            String dataToSend = JSON.Serialize(JSON.FromValue(borderNodeMsg));
             nccWriter.Write(dataToSend);
         }
 
@@ -290,7 +290,7 @@ namespace ControlCCRC
             setFIBmsg.NodeFrom = nodeFrom;
             setFIBmsg.NodeTo = nodeTo;
             setFIBmsg.Rate = rate;
-            String dataToSend = JMessage.Serialize(JMessage.FromValue(setFIBmsg));
+            String dataToSend = JSON.Serialize(JSON.FromValue(setFIBmsg));
             socketHandler[ccName].Write(dataToSend);
         }
     }

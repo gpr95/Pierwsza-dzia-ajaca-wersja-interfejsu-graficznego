@@ -135,7 +135,7 @@ namespace ControlCCRC
             RCtoRCSignallingMessage initMsg = new RCtoRCSignallingMessage();
             initMsg.State = RCtoRCSignallingMessage.RC_FROM_SUBNETWORK_INIT;
             initMsg.Identifier = identifier;
-            String send_object = JMessage.Serialize(JMessage.FromValue(initMsg));
+            String send_object = JSON.Serialize(JSON.FromValue(initMsg));
             upperWriter.Write(send_object);
 
             Boolean noError = true;
@@ -144,7 +144,7 @@ namespace ControlCCRC
                 try
                 {
                     string received_data = reader.ReadString();
-                    JMessage received_object = JMessage.Deserialize(received_data);
+                    JSON received_object = JSON.Deserialize(received_data);
                     if (received_object.Type != typeof(RCtoRCSignallingMessage))
                         noError = false;
                     RCtoRCSignallingMessage msg = received_object.Value.ToObject<RCtoRCSignallingMessage>();
@@ -165,7 +165,7 @@ namespace ControlCCRC
                                     countPathsMsg.Identifier = identifier;
                                     countPathsMsg.AllUpperNodesToCountWeights = wholeTopologyNodesAndConnectedNodesWithPorts.Keys.ToList();
                                     countPathsMsg.RateToCountWeights = msg.RateToCountWeights;
-                                    String dataToSend = JMessage.Serialize(JMessage.FromValue(countPathsMsg));
+                                    String dataToSend = JSON.Serialize(JSON.FromValue(countPathsMsg));
                                     socketHandler[id].Write(dataToSend);
                                 }
                             }
@@ -207,7 +207,8 @@ namespace ControlCCRC
                         consoleWriter("[RC] Computing weights between: " + pathNeededToBeCount[i] + " and " + s + " with:"
                         + rate + "x VC-3");
                         connections.Add(s, findWeightBetweenTwoNodes(pathNeededToBeCount[i], s, rate));
-                        nodeConnectionsIntoSubnet.Add(pathNeededToBeCount[i], associatedNodeStart + "#" + associatedNodeStop);
+                        if(!nodeConnectionsIntoSubnet.ContainsKey(pathNeededToBeCount[i]))
+                            nodeConnectionsIntoSubnet.Add(pathNeededToBeCount[i], associatedNodeStart + "#" + associatedNodeStop);
                         consoleWriter("Computed weight  between:" + pathNeededToBeCount[i] + " and " + s +
                             "with w=" + connections[s]);
                     }
@@ -249,7 +250,7 @@ namespace ControlCCRC
             }
             countedPathValue.RateToCountWeights = rate;
             countedPathValue.Identifier = identifier;
-            String dataToSend = JMessage.Serialize(JMessage.FromValue(countedPathValue));
+            String dataToSend = JSON.Serialize(JSON.FromValue(countedPathValue));
             upperWriter.Write(dataToSend);
         }
 
@@ -1074,6 +1075,7 @@ namespace ControlCCRC
             topologyUnallocatedLayer2.Remove(whoDied);
             topologyUnallocatedLayer3.Remove(whoDied);
             wholeTopologyNodesAndConnectedNodesWithPorts.Remove(whoDied);
+            socketHandler.Remove(whoDied);
         }
 
         public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate, int requestId)
@@ -1106,7 +1108,7 @@ namespace ControlCCRC
                 countPathsMsg.Identifier = identifier;
                 countPathsMsg.AllUpperNodesToCountWeights = wholeTopologyNodesAndConnectedNodesWithPorts.Keys.ToList();
                 countPathsMsg.RateToCountWeights = rate;
-                String dataToSend = JMessage.Serialize(JMessage.FromValue(countPathsMsg));
+                String dataToSend = JSON.Serialize(JSON.FromValue(countPathsMsg));
                 socketHandler[id].Write(dataToSend);
             }
         }

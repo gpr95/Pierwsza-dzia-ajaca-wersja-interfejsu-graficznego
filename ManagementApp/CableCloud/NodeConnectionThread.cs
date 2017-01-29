@@ -74,7 +74,7 @@ namespace CableCloud
                     continue;
 
                 Signal signal = null;
-                JMessage received_object = JMessage.Deserialize(received_data);
+                JSON received_object = JSON.Deserialize(received_data);
                 if (received_object.Type == typeof(Signal))
                 {
                     signal = received_object.Value.ToObject<Signal>();  

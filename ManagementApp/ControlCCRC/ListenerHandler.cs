@@ -49,7 +49,7 @@ namespace ControlCCRC
                 try
                 {
                     string received_data = reader.ReadString();
-                    JMessage received_object = JMessage.Deserialize(received_data);
+                    JSON received_object = JSON.Deserialize(received_data);
                     if (received_object.Type == typeof(RCtoLRMSignallingMessage))
                     {
                         RCtoLRMSignallingMessage lrmMsg = received_object.Value.ToObject<RCtoLRMSignallingMessage>();
@@ -121,7 +121,7 @@ namespace ControlCCRC
                 }
                 catch(IOException ex)
                 {
-                    Environment.Exit(1);
+                    
                 }
             }
         }
@@ -136,7 +136,7 @@ namespace ControlCCRC
             msg.Fib_table = fibs;
             msg.State = CCtoCCSignallingMessage.CC_UP_FIB_CHANGE;
 
-            String send_object = JMessage.Serialize(JMessage.FromValue(msg));
+            String send_object = JSON.Serialize(JSON.FromValue(msg));
             writer.Write(send_object);
         }
 
