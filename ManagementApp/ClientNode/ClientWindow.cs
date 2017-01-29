@@ -165,7 +165,11 @@ namespace ClientWindow
                         }
                         else if (management_packet.State == Management.ManagmentProtocol.POSSIBLEDESITATIONS)
                         {
-
+                            foreach(var c in management_packet.PossibleDestinations)
+                            {
+                                if (!c.Key.Equals(virtualIP))
+                                    comboBox1.Items.Add(c.Key);
+                            }
                             //this.possibleDestinations = management_packet.PossibleDestinations;
                             //this.virtualPort = management_packet.Port;
                             ////logTextBox.AppendText("Virtual Port: " + virtualPort);
@@ -438,7 +442,12 @@ namespace ClientWindow
         private void connectButton_Click(object sender, EventArgs e)
         {
             try {
-                Address address = new Address(addressTextBox.Text);
+                Address address;
+                logTextBox.AppendText("#" + comboBox1.GetItemText(comboBox1.SelectedItem) + "#");
+                if (addressTextBox.Text.Equals(""))
+                    address = new Address(comboBox1.GetItemText(comboBox1.SelectedItem));
+                else
+                    address = new Address(addressTextBox.Text);
                 controlAgent.connect();
                 int speed;
                 bool res = int.TryParse(speedComboBox.SelectedItem.ToString(), out speed);
