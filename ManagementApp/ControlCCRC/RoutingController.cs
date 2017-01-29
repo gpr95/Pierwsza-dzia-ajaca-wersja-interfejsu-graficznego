@@ -51,9 +51,9 @@ namespace ControlCCRC
         private String associatedNodeStop;
         public Dictionary<string, string> myBorderNodeAndConnectedOtherBorderNodeMap;
 
-        public bool vc1Forbidden { get; private set; } = false;
-        public bool vc2Forbidden { get; private set; } = false;
-        public bool vc3Forbidden { get; private set; } = false;
+        public bool vc1Forbidden { get; private set; }
+        public bool vc2Forbidden { get; private set; }
+        public bool vc3Forbidden { get; private set; }
 
 
 
@@ -63,6 +63,10 @@ namespace ControlCCRC
         */
         public RoutingController(string[] args)
         {
+            vc1Forbidden = false;
+            vc2Forbidden = false;
+            vc3Forbidden = false;
+
             iAmDomain = (args.Length == 1);
             identifier = args[0];
             domainNumber = 0;
@@ -686,7 +690,14 @@ namespace ControlCCRC
                 layers.Add(2);
             if (vc33 != 0)
                 layers.Add(3);
-
+            List<int> lastFibs = new List<int>();
+            if (!vc1Forbidden)
+                lastFibs.Add(1);
+            if (!vc2Forbidden)
+                lastFibs.Add(2);
+            if (!vc3Forbidden)
+                lastFibs.Add(3);
+            int counter = 0;
             foreach (int layer in layers)
             {
 
@@ -727,33 +738,11 @@ namespace ControlCCRC
                         wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][internalNodeFrom],
                         layer + 10
                         ));
-                        int lastFib = layer;
-                        if (layer == 1 && vc1Forbidden)
-                        {
-                            if (!vc2Forbidden)
-                                lastFib = 2;
-                            else
-                                lastFib = 3;
-                        }
-                        else if (layer == 2 && vc2Forbidden)
-                        {
-                            if (!vc3Forbidden)
-                                lastFib = 3;
-                            else
-                                lastFib = 1;
-                        }
-                        else if (layer == 3 && vc3Forbidden)
-                        {
-                            if (!vc2Forbidden)
-                                lastFib = 2;
-                            else
-                                lastFib = 1;
-                        }
                         result[additionalPath[i + 1]].Add(new FIB(
                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i + 1]][internalNodeTo],
                        layer + 10,
                        wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i + 1]][additionalPath[i + 2]],
-                       lastFib + 10
+                       lastFibs[counter] + 10
                        ));
 
                         i++;
@@ -761,33 +750,11 @@ namespace ControlCCRC
                     }
                     if (i == additionalPath.Count - 2)
                     {
-                        int lastFib = layer;
-                        if (layer == 1 && vc1Forbidden)
-                        {
-                            if (!vc2Forbidden)
-                                lastFib = 2;
-                            else
-                                lastFib = 3;
-                        }
-                        else if (layer == 2 && vc2Forbidden)
-                        {
-                            if (!vc3Forbidden)
-                                lastFib = 3;
-                            else
-                                lastFib = 1;
-                        }
-                        else if (layer == 3 && vc3Forbidden)
-                        {
-                            if (!vc2Forbidden)
-                                lastFib = 2;
-                            else
-                                lastFib = 1;
-                        }
                         result[additionalPath[i]].Add(new FIB(
                            wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i - 1]],
                            layer + 10,
                            wholeTopologyNodesAndConnectedNodesWithPorts[additionalPath[i]][additionalPath[i + 1]],
-                           lastFib + 10
+                           lastFibs[counter] + 10
                            ));
                     }
                     else
@@ -800,6 +767,7 @@ namespace ControlCCRC
                             ));
                     }
                 }
+                counter++;
             }
 
             for(int i = 0; i < nodeFromListAndRcName.Count; i++)
