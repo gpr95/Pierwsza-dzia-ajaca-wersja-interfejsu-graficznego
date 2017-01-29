@@ -84,7 +84,19 @@ namespace CableCloud
 
                 Signal signal = null;
                 JSON received_object = null;
-                received_object = JSON.Deserialize(received_data);
+                try
+                {
+                    received_object = JSON.Deserialize(received_data);
+                }
+                catch(Exception e)
+                {
+                    string[] tempData = received_data.Split('{');
+                    string newData = "{" + tempData[1] + "{" + tempData[2];
+                    newData.Remove(newData.LastIndexOf('}'));
+                    received_object = JSON.Deserialize(newData);
+                    received_data = "";
+                }
+                
 
                 if (received_object.Type == typeof(Signal))
                 {
