@@ -41,18 +41,28 @@ namespace ManagementApp
 
         public void updateConnections(List<NodeConnection> connections)
         {
-            for (int i = 0; i < connections.Count; i++)
+            String data = JSON.Serialize(JSON.FromValue(connections.Select(n => n.Prop).ToList()));
+            try
             {
-                String data = JSON.Serialize(JSON.FromValue(connections[i].Prop));
-                try
-                {
-                    writerCableCloud.Write(data);
-                }
-                catch (SocketException e)
-                {
-                    Console.WriteLine(e.StackTrace);
-                }
+                writerCableCloud.Write(data);
             }
+            catch (SocketException e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+            //connectionList.Add(new NodeConnection(from, portFrom, to, portTo, from.Name + "-" + to.Name));
+            //for (int i = 0; i < connections.Count; i++)
+            //{
+            //    String data = JSON.Serialize(JSON.FromValue(connections[i].Prop));
+            //    try
+            //    {
+            //        writerCableCloud.Write(data);
+            //    }
+            //    catch (SocketException e)
+            //    {
+            //        Console.WriteLine(e.StackTrace);
+            //    }
+            //}
         }
         public void updateOneConnection()
         {

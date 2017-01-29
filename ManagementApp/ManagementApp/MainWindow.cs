@@ -1303,13 +1303,15 @@ namespace ManagementApp
             connect(n, l);
             connect(r, p);
             connect(s, o);
+            controler.updateCableCloud();
             Refresh();
         }
 
         private void connect(Node x, Node y)
         {
-            Thread.Sleep(200);
-            addConnection(x, getPort(x), y, getPort(y));
+            //Thread.Sleep(200);
+            //addConnection(x, getPort(x), y, getPort(y));
+            connectionList.Add(new NodeConnection(x, getPort(x), y, getPort(y), x.Name + "-" + y.Name));
         }
 
         private Node addN(int x, int y)
