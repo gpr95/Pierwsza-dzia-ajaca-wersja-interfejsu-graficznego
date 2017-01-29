@@ -86,10 +86,11 @@ namespace ControlNCC
                                 borderGWAddresses = handlerNCC.returnBorderGateway(addressFromOtherDomain.domain);
                                 string borderGWAddress = borderGWAddresses.First();
                                 handlerNCC.initInterdomanCallTask(packet.RequestID, borderGWAddress);
-                                handlerNCC.addInterdomainCall(borderGWAddress, packet.RequestID);
+                               // handlerNCC.addInterdomainCall(borderGWAddress, packet.RequestID);
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, packet.destinationIdentifier, borderGWAddress, packet.RequestID);
                                 packetToNCC.domain = handlerNCC.domainNumber;
                                 serviceToNCC.send(packetToNCC);
+                                Console.WriteLine("[NCC]Send call request to next NCC, destination: "+packet.destinationIdentifier+" origin(BG address): "+ borderGWAddress);
                             }
 
                         }
@@ -172,7 +173,7 @@ namespace ControlNCC
                                 else
                                 {
                                     handlerNCC.addIntrerdomainCallsAttempts(packet.RequestID, anotherBorderGWAddress);
-                                    handlerNCC.addInterdomainCall(anotherBorderGWAddress, packet.RequestID);
+                                   // handlerNCC.addInterdomainCall(anotherBorderGWAddress, packet.RequestID);
                                     Address address = new Address(handlerNCC.getCNAddressesForInterdomainCalls(packet.RequestID));
                                     ControlConnectionService serviceToNCC = handlerNCC.getService(address.domain);
                                     ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, packet.originIdentifier, anotherBorderGWAddress, packet.RequestID);

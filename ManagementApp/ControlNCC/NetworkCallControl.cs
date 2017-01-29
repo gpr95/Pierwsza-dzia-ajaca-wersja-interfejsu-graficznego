@@ -24,7 +24,7 @@ namespace ControlNCC
         private ManagementHandler management;
         private int managementPort;
         private Dictionary<int, int> interdomainRequests;
-        private Dictionary<string, int> interdomainCalls;
+        //private Dictionary<string, int> interdomainCalls;
         private Dictionary<int, List<string>> intrerdomainCallsAttempts;
         private Dictionary<int, string> CNAddressesForInterdomainCalls;
         private Dictionary<string, int> borderGateways;
@@ -35,7 +35,7 @@ namespace ControlNCC
             interdomainRequests = new Dictionary<int, int>();
             CNAddressesForInterdomainCalls = new Dictionary<int, string>();
             borderGateways = new Dictionary<string, int>();
-            interdomainCalls = new Dictionary<string, int>();
+            //interdomainCalls = new Dictionary<int, string>();
             intrerdomainCallsAttempts = new Dictionary<int, List<string>>();
             string ip = "127.0.0.1";
             int.TryParse(domainParams[0], out domainNumber);
@@ -136,16 +136,16 @@ namespace ControlNCC
             return res;
         }
 
-        public void addInterdomainCall(string borderGWaddress, int interdomainRequestID)
-        {
-            interdomainCalls.Add(borderGWaddress, interdomainRequestID);
-        }
+        //public void addInterdomainCall(string borderGWaddress, int interdomainRequestID)
+        //{
+        //    interdomainCalls.Add(borderGWaddress, interdomainRequestID);
+        //}
         public bool checkIfInterdomainCall(int interdomainRequestID)
         {
             bool result = false;
-            foreach (var borderGwRequestIDPair in interdomainCalls)
+            foreach (var borderGwRequestIDPair in intrerdomainCallsAttempts)
             {
-                if (borderGwRequestIDPair.Value == interdomainRequestID)
+                if (borderGwRequestIDPair.Key == interdomainRequestID)
                 {
                     result = true;
                     break;
@@ -188,11 +188,11 @@ namespace ControlNCC
 
         public void clearInterdomainCallAttempt(int interdomainCallRequestIDToClear)
         {
-            foreach (var tmp in interdomainCalls)
-            {
-                if (tmp.Value == interdomainCallRequestIDToClear)
-                    interdomainCalls.Remove(tmp.Key);
-            }
+            //foreach (var tmp in interdomainCalls)
+            //{
+            //    if (tmp.Value == interdomainCallRequestIDToClear)
+            //        interdomainCalls.Remove(tmp.Key);
+            //}
             intrerdomainCallsAttempts.Remove(interdomainCallRequestIDToClear);
         }
 
