@@ -516,11 +516,11 @@ namespace ControlCCRC
             Dictionary<String, List<FIB>> result = new Dictionary<string, List<FIB>>();
             String firstInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
                .Where(node => node.Value.ContainsKey(startNode)).FirstOrDefault().Key;
-            if (firstInMyNetwork.Equals(default(String)))
+            if (firstInMyNetwork == null || firstInMyNetwork.Equals(default(String)))
                 return null;
             String lastInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
                 .Where(node => node.Value.ContainsKey(endNode)).FirstOrDefault().Key;
-            if (lastInMyNetwork.Equals(default(String)))
+            if (lastInMyNetwork == null || lastInMyNetwork.Equals(default(String)))
                 return null;
 
             switch (howMuchVC3)
@@ -787,13 +787,13 @@ namespace ControlCCRC
             Dictionary<String, List<FIB>> result = new Dictionary<string, List<FIB>>();
             String firstInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
                 .Where(node => node.Value.ContainsKey(startNode)).FirstOrDefault().Key;
-            if (firstInMyNetwork.Equals(default(String)))
+            if (firstInMyNetwork == null || firstInMyNetwork.Equals(default(String)))
                 return null;
 
 
             String lastInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
                 .Where(node => node.Value.ContainsKey(endNode)).FirstOrDefault().Key;
-            if (lastInMyNetwork.Equals(default(String)))
+            if (lastInMyNetwork == null || lastInMyNetwork.Equals(default(String)))
                 return null;
 
             switch (howMuchVC3)
