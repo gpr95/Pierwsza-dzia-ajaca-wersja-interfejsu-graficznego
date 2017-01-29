@@ -63,7 +63,7 @@ namespace NetNode
                                 if (LRM.allocateResource(row.oport, row.out_cont))
                                 {
                                     sendTopologyAllocated(row.iport, row.in_cont);
-                                    sendTopologyAllocated(row.iport, row.in_cont);
+                                    sendTopologyAllocated(row.oport, row.out_cont);
                                     SwitchingField.addToSwitch(row);
                                     SwitchingField.addToSwitch(new FIB(row.oport, row.out_cont, row.iport, row.in_cont));
                                     sendConfirmation(row.iport, row.in_cont, true);
