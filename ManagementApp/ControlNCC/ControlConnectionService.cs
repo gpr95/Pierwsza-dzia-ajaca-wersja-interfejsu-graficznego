@@ -101,7 +101,15 @@ namespace ControlNCC
 
                         } else if (packet.virtualInterface == ControlInterface.CALL_RELEASE_IN)
                         {
-                            ///////////////////
+                            //RELEASE
+                            int id = packet.RequestID;
+                            Console.WriteLine("[CPCC] Release connection id: " + id);
+                            Console.WriteLine("[CC]Send connection release");
+                            CCtoNCCSingallingMessage packetToCC = new CCtoNCCSingallingMessage();
+                            packetToCC.State = CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID;
+                            packetToCC.RequestID = packet.RequestID;
+                            ControlConnectionService CCService = this.handlerNCC.getCCService();
+                            CCService.sendCCRequest(packetToCC);
                         }
                        
                         else if (packet.virtualInterface == ControlInterface.NETWORK_CALL_COORDINATION_IN)

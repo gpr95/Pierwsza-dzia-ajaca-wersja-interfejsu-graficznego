@@ -80,6 +80,13 @@ namespace NetNode
                             }
                         }
                     }
+                    else if (received_Protocol.State == CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM)
+                    {
+                        foreach (var temp in received_Protocol.Fib_table)
+                        {
+                          NetNode.log("deallocate" + temp.toString(),ConsoleColor.Green);
+                        }
+                    }
                     else
                     {
                         NetNode.log("Control Signal: undefined protocol", ConsoleColor.Red);
