@@ -88,7 +88,6 @@ namespace ClientWindow
                     Signal received_signal = received_object.Value.ToObject<Signal>();
                     if (received_signal.stm1 != null)
                     {
-                        Log2("DEBUG", "cos odebralo");
                         STM1 received_frame = received_signal.stm1;
                         if (received_frame.vc4.vc3List.Count > 0)
                         {
@@ -100,11 +99,9 @@ namespace ClientWindow
                                 receivedTextBox.AppendText(Environment.NewLine);
                                 Log1("IN", virtualIP, received_signal.port.ToString(), v.Key, "VC-3", v.Value.POH.ToString(), v.Value.C3);
                                 slots.Add(v.Key);
-                                Log2("DEBUG", "sloty w druga strone: " + v.Key);
                             }
 
                         }
-
                         else
                         {
                            
@@ -112,6 +109,14 @@ namespace ClientWindow
                             receivedTextBox.AppendText(Environment.NewLine);
                             Log1("IN", virtualIP, received_signal.port.ToString(), 1, "VC-4", received_frame.vc4.POH.ToString(), received_frame.vc4.C4);
                         }
+
+                        logTextBox.AppendText(Environment.NewLine);
+                        logTextBox.Paste("Path: \n");
+                        foreach(var log in received_signal.path)
+                        {
+                            logTextBox.Paste(log + " -> ");
+                        }
+                        logTextBox.Paste(this.virtualIP);
                     }
                     else if (received_signal.lrmProtocol != null)
                     {
@@ -211,7 +216,9 @@ namespace ClientWindow
                 }
                     STM1 frame = new STM1(adaptation(),vc3List);
                     //SYGNAL
-                    Signal signal = new Signal(virtualPort, frame);
+                    List<string> temp = new List<string>();
+                    temp.Add(this.virtualIP);
+                    Signal signal = new Signal(virtualPort, frame, temp);
                     string data = JMessage.Serialize(JMessage.FromValue(signal));
                     writer.Write(data);
                     foreach (KeyValuePair<int, VirtualContainer3> v in frame.vc4.vc3List)
@@ -258,7 +265,9 @@ namespace ClientWindow
                 }
                 frame = new STM1(adaptation(), vc3List);
                 //SYGNAL
-                signal = new Signal(virtualPort, frame);
+                List<string> temp = new List<string>();
+                temp.Add(this.virtualIP);
+                signal = new Signal(virtualPort, frame, temp);
                 data = JMessage.Serialize(JMessage.FromValue(signal));
 
 

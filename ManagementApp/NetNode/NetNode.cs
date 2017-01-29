@@ -29,6 +29,8 @@ namespace NetNode
         private Thread threadConsole;
         private Thread threadComutation;
 
+        private List<string> pathList = new List<string>();
+
         public NetNode(string[] args)
         {
             flag = true;
@@ -82,6 +84,7 @@ namespace NetNode
                         Signal received_signal = received_object.Value.ToObject<Signal>();
                         if(received_signal.stm1 != null)
                         {
+                            this.pathList = received_signal.path;
                             STM1 frame = received_signal.stm1;
                             int virtPort = received_signal.port;
                             consoleWriter("received signal on port: " + virtPort);
@@ -240,7 +243,8 @@ namespace NetNode
                         {
                             try
                             {
-                                Signal signal = new Signal(oport.port, frame);
+                                pathList.Add(this.virtualIp);
+                                Signal signal = new Signal(oport.port, frame, pathList);
                                 consoleWriter("sending signal port: " + signal.port);
                                 string data = JMessage.Serialize(JMessage.FromValue(signal));
                                 Console.WriteLine(data);
