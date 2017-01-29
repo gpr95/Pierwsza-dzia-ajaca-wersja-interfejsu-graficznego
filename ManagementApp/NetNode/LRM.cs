@@ -173,7 +173,7 @@ namespace NetNode
             return false;
         }
 
-        public static void deallocateResource(int port, int no_vc3)
+        public static bool deallocateResource(int port, int no_vc3)
         {
             foreach (var res in resources)
             {
@@ -181,8 +181,10 @@ namespace NetNode
                 {
                     Console.WriteLine("Deallocating on port: " + port + "vc3: " + no_vc3);
                     resources[resources.IndexOf(res)].status = false;
+                    return true;
                 }
             }
+            return false;
         }
 
         private static bool checkResources(int port, int amount)
