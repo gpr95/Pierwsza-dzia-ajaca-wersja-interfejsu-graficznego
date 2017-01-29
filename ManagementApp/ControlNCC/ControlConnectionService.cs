@@ -101,7 +101,8 @@ namespace ControlNCC
                                 Console.WriteLine("[NCC]Send call request to next NCC, destination: " + packet.destinationIdentifier + " origin(BG address): " + borderGWAddress);
                             }
 
-                        } else if (packet.virtualInterface == ControlInterface.CALL_RELEASE_IN)
+                        }
+                        else if (packet.virtualInterface == ControlInterface.CALL_RELEASE_IN)
                         {
                             //RELEASE
                             int id = packet.RequestID;
@@ -125,7 +126,7 @@ namespace ControlNCC
                                 Console.WriteLine("[NCC]Send call release to next NCC: ");
                             }
                         }
-                       
+
                         else if (packet.virtualInterface == ControlInterface.NETWORK_CALL_COORDINATION_IN)
                         {
                             Console.WriteLine("[NCC] Receive NCC invitation from NCC in domain" + packet.RequestID);
@@ -146,9 +147,10 @@ namespace ControlNCC
                                 Console.WriteLine("[NCC] Recived request to setup call from " + packet.originIdentifier + " to: " + packet.destinationIdentifier);
                                 if (handlerNCC.interdomainRequests.ContainsKey(packet.RequestID))
                                 {
-                                    Console.WriteLine("KOLEJNA PROBA Z INNYM GW: "+packet.originIdentifier);
-                                }else
-                                handlerNCC.addInterdomainRequest(packet.RequestID, packet.domain);
+                                    Console.WriteLine("KOLEJNA PROBA Z INNYM GW: " + packet.originIdentifier);
+                                }
+                                else
+                                    handlerNCC.addInterdomainRequest(packet.RequestID, packet.domain);
                                 // ZAKLADAMY TU ZE KAZDE NCC MA HANDLER NA INNE, INACZEJ SPRAWDZ DOMENE CZY TWOJA, NIE TO SLIJ DALEJ
                                 Console.WriteLine("[DIRECTORY]Receive local name");
                                 Console.WriteLine("[POLICY]Send policy out");
@@ -202,7 +204,7 @@ namespace ControlNCC
                                 if (counter < 0)
                                     break;
                                 Console.WriteLine("[Other NCC] CALL REJECTED");
-                               // handlerNCC.showInterdomainAttemptsForRequestID(packet.RequestID);
+                                // handlerNCC.showInterdomainAttemptsForRequestID(packet.RequestID);
                                 Console.WriteLine("Szukam borderow dla ip: " + packet.destinationIdentifier);
                                 String anotherBorderGWAddress = handlerNCC.getAnotherBorderGatewayAddress(packet.RequestID, packet.originIdentifier);
                                 Console.WriteLine("Znaleziony border GW: " + anotherBorderGWAddress);
@@ -256,7 +258,8 @@ namespace ControlNCC
 
 
                             Console.WriteLine("[CC]Receive connection confirm");
-                            handlerNCC.rejectedDestinations.Remove(packet.RequestID);
+                            if (handlerNCC.rejectedDestinations.ContainsKey(packet.RequestID))
+                                handlerNCC.rejectedDestinations.Remove(packet.RequestID);
                             if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
                             {
                                 ControlConnectionService NCCService = handlerNCC.getService(handlerNCC.getDomainService(packet.RequestID));
@@ -295,7 +298,7 @@ namespace ControlNCC
                                 cpccCallService.send(packetToCPCC);
                                 handlerNCC.management.send(packet.RequestID, packet.NodeTo);
                                 //if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
-                                  //  handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
+                                //  handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
                             }
 
 
@@ -310,7 +313,7 @@ namespace ControlNCC
                                 //Nodeto GW, NodeFrom CN in other domain address
                                 Console.WriteLine("[CC]Destination node to previous ncc: " + handlerNCC.rejectedDestinations[packet.RequestID]);
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_REQUEST_ACCEPT, ControlPacket.REJECT, packet.Rate, packet.NodeTo, handlerNCC.rejectedDestinations[packet.RequestID], packet.RequestID);
-                                 packetToNCC.domain = handlerNCC.domainNumber;
+                                packetToNCC.domain = handlerNCC.domainNumber;
                                 NCCService.send(packetToNCC);
                                 handlerNCC.rejectedDestinations.Remove(packet.RequestID);
                             }
