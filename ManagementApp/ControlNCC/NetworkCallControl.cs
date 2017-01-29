@@ -135,6 +135,11 @@ namespace ControlNCC
                     res.Add(addresDomainPair.Key);
                 }
             }
+            List<int> sortedResult = res.Select(n => new Address(n).space).ToList();
+            sortedResult.Sort();
+
+            res = res.OrderBy(n => n).ToList();
+
             return res;
         }
 
