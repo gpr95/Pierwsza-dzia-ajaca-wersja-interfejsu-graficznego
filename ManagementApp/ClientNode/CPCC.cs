@@ -57,6 +57,7 @@ namespace ClientWindow
                         {
                             if (packet.state == ControlPacket.ACCEPT)
                             {
+                                clientWindowHandler.addToConnectionCombobox(packet.RequestID, packet.destinationIdentifier);
                                 clientWindowHandler.slots.Clear();
                                 if(packet.Vc11  != 0)
                                 {
@@ -98,8 +99,16 @@ namespace ClientWindow
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
             clientWindowHandler.Log2("CONTROL", "send request on " + ControlInterface.CALL_REQUEST + " interface for"+ clientName);
-
         }
 
+
+        public void sendRelease(int id)
+        {
+            ControlPacket packet = new ControlPacket(ControlInterface.CALL_RELEASE_IN, ControlPacket.IN_PROGRESS, 0, "", clientWindowHandler.virtualIP, id);
+            string data = JMessage.Serialize(JMessage.FromValue(packet));
+            writer.Write(data);
+            clientWindowHandler.Log2("CONTROL", "send release on " + ControlInterface.CALL_RELEASE_IN);
+ 
+        }
     }
 }

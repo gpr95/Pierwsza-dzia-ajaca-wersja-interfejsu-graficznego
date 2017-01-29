@@ -28,7 +28,7 @@ namespace ClientWindow
         private CPCC controlAgent;
         public List<int> slots;
         Random r;
-
+        private Dictionary<int, string> conn = new Dictionary<int,string>();
 
         public ClientWindow(string[] args)
         {
@@ -513,6 +513,24 @@ namespace ClientWindow
             //portTextBox.Clear();
         }
 
-        
+        public void addToConnectionCombobox(int id, string virtualIp)
+        {
+            conn.Add(id, virtualIP);
+            comboBox2.Items.Add(virtualIP);
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            string ip = comboBox2.GetItemText(comboBox2.SelectedItem);
+            int id;
+            foreach (var temp in conn)
+            {
+                if(temp.Value == ip)
+                {
+                    id = temp.Key;
+                    controlAgent.sendRelease(id);
+                }
+            }
+        }
     }
 }
