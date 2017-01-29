@@ -17,6 +17,8 @@ namespace ControlCCRC.Protocols
         public const int CC_REJECT = 3;
         // CC sending border node address to NCC
         public const int BORDER_NODE = 4;
+        // NCC - release connection from ID
+        public const int NCC_RELEASE_WITH_ID = 5;
 
 
 

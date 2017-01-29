@@ -39,6 +39,7 @@ namespace ControlCCRC
         public String requestNodeTo;
         public int requestRate;
         private int requestId;
+        private Dictionary<int, Dictionary<String, List<FIB>>> requestForFibs;
 
         private ConnectionController ccHandler;
         private Dictionary<String, BinaryWriter> socketHandler;
@@ -66,6 +67,7 @@ namespace ControlCCRC
             vc1Forbidden = false;
             vc2Forbidden = false;
             vc3Forbidden = false;
+            requestForFibs = new Dictionary<int, Dictionary<string, List<FIB>>>();
 
             iAmDomain = (args.Length == 1);
             identifier = args[0];
@@ -774,6 +776,7 @@ namespace ControlCCRC
                 ccHandler.sendFIBSettingRequestForSubnetwork(nodeFromListAndRcName.Keys.ElementAt(i), 
                     nodeToListAndRcName.Keys.ElementAt(i), nodeFromListAndRcName.Values.ElementAt(i), vc31 + vc32 + vc33);
 
+            requestForFibs.Add(requestId, result);
             return result;
         }
 
@@ -1326,7 +1329,7 @@ namespace ControlCCRC
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(requestNodeFrom + "#" + path[0], out temp);
                         Console.WriteLine("DEBUG###: " + temp);
 
-                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, requestNodeFrom, path[0], rate);
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, requestNodeFrom, path[0], rate,requestId);
                     }
                     for(int i = 0; i < path.Count-1; i++)
                     {
@@ -1335,7 +1338,7 @@ namespace ControlCCRC
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(path[i] + "#" + path[i+1], out temp);
                         Console.WriteLine("DEBUG###: " + temp);
 
-                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, path[i], path[i+1], rate);
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, path[i], path[i+1], rate, requestId);
                     }
                     if (mapNodeConnectedNodeAndAssociatedRCSubnetwork.ContainsKey(path.Last() + "#" + requestNodeTo))
                     {
@@ -1344,7 +1347,7 @@ namespace ControlCCRC
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(path.Last() + "#" + requestNodeTo, out temp);
                         Console.WriteLine("DEBUG###: " + temp);
 
-                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, path.Last(), requestNodeTo, rate);
+                        ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, path.Last(), requestNodeTo, rate, requestId);
                     }
                 }
                 else
@@ -1422,6 +1425,14 @@ namespace ControlCCRC
                 {
                     sendCountedWeightsToUpperNode(rate);
                 }
+            }
+        }
+
+        public void releaseConnection(int requestIdToRealese)
+        {
+            foreach(String node in requestForFibs[requestIdToRealese].Keys)
+            {
+                
             }
         }
 

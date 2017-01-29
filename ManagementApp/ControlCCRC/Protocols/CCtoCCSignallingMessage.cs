@@ -21,7 +21,9 @@ namespace ControlCCRC.Protocols
         public const int CC_BUILD_PATH_REQUEST = 4;
 
         public const int FIB_SETTING_TOP_BOTTOM = 5;
-        
+
+        // release
+        public const int REALEASE_TOP_BOTTOM = 5;
 
 
         private int state;
@@ -36,6 +38,7 @@ namespace ControlCCRC.Protocols
         private String nodeFrom;
         private String nodeTo;
         private int rate;
+        private int requestId;
 
         private int vc1 =1;
         private int vc2 =1;
@@ -168,6 +171,19 @@ namespace ControlCCRC.Protocols
             set
             {
                 vc3 = value;
+            }
+        }
+
+        public int RequestId
+        {
+            get
+            {
+                return requestId;
+            }
+
+            set
+            {
+                requestId = value;
             }
         }
     }

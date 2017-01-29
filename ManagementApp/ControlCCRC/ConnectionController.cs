@@ -118,7 +118,9 @@ namespace ControlCCRC
                             consoleWriter("VC1 SENDING TO SUBNETWORK :" + msg.Vc11);
                             consoleWriter("VC2 SENDING TO SUBNETWORK :" + msg.Vc12);
                             consoleWriter("VC3 SENDING TO SUBNETWORK :" + msg.Vc13);
-
+                            break;
+                        case CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID:
+                            ////////////////
                             break;
                     }
                 }
@@ -158,7 +160,7 @@ namespace ControlCCRC
                         case CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST:
                             Console.WriteLine("received CC_BUILD_PATH_REQUEST: " + this.identifier);
                            // lowerCcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("CC_")).ToList().Count();
-                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, 0, msg.Vc1, msg.Vc2, msg.Vc3);
+                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestId, msg.Vc1, msg.Vc2, msg.Vc3);
                             break;
                         case CCtoCCSignallingMessage.FIB_SETTING_TOP_BOTTOM:
                             rcHandler.startProperWeigthComputingTopBottom(new Dictionary<string, Dictionary<string, int>>(),
@@ -174,17 +176,6 @@ namespace ControlCCRC
             }
         }
 
-        public void setFibsFromRC(Dictionary<String, List<FIB>> fibs)
-        {
-            if (fibs != null)
-                for (int i = 0; i < fibs.Count; i++)
-                {
-                   // socketHandler[fibs.Keys.ElementAt(i)].writeFIB(fibs.Values.ElementAt(i));
-                }
-            else
-                consoleWriter("[ERROR] FIBS null - connection can't be made.");
-        }
-
         private void consoleStart()
         {
             consoleWriter("[INIT] Started.");
@@ -198,7 +189,7 @@ namespace ControlCCRC
             Console.Write(Environment.NewLine);
         }
 
-        internal void sendRequestToSubnetworkCCToBuildPath(string rcName, string nodeFrom, string nodeTo, int rate)
+        internal void sendRequestToSubnetworkCCToBuildPath(string rcName, string nodeFrom, string nodeTo, int rate, int requestId)
         {
             Console.WriteLine("CC_BUILD_PATH_REQUEST to: " + rcName);
             CCtoCCSignallingMessage ccRequest = new CCtoCCSignallingMessage();
@@ -206,6 +197,7 @@ namespace ControlCCRC
             ccRequest.NodeFrom = nodeFrom;
             ccRequest.NodeTo = nodeTo;
             ccRequest.Rate = rate;
+            ccRequest.RequestId = requestId;
             if (rcHandler.vc1Forbidden)
                 ccRequest.Vc1 = 0;
             else
