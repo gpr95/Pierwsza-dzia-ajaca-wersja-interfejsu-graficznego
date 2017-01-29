@@ -35,44 +35,6 @@ namespace ManagementApp
             mainWindow.setLists(nodeList, domainList, subnetworkList, connectionList);
             cableHandler = new CloudCableHandler(connectionList, CLOUDPORT);
             managHandler = new ManagementHandler(MANAGPORT, nodeConnectionPort);
-
-            //Thread t = new Thread(new ThreadStart(fillTopology));
-            //t.Start();
-            //fillTopology();
-        }
-
-        private void fillTopology()
-        {
-            Thread.Sleep(5000);
-            addDomainToQueue(new Point(60, 200), new Point(320, 320));
-            Thread.Sleep(1000);
-            addSubnetworkToQueue(new Point(100, 220), new Point(440, 300));
-            Thread.Sleep(1000);
-            addSubnetworkToQueue(new Point(220, 240), new Point(360, 280));
-            Thread.Sleep(1000);
-            Node a = addNetwork(new Point(260,260));
-            Node b = addNetwork(new Point(320, 260));
-            Node c = addNetwork(new Point(200, 260));
-            Node d = addNetwork(new Point(380, 260));
-            Node e = addNetwork(new Point(120, 260));
-            Node f = addNetwork(new Point(420, 260));
-            Node g = addClient(new Point(120, 220));
-            Node h = addClient(new Point(420, 220));
-            Thread.Sleep(2000);
-            mainWindow.addConnection(a, mainWindow.getPort(a), b, mainWindow.getPort(b));
-            Thread.Sleep(2000);
-            mainWindow.addConnection(a, mainWindow.getPort(a), c, mainWindow.getPort(c));
-            Thread.Sleep(2000);
-            mainWindow.addConnection(c, mainWindow.getPort(c), e, mainWindow.getPort(e));
-            Thread.Sleep(2000);
-            mainWindow.addConnection(e, mainWindow.getPort(e), g, mainWindow.getPort(g));
-            Thread.Sleep(2000);
-            mainWindow.addConnection(b, mainWindow.getPort(b), d, mainWindow.getPort(d));
-            Thread.Sleep(2000);
-            mainWindow.addConnection(d, mainWindow.getPort(d), f, mainWindow.getPort(f));
-            Thread.Sleep(2000);
-            mainWindow.addConnection(f, mainWindow.getPort(f), h, mainWindow.getPort(h));
-            mainWindow.Refresh();
         }
 
         internal Node addClient(Point point)
@@ -400,6 +362,21 @@ namespace ManagementApp
                     return null;
             }
             return output;
+        }
+
+        public void sendClientList()
+        {
+            //Create list
+            List<String> toSend = new List<string>();
+            foreach(Node n in nodeList)
+            {
+                if(n.Type == Node.NodeType.CLIENT)
+                    toSend.Add(n.Name);
+            }
+            foreach(Domain d in domainList)
+            {
+                d.ManagementH.sendAllClients(toSend);
+            }
         }
     }
 }

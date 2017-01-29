@@ -92,5 +92,15 @@ namespace ManagementApp
                 writerManagement.Write(data);
             }
         }
+
+        internal void sendAllClients(List<string> clientList)
+        {
+            ApplicationProtocol toSend = new ApplicationProtocol();
+            toSend.State = ApplicationProtocol.ALLCLIENTS;
+            toSend.AllClients = clientList;
+            string data = JSON.Serialize(JSON.FromValue(toSend));
+            threadManagement = new Thread(new ParameterizedThreadStart(tryToSendData));
+            threadManagement.Start(data);
+        }
     }
 }

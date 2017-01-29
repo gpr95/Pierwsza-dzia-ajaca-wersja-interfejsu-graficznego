@@ -1162,6 +1162,7 @@ namespace ManagementApp
         {
             fillTopologyOne();
             label3.Visible = true;
+            controler.sendClientList();
             scenariusz1ToolStripMenuItem.Enabled = false;
             wyczyśćScenariuszToolStripMenuItem.Enabled = true;
             scenariusz2ToolStripMenuItem.Enabled = false;
@@ -1181,6 +1182,7 @@ namespace ManagementApp
         {
             fillTopologyOneAndAHalf();
             label3.Visible = true;
+            controler.sendClientList();
             scenariusz1ToolStripMenuItem.Enabled = false;
             scenariusz15ToolStripMenuItem.Enabled = false;
             scenariusz2ToolStripMenuItem.Enabled = false;
@@ -1191,6 +1193,7 @@ namespace ManagementApp
         {
             fillTopologyTwo();
             label3.Visible = true;
+            controler.sendClientList();
             scenariusz1ToolStripMenuItem.Enabled = false;
             scenariusz15ToolStripMenuItem.Enabled = false;
             scenariusz2ToolStripMenuItem.Enabled = false;

@@ -460,7 +460,7 @@ namespace ClientWindow
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            string destinationNode = nodeTextBox.Text;
+            string destinationNode = "";
 
             int slot;
             bool res = int.TryParse(slotTextBox.Text, out slot);
@@ -479,7 +479,7 @@ namespace ClientWindow
                 List<string> destinations = new List<string>(this.possibleDestinations.Keys);
                 addressTextBox.Text = destinationNode;
 
-                nodeTextBox.Clear();
+                //nodeTextBox.Clear();
                 slotTextBox.Clear();
             }
             else
@@ -490,7 +490,7 @@ namespace ClientWindow
             }
 
             int virtualPort;
-            bool res2 = int.TryParse(portTextBox.Text, out virtualPort);
+            bool res2 = int.TryParse("", out virtualPort);
             if (res2)
             {
                 this.virtualPort = virtualPort;
@@ -501,7 +501,7 @@ namespace ClientWindow
                 logTextBox.AppendText(Environment.NewLine);
 
             }
-            portTextBox.Clear();
+            //portTextBox.Clear();
         }
 
         

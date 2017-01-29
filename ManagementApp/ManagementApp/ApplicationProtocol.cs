@@ -11,7 +11,7 @@ namespace ManagementApp
         public const int CONNECTIONTONCC = 0;
         public const int KILL = 1;
         public const int TOOTHERNCC = 2;
-        public const int D = 3;
+        public const int ALLCLIENTS = 3;
         public const int E = 4;
         public const int F = 5;
         public const int G = 6;
@@ -20,6 +20,7 @@ namespace ManagementApp
         private int state;
         private List<String> connectionToNcc;
         private List<int> connectionToOtherNcc;
+        private List<String> allClients;
 
         public int State
         {
@@ -57,6 +58,19 @@ namespace ManagementApp
             set
             {
                 connectionToOtherNcc = value;
+            }
+        }
+
+        public List<String> AllClients
+        {
+            get
+            {
+                return allClients;
+            }
+
+            set
+            {
+                allClients = value;
             }
         }
     }
