@@ -1,4 +1,5 @@
 ﻿using ClientWindow;
+using ManagementApp;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -74,7 +75,15 @@ namespace CableCloud
                     continue;
 
                 Signal signal = null;
-                JSON received_object = JSON.Deserialize(received_data);
+                JSON received_object = null;
+                try
+                {
+                    received_object = JSON.Deserialize(received_data);
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
                 if (received_object.Type == typeof(Signal))
                 {
                     signal = received_object.Value.ToObject<Signal>();  
