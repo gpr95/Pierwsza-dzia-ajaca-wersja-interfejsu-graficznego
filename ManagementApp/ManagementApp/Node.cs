@@ -41,6 +41,8 @@ namespace ManagementApp
                 startInfo.Arguments = parameters;
 
                 this.ProcessHandle = Process.Start(startInfo);
+                Thread.Sleep(100);
+                Program.SwitchToThisWindow(Process.GetCurrentProcess().MainWindowHandle, true);
             }
             else if (n.Equals(NodeType.NETWORK))
             {
@@ -55,7 +57,12 @@ namespace ManagementApp
                 startInfo.Arguments = parameters;
 
                 this.ProcessHandle = Process.Start(startInfo);
+                Thread.Sleep(50);
+                Program.SwitchToThisWindow(Process.GetCurrentProcess().MainWindowHandle, true);
             }
+            //Thread.Sleep(100);
+            //System.Diagnostics.Process me = System.Diagnostics.Process.GetCurrentProcess();
+            //Program.SwitchToThisWindow(me.MainWindowHandle, true);
         }
 
         public Node(Node n) : this(n.Position, n.Type, n.Name, n.LocalPort, n.ManagmentPort, n.CcRcPort, n.NccPort)
