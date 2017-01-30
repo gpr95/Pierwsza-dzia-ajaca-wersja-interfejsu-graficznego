@@ -900,7 +900,8 @@ namespace ControlCCRC
                                 Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
                             }
                         }
-
+                        if (!requestForFibs.ContainsKey(requestId))
+                            requestForFibs.Add(requestId, result);
                         return result;
                     }
                     else
@@ -1014,7 +1015,8 @@ namespace ControlCCRC
                                 ));
                         }
                     }
-
+                    if (!requestForFibs.ContainsKey(requestId))
+                        requestForFibs.Add(requestId, result);
                     return result;
                 case 3:
                     List<String> path31 = null;
@@ -1068,6 +1070,8 @@ namespace ControlCCRC
                                     ));
                             }
                         }
+                        if(!requestForFibs.ContainsKey(requestId))
+                        requestForFibs.Add(requestId, result);
                         return result;
                     }
                     else
@@ -1194,16 +1198,18 @@ namespace ControlCCRC
             topologyUnallocatedLayer3.Remove(whoDied);
             wholeTopologyNodesAndConnectedNodesWithPorts.Remove(whoDied);
             socketHandler.Remove(whoDied);
-
+            if(requestForFibs.ContainsKey(requestId) && requestForFibs[requestId].ContainsKey(whoDied))
+                requestForFibs[requestId].Remove(whoDied);
 
             if (iAmDomain)
             {
-                initConnectionRequestFromCC(requestNodeFrom, requestNodeTo, requestRate, requestId, 1, 1, 1);
+                releaseConnection(requestId);
+                initConnectionRequestFromCC(requestNodeFrom, requestNodeTo, requestRate, requestId, 1, 1, 1,true);
             }
 
         }
 
-        public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate, int requestId, int vc1, int vc2, int vc3)
+        public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate, int requestId, int vc1, int vc2, int vc3, bool routed)
         {
             consoleWriter("[CC] Received request for path between:" + nodeFrom
                                 + " and " + nodeTo + " with " + rate + "x VC-3 , requestId=" + requestId);
@@ -1221,7 +1227,7 @@ namespace ControlCCRC
 
             if(lowerRcRequestedInAction == 0)
             {
-                ccHandler.sendFibs(findPath(nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3,requestId, rate);
+                ccHandler.sendFibs(findPath(nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3,requestId, rate, routed);
             }
 
             foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC_")))
@@ -1366,7 +1372,7 @@ namespace ControlCCRC
             }
 
             ccHandler.sendFibs(findPathWithSubnetworks(
-                nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3, requestId, rate);
+                nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3, requestId, rate, false);
             ///////TODO zestawianie fibow
         }
 

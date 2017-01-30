@@ -114,7 +114,7 @@ namespace ControlCCRC
                     {
                         // POPRAWIC
                         case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:
-                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestID, msg.Vc11, msg.Vc12, msg.Vc13);
+                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestID, msg.Vc11, msg.Vc12, msg.Vc13, false);
                             consoleWriter("[NCC] Received request for connection between:" + msg.NodeFrom 
                                 + " and " + msg.NodeTo + " with " + msg.Rate + "x VC-3 , requestId=" + msg.RequestID);
                             break;
@@ -159,7 +159,7 @@ namespace ControlCCRC
                     {
                         case CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST:
                             rcHandler.initConnectionRequestFromCC(msg.NodeFrom,
-                                msg.NodeTo, msg.Rate, msg.RequestId, msg.Vc1, msg.Vc2, msg.Vc3);
+                                msg.NodeTo, msg.Rate, msg.RequestId, msg.Vc1, msg.Vc2, msg.Vc3, false);
                             Console.WriteLine("[UPPER CC] Received build path request for connection between:" + msg.NodeFrom
                                 + " and " + msg.NodeTo + " with " + msg.Rate + "x VC-3 , requestId=" + msg.RequestId);
                             break;
@@ -229,7 +229,7 @@ namespace ControlCCRC
 
         }
 
-        internal void sendFibs(Dictionary<string, List<FIB>> dictionary, int using1, int using2, int using3, int requestId, int rate)
+        internal void sendFibs(Dictionary<string, List<FIB>> dictionary, int using1, int using2, int using3, int requestId, int rate, bool routed)
         {
             if (dictionary != null)
             {
@@ -242,6 +242,8 @@ namespace ControlCCRC
                     socketHandler[nodeName].Write(dataOut);
                 }
             }
+            if (routed)
+                return;
             if(iAmDomain)
             {
                 if (dictionary != null)
