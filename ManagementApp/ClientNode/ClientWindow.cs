@@ -519,7 +519,14 @@ namespace ClientWindow
 
         public void addToConnectionCombobox(int id, string virtualIp)
         {
-            conn.Add(id, virtualIP);
+            if (conn.ContainsKey(id))
+            {
+
+            }else
+            {
+                conn.Add(id, virtualIP);
+            }
+
             comboBox2.Items.Add(virtualIP);
             comboBox3.Items.Add(virtualIP);
         }
