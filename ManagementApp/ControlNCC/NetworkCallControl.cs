@@ -170,7 +170,7 @@ namespace ControlNCC
             string result = null;
             foreach(String used in intrerdomainCallsAttempts[interdomainRequestID])
             {
-                Console.WriteLine("UZYTY id " + interdomainRequestID + ": " + used);
+                //Console.WriteLine("UZYTY id " + interdomainRequestID + ": " + used);
             }
            for (int i = 0; i < borderGWAddresses.Count; i++)
             {
@@ -193,7 +193,7 @@ namespace ControlNCC
         public void showInterdomainAttemptsForRequestID(int requestID)
         {
             foreach (string addres in intrerdomainCallsAttempts[requestID])
-                Console.WriteLine("Próby dla "+requestID+" :"+addres);
+               // Console.WriteLine("Próby dla "+requestID+" :"+addres);
 
         }
 

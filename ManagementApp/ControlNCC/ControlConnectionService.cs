@@ -218,9 +218,9 @@ namespace ControlNCC
                                     break;
                                 Console.WriteLine("[Other NCC] CALL REJECTED");
                                 // handlerNCC.showInterdomainAttemptsForRequestID(packet.RequestID);
-                                Console.WriteLine("Szukam borderow dla ip: " + packet.destinationIdentifier);
+                               // Console.WriteLine("Szukam borderow dla ip: " + packet.destinationIdentifier);
                                 String anotherBorderGWAddress = handlerNCC.getAnotherBorderGatewayAddress(packet.RequestID, packet.originIdentifier);
-                                Console.WriteLine("Znaleziony border GW: " + anotherBorderGWAddress);
+                                //Console.WriteLine("Znaleziony border GW: " + anotherBorderGWAddress);
                                 if (anotherBorderGWAddress == null)
                                 {
                                     ControlConnectionService cpccCallService = handlerNCC.getService(packet.RequestID);
