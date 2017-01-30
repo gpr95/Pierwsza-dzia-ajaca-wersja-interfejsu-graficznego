@@ -90,13 +90,12 @@ namespace CableCloud
                 }
                 catch(Exception e)
                 {
-                    string[] tempData = received_data.Split('{');
-                    string newData = "{" + tempData[1] + "{" + tempData[2];
-                    newData.Remove(newData.LastIndexOf('}'));
-                    received_object = JSON.Deserialize(newData);
-                    received_data = "";
+
                 }
-                
+                if(received_object == null)
+                {
+                    return;
+                }
 
                 if (received_object.Type == typeof(Signal))
                 {

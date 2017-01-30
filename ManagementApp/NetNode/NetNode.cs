@@ -42,17 +42,18 @@ namespace NetNode
             this.controlAgent = new ControlAgent(Convert.ToInt32(args[3]), this.virtualIp);
             this.listener = new TcpListener(IPAddress.Parse("127.0.0.1"), Convert.ToInt32(args[1]));
 
-            if (args[3] != "0")
-            {
-                this.lrm = new LRM(args[0]);
-            }
-
             this.threadListen = new Thread(new ThreadStart(Listen));
             threadListen.Start();
             this.threadConsole = new Thread(new ThreadStart(ConsoleInterface));
             threadConsole.Start();
             this.threadComutation = new Thread(new ThreadStart(commutation));
             threadComutation.Start();
+
+            if (args[3] != "0")
+            {
+                this.lrm = new LRM(args[0]);
+            }
+
             //this.commutation();
         }
         private void Listen()

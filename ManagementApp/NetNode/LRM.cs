@@ -31,6 +31,8 @@ namespace NetNode
             this.virtualIp = virtualIp;
             initResources(resources);
 
+            Thread.Sleep(10000);
+
             //Timer for topology
             timerForSending = new System.Timers.Timer();
             timerForSending.Elapsed += new ElapsedEventHandler(sendMessage);
@@ -98,7 +100,7 @@ namespace NetNode
                 {
                     confirmations[i] = true;
                 }
-
+                //Thread.Sleep(50);
                 writer.Write(data);
             }
             Thread.Sleep(4900);
