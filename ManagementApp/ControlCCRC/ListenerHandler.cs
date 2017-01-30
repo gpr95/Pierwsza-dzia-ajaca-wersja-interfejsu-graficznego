@@ -56,25 +56,20 @@ namespace ControlCCRC
                         switch (lrmMsg.State)
                         {
                             case RCtoLRMSignallingMessage.LRM_INIT:
-                                consoleWriter("[received from LRRM] LRM_INIT");
                                 identifier = lrmMsg.NodeName;
                                 rc.initLRMNode(identifier);
                                 socketHandler.Add(identifier, writer);
                                 break;
                             case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD:
-                                consoleWriter("[received from LRRM] LRM_TOP_ADD");
                                 rc.addTopologyElementFromLRM(identifier, lrmMsg.ConnectedNode, lrmMsg.ConnectedNodePort);
                                 break;
                             case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE:
-                                consoleWriter("[received from LRRM] LRM_TOP_DEL");
                                 rc.deleteTopologyElementFromLRM(lrmMsg.ConnectedNode);
                                 break;
                             case RCtoLRMSignallingMessage.LRM_TOPOLOGY_ALLOCATED:
-                                consoleWriter("[received from LRRM] LRM_ALLOCATED");
                                 rc.allocatedTopologyConnection(identifier, lrmMsg.ConnectedNode, lrmMsg.AllocatedSlot);
                                 break;
                             case RCtoLRMSignallingMessage.LRM_TOPOLOGY_DEALLOCATED:
-                                consoleWriter("[received from LRRM] LRM_DEALLOCATED");
                                 rc.deallocatedTopologyConnection(identifier, lrmMsg.ConnectedNode, lrmMsg.AllocatedSlot);
                                 break;
                         }

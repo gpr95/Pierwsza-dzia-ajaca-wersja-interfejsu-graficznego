@@ -115,11 +115,11 @@ namespace ControlCCRC
                         // POPRAWIC
                         case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:
                             rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestID, msg.Vc11, msg.Vc12, msg.Vc13);
-                            consoleWriter("VC1 SENDING TO SUBNETWORK :" + msg.Vc11);
-                            consoleWriter("VC2 SENDING TO SUBNETWORK :" + msg.Vc12);
-                            consoleWriter("VC3 SENDING TO SUBNETWORK :" + msg.Vc13);
+                            consoleWriter("[NCC] Received request for connection between:" + msg.NodeFrom 
+                                + " and " + msg.NodeTo + " with " + msg.Rate + "x VC-3 , requestId=" + msg.RequestID);
                             break;
                         case CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID:
+                            consoleWriter("[NCC] Received request for release for requestId=" + msg.RequestID);
                             rcHandler.releaseConnection(msg.RequestID);
                             break;
                     }
@@ -158,17 +158,21 @@ namespace ControlCCRC
                     switch(msg.State)
                     {
                         case CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST:
-                            Console.WriteLine("received CC_BUILD_PATH_REQUEST: " + this.identifier);
-                           // lowerCcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("CC_")).ToList().Count();
-                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestId, msg.Vc1, msg.Vc2, msg.Vc3);
+                            rcHandler.initConnectionRequestFromCC(msg.NodeFrom,
+                                msg.NodeTo, msg.Rate, msg.RequestId, msg.Vc1, msg.Vc2, msg.Vc3);
+                            Console.WriteLine("[UPPER CC] Received build path request for connection between:" + msg.NodeFrom
+                                + " and " + msg.NodeTo + " with " + msg.Rate + "x VC-3 , requestId=" + msg.RequestId);
                             break;
                         case CCtoCCSignallingMessage.FIB_SETTING_TOP_BOTTOM:
                             rcHandler.startProperWeigthComputingTopBottom(new Dictionary<string, Dictionary<string, int>>(),
                                       new Dictionary<string, string>(), msg.Rate, "",
                                       msg.NodeFrom, msg.NodeTo);
+                            Console.WriteLine("[UPPER CC] Received FIB setting request for connection between:" + msg.NodeFrom
+                                + " and " + msg.NodeTo + " with " + msg.Rate + "x VC-3 , requestId=" + rcHandler.requestId);
                             break;
                         case CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM:
                             rcHandler.releaseConnection(msg.RequestId);
+                            Console.WriteLine("[UPPER CC] Received release request for requestId=" + msg.RequestId);
                             break;
                     }
                 }
@@ -181,7 +185,7 @@ namespace ControlCCRC
 
         private void consoleStart()
         {
-            consoleWriter("[INIT] Started.");
+            consoleWriter("[INIT]");
         }
         private void consoleWriter(String msg)
         {
