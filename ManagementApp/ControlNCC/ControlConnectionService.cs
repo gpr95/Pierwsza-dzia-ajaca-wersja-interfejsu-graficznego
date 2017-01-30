@@ -58,7 +58,7 @@ namespace ControlNCC
                         {
                             handlerNCC.addService(packet.RequestID, this);
                             Console.WriteLine("[CPCC]Receive call request for " + packet.destinationIdentifier + " on " + ControlInterface.CALL_REQUEST_ACCEPT + " interface");
-                            Console.WriteLine("[DIRECTORY]Send directory request");//sprawdzenie czy w naszej domenie 
+                            Console.WriteLine("[DIRECTORY]Send directory request");
                             if (handlerNCC.checkIfInDirectory(packet.destinationIdentifier))
                             {
                                 Console.WriteLine("[DIRECTORY]Receive local name");
@@ -91,7 +91,6 @@ namespace ControlNCC
                                 borderGWAddresses = handlerNCC.returnBorderGateway(addressFromOtherDomain.domain);
                                 string borderGWAddress = borderGWAddresses.First();
                                 handlerNCC.initInterdomanCallTask(packet.RequestID, borderGWAddress);
-                                // handlerNCC.addInterdomainCall(borderGWAddress, packet.RequestID);
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, packet.destinationIdentifier, borderGWAddress, packet.RequestID);
                                 packetToNCC.domain = handlerNCC.domainNumber;
                                 packetToNCC.Vc11 = 1;
@@ -119,11 +118,18 @@ namespace ControlNCC
                             }
                             else
                             {
-                                Address address = new Address(packet.destinationIdentifier);
-                                ControlConnectionService serviceToNCC = handlerNCC.getService(address.domain);
-                                ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_RELEASE_IN, ControlPacket.IN_PROGRESS, 0, packet.destinationIdentifier, packet.originIdentifier, id);
-                                serviceToNCC.send(packetToNCC);
-                                Console.WriteLine("[NCC]Send call release to next NCC: ");
+                                Console.WriteLine("[CC]Send connection release");
+                                CCtoNCCSingallingMessage packetToCC = new CCtoNCCSingallingMessage();
+                                packetToCC.State = CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID;
+                                packetToCC.RequestID = packet.RequestID;
+                                ControlConnectionService CCService = this.handlerNCC.getCCService();
+                                CCService.sendCCRequest(packetToCC);
+                                //////
+                                //Address address = new Address(packet.destinationIdentifier);
+                                //ControlConnectionService serviceToNCC = handlerNCC.getService(address.domain);
+                                //ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.REJECT, 0, packet.destinationIdentifier, packet.originIdentifier, id);
+                                //serviceToNCC.send(packetToNCC);
+                                //Console.WriteLine("[NCC]Send call release to next NCC: ");
                             }
                         }
 
@@ -147,10 +153,10 @@ namespace ControlNCC
                                 Console.WriteLine("[NCC] Recived request to setup call from " + packet.originIdentifier + " to: " + packet.destinationIdentifier);
                                 if (handlerNCC.interdomainRequests.ContainsKey(packet.RequestID))
                                 {
-                                    Console.WriteLine("KOLEJNA PROBA Z INNYM GW: " + packet.originIdentifier);
+                                    //Console.WriteLine("KOLEJNA PROBA Z INNYM GW: " + packet.originIdentifier);
                                 }
                                 else
-                                    handlerNCC.addInterdomainRequest(packet.RequestID, packet.domain);
+                                handlerNCC.addInterdomainRequest(packet.RequestID, packet.domain);
                                 // ZAKLADAMY TU ZE KAZDE NCC MA HANDLER NA INNE, INACZEJ SPRAWDZ DOMENE CZY TWOJA, NIE TO SLIJ DALEJ
                                 Console.WriteLine("[DIRECTORY]Receive local name");
                                 Console.WriteLine("[POLICY]Send policy out");
@@ -173,7 +179,14 @@ namespace ControlNCC
                             }
                             else if (packet.state == ControlPacket.REJECT)
                             {
-                                //NAPISZ DO CC NIECH ROZLACZY
+                                
+                                Console.WriteLine("[NCC] Receive Call Release from previous NCC");
+                                CCtoNCCSingallingMessage packetToCC = new CCtoNCCSingallingMessage();
+                                packetToCC.State = CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID;
+                                packetToCC.RequestID = packet.RequestID;
+                                ControlConnectionService CCService = handlerNCC.getCCService();
+                                CCService.sendCCRequest(packetToCC);
+
                             }
 
                         }
@@ -213,7 +226,7 @@ namespace ControlNCC
                                     ControlConnectionService cpccCallService = handlerNCC.getService(packet.RequestID);
                                     ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.REJECT, packet.speed, packet.originIdentifier, handlerNCC.getCNAddressesForInterdomainCalls(packet.RequestID), packet.RequestID);
                                     cpccCallService.send(packetToCPCC);
-                                    Console.WriteLine("[CPCC] ALL INTERDOMAINS CONNECTIONS BUSY, SEND REJECT TO CPCC");
+                                    Console.WriteLine("[NCC] ALL INTERDOMAINS CONNECTIONS BUSY, SEND REJECT TO CPCC");
                                     handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
                                     handlerNCC.clearInterdomainCallAttempt(packet.RequestID);
                                     //NIE UDALO SIE U NAS, WYSLAC DO TAMTEGO NCC NIECH ROZLACZY JEDNAK
@@ -224,9 +237,8 @@ namespace ControlNCC
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Znalazłem nowy border wyjsciowy: " + anotherBorderGWAddress);
+                                    //Console.WriteLine("Znalazłem nowy border wyjsciowy: " + anotherBorderGWAddress);
                                     handlerNCC.addIntrerdomainCallsAttempts(packet.RequestID, anotherBorderGWAddress);
-                                    // handlerNCC.addInterdomainCall(anotherBorderGWAddress, packet.RequestID);
                                     Address address = new Address(packet.originIdentifier);
                                     ControlConnectionService serviceToNCC = handlerNCC.getService(address.domain);
                                     ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION, ControlPacket.IN_PROGRESS, packet.speed, packet.originIdentifier, anotherBorderGWAddress, packet.RequestID);
@@ -254,17 +266,63 @@ namespace ControlNCC
                             handlerNCC.setCCService(this);
                         }
                         else if (packet.State == CCtoNCCSingallingMessage.CC_CONFIRM)
-                        {
+
+                       {
 
 
-                            Console.WriteLine("[CC]Receive connection confirm");
+                            Console.WriteLine("[CC]Receive connection request confirm");
+                            if (!packet.routed)
+                            {
+                                if (handlerNCC.rejectedDestinations.ContainsKey(packet.RequestID))
+                                    handlerNCC.rejectedDestinations.Remove(packet.RequestID);
+                                if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
+                                {
+                                    ControlConnectionService NCCService = handlerNCC.getService(handlerNCC.getDomainService(packet.RequestID));
+                                    //Console.WriteLine("[CC]Border gateway to previous ncc: " + packet.NodeTo);
+                                    //Nodeto GW, NodeFrom CN in other domain address
+                                    ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_REQUEST_ACCEPT, ControlPacket.ACCEPT, packet.Rate, packet.NodeTo, packet.NodeFrom, packet.RequestID);
+                                    packetToNCC.domain = handlerNCC.domainNumber;
+                                    packetToNCC.Vc11 = packet.Vc11;
+                                    packetToNCC.Vc12 = packet.Vc12;
+                                    packetToNCC.Vc13 = packet.Vc13;
+                                    NCCService.send(packetToNCC);
+                                    handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
+                                }
+                                else
+                                {
+                                    ControlConnectionService cpccCallService = handlerNCC.getService(packet.RequestID);
+                                    ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.ACCEPT, packet.Rate, packet.NodeTo, packet.NodeTo, packet.RequestID);
+                                    List<int> slots = new List<int>();
+                                    if (packet.Vc11 != 0)
+                                    {
+
+                                        packetToCPCC.Vc11 = 1;
+                                        slots.Add(11);
+                                    }
+                                    if (packet.Vc12 != 0)
+                                    {
+                                        packetToCPCC.Vc12 = 1;
+                                        slots.Add(12);
+                                    }
+                                    if (packet.Vc13 != 0)
+                                    {
+                                        packetToCPCC.Vc13 = 1;
+                                        slots.Add(13);
+                                    }
+                                    cpccCallService.send(packetToCPCC);
+                                    handlerNCC.management.send(packet.RequestID, packet.NodeTo);
+                                    Console.WriteLine("[NCC] Send Call Accept to CPCC");
+                                    //if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
+                                    //  handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
+                                }
+
+                            }
                             if (handlerNCC.rejectedDestinations.ContainsKey(packet.RequestID))
                                 handlerNCC.rejectedDestinations.Remove(packet.RequestID);
                             if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
                             {
                                 ControlConnectionService NCCService = handlerNCC.getService(handlerNCC.getDomainService(packet.RequestID));
-                                Console.WriteLine("[CC]Border gateway to previous ncc: " + packet.NodeTo);
-                                //MOZE SIE TU WYSRAC PRZYPILNOWAC CZY GRZES DOBRZE DAJE node from i node to
+                                //Console.WriteLine("[CC]Border gateway to previous ncc: " + packet.NodeTo);
                                 //Nodeto GW, NodeFrom CN in other domain address
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_REQUEST_ACCEPT, ControlPacket.ACCEPT, packet.Rate, packet.NodeTo, packet.NodeFrom, packet.RequestID);
                                 packetToNCC.domain = handlerNCC.domainNumber;
@@ -297,6 +355,7 @@ namespace ControlNCC
                                 }
                                 cpccCallService.send(packetToCPCC);
                                 handlerNCC.management.send(packet.RequestID, packet.NodeTo);
+                                Console.WriteLine("[NCC] Send Call Accept to CPCC");
                                 //if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
                                 //  handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
                             }
@@ -308,10 +367,9 @@ namespace ControlNCC
                             Console.WriteLine("[CC]Receive connection reject");
                             if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
                             {
-                                //NIE UDALO SIE ZROBIC U MNIE, ZWOLNIJ U SIEBIE TO CO ZROBILES DLA TEGO REQUESTA
                                 ControlConnectionService NCCService = handlerNCC.getService(handlerNCC.getDomainService(packet.RequestID));
                                 //Nodeto GW, NodeFrom CN in other domain address
-                                Console.WriteLine("[CC]Destination node to previous ncc: " + handlerNCC.rejectedDestinations[packet.RequestID]);
+                               // Console.WriteLine("[CC]Destination node to previous ncc: " + handlerNCC.rejectedDestinations[packet.RequestID]);
                                 ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_REQUEST_ACCEPT, ControlPacket.REJECT, packet.Rate, packet.NodeTo, handlerNCC.rejectedDestinations[packet.RequestID], packet.RequestID);
                                 packetToNCC.domain = handlerNCC.domainNumber;
                                 NCCService.send(packetToNCC);
@@ -321,6 +379,7 @@ namespace ControlNCC
                             {
                                 ControlConnectionService cpccCallService = handlerNCC.getService(packet.RequestID);
                                 ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.REJECT, packet.Rate, packet.NodeTo, packet.NodeTo, packet.RequestID);
+                                Console.WriteLine("[NCC] Send Call Request Reject to CPCC");
                                 cpccCallService.send(packetToCPCC);
                             }
 
