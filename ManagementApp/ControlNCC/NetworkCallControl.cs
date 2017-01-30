@@ -192,7 +192,7 @@ namespace ControlNCC
 
         public void showInterdomainAttemptsForRequestID(int requestID)
         {
-            foreach (string addres in intrerdomainCallsAttempts[requestID])
+            //foreach (string addres in intrerdomainCallsAttempts[requestID])
                // Console.WriteLine("Próby dla "+requestID+" :"+addres);
 
         }
