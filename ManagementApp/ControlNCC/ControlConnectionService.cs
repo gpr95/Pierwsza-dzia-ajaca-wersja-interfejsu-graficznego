@@ -271,52 +271,7 @@ namespace ControlNCC
 
 
                             Console.WriteLine("[CC]Receive connection request confirm");
-                            if (!packet.routed)
-                            {
-                                if (handlerNCC.rejectedDestinations.ContainsKey(packet.RequestID))
-                                    handlerNCC.rejectedDestinations.Remove(packet.RequestID);
-                                if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
-                                {
-                                    ControlConnectionService NCCService = handlerNCC.getService(handlerNCC.getDomainService(packet.RequestID));
-                                    //Console.WriteLine("[CC]Border gateway to previous ncc: " + packet.NodeTo);
-                                    //Nodeto GW, NodeFrom CN in other domain address
-                                    ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_REQUEST_ACCEPT, ControlPacket.ACCEPT, packet.Rate, packet.NodeTo, packet.NodeFrom, packet.RequestID);
-                                    packetToNCC.domain = handlerNCC.domainNumber;
-                                    packetToNCC.Vc11 = packet.Vc11;
-                                    packetToNCC.Vc12 = packet.Vc12;
-                                    packetToNCC.Vc13 = packet.Vc13;
-                                    NCCService.send(packetToNCC);
-                                    handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
-                                }
-                                else
-                                {
-                                    ControlConnectionService cpccCallService = handlerNCC.getService(packet.RequestID);
-                                    ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_ACCEPT, ControlPacket.ACCEPT, packet.Rate, packet.NodeTo, packet.NodeTo, packet.RequestID);
-                                    List<int> slots = new List<int>();
-                                    if (packet.Vc11 != 0)
-                                    {
-
-                                        packetToCPCC.Vc11 = 1;
-                                        slots.Add(11);
-                                    }
-                                    if (packet.Vc12 != 0)
-                                    {
-                                        packetToCPCC.Vc12 = 1;
-                                        slots.Add(12);
-                                    }
-                                    if (packet.Vc13 != 0)
-                                    {
-                                        packetToCPCC.Vc13 = 1;
-                                        slots.Add(13);
-                                    }
-                                    cpccCallService.send(packetToCPCC);
-                                    handlerNCC.management.send(packet.RequestID, packet.NodeTo);
-                                    Console.WriteLine("[NCC] Send Call Accept to CPCC");
-                                    //if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
-                                    //  handlerNCC.clearCNAddressesForInterdomainCalls(packet.RequestID);
-                                }
-
-                            }
+                            
                             if (handlerNCC.rejectedDestinations.ContainsKey(packet.RequestID))
                                 handlerNCC.rejectedDestinations.Remove(packet.RequestID);
                             if (handlerNCC.checkIfInterdomainRequest(packet.RequestID))
