@@ -774,13 +774,16 @@ namespace ControlCCRC
                 }
                 counter++;
             }
+            if (!requestForFibs.ContainsKey(requestId))
+                requestForFibs.Add(requestId, result);
+            if (!requestIdAndRcNames.ContainsKey(requestId))
+                requestIdAndRcNames.Add(requestId, nodeFromListAndRcName);
 
-            for(int i = 0; i < nodeFromListAndRcName.Count; i++)
+            for (int i = 0; i < nodeFromListAndRcName.Count; i++)
                 ccHandler.sendFIBSettingRequestForSubnetwork(nodeFromListAndRcName.Keys.ElementAt(i), 
                     nodeToListAndRcName.Keys.ElementAt(i), nodeFromListAndRcName.Values.ElementAt(i), vc31 + vc32 + vc33);
 
-            requestForFibs.Add(requestId, result);
-            requestIdAndRcNames.Add(requestId, nodeFromListAndRcName);
+           
             return result;
         }
 
