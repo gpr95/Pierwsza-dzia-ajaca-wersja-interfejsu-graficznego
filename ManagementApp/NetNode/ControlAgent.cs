@@ -52,7 +52,7 @@ namespace NetNode
                     if (received_Protocol.State == CCtoCCSignallingMessage.CC_UP_FIB_CHANGE)
                     {
                         //insert FIB
-                        NetNode.log("Control Signal: insertFib", ConsoleColor.Yellow);
+                        NetNode.log(DateTime.Now.ToLongTimeString() + " [CC -> node] insertFib", ConsoleColor.Yellow);
                         List<FIB> rec = received_Protocol.Fib_table;
 
                         //TODO allocate resources
@@ -60,8 +60,10 @@ namespace NetNode
                         {
                             if (LRM.allocateResource(row.iport, row.in_cont))
                             {
+                                NetNode.log(DateTime.Now.ToLongTimeString() + " [CC -> node] allocate: " + row.iport + " " + row.in_cont, ConsoleColor.Yellow);
                                 if (LRM.allocateResource(row.oport, row.out_cont))
                                 {
+                                    NetNode.log(DateTime.Now.ToLongTimeString() + " [CC -> node] allocate: " + row.oport + " " + row.out_cont, ConsoleColor.Yellow);
                                     sendTopologyAllocated(row.iport, row.in_cont);
                                     sendTopologyAllocated(row.oport, row.out_cont);
                                     SwitchingField.addToSwitch(row);
@@ -84,7 +86,7 @@ namespace NetNode
                     {
                         foreach (var fib in received_Protocol.Fib_table)
                         {
-                          NetNode.log("deallocate" + fib.toString(),ConsoleColor.Green);
+                            NetNode.log(DateTime.Now.ToLongTimeString() + " [CC -> LRM]" + " deallocate" + fib.toString(), ConsoleColor.Green);
                           if(LRM.deallocateResource(fib.iport,fib.in_cont))
                           {
                               sendTopologyDeallocated(fib.iport, fib.in_cont);
@@ -99,7 +101,7 @@ namespace NetNode
                     }
                     else
                     {
-                        NetNode.log("Control Signal: undefined protocol", ConsoleColor.Red);
+                        NetNode.log("undefined protocol", ConsoleColor.Red);
                     }
                 }
             }
@@ -113,7 +115,7 @@ namespace NetNode
 
         public static void sendTopologyInit(string ip)
         {
-            NetNode.log("sending inittopology to RC: " + ip, ConsoleColor.Yellow);
+            NetNode.log(DateTime.Now.ToLongTimeString() + " [LRM -> RC] inittopology: " + ip, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_INIT;
@@ -125,7 +127,7 @@ namespace NetNode
         public static void sendTopology(string from, int port, string to)
         {
             string toSend = port.ToString() + " " + to;
-            NetNode.log("sending topology to RC: " + toSend, ConsoleColor.Yellow);
+            NetNode.log(DateTime.Now.ToLongTimeString() + " [LRM -> RC] LocalTopology : " + toSend, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_ADD;
@@ -139,7 +141,7 @@ namespace NetNode
         {
             string to;
             LRM.connections.TryGetValue(port, out to);
-            NetNode.log("sending topology allocated: " + to + " " + no_vc3, ConsoleColor.Yellow);
+            NetNode.log(DateTime.Now.ToLongTimeString() + " [LRM -> RC] topology allocated: " + to + " " + no_vc3, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_ALLOCATED;
@@ -153,7 +155,7 @@ namespace NetNode
         {
             string to;
             LRM.connections.TryGetValue(port, out to);
-            NetNode.log("sending topology deallocated: " + to + " " + no_vc3, ConsoleColor.Red);
+            NetNode.log(DateTime.Now.ToLongTimeString() + " [LRM -> RC] topology deallocated: " + to + " " + no_vc3, ConsoleColor.Red);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_DEALLOCATED;
@@ -166,7 +168,7 @@ namespace NetNode
         public static void sendDeleted(string from, int port, string to)
         {
             string toSend = port.ToString() + " " + to;
-            NetNode.log("sending to RC info about deletion: " + toSend, ConsoleColor.Yellow);
+            NetNode.log(DateTime.Now.ToLongTimeString() + " [LRM -> RC] info about deletion: " + toSend, ConsoleColor.Yellow);
 
             RCtoLRMSignallingMessage protocol = new RCtoLRMSignallingMessage();
             protocol.State = RCtoLRMSignallingMessage.LRM_TOPOLOGY_DELETE;
@@ -183,12 +185,12 @@ namespace NetNode
             if (flag == true)
             {
                 protocol.State = CCtoCCSignallingMessage.CC_LOW_CONFIRM;
-                NetNode.log("Send CONFIRM", ConsoleColor.Green);
+                NetNode.log(DateTime.Now.ToLongTimeString() + " [node -> CC] CONFIRM", ConsoleColor.Green);
             }
             else
             {
                 protocol.State = CCtoCCSignallingMessage.CC_LOW_REJECT;
-                NetNode.log("Send REJECT", ConsoleColor.Red);
+                NetNode.log(DateTime.Now.ToLongTimeString() + " [node -> CC] REJECT", ConsoleColor.Red);
             }
             String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
             writer.Write(send_object);

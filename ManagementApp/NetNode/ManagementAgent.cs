@@ -46,17 +46,17 @@ namespace NetNode
 
                     if (received_Protocol.State == ManagmentProtocol.WHOIS)
                     {
-                        NetNode.log("Signal from management: receivedWhoIs", ConsoleColor.Blue);
+                        NetNode.log(DateTime.Now.ToLongTimeString() + " [Management]" + " receiving: receivedWhoIs", ConsoleColor.Blue);
                         //send name to management
                         ManagmentProtocol protocol = new ManagmentProtocol();
                         protocol.Name = this.virtualIp;
                         String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
                         writer.Write(send_object);
-                        NetNode.log("sending name to management: " + protocol.Name, ConsoleColor.Blue);
+                        NetNode.log(DateTime.Now.ToLongTimeString() + " [Management]" + " sending: " + protocol.Name, ConsoleColor.Blue);
                     }
                     else if (received_Protocol.State == ManagmentProtocol.ROUTINGTABLES)
                     {
-                        NetNode.log("Signal from management: receivedroutingtable", ConsoleColor.Blue);
+                        NetNode.log(DateTime.Now.ToLongTimeString() + " [Management]" + " receiving: receivedroutingtable", ConsoleColor.Blue);
                         //receiving fibs
                         if (received_Protocol.RoutingTable != null)
                         {
@@ -70,7 +70,7 @@ namespace NetNode
                     }
                     else if (received_Protocol.State == ManagmentProtocol.ROUTINGENTRY)
                     {
-                        NetNode.log("Signal from management: receivedroutingentry", ConsoleColor.Blue);
+                        NetNode.log(DateTime.Now.ToLongTimeString() + " [Management]" + " receiving: receivedroutingentry", ConsoleColor.Blue);
                         //receiving fibs
                         if (received_Protocol.RoutingEntry != null)
                         {
@@ -82,7 +82,7 @@ namespace NetNode
                     }
                     else if (received_Protocol.State == ManagmentProtocol.INTERFACEINFORMATION)
                     {
-                        NetNode.log("Signal from management: iterfaceinformation", ConsoleColor.Blue);
+                        NetNode.log(DateTime.Now.ToLongTimeString() + " [Management]" + " receiving: iterfaceinformation", ConsoleColor.Blue);
                         //send dictionary from LRM to management
                         ManagmentProtocol protocol = new ManagmentProtocol();
                         protocol.State = ManagmentProtocol.INTERFACEINFORMATION;
@@ -92,7 +92,7 @@ namespace NetNode
                     }
                     else if (received_Protocol.State == ManagmentProtocol.GETTABLE)
                     {
-                        NetNode.log("Signal from management: getTable", ConsoleColor.Blue);
+                        NetNode.log(DateTime.Now.ToLongTimeString() + " [Management]" + " receiving: getTable", ConsoleColor.Blue);
                         //send dictionary from LRM to management
                         ManagmentProtocol protocol = new ManagmentProtocol();
                         protocol.State = ManagmentProtocol.GETTABLE;
@@ -102,7 +102,7 @@ namespace NetNode
                     }
                     else
                     {
-                        NetNode.log("Signal from management: undefined protocol", ConsoleColor.Red);
+                        NetNode.log("[Management] undefined protocol", ConsoleColor.Red);
                     }
                 }
             }

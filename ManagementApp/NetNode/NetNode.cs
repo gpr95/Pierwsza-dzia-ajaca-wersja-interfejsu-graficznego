@@ -305,7 +305,7 @@ namespace NetNode
 
         private void consoleWriter(String msg)
         {
-            log("#" + DateTime.Now.ToLongTimeString() + DateTime.Now.ToLongDateString() + "#:" + msg, ConsoleColor.Magenta);
+            log(DateTime.Now.ToLongTimeString()+": " + msg, ConsoleColor.Magenta);
         }
 
         public static void log(String msg, ConsoleColor cc)
