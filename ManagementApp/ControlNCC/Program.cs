@@ -15,6 +15,7 @@ namespace ControlNCC
              * 1 - NCC Listener
              * 2 - Management Port
              * */
+            Console.Title = "Network Call Controller" + args[0];
             NetworkCallControl ncc = new NetworkCallControl(args);
         }
     }

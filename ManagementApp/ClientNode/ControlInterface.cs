@@ -22,5 +22,9 @@ namespace ClientNode
         public static string CALL_INDICATION = "call indication"; //wywołanie klienta docelowego, dla formalnosci NCC->NCC
         public static string CALL_MODIFICATION_INDICATION = "call modification indication"; //zmiana parametrow polaczenia NCC->CPCC
         public static string CONNECTION_REQUEST_OUT = "connection request out";
+        public static string INIT_CPCC_CONNECTION = "init cpcc connection";
+        public static string INIT_CPCC_CONNECTION_CONFIRM = "init cpcc connection confirm";
+        public static string CALL_INDICATION_CPCC = "call indication cpcc";
+        public static string CALL_INDICATION_CPCC_ACCEPT = "call indication cpcc accept";
     }
 }

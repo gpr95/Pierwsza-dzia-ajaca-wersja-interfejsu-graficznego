@@ -1,5 +1,6 @@
 ﻿using ClientNode;
 using ClientWindow;
+using ManagementApp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,11 +73,24 @@ namespace ClientWindow
                                     clientWindowHandler.slots.Add(13);
                                 }
 
-                                clientWindowHandler.Log2("CONTROL", "call request accepted");
+                                clientWindowHandler.Log2("CONTROL", "CPCC <- NCC Call Request Accepted");
                             }else
                             {
-                                clientWindowHandler.Log2("CONTROL", "call request rejected");
+                                clientWindowHandler.Log2("CONTROL", "CPCC <- NCC Call Request Rejected");
                             }
+                        }else if(packet.virtualInterface == ControlInterface.INIT_CPCC_CONNECTION_CONFIRM)
+                        {
+                            clientWindowHandler.Log2("CONTROL", "CPCC <-> NCC connection established");
+                        }else if(packet.virtualInterface == ControlInterface.CALL_INDICATION_CPCC)
+                        {
+                            clientWindowHandler.Log2("CPCC <- NCC", "Receive Call Indication");
+                            ControlPacket packetToNCC = new ControlPacket(ControlInterface.CALL_INDICATION_CPCC_ACCEPT, packet.state, packet.speed, packet.destinationIdentifier, packet.originIdentifier, packet.RequestID);
+                            packetToNCC.Vc11 = packet.Vc11;
+                            packetToNCC.Vc12 = packet.Vc12;
+                            packetToNCC.Vc13 = packet.Vc13;
+                            string data = JMessage.Serialize(JMessage.FromValue(packetToNCC));
+                            writer.Write(data);
+                            clientWindowHandler.Log2("CPCC -> NCC", "Send Call Indication Confirmation");
                         }
 
                 }
@@ -87,18 +101,28 @@ namespace ClientWindow
                 }
                 catch (IOException e)
                 {
-                    clientWindowHandler.Log2("CONTROL", "Connection closed");
+                    clientWindowHandler.Log2("CONTROL", "CPCC <-> NCC Connection closed");
                     break;
                 }
             }
         }
 
-        public void sendRequest(string clientName, int speed)
+        public void sendInit()
         {
-            ControlPacket packet = new ControlPacket(ControlInterface.CALL_REQUEST,ControlPacket.IN_PROGRESS,speed,clientName,clientWindowHandler.virtualIP, clientWindowHandler.adaptation());
+            Address address = new Address(clientWindowHandler.virtualIP);
+            int cpccID = address.type + address.domain + address.subnet + address.space;
+            ControlPacket packet = new ControlPacket(ControlInterface.INIT_CPCC_CONNECTION, ControlPacket.IN_PROGRESS, 0, "", clientWindowHandler.virtualIP, cpccID);
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
-            clientWindowHandler.Log2("CONTROL", "send request on " + ControlInterface.CALL_REQUEST + " interface for"+ clientName);
+            clientWindowHandler.Log2("CONTROL", "Init CPCC <-> NCC connection");
+        }
+
+        public void sendRequest(string clientName, int speed)
+        {
+            ControlPacket packet = new ControlPacket(ControlInterface.CALL_REQUEST,ControlPacket.IN_PROGRESS,speed,clientName,clientWindowHandler.virtualIP, 0);
+            string data = JMessage.Serialize(JMessage.FromValue(packet));
+            writer.Write(data);
+            clientWindowHandler.Log2("CONTROL", " CPCC -> NCC Send Call Request");
         }
 
 
@@ -107,7 +131,7 @@ namespace ClientWindow
             ControlPacket packet = new ControlPacket(ControlInterface.CALL_RELEASE_IN, ControlPacket.IN_PROGRESS, 0, to, clientWindowHandler.virtualIP, id);
             string data = JMessage.Serialize(JMessage.FromValue(packet));
             writer.Write(data);
-            clientWindowHandler.Log2("CONTROL", "send release on " + ControlInterface.CALL_RELEASE_IN);
+            clientWindowHandler.Log2("CONTROL", "CPCC -> NCC Send Call Release");
  
         }
     }

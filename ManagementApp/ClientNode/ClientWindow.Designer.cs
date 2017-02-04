@@ -68,12 +68,12 @@
             this.logTextBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(51)))), ((int)(((byte)(51)))), ((int)(((byte)(55)))));
             this.logTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.logTextBox.ForeColor = System.Drawing.Color.White;
-            this.logTextBox.Location = new System.Drawing.Point(-4, 0);
+            this.logTextBox.Location = new System.Drawing.Point(-1, 0);
             this.logTextBox.Multiline = true;
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
             this.logTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.logTextBox.Size = new System.Drawing.Size(311, 118);
+            this.logTextBox.Size = new System.Drawing.Size(307, 118);
             this.logTextBox.TabIndex = 3;
             // 
             // receivedTextBox

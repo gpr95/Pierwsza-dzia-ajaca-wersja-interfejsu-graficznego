@@ -52,6 +52,7 @@ namespace ClientWindow
             controlAgent = new CPCC(this, args[3]);
             initSpeedComboBox();
             r = new Random();
+            initControlConnection();
         }
 
         private void initSpeedComboBox()
@@ -59,6 +60,12 @@ namespace ClientWindow
             for(int i=1; i<4; i++)
             speedComboBox.Items.Add(i);
 
+        }
+
+        private void initControlConnection()
+        {
+            controlAgent.connect();
+            controlAgent.sendInit();
         }
 
         private void Listen()
@@ -170,19 +177,7 @@ namespace ClientWindow
                                 if (!c.Key.Equals(virtualIP))
                                     comboBox1.Items.Add(c.Key);
                             }
-                            //this.possibleDestinations = management_packet.PossibleDestinations;
-                            //this.virtualPort = management_packet.Port;
-                            ////logTextBox.AppendText("Virtual Port: " + virtualPort);
-                            //List<string> destinations = new List<string>(this.possibleDestinations.Keys);
 
-                            //sendComboBox.Items.Clear();
-                            //sendComboBox.Refresh();
-                            //for (int i = 0; i < destinations.Count; i++)
-                            //{
-                            //    //DEBUG
-                            //    //Log2("MAGAGEMENT INFO", destinations[i] + " : " + possibleDestinations[destinations[i]]);
-                            //    sendComboBox.Items.Add(destinations[i]);
-                            //}
                         }
 
                     }
@@ -212,8 +207,8 @@ namespace ClientWindow
                 Dictionary<int, VirtualContainer3> vc3List = new Dictionary<int, VirtualContainer3>();
                 foreach (int slot in slots)
                 {
-                    Log2("DEBUG", "sloty od controla: "+slot);
-                    VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), "Slot"+slot+" :"+message);
+                    //Log2("DEBUG", "sloty od controla: "+slot);
+                    VirtualContainer3 vc3 = new VirtualContainer3(adaptation(), "Slot"+slot+" : "+message);
                     vc3List.Add(slot, vc3);
                 }
                     STM1 frame = new STM1(adaptation(),vc3List);
@@ -452,7 +447,7 @@ namespace ClientWindow
                     address = new Address(addressTextBox.Text);
                     adr = addressTextBox.Text;
                 } 
-                controlAgent.connect();
+                
                 int speed;
                 bool res = int.TryParse(speedComboBox.SelectedItem.ToString(), out speed);
                 controlAgent.sendRequest(adr, speed);

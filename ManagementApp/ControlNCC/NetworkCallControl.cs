@@ -19,6 +19,7 @@ namespace ControlNCC
         private int controlPort;
         private TcpListener listener;
         private Dictionary<int, ControlConnectionService> services;
+        private Dictionary<int, int> cpccRequests;
         public int domainNumber;
         private ControlConnectionService CCService;
         public ManagementHandler management;
@@ -29,10 +30,12 @@ namespace ControlNCC
         private Dictionary<int, string> CNAddressesForInterdomainCalls;
         private Dictionary<string, int> borderGateways;
         public Dictionary<int, string> rejectedDestinations;
+        Random r;
         public NetworkCallControl(string[] domainParams)
         {
-
+            r = new Random();
             services = new Dictionary<int, ControlConnectionService>();
+            cpccRequests = new Dictionary<int, int>();
             interdomainRequests = new Dictionary<int, int>();
             CNAddressesForInterdomainCalls = new Dictionary<int, string>();
             borderGateways = new Dictionary<string, int>();
@@ -47,8 +50,7 @@ namespace ControlNCC
             listener = new TcpListener(IPAddress.Parse(ip), controlPort);
             Thread thread = new Thread(new ThreadStart(Listen));
             thread.Start();
-            Console.WriteLine("Nodes in my network: ");
-            Console.WriteLine("[INIT]Start NCC, IP: " + ip + " Port: " + controlPort);
+            Console.WriteLine("[INIT] Start NCC, IP: " + ip + " Port: " + controlPort);
 
             int.TryParse(domainParams[2], out this.managementPort);
             management = new ManagementHandler(this.managementPort, this);
@@ -84,6 +86,29 @@ namespace ControlNCC
         {
             return this.CCService;
         }
+
+        public void addCpccRequest(int requestID, int cpccService)
+        {
+            this.cpccRequests.Add(requestID, cpccService);
+        }
+
+        public void removeCpccRequest(int requestID)
+        {
+            this.cpccRequests.Remove(requestID);
+        }
+
+        public int getCpccService(int requestID)
+        {
+            return this.cpccRequests[requestID];
+        }
+
+        public ControlConnectionService getCpccServiceByAddr(string destinationAddress)
+        {
+            Address address = new Address(destinationAddress);
+            int CPCCID = address.type + address.domain + address.subnet + address.space;
+            return this.services[CPCCID];
+        }
+
 
         public void addInterdomainRequest(int requestID, int domainID)
         {
@@ -199,30 +224,13 @@ namespace ControlNCC
 
         public void clearInterdomainCallAttempt(int interdomainCallRequestIDToClear)
         {
-            //foreach (var tmp in interdomainCalls)
-            //{
-            //    if (tmp.Value == interdomainCallRequestIDToClear)
-            //        interdomainCalls.Remove(tmp.Key);
-            //}
+
             intrerdomainCallsAttempts.Remove(interdomainCallRequestIDToClear);
         }
 
-        //remove
 
-        //private void readConfig()
-        //{
-        //    XmlDocument doc = new XmlDocument();
-        //    doc.Load("config.xml");
-        //    XmlNode portNode = doc.DocumentElement.SelectSingleNode("/domain"+domainNumber+"/controlPort");
-        //    string controlPort = portNode.InnerText;
-        //    bool res = int.TryParse(controlPort, out this.controlPort);
-        //    XmlNodeList clients = doc.DocumentElement.SelectNodes("/domain" + domainNumber + "/client");
-        //    foreach(XmlNode node in clients)
-        //    {
-        //        directory.Add(node.InnerText);
 
-        //    }
-        //}
+      
 
         public Boolean checkIfInDirectory(string address)
         {
@@ -237,6 +245,24 @@ namespace ControlNCC
             }
 
 
+        }
+
+        public int generateRequestID()
+        {
+            int reqID = r.Next(10000, 40000);
+            return reqID;
+        }
+
+        public void consoleWriter(string msg)
+        {
+            log(DateTime.Now.ToLongTimeString() + ": " + msg, ConsoleColor.Cyan);
+        }
+
+        public static void log(string msg, ConsoleColor cc)
+        {
+            Console.ForegroundColor = cc;
+            Console.WriteLine(msg);
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }
