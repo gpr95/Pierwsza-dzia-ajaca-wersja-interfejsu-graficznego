@@ -178,6 +178,17 @@ namespace NetNode
             writer.Write(send_object);
         }
 
+        public static void sendDeletedCC(string from, int port, string to)
+        {
+            string toSend = port.ToString() + " " + to;
+            NetNode.log(DateTime.Now.ToLongTimeString() + " [node -> CC] info about deletion: " + toSend, ConsoleColor.Yellow);
+
+            CCtoCCSignallingMessage protocol = new CCtoCCSignallingMessage();
+            protocol.State = CCtoCCSignallingMessage.RE_ROUTE_QUERY;
+            String send_object = JMessage.Serialize(JMessage.FromValue(protocol));
+            writer.Write(send_object);
+        }
+
         public static void sendConfirmation(int port, int no_vc3, bool flag)
         {
             CCtoCCSignallingMessage protocol = new CCtoCCSignallingMessage();

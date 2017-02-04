@@ -129,6 +129,7 @@ namespace NetNode
                     connections.Remove(i.Key);
                     //inform RC that row is deleted
                     ControlAgent.sendDeleted(this.virtualIp, i.Key, i.Value);
+                    ControlAgent.sendDeletedCC(this.virtualIp, i.Key, i.Value);
                     clearResources(i.Key);
                 }
             }
