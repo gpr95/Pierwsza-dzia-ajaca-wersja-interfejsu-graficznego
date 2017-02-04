@@ -15,6 +15,7 @@ namespace ControlCCRC
 {
     class ListenerHandler
     {
+        private static readonly object ConsoleWriterLock = new object();
         private Thread thread;
         private String identifier;
         private bool lastNode;
@@ -94,7 +95,6 @@ namespace ControlCCRC
                                 }
                                 else
                                 {
-                                    consoleWriter("Received counted weigths from " + rcMsg.Identifier);
                                     rc.startProperWeigthComputingTopBottom(rcMsg.NodeConnectionsAndWeights,
                                           rcMsg.AssociatedNodesInSubnetwork, rcMsg.RateToCountWeights, rcMsg.Identifier,
                                           rc.requestNodeFrom, rc.requestNodeTo);
@@ -114,6 +114,10 @@ namespace ControlCCRC
                             case CCtoCCSignallingMessage.CC_MIDDLE_INIT:
                                 if (!socketHandler.ContainsKey(ccMsg.Identifier))
                                     socketHandler.Add(ccMsg.Identifier, writer);
+                                break;
+                            case CCtoCCSignallingMessage.RE_ROUTE_QUERY:
+
+                                cc.reRouteInit();
                                 break;
                         }
                     }
@@ -142,11 +146,14 @@ namespace ControlCCRC
 
         private void consoleWriter(String msg)
         {
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
-            Console.BackgroundColor = ConsoleColor.White;
+            lock (ConsoleWriterLock)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.BackgroundColor = ConsoleColor.White;
 
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:[RC]" + msg);
-            Console.Write(Environment.NewLine);
+                Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:[RC]" + msg);
+                Console.Write(Environment.NewLine);
+            }
         }
     }
 }

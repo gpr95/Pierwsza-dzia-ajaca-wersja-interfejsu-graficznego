@@ -16,6 +16,8 @@ namespace ControlCCRC
 {
     class RoutingController
     {
+        private static readonly object ConsoleWriterLock = new object();
+
         public Boolean iAmDomain;
         public int domainNumber;
 
@@ -105,6 +107,7 @@ namespace ControlCCRC
             consoleStart();
         }
 
+
         public void setCCHandler(ConnectionController cc)
         {
             this.ccHandler = cc;
@@ -117,19 +120,16 @@ namespace ControlCCRC
 
         public void allocatedTopologyConnection(string nodeName, string connectedNode, int slotVC3)
         {
-            consoleWriter("[LRM] Topology status: " + nodeName + " : " + connectedNode +  " allocated");
+            consoleWriter("[LRM -> RC] LocalTopology( " + nodeName + " : " + connectedNode +  " allocated )");
             switch (slotVC3)
             {
                 case 11:
-                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
                     topologyUnallocatedLayer1[nodeName].Remove(connectedNode);
                     break;
                 case 12:
-                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
                     topologyUnallocatedLayer2[nodeName].Remove(connectedNode);
                     break;
                 case 13:
-                    consoleWriter("ALLOCATION: removing slot " + slotVC3 + " from " + nodeName + " to " + connectedNode);
                     topologyUnallocatedLayer3[nodeName].Remove(connectedNode);
                     break;
             }
@@ -137,7 +137,7 @@ namespace ControlCCRC
 
         public void deallocatedTopologyConnection(string nodeName, string connectedNode, int slotVC3)
         {
-            consoleWriter("[LRM] Topology status: " + nodeName + " : " + connectedNode + " resource free again ");
+            consoleWriter("[LRM -> RC] LocalTopology( " + nodeName + " : " + connectedNode + " deallocated )");
             switch (slotVC3)
             {
                 case 11:
@@ -184,7 +184,6 @@ namespace ControlCCRC
                             if (socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count() > 0)
                             {
                                 lowerRcRequestedInAction = socketHandler.Keys.Where(id => id.StartsWith("RC_")).Count();
-                                Console.WriteLine("DEBUG###1: " + lowerRcRequestedInAction);
                                 foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC")))
                                 {
                                     RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
@@ -232,13 +231,11 @@ namespace ControlCCRC
                         continue;
                     if (findWeightBetweenTwoNodes(pathNeededToBeCount[i], s, rate) != 0)
                     {
-                        consoleWriter("[RC] Computing weights between: " + pathNeededToBeCount[i] + " and " + s + " with:"
-                        + rate + "x VC-3");
                         connections.Add(s, findWeightBetweenTwoNodes(pathNeededToBeCount[i], s, rate));
                         if(!nodeConnectionsIntoSubnet.ContainsKey(pathNeededToBeCount[i]))
                             nodeConnectionsIntoSubnet.Add(pathNeededToBeCount[i], associatedNodeStart + "#" + associatedNodeStop);
-                        consoleWriter("Computed weight  between:" + pathNeededToBeCount[i] + " and " + s +
-                            "with w=" + connections[s]);
+                        consoleWriter("NetworkTopology update ( " + pathNeededToBeCount[i] + " and " + s +
+                            "with w=" + connections[s] + " )");
                     }
                 }
 
@@ -263,14 +260,6 @@ namespace ControlCCRC
                 countedPathValue.NodeConnectionsAndWeights = nodeConnectionsAndWeights;
                 countedPathValue.AssociatedNodesInSubnetwork = nodeConnectionsIntoSubnet;
                 countedPathValue.State = RCtoRCSignallingMessage.COUNTED_ALL_PATHS_CONFIRM;
-                foreach(String node in nodeConnectionsAndWeights.Keys)
-                {
-                    foreach(String connection in nodeConnectionsAndWeights[node].Keys)
-                    {
-                        consoleWriter("Sending calculated weights: " + node + " -> " + connection +
-                            " weight:" + nodeConnectionsAndWeights[node][connection]);
-                    }
-                }
             }
             else
             {
@@ -437,8 +426,6 @@ namespace ControlCCRC
         public List<String> findChepestNodesBetweenTwoNodes(String startNode, String endNode, int howMuchVC3)
         {
             List<String> result = new List<string>();
-            consoleWriter("[RC] calculating shortest path (only calculating): " + startNode + " and " + endNode + " with:"
-                + howMuchVC3 + "x VC-3");
 
             if (wholeTopologyNodesAndConnectedNodesWithPorts
                .Where(node => node.Value.ContainsKey(startNode)) == null)
@@ -511,8 +498,6 @@ namespace ControlCCRC
 
         public Dictionary<String,List<FIB>> findPathWithSubnetworks(String startNode, String endNode, int howMuchVC3)
         {
-            consoleWriter("[CC] Sended info to make path between: " + startNode + " and " + endNode + " with:"
-                + howMuchVC3 + "x VC-3");
             Dictionary<String, List<FIB>> result = new Dictionary<string, List<FIB>>();
             String firstInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
                .Where(node => node.Value.ContainsKey(startNode)).FirstOrDefault().Key;
@@ -526,7 +511,6 @@ namespace ControlCCRC
             switch (howMuchVC3)
             {
                 case 1:
-                    int whichTopology = 1;
                     usingTopology1 = 1;
                     usingTopology2 = 0;
                     usingTopology3 = 0;
@@ -535,7 +519,6 @@ namespace ControlCCRC
                     if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     {
                             pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer2);
-                        whichTopology = 2;
                         usingTopology1 = 0;
                         usingTopology2 = 1;
                         usingTopology3 = 0;
@@ -543,7 +526,6 @@ namespace ControlCCRC
                     if (pathRate1 == null || !pathRate1.First().Equals(firstInMyNetwork) || !pathRate1.Last().Equals(lastInMyNetwork))
                     {
                             pathRate1 = shortest_path(firstInMyNetwork, lastInMyNetwork, topologyUnallocatedLayer3);
-                        whichTopology = 3;
                         usingTopology1 = 0;
                         usingTopology2 = 0;
                         usingTopology3 = 1;
@@ -562,6 +544,10 @@ namespace ControlCCRC
 
                         result = setFibsForRateAndCallSubnetworks(pathRate1,
                             startNode, endNode, usingTopology1, usingTopology2, usingTopology3);
+                        foreach(String node in result.Keys)
+                        {
+                            consoleWriter("[PATHwithSubNetworks] " + node);
+                        }
                         return result;
                     }
                     else
@@ -626,6 +612,10 @@ namespace ControlCCRC
                         properPath = path3;
                     result = setFibsForRateAndCallSubnetworks(properPath,
                            startNode, endNode, usingTopology1, usingTopology2, usingTopology3);
+                    foreach (String node in result.Keys)
+                    {
+                        consoleWriter("[PATHwithSubNetworks] " + node);
+                    }
                     return result;
                 case 3:
                     List<String> path31 = null;
@@ -653,6 +643,10 @@ namespace ControlCCRC
                     }
                     result = setFibsForRateAndCallSubnetworks(path31,
                            startNode, endNode, usingTopology1, usingTopology2, usingTopology3);
+                    foreach (String node in result.Keys)
+                    {
+                        consoleWriter("[PATHwithSubNetworks] " + node);
+                    }
                     return result;
             }
 
@@ -720,13 +714,6 @@ namespace ControlCCRC
                              mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].IndexOf("#"));
                         String internalNodeFrom = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeFrom + "#" + virtualNodeTo].Split('#')[1];
                         String internalNodeTo = mapNodeConnectedNodeAndAssociatedRCSubnetwork[virtualNodeTo + "#" + virtualNodeFrom].Split('#')[1];
-                        consoleWriter("While setting FIB founded subnetwork!!!\n " +
-                            "VirtualNodeFrom:" + virtualNodeFrom + "\n" +
-                            "internalNodeFrom:" + internalNodeFrom + "\n" +
-                            "internalNodeTo:" + internalNodeTo + "\n" +
-                            "VirtualNodeTo:" + virtualNodeTo + "\n" +
-                            "RC: " + rcNeededToBeSet);
-
                         if(!nodeFromListAndRcName.Keys.Contains(virtualNodeFrom))
                             nodeFromListAndRcName.Add(virtualNodeFrom, rcNeededToBeSet);
                         if (!nodeToListAndRcName.Keys.Contains(virtualNodeTo))
@@ -790,10 +777,6 @@ namespace ControlCCRC
 
         public Dictionary<String,List<FIB>> findPath(String startNode, String endNode, int howMuchVC3)
         {
-            
-            consoleWriter("[CC] Sended info to make path between: " + startNode + " and " + endNode + " with:" 
-                + howMuchVC3 + "x VC-3");
-
             Dictionary<String, List<FIB>> result = new Dictionary<string, List<FIB>>();
             String firstInMyNetwork = wholeTopologyNodesAndConnectedNodesWithPorts
                 .Where(node => node.Value.ContainsKey(startNode)).FirstOrDefault().Key;
@@ -895,16 +878,12 @@ namespace ControlCCRC
                                     whichTopology + 10
                                     ));
                         }
-
-                        foreach (var temp in result)
-                        {
-                            foreach (var fib in temp.Value)
-                            {
-                                Console.WriteLine("debug: " + temp.Key + " " + fib.toString());
-                            }
-                        }
                         if (!requestForFibs.ContainsKey(requestId))
                             requestForFibs.Add(requestId, result);
+                        foreach (String node in result.Keys)
+                        {
+                            consoleWriter("[PATHwithSubNetworks] " + node);
+                        }
                         return result;
                     }
                     else
@@ -1020,6 +999,11 @@ namespace ControlCCRC
                     }
                     if (!requestForFibs.ContainsKey(requestId))
                         requestForFibs.Add(requestId, result);
+
+                    foreach (String node in result.Keys)
+                    {
+                        consoleWriter("[PATHwithSubNetworks] " + node);
+                    }
                     return result;
                 case 3:
                     List<String> path31 = null;
@@ -1075,6 +1059,11 @@ namespace ControlCCRC
                         }
                         if(!requestForFibs.ContainsKey(requestId))
                         requestForFibs.Add(requestId, result);
+
+                        foreach (String node in result.Keys)
+                        {
+                            consoleWriter("[PATHwithSubNetworks] " + node);
+                        }
                         return result;
                     }
                     else
@@ -1159,7 +1148,7 @@ namespace ControlCCRC
         
         public void initLRMNode(String nodeName)
         {
-            consoleWriter("[LRM] INIT FROM: " + nodeName);
+            consoleWriter("[LRM -> RC] LocalTopology( " + nodeName + " adding)");
             topologyUnallocatedLayer1.Add(nodeName, new Dictionary<string, int>());
             topologyUnallocatedLayer2.Add(nodeName, new Dictionary<string, int>());
             topologyUnallocatedLayer3.Add(nodeName, new Dictionary<string, int>());
@@ -1168,7 +1157,7 @@ namespace ControlCCRC
 
         public void addTopologyElementFromLRM(String nodeName, String connectedNode, int connectedNodePort)
         {
-            consoleWriter("[LRM] New topology:" + nodeName + " to " + connectedNode);
+            consoleWriter("[LRM -> RC] LocalTopology( " + nodeName + " connected with "+ connectedNode + " )");
             topologyUnallocatedLayer1[nodeName].Add(connectedNode, 1);
             topologyUnallocatedLayer2[nodeName].Add(connectedNode, 1);
             topologyUnallocatedLayer3[nodeName].Add(connectedNode, 1);
@@ -1187,7 +1176,7 @@ namespace ControlCCRC
 
         public void deleteTopologyElementFromLRM(String whoDied)
         {
-            consoleWriter("[LRM]" + whoDied + "died ! (removing from topology)");
+            consoleWriter("[LRM -> RC] LocalTopology( " + whoDied + " deleting)");
             foreach (var item in topologyUnallocatedLayer1.Where(node => node.Value.ContainsKey(whoDied)).ToList())
                 item.Value.Remove(whoDied);
             foreach (var item in topologyUnallocatedLayer2.Where(node => node.Value.ContainsKey(whoDied)).ToList())
@@ -1203,19 +1192,21 @@ namespace ControlCCRC
             socketHandler.Remove(whoDied);
             if(requestForFibs.ContainsKey(requestId) && requestForFibs[requestId].ContainsKey(whoDied))
                 requestForFibs[requestId].Remove(whoDied);
+        }
 
+        public void reRouteQuery()
+        {
             if (iAmDomain)
             {
                 releaseConnection(requestId);
-                initConnectionRequestFromCC(requestNodeFrom, requestNodeTo, requestRate, requestId, 1, 1, 1,true);
+                initConnectionRequestFromCC(requestNodeFrom, requestNodeTo, requestRate, requestId, 1, 1, 1, true);
             }
-
         }
 
         public void initConnectionRequestFromCC(String nodeFrom, String nodeTo, int rate, int requestId, int vc1, int vc2, int vc3, bool routed)
         {
-            consoleWriter("[CC] Received request for path between:" + nodeFrom
-                                + " and " + nodeTo + " with " + rate + "x VC-3 , requestId=" + requestId);
+            consoleWriter("[CC(mine) -> RC(mine)] RouteQuery( " + nodeFrom
+                              + " , " + nodeTo + " ) (" + rate + "x VC-3 , requestId=" + requestId + " ) ");
             this.requestNodeFrom = nodeFrom;
             this.requestNodeTo = nodeTo;
             this.requestRate = rate;
@@ -1235,7 +1226,6 @@ namespace ControlCCRC
 
             foreach (String id in socketHandler.Keys.Where(id => id.StartsWith("RC_")))
             {
-                consoleWriter("[SENDING TO LOWER RC] Compute path to  " + id);
                 RCtoRCSignallingMessage countPathsMsg = new RCtoRCSignallingMessage();
                 countPathsMsg.State = RCtoRCSignallingMessage.COUNT_ALL_PATHS_REQUEST;
                 countPathsMsg.Identifier = identifier;
@@ -1251,7 +1241,6 @@ namespace ControlCCRC
             Dictionary<string, string> associatedNodes, int rate, String rcFrom)
         {
             lowerRcRequestedInAction--;
-            consoleWriter("[LOWER RC] Received counted weigths from " + rcFrom);
             foreach (String node in nodeConnectionsAndWeights.Keys)
             {
                 for (int i = 0; i < nodeConnectionsAndWeights[node].Count; i++)
@@ -1289,7 +1278,6 @@ namespace ControlCCRC
             {
                 if (iAmDomain)
                 {
-                    consoleWriter("[PATH] Calculating shortest path between:" + requestNodeFrom + " and " + requestNodeTo);
                     List<String> path = findChepestNodesBetweenTwoNodes(requestNodeFrom, requestNodeTo, requestRate);
                     if(path == null || path.Count == 0)
                     {
@@ -1302,7 +1290,6 @@ namespace ControlCCRC
                         lowerRcRequestedInAction++;
                         string temp;
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(requestNodeFrom + "#" + path[0], out temp);
-                        Console.WriteLine("DEBUG###: " + temp);
 
                         ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, requestNodeFrom, path[0], rate,requestId);
                     }
@@ -1311,7 +1298,6 @@ namespace ControlCCRC
                         lowerRcRequestedInAction++;
                         string temp;
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(path[i] + "#" + path[i+1], out temp);
-                        Console.WriteLine("DEBUG###: " + temp);
 
                         ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, path[i], path[i+1], rate, requestId);
                     }
@@ -1320,7 +1306,6 @@ namespace ControlCCRC
                         lowerRcRequestedInAction++;
                         string temp;
                         mapNodeConnectedNodeAndAssociatedRCSubnetwork.TryGetValue(path.Last() + "#" + requestNodeTo, out temp);
-                        Console.WriteLine("DEBUG###: " + temp);
 
                         ccHandler.sendRequestToSubnetworkCCToBuildPath(temp, path.Last(), requestNodeTo, rate, requestId);
                     }
@@ -1336,9 +1321,8 @@ namespace ControlCCRC
         public void startProperWeigthComputingTopBottom(Dictionary<string, Dictionary<string, int>> nodeConnectionsAndWeights,
             Dictionary<string, string> associatedNodes, int rate, String rcFrom,String nodeFrom, String nodeTo)
         {
-            Console.WriteLine("[CC] Received FIB computing request for connection between:" + nodeFrom
-                                + " and " + nodeTo + " with " + rate + "x VC-3");
-            consoleWriter("[COUNTING FIBS]");
+            consoleWriter("[CC(mine) -> RC(mine)] RouteQuery( " + nodeFrom
+                               + " , " + nodeTo + " ) (" + rate + "x VC-3 , requestId=" + requestId + " ) ");
             Dictionary<String, String> nodeHashtagNodeAndNodeInSubnetwork = new Dictionary<string, string>();
             foreach (String node in nodeConnectionsAndWeights.Keys)
             {
@@ -1376,7 +1360,6 @@ namespace ControlCCRC
 
             ccHandler.sendFibs(findPathWithSubnetworks(
                 nodeFrom, nodeTo, rate), usingTopology1, usingTopology2, usingTopology3, requestId, rate, false);
-            ///////TODO zestawianie fibow
         }
 
         internal void lowerRcSendedRejectAction(int rate, String rcFrom)
@@ -1397,8 +1380,6 @@ namespace ControlCCRC
 
         public void releaseConnection(int requestIdToRealese)
         {
-            consoleWriter("[CC] Received request for release for requestId=" + requestIdToRealese);
-
             ccHandler.sendRealeseFibs(requestForFibs[requestIdToRealese],requestIdToRealese);
 
             if (requestIdAndRcNames.ContainsKey(requestIdToRealese))
@@ -1411,16 +1392,17 @@ namespace ControlCCRC
 
         private void consoleWriter(String msg)
         {
-            Console.ForegroundColor = ConsoleColor.DarkBlue;
-            Console.BackgroundColor = ConsoleColor.White;
-
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:[RC]" + msg);
-            Console.Write(Environment.NewLine);
+            lock (ConsoleWriterLock)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.Write("#[RC]" + DateTime.Now.ToLongTimeString() + " #:" + msg);
+                Console.Write(Environment.NewLine);
+            }
         }
 
         private void consoleStart()
         {
-            consoleWriter("[INIT]");
         }
     }
 }

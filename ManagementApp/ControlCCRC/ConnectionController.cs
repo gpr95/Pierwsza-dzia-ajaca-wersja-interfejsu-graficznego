@@ -16,6 +16,7 @@ namespace ControlCCRC
 {
     class ConnectionController
     {
+        private static readonly object ConsoleWriterLock = new object();
         private String identifier;
 
         private TcpClient CCClient;
@@ -29,7 +30,6 @@ namespace ControlCCRC
         private RoutingController rcHandler;
         private Dictionary<String, BinaryWriter> socketHandler;
 
-        private int lowerCcRequestedInAction;
         private Boolean iAmDomain;
         /**
          * DOMAIN [CC_ID, connect NCC]
@@ -112,14 +112,15 @@ namespace ControlCCRC
                     CCtoNCCSingallingMessage msg = received_object.Value.ToObject<CCtoNCCSingallingMessage>();
                     switch (msg.State)
                     {
-                        // POPRAWIC
-                        case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:
+                        case CCtoNCCSingallingMessage.NCC_SET_CONNECTION:      
+                            consoleWriter("[NCC -> CC(mine)] ConnectionRequest( " + msg.NodeFrom 
+                                + " , " + msg.NodeTo + " ) (" + msg.Rate + "x VC-3 , requestId=" + msg.RequestID + " ) ");
+                            consoleWriter("[CC(mine) -> RC(mine)] RouteQuery( " + msg.NodeFrom
+                                + " , " + msg.NodeTo + " ) (" + msg.Rate + "x VC-3 , requestId=" + msg.RequestID + " ) ");
                             rcHandler.initConnectionRequestFromCC(msg.NodeFrom, msg.NodeTo, msg.Rate, msg.RequestID, msg.Vc11, msg.Vc12, msg.Vc13, false);
-                            consoleWriter("[NCC] Received request for connection between:" + msg.NodeFrom 
-                                + " and " + msg.NodeTo + " with " + msg.Rate + "x VC-3 , requestId=" + msg.RequestID);
                             break;
                         case CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID:
-                            consoleWriter("[NCC] Received request for release for requestId=" + msg.RequestID);
+                            consoleWriter("[NCC -> CC(mine)] CallRelease( " + msg.RequestID + " ) ");
                             rcHandler.releaseConnection(msg.RequestID);
                             break;
                     }
@@ -158,21 +159,27 @@ namespace ControlCCRC
                     switch(msg.State)
                     {
                         case CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST:
+                            
                             rcHandler.initConnectionRequestFromCC(msg.NodeFrom,
                                 msg.NodeTo, msg.Rate, msg.RequestId, msg.Vc1, msg.Vc2, msg.Vc3, false);
-                            Console.WriteLine("[UPPER CC] Received build path request for connection between:" + msg.NodeFrom
-                                + " and " + msg.NodeTo + " with " + msg.Rate + "x VC-3 , requestId=" + msg.RequestId);
+                            consoleWriter("[CC(upper) -> CC(mine)] Prepare weights( " + msg.NodeFrom
+                                + " , " + msg.NodeTo + " ) (" + msg.Rate + "x VC-3 , requestId=" + msg.RequestId + " )");
+                            consoleWriter("[CC(mine) -> RC(mine)] RouteQuery( " + msg.NodeFrom
+                               + " , " + msg.NodeTo + " ) (" + msg.Rate + "x VC-3 , requestId=" + msg.RequestId + " ) ");
                             break;
                         case CCtoCCSignallingMessage.FIB_SETTING_TOP_BOTTOM:
+                            
                             rcHandler.startProperWeigthComputingTopBottom(new Dictionary<string, Dictionary<string, int>>(),
                                       new Dictionary<string, string>(), msg.Rate, "",
                                       msg.NodeFrom, msg.NodeTo);
-                            Console.WriteLine("[UPPER CC] Received FIB setting request for connection between:" + msg.NodeFrom
-                                + " and " + msg.NodeTo + " with " + msg.Rate + "x VC-3 , requestId=" + rcHandler.requestId);
+                            consoleWriter("[CC(upper) -> CC(mine)] ConnectionRequest( " + msg.NodeFrom
+                                + " , " + msg.NodeTo + " ) (" + msg.Rate + "x VC-3 , requestId=" + msg.RequestId + " ) \n");
+                            consoleWriter("[CC(mine) -> RC(mine)] RouteQuery( " + msg.NodeFrom
+                              + " , " + msg.NodeTo + " ) (" + msg.Rate + "x VC-3 , requestId=" + msg.RequestId + " ) ");
                             break;
                         case CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM:
                             rcHandler.releaseConnection(msg.RequestId);
-                            Console.WriteLine("[UPPER CC] Received release request for requestId=" + msg.RequestId);
+                            consoleWriter("[CC(upper) -> CC(mine)] CallRelease( " + msg.RequestId + " ) ");
                             break;
                     }
                 }
@@ -183,22 +190,32 @@ namespace ControlCCRC
             }
         }
 
+        internal void reRouteInit()
+        {
+            consoleWriter("[CC(lower) -> CC(mine)] soft re-routing( "+rcHandler.requestId+" ) ");
+            consoleWriter("[CC(mine) -> RC(mine)] RouteQuery( ) ");
+            rcHandler.reRouteQuery();
+        }
+
         private void consoleStart()
         {
-            consoleWriter("[INIT]");
         }
+
         private void consoleWriter(String msg)
         {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.BackgroundColor = ConsoleColor.White;
-
-            Console.Write("#" + DateTime.Now.ToLongTimeString() + " " + DateTime.Now.ToLongDateString() + "#:[CC]" + msg);
-            Console.Write(Environment.NewLine);
+            lock (ConsoleWriterLock)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.BackgroundColor = ConsoleColor.White;
+                Console.Write("#[CC]" + DateTime.Now.ToLongTimeString() + " #:" + msg);
+                Console.Write(Environment.NewLine);
+            }
         }
 
         internal void sendRequestToSubnetworkCCToBuildPath(string rcName, string nodeFrom, string nodeTo, int rate, int requestId)
         {
-            Console.WriteLine("CC_BUILD_PATH_REQUEST to: " + rcName);
+            consoleWriter("[CC(upper) -> CC(mine)] Prepare weights( " + nodeFrom
+                               + " , " + nodeTo + " ) (" + rate + "x VC-3 , requestId=" + requestId + " ) ");
             CCtoCCSignallingMessage ccRequest = new CCtoCCSignallingMessage();
             ccRequest.State = CCtoCCSignallingMessage.CC_BUILD_PATH_REQUEST;
             ccRequest.NodeFrom = nodeFrom;
@@ -220,13 +237,8 @@ namespace ControlCCRC
             else
                 ccRequest.Vc3 = 1;
 
-            consoleWriter("VC1 SENDING TO SUBNETWORK :" + ccRequest.Vc1);
-            consoleWriter("VC2 SENDING TO SUBNETWORK :" + ccRequest.Vc2);
-            consoleWriter("VC3 SENDING TO SUBNETWORK :" + ccRequest.Vc3);
-
             String dataToSend = JSON.Serialize(JSON.FromValue(ccRequest));
             socketHandler["CC_" + rcName.Substring(rcName.IndexOf("_") + 1)].Write(dataToSend);
-
         }
 
         internal void sendFibs(Dictionary<string, List<FIB>> dictionary, int using1, int using2, int using3, int requestId, int rate, bool routed)
@@ -235,6 +247,7 @@ namespace ControlCCRC
             {
                 foreach (string nodeName in dictionary.Keys)
                 {
+                    consoleWriter("[CC(mine) -> CC(in node)] SetFIBS( requestId=" + requestId + " ) ");
                     CCtoCCSignallingMessage fibsMsg = new CCtoCCSignallingMessage();
                     fibsMsg.State = CCtoCCSignallingMessage.CC_UP_FIB_CHANGE;
                     fibsMsg.Fib_table = dictionary[nodeName];
@@ -248,6 +261,7 @@ namespace ControlCCRC
             {
                 if (dictionary != null)
                 {
+                    consoleWriter("[CC -> NCC] ConnectionConfirmed( " + requestId + " ) ");
                     CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
                     finishMsg.State = CCtoNCCSingallingMessage.CC_CONFIRM;
                     finishMsg.Rate = rate;
@@ -261,7 +275,6 @@ namespace ControlCCRC
                         if (connectedNode.StartsWith("192"))
                         {
                             finishMsg.NodeFrom = connectedNode;
-                            consoleWriter("###################" + connectedNode);
                         }
                             
                     }
@@ -271,6 +284,7 @@ namespace ControlCCRC
                 }
                 else
                 {
+                    consoleWriter("[CC -> NCC] ConnectionRejected( " + requestId + " ) ");
                     CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
                     finishMsg.State = CCtoNCCSingallingMessage.CC_REJECT;
                     finishMsg.Rate = rate;
@@ -282,35 +296,13 @@ namespace ControlCCRC
                     nccWriter.Write(dataToSend);
                 }
             }
-            else
-            {
-                if (dictionary != null)
-                {
-                    CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
-                    finishMsg.State = CCtoNCCSingallingMessage.CC_CONFIRM;
-                    finishMsg.Vc11 = using1;
-                    finishMsg.Vc12 = using2;
-                    finishMsg.Vc13 = using3;
-                    finishMsg.RequestID = requestId;
-                    String dataToSend = JSON.Serialize(JSON.FromValue(finishMsg));
-                    ccWriter.Write(dataToSend);
-                }
-                else
-                {
-                    CCtoNCCSingallingMessage finishMsg = new CCtoNCCSingallingMessage();
-                    finishMsg.State = CCtoNCCSingallingMessage.CC_REJECT;
-                    finishMsg.RequestID = requestId;
-                    String dataToSend = JSON.Serialize(JSON.FromValue(finishMsg));
-                    ccWriter.Write(dataToSend);
-                }
-            }
-
         }
 
         public void sendRealeseFibs(Dictionary<string, List<FIB>> dictionary,int requestId)
         {
             foreach (string nodeName in dictionary.Keys)
             {
+                consoleWriter("[CC(mine) -> CC(in node)] CallRelease( " + requestId + " ) ");
                 CCtoCCSignallingMessage fibsMsg = new CCtoCCSignallingMessage();
                 fibsMsg.State = CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM;
                 fibsMsg.Fib_table = dictionary[nodeName];
@@ -332,19 +324,22 @@ namespace ControlCCRC
 
         public void sendFIBSettingRequestForSubnetwork(String nodeFrom, String nodeTo, String rcName,int rate)
         {
+            consoleWriter("[CC(mine) -> CC(lower)] ConnectionRequest( " + nodeFrom
+                                 + " , " + nodeTo + " ) (" + rate + "x VC-3 , requestId=" + rcHandler.requestId + " ) ");
             String ccName = rcName.Replace("RC", "CC"); ;
             CCtoCCSignallingMessage setFIBmsg = new CCtoCCSignallingMessage();
             setFIBmsg.State = CCtoCCSignallingMessage.FIB_SETTING_TOP_BOTTOM;
             setFIBmsg.NodeFrom = nodeFrom;
             setFIBmsg.NodeTo = nodeTo;
             setFIBmsg.Rate = rate;
+            setFIBmsg.RequestId = rcHandler.requestId;
             String dataToSend = JSON.Serialize(JSON.FromValue(setFIBmsg));
             socketHandler[ccName].Write(dataToSend);
         }
 
         internal void sendFIBRealeaseForSubnetwork(String rcName, int requestIdToRealese)
         {
-            consoleWriter("PROPER REQUEST ID:" + rcHandler.requestId);
+            consoleWriter("[CC(mine) -> CC(lower)] CallRelease( " + requestIdToRealese + " ) ");
             String ccName = rcName.Replace("RC", "CC"); ;
             CCtoCCSignallingMessage setFIBmsg = new CCtoCCSignallingMessage();
             setFIBmsg.State = CCtoCCSignallingMessage.REALEASE_TOP_BOTTOM;

@@ -25,6 +25,8 @@ namespace ControlCCRC.Protocols
         // release
         public const int REALEASE_TOP_BOTTOM = 6;
 
+        public const int RE_ROUTE_QUERY = 7;
+
 
         private int state;
         // from last CC
