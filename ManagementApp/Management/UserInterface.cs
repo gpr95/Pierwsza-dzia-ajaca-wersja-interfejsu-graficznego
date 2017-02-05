@@ -17,7 +17,9 @@ namespace Management
         private static String nodeStart = null;
 
         private enum OPERATION
-        { ENTRY, TABLE, SOFT, SHOW, INTERFACES, CLEAR, NONE, SOFTRELEASE }
+        { ENTRY, TABLE, SOFT, SHOW, INTERFACES, CLEAR, NONE, SOFTRELEASE,
+            SOFTSHOW
+        }
 
         internal static ManagementPlane Management
         {
@@ -57,10 +59,11 @@ namespace Management
                 Console.WriteLine("\n --- Soft  Pernament --- ");
                 Console.WriteLine("\n\t 3) Create soft pernament trail");
                 Console.WriteLine("\n\t 4) Show soft pernament trail");
+                Console.WriteLine("\n\t 5) Show soft pernament trail");
                 Console.WriteLine("\n --- More Operations --- ");
-                Console.WriteLine("\n\t 5) Show connection table of Node");
-                Console.WriteLine("\n\t 6) Show interfaces of Node");
-                Console.WriteLine("\n\t 7) Clear connection table of Node");
+                Console.WriteLine("\n\t 6) Show connection table of Node");
+                Console.WriteLine("\n\t 7) Show interfaces of Node");
+                Console.WriteLine("\n\t 8) Clear connection table of Node");
                 Console.WriteLine("\n");
 
                 int choice;
@@ -83,18 +86,22 @@ namespace Management
                             management.getNodes(true);
                             break;
                         case 4:
+                            operation = OPERATION.SOFTSHOW;
+                            management.getConnections(false);
+                            break;
+                        case 5:
                             operation = OPERATION.SOFTRELEASE;
                             management.getConnections();
                             break;
-                        case 5:
+                        case 6:
                             operation = OPERATION.SHOW;
                             management.getNodes();
                             break;
-                        case 6:
+                        case 7:
                             operation = OPERATION.INTERFACES;
                             management.getNodes();
                             break;
-                        case 7:
+                        case 8:
                             operation = OPERATION.CLEAR;
                             management.getNodes();
                             break;

@@ -29,7 +29,7 @@ namespace Management
         private String nodeStart;
         private String nodeEnd;
         private int speed;
-        private String connection;
+        private int connection;
 
         public int State
         {
@@ -187,7 +187,7 @@ namespace Management
             }
         }
 
-        public string Connection
+        public int Connection
         {
             get
             {

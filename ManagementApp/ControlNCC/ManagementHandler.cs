@@ -76,6 +76,10 @@ namespace ControlNCC
                             control.consoleWriter("[NCC -> CPCC] Send Call Indication");
 
                         }
+                        else if (management_packet.State == Management.ManagmentProtocol.RELEASESOFTPERNAMENT)
+                        {
+                            Console.WriteLine("ZWOLNIJ WSZYSTKO");
+                        }
                     }
                 }
             }

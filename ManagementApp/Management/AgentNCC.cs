@@ -106,7 +106,9 @@ namespace Management
         {
             ManagmentProtocol toSend = new ManagmentProtocol();
             toSend.State = ManagmentProtocol.RELEASESOFTPERNAMENT;
-            toSend.Connection = connection;
+            int i = 0;
+            int.TryParse(connection, out i);
+            toSend.Connection = i;
             string data = JSON.Serialize(JSON.FromValue(toSend));
             writerNCC.Write(data);
         }

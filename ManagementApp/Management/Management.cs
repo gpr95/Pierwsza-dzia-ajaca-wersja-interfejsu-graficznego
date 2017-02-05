@@ -228,12 +228,44 @@ namespace Management
             }
         }
 
-        public void getConnections()
+        public void getConnections(bool release = true)
         {
-           foreach(var temp in conn)
-           {
-               Console.WriteLine("Connection id: "+temp.Key+ " to: "+temp.Value, ConsoleColor.Yellow);
-           }
+            if(release)
+            {
+                Dictionary<int, KeyValuePair<string, string>> tempConnDic = new Dictionary<int, KeyValuePair<string, string>>();
+                int enumerate = 1;
+                Console.ForegroundColor = ConsoleColor.White;
+                foreach (var temp in conn)
+                {
+                    Console.WriteLine(enumerate + ") " + "Connection id: " + temp.Key + " to: " + temp.Value);
+                    tempConnDic.Add(enumerate++, new KeyValuePair<string, string>(temp.Key, temp.Value));
+                }
+                String s;
+                KeyValuePair<string, string> n;
+                if (tempConnDic.Count != 0)
+                {
+                    while (true)
+                    {
+                        s = Console.ReadLine();
+                        if (s.Equals("q"))
+                            return;
+
+                        int choice;
+                        bool res = int.TryParse(s, out choice);
+                        tempConnDic.TryGetValue(choice, out n);
+                        if (!n.Equals(default(KeyValuePair<string, string>)))
+                            break;
+                    }
+                    agentNcc.sendReleaseSoftPernament(n.Key);
+                }
+            }
+            else
+            {
+                foreach (var temp in conn)
+                {
+                    Console.WriteLine("Connection id: " + temp.Key + " to: " + temp.Value, ConsoleColor.Yellow);
+                }
+            }
         }
     }
 }
