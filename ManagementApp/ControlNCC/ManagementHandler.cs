@@ -78,7 +78,28 @@ namespace ControlNCC
                         }
                         else if (management_packet.State == Management.ManagmentProtocol.RELEASESOFTPERNAMENT)
                         {
-                            Console.WriteLine("ZWOLNIJ WSZYSTKO");
+                            int id = management_packet.Connection;
+                            control.consoleWriter("[NCC <- CPCC] Call release id: " + id);
+
+                            if (!control.checkIfInterdomainRequest(id))
+                            {
+                                control.consoleWriter("[NCC -> CC]Send connection release");
+                                CCtoNCCSingallingMessage packetToCC = new CCtoNCCSingallingMessage();
+                                packetToCC.State = CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID;
+                                packetToCC.RequestID = id;
+                                ControlConnectionService CCService = control.getCCService();
+                                CCService.sendCCRequest(packetToCC);
+                            }
+                            else
+                            {
+                                control.consoleWriter("[NCC -> CC]Send connection release");
+                                CCtoNCCSingallingMessage packetToCC = new CCtoNCCSingallingMessage();
+                                packetToCC.State = CCtoNCCSingallingMessage.NCC_RELEASE_WITH_ID;
+                                packetToCC.RequestID = id;
+                                ControlConnectionService CCService = control.getCCService();
+                                CCService.sendCCRequest(packetToCC);
+
+                            }
                         }
                     }
                 }
