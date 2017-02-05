@@ -57,9 +57,9 @@ namespace Management
                 Console.WriteLine("\n\t 1) Insert forwarding entry to Node");
                 Console.WriteLine("\n\t 2) Insert forwarding table to Node");
                 Console.WriteLine("\n --- Soft  Pernament --- ");
-                Console.WriteLine("\n\t 3) Create soft pernament trail");
-                Console.WriteLine("\n\t 4) Show soft pernament trail");
-                Console.WriteLine("\n\t 5) Show soft pernament trail");
+                Console.WriteLine("\n\t 3) Create soft permanent trail");
+                Console.WriteLine("\n\t 4) Show soft permanent trail");
+                Console.WriteLine("\n\t 5) Release soft permanent trail");
                 Console.WriteLine("\n --- More Operations --- ");
                 Console.WriteLine("\n\t 6) Show connection table of Node");
                 Console.WriteLine("\n\t 7) Show interfaces of Node");
@@ -74,7 +74,7 @@ namespace Management
                     {
                         case 1:
                             operation = OPERATION.ENTRY;
-                            log("#DEBUG1", ConsoleColor.Magenta);
+                            //log("#DEBUG1", ConsoleColor.Magenta);
                             management.getNodes();
                             break;
                         case 2:

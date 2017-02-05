@@ -69,13 +69,13 @@ namespace Management
 
         internal void getNodes(bool clientsOnly = false)
         {
-            log("#DEBUG2", ConsoleColor.Magenta);
+            //log("#DEBUG2", ConsoleColor.Magenta);
             UserInterface.nodeList(nodeList, clientsOnly);
         }
 
         public void getInterfaces(Node n)
         {
-            log("#DEBUG4", ConsoleColor.Magenta);
+            //log("#DEBUG4", ConsoleColor.Magenta);
             try
             {
                 protocol.State = ManagmentProtocol.INTERFACEINFORMATION;
@@ -102,7 +102,7 @@ namespace Management
         {
             Node node = nodeList.Where(n => n.Name.Equals(clienttmp)).FirstOrDefault();
             if (node == default(Node))
-                log("#DEBUG 5", ConsoleColor.Magenta);
+                //log("#DEBUG 5", ConsoleColor.Magenta);
             nodeList.Remove(node);
         }
 
