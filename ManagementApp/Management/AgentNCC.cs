@@ -69,7 +69,7 @@ namespace Management
             ManagmentProtocol toSend = new ManagmentProtocol();
             toSend.State = ManagmentProtocol.TOOTHERNCC;
             toSend.ConnectionToOtherNcc = nccPorts;
-            string data = ManagementApp.JSON.Serialize(ManagementApp.JSON.FromValue(toSend));
+            string data = JSON.Serialize(JSON.FromValue(toSend));
             Thread threadManagement = new Thread(new ParameterizedThreadStart(tryToSendData));
             threadManagement.Start(data);
         }
@@ -98,7 +98,16 @@ namespace Management
             toSend.NodeStart = start;
             toSend.NodeEnd = end;
             toSend.Speed = speed;
-            string data = ManagementApp.JSON.Serialize(ManagementApp.JSON.FromValue(toSend));
+            string data = JSON.Serialize(JSON.FromValue(toSend));
+            writerNCC.Write(data);
+        }
+
+        public void sendReleaseSoftPernament(String connection)
+        {
+            ManagmentProtocol toSend = new ManagmentProtocol();
+            toSend.State = ManagmentProtocol.RELEASESOFTPERNAMENT;
+            toSend.Connection = connection;
+            string data = JSON.Serialize(JSON.FromValue(toSend));
             writerNCC.Write(data);
         }
 

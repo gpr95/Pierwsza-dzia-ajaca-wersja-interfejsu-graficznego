@@ -68,8 +68,11 @@ namespace ControlNCC
                             packet.Vc12 = 1;
                             packet.Vc13 = 1;
                             packet.Rate = management_packet.Speed;
-                            packet.RequestID = r.Next(10000, 40000);
-                            control.addService(packet.RequestID, control.getCCService());
+                            packet.RequestID = control.generateRequestID();
+                            Address address = new Address(packet.NodeFrom);
+                            int cpccID = address.type + address.domain + address.subnet + address.space;
+                            control.addCpccRequest(packet.RequestID, cpccID);
+                            //control.addService(packet.RequestID, control.getCCService());
                             control.getCCService().sendCCRequest(packet);
                         }
                     }

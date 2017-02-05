@@ -80,7 +80,7 @@ namespace Management
                             break;
                         case 3:
                             operation = OPERATION.SOFT;
-                            management.getNodes();
+                            management.getNodes(true);
                             break;
                         case 4:
                             operation = OPERATION.SOFTRELEASE;
