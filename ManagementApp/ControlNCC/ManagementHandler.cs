@@ -60,20 +60,21 @@ namespace ControlNCC
                         }
                         else if (management_packet.State == Management.ManagmentProtocol.SOFTPERNAMENT)
                         {
-                            CCtoNCCSingallingMessage packet = new CCtoNCCSingallingMessage();
-                            packet.State = CCtoNCCSingallingMessage.NCC_SET_CONNECTION;
-                            packet.NodeFrom = management_packet.NodeStart;
-                            packet.NodeTo = management_packet.NodeEnd;
-                            packet.Vc11 = 1;
-                            packet.Vc12 = 1;
-                            packet.Vc13 = 1;
-                            packet.Rate = management_packet.Speed;
-                            packet.RequestID = control.generateRequestID();
-                            Address address = new Address(packet.NodeFrom);
+                          
+                            control.consoleWriter("[NCC <- Management] Soft pernament from "+ management_packet.NodeStart+" to "+management_packet.NodeEnd);
+                            int RequestID = control.generateRequestID();
+                            Address address = new Address(management_packet.NodeStart);
                             int cpccID = address.type + address.domain + address.subnet + address.space;
-                            control.addCpccRequest(packet.RequestID, cpccID);
-                            //control.addService(packet.RequestID, control.getCCService());
-                            control.getCCService().sendCCRequest(packet);
+                            control.addCpccRequest(RequestID, cpccID);
+
+                            ControlPacket packetToCPCC = new ControlPacket(ControlInterface.CALL_INDICATION_CPCC, ControlPacket.IN_PROGRESS, management_packet.Speed, management_packet.NodeEnd, management_packet.NodeStart, RequestID);
+                            packetToCPCC.Vc11 = 1;
+                            packetToCPCC.Vc12 = 1;
+                            packetToCPCC.Vc13 = 1;
+                            ControlConnectionService cpccService = control.getCpccServiceByAddr(management_packet.NodeEnd);
+                            cpccService.send(packetToCPCC);
+                            control.consoleWriter("[NCC -> CPCC] Send Call Indication");
+
                         }
                     }
                 }
